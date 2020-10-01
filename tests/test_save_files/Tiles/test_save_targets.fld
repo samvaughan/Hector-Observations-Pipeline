@@ -1,0 +1,7 @@
+# Target and Standard Star file from Sam's tiling code
+# 0.0 0.0
+ID RA DEC mag type isel
+1 0.0 -1.0 19 1 9
+2 0.1 -2.0 20 1 9
+100 2.0 -0.5 9 0 27
+200 1.9 -1.0 10 0 27

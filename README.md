@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/samvaughan/Galaxy-Tiling.svg?branch=master)](https://travis-ci.org/samvaughan/Galaxy-Tiling)
