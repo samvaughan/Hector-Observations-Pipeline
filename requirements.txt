@@ -4,4 +4,4 @@ pandas
 pytest
 scipy
 tqdm
-
+astropy

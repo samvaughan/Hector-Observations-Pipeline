@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import pandas as pd
-import pandas_tools as P
+import hector_tiling.pandas_tools as P
 import os
 from tqdm import tqdm 
 import hector_tiling.tiling_functions as T
