@@ -5,3 +5,5 @@ pytest
 scipy
 tqdm
 astropy
+coverage
+coveralls
