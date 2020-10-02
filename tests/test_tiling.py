@@ -7,7 +7,7 @@ import os
 
 from hector_tiling import tiling_functions as T
 
-
+np.random.seed(12345)
 class Test_find_clashes():
 
     def test_no_clashes_in_data_when_proximity_small(self):
@@ -86,27 +86,53 @@ class Test_get_best_tile_centre_greedy():
         assert np.array_equal([10, 10], centre)
 
 
+@pytest.fixture(scope='function')
+def FOV_test_data():
+    file_location = os.path.dirname(os.path.abspath(__file__))
+    test_data = pd.read_csv(f'{file_location}/test_save_files/input_test_data/test_data_for_FoV.csv')
+
+    yield test_data
+
+
 class Test_check_if_in_FOV():
 
-    def test_reject_when_FOV_is_small(self):
+    def test_object_returned_from_check_if_in_FOV_is_boolean(self, FOV_test_data):
 
-        RA = np.array([1, 2, 2.01, 4, 5])
-        DEC = np.array([1, 2, 2.01, 4, 5])
+        FOV_mask = T.check_if_in_fov(FOV_test_data, 0.0, 0.0, inner_radius=0.0, outer_radius=1)
 
-        df = pd.DataFrame(dict(RA=RA, DEC=DEC))
+        assert FOV_mask.dtype == bool
 
-        FOV_mask = T.check_if_in_fov(df, 2.5, 2.5, inner_radius=0.0, outer_radius=0.01)
+    def test_reject_when_FOV_is_small(self, FOV_test_data):
+
+        # Check that we don't get any galaxies in the FoV when both radii are small
+
+        FOV_mask = T.check_if_in_fov(FOV_test_data, 0.0, 0.0, inner_radius=0.0, outer_radius=0.001)
 
         assert FOV_mask.sum() == 0
 
-    # def test_inner_radius_is_adhered_to(self):
+    def test_inner_radius_is_adhered_to(self, FOV_test_data):
 
-    #     RA = np.array([1, 2, 2.01, 4, 5])
-    #     DEC = np.array([1, 2, 2.01, 4, 5])
+        # With this known number of points, we should have 364 galaxies within an annulus of radii 0.1 and 1.0
 
-    #     df = pd.DataFrame(dict(RA=RA, DEC=DEC))
+        FOV_mask = T.check_if_in_fov(FOV_test_data, 0.0, 0.0, inner_radius=0.1, outer_radius=1.0)
 
-    #     FOV_mask = T.check_if_in_fov(df, 2.5, 2.5, inner_radius=0.0, outer_radius=0.01)
+        assert FOV_mask.sum() == 364
+
+    def test_all_galaxies_recovered_when_radius_is_large(self, FOV_test_data):
+
+        # With this known number of points, we should have 364 galaxies within an annulus of radii 0.1 and 1.0
+
+        FOV_mask = T.check_if_in_fov(FOV_test_data, 0.0, 0.0, inner_radius=0.0, outer_radius=10.0)
+
+        assert FOV_mask.sum() == len(FOV_test_data)
+
+    def test_no_galaxies_recovered_when_outer_radius_is_large_and_inner_radius_is_too(self, FOV_test_data):
+
+        # With this known number of points, we should have 364 galaxies within an annulus of radii 0.1 and 1.0
+
+        FOV_mask = T.check_if_in_fov(FOV_test_data, 0.0, 0.0, inner_radius=9.0, outer_radius=10.0)
+
+        assert FOV_mask.sum() == 0.0
 
 
 class Test_find_nearest():
@@ -190,3 +216,22 @@ class Test_select_stars_for_tile():
         sorted_ascending = np.sort(star_df['R_MAG_AUTO'])
 
         assert np.array_equal(vals, sorted_ascending)
+
+@pytest.fixture(scope='function')
+def inputs_for_select_targets():
+
+    file_location = os.path.dirname(os.path.abspath(__file__))
+    test_data = pd.read_csv(f'{file_location}/test_save_files/input_test_data/test_data_for_select_targets.csv')
+
+    yield test_data
+
+
+class Test_select_targets():
+
+    @pytest.mark.parametrize('Nsel', [1, 7, 12, 19, 26])
+    def test_select_targets_gives_Nsel_objects_in_output(self, inputs_for_select_targets, Nsel):
+
+        proximity = 200
+        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+
+        assert (len(tile_members) == Nsel)

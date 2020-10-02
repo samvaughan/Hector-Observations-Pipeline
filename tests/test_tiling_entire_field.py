@@ -94,5 +94,5 @@ class Test_outputs_of_known_tiling():
         Make sure that our tiling has the expected number of tiles
         """
         df = pd.read_csv(f'{output_folder}/Tiles/overall_targets_dataframe.csv')
-        assert df['Tile_number'].unique().size == 61
+        assert df['Tile_number'].unique().size == 59
 
