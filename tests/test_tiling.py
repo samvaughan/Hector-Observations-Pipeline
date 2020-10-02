@@ -99,6 +99,15 @@ class Test_check_if_in_FOV():
 
         assert FOV_mask.sum() == 0
 
+    # def test_inner_radius_is_adhered_to(self):
+
+    #     RA = np.array([1, 2, 2.01, 4, 5])
+    #     DEC = np.array([1, 2, 2.01, 4, 5])
+
+    #     df = pd.DataFrame(dict(RA=RA, DEC=DEC))
+
+    #     FOV_mask = T.check_if_in_fov(df, 2.5, 2.5, inner_radius=0.0, outer_radius=0.01)
+
 
 class Test_find_nearest():
 
