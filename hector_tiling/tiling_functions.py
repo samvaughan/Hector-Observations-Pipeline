@@ -307,11 +307,11 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
                 isel_values.extend([1.0] * len(repeats_to_fill_hexabundles))
 
                 if len(tile_df) < Nsel:
-                    warnings.warn(f"Can only select {len(targets)} new targets for this field. Can only select {N_to_append} repeats. Tile length is only {len(tile_df)}!!!")
+                    print(f"Can only select {len(targets)} new targets for this field. Can only select {N_to_append} repeats. Tile length is only {len(tile_df)}!!!")
                 else:
-                    warnings.warn(f"Can only select {len(targets)} new targets for this field. Select {N_to_append} repeats. Tile length is {len(tile_df)}")
+                    print(f"Can only select {len(targets)} new targets for this field. Select {N_to_append} repeats. Tile length is {len(tile_df)}")
             else:
-                warnings.warn(f"Can only select {len(targets)} new targets for this field. Can't select any repeats. Tile length is only {len(tile_df)}!!!")
+                print(f"Can only select {len(targets)} new targets for this field. Can't select any repeats. Tile length is only {len(tile_df)}!!!")
 
     # # # If we don't fill a tile, append already observed galaxies till we get to the right number
     # # # These are set an isel value of 1.
@@ -341,12 +341,12 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
 
     if len(tile_df) < Nsel:
         if (len(all_targets_df) > len(tile_df)):
-            warnings.warn(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV and {len(tile_df)} in tile!")
+            print(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV and {len(tile_df)} in tile!")
         else:
             targets_not_already_in_tile = all_targets_df[~all_targets_df.index.isin(tile_df.index)]
             clashes = find_clashes(targets_not_already_in_tile, tile_df, proximity=proximity)
             n_clashes = clashes.sum(axis=1)
-            warnings.warn(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV; {len(tile_df)} in tile; {len(targets_not_already_in_tile)} are in FOV but not tiled, of which each one clashes {n_clashes} times")
+            print(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV; {len(tile_df)} in tile; {len(targets_not_already_in_tile)} are in FOV but not tiled, of which each one clashes {n_clashes} times")
 
     # Check if we clash with ourself- this should never happen
     clashes = find_clashes(tile_df, tile_df, proximity)
