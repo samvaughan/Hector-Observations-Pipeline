@@ -291,7 +291,7 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
 
     if fill_spares_with_repeats:
         if len(tile_df) < Nsel:
-            print("!!")
+            # print("!!")
             # We now see if any things which have already been tiled can be repeated
             # We check to see whether everything in the Field of View clashes with anything which has already been tiled.
             # NOTE that this a quick-fix way of doing things- for example, if two things are in a close pair, using this method they will never be added to the tile as a repeat, since they will always clash with each other. The correct thing to do would be to add in things to repeat one by one, as in the method above
@@ -352,8 +352,6 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
     clashes = find_clashes(tile_df, tile_df, proximity)
     if np.sum(clashes) != 0:
         raise ValueError("Our tile seems to clash with itself... This should never happen!")
-
-
 
     return tile_df, isel_values
 

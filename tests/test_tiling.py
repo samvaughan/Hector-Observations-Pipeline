@@ -231,7 +231,57 @@ class Test_select_targets():
     @pytest.mark.parametrize('Nsel', [1, 7, 12, 19, 26])
     def test_select_targets_gives_Nsel_objects_in_output(self, inputs_for_select_targets, Nsel):
 
+        """
+        When there are many untiled things in a field, check that our tiles contain NSel galaxies
+        """
+
         proximity = 200
         tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
 
         assert (len(tile_members) == Nsel)
+
+    def test_select_targets_doesnt_raise_value_error(self, inputs_for_select_targets):
+
+        """
+        Make sure that select targets doesn't raise a value error when it checks that our tile doesn't clash with itself
+        """
+        proximity = 200
+        Nsel = 19
+
+        try:
+            tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+        except ValueError:
+            pytest.fail("Value error raised implies our tile clashes with itself!")
+
+    def test_fill_with_repeats_adds_galaxies_to_fill_tile(self, inputs_for_select_targets):
+
+        """
+        When there are fewer than Nsel things left to tile in the field, check that the 'fill_spares_with_repeats' flag does add in spare galaxies to reach Nsel targets
+        """
+        proximity = 200
+        Nsel = 19
+        # Make it so that everything in this field has been observed except one galaxy
+        inputs_for_select_targets['ALREADY_TILED'] = True
+        inputs_for_select_targets.loc[inputs_for_select_targets.CATAID==8706, 'ALREADY_TILED'] = False 
+
+
+        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=True)
+
+        assert len(tile_members) == Nsel
+
+    def test_fill_with_repeats_being_false_doesnt_add_galaxies_to_fill_tile(self, inputs_for_select_targets):
+
+
+        """
+        When there are fewer than Nsel things left to tile in a field, check that not having the fill_spares_with_repeats flag means that we only return the number of unobserved galaxies for this tile
+        """
+        proximity = 200
+        Nsel = 19
+        
+        # Make it so that everything in this field has been observed except one galaxy
+        inputs_for_select_targets['ALREADY_TILED'] = True
+        inputs_for_select_targets.loc[inputs_for_select_targets.CATAID==8706, 'ALREADY_TILED'] = False 
+
+        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+
+        assert len(tile_members) == 1
