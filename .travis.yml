@@ -12,6 +12,6 @@ install:
   - pip install "."
 # command to run tests
 script:
-  - coverage run -m pytest
+  - pytest --cov=hector_tiling tests/
 after_success:
   - coveralls
