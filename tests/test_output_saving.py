@@ -4,10 +4,20 @@ import unittest
 import pandas as pd
 
 import hector_tiling.tiling_functions as T
+import hector_tiling.pandas_tools as P
 
 """
 Test that the save_tile_text_file and save_guide_text_file functions are doing sensible things
 """
+
+def test_pandas_tools_saving():
+
+    """
+    Make sure pandas_tools can save fits files
+    """
+
+    df = pd.DataFrame(dict(RA=np.random.randn(10), DEC=np.random.randn(10)))
+    P.save_dataframe_as_FITS_table(df, "tests/test_save_files/Tiles/example_saved_fits_file.fits")
 
 
 @pytest.fixture()
