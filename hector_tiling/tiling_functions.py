@@ -471,7 +471,7 @@ def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tili
         axs[0].add_artist(tile_footprint)
 
     
-    completeness, comp_fraction_x, used_tiles_to_get_to_x, min_number_tiles_for_x = calculate_completeness_stats(df_targets, tiling_parameters, completion_fraction_to_calculate=completion_fraction_to_calculate, verbose=verbose)
+    completeness, completion_fraction_to_calculate, used_tiles_to_get_to_x, minimum_number_of_tiles_for_x, efficiency_xpc, efficiency = calculate_completeness_stats(df_targets, tiling_parameters['N_targets_per_Hector_field'], completion_fraction_to_calculate=completion_fraction_to_calculate, verbose=verbose)
 
     # Plot the completeness as a function of tile number
     xx = np.arange(1, len(completeness) + 1)
@@ -481,7 +481,7 @@ def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tili
     axs[1].axhline(1, c='0.5')
     axs[1].set_ylim(0, 1.2)
     axs[1].axvline(used_tiles_to_get_to_x, c='0.8', linestyle='dashed')
-    axs[1].axvline(min_number_tiles_for_x, c='0.8', linestyle='dashed')
+    axs[1].axvline(minimum_number_of_tiles_for_x, c='0.8', linestyle='dashed')
     axs[1].set_xlabel(r'$N_{\rm{tiles}}$')
     axs[1].set_ylabel('Completeness')
 
@@ -500,20 +500,18 @@ def _calc_completeness(df_targets):
     return completeness
 
 
-def calculate_completeness_stats(df_targets, tiling_parameters, completion_fraction_to_calculate=0.95, verbose=True):
+def calculate_completeness_stats(df_targets, N_targets_per_Hector_field, completion_fraction_to_calculate=0.95, verbose=True):
     """
     Given a set of tiles, calculate some stats about the efficiency to get to a given completeness fraction
     Inputs:
         df_targets (dataframe): a dataframe with a row for each target. Must have a column 'Tile_number'
-        tiling_parameters (dict): a dictionary of parameters used for the tiling. Must have key 'N_targets_per_Hector_field'
+        N_targets_per_Hector_field (dict): The numnber of hexabundles we can place on galaxy targets
         completeness_fraction_to_calculate (float, default=0.95): calculate the efficiency to reach this completeness fraction. This is defined as actual number of tiles used / minimum number of tiles possible) 
         verbose (bool, default=True): print efficiency stats or not.  
     """
 
     if (completion_fraction_to_calculate > 1) or (completion_fraction_to_calculate < 0):
         raise ValueError(f"completion_fraction_to_calculate must be between 0 and 1: currently {completion_fraction_to_calculate}")
-
-    N_targets_per_Hector_field = tiling_parameters['N_targets_per_Hector_field']
 
     # Work out the completeness after each tile
     completeness = _calc_completeness(df_targets)
@@ -530,7 +528,7 @@ def calculate_completeness_stats(df_targets, tiling_parameters, completion_fract
         print(f"Efficiency for completion={completion_fraction_to_calculate}: {100*efficiency_xpc:.3f}%")
         print(f"Efficiency for completion=1: {100*efficiency:.3f}%")
 
-    return completeness, completion_fraction_to_calculate, used_tiles_to_get_to_x, minimum_number_of_tiles_for_x
+    return completeness, completion_fraction_to_calculate, used_tiles_to_get_to_x, minimum_number_of_tiles_for_x, efficiency_xpc, efficiency
 
 
 def plot_tile(tile_df, guide_df, standards_df, catalogue_df, tile_RA, tile_Dec, tile_outer_radius, tile_inner_radius, tile_number, proximity, fig=None, ax=None):

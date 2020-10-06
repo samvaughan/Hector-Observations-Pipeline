@@ -5,6 +5,7 @@ import hector_tiling.pandas_tools as P
 import os
 from tqdm import tqdm 
 import hector_tiling.tiling_functions as T
+import matplotlib.pyplot as plt 
 
 np.random.seed(12345)
 
@@ -82,6 +83,9 @@ def output_folder(input_dataframes):
 
         #print(f"\tTile {current_tile}: Tiled targets: {df_targets['ALREADY_TILED'].sum()}. Selected for this tile: {selected_targets_mask.sum()}. Remaining targets in field: {len(df_targets[df_targets['ALREADY_TILED']==False])}. ")
     df_targets.to_csv(f'{output_folder}/Tiles/overall_targets_dataframe.csv')
+    tile_positions = [best_tile_RAs, best_tile_Decs]
+    fig, ax = T.plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tiling_parameters, verbose=False)
+    plt.close('all')
 
     yield output_folder
 

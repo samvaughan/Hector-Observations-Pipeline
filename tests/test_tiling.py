@@ -299,3 +299,43 @@ class Test_select_targets():
         with pytest.raises(NameError):
             tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='wrong_value', fill_spares_with_repeats=False)
 
+
+@pytest.fixture(scope='function')
+def inputs_for_calc_completeness():
+
+    file_location = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(f"{file_location}/test_save_files/input_test_data/example_tile_distribution_for_completeness_calcs.csv")
+
+    yield df
+
+
+class Test_calculate_completeness_functions():
+
+    def test_calc_completeness_gives_overall_correct_answer(self, inputs_for_calc_completeness):
+
+        df = inputs_for_calc_completeness
+        Nsel_max_per_tile = 19
+
+        # This is the completeness of the tiles
+        theoretical_completeness = np.ceil(len(df) / Nsel_max_per_tile)
+        actual_number_used = df['Tile_number'].max() + 1 ##  Remember to add one since we index from 0
+
+        efficiency = theoretical_completeness / actual_number_used
+
+        # Now get the values from the code
+        completeness, completion_fraction_to_calculate, used_tiles_to_get_to_x, minimum_number_of_tiles_for_x, efficiency_xpc, efficiency_from_code = T.calculate_completeness_stats(df, Nsel_max_per_tile, verbose=False)
+
+        assert efficiency == efficiency_from_code
+
+    def test_running_completeness_gives_correct_answer(self, inputs_for_calc_completeness):
+
+        """
+        Test that we get the right answer when calculating the completeness as a function of tile number
+        """
+
+        completeness_from_code = T._calc_completeness(inputs_for_calc_completeness)
+
+        galaxies_per_tile = inputs_for_calc_completeness.groupby("Tile_number").size()
+        running_completeness = np.cumsum(galaxies_per_tile)/len(inputs_for_calc_completeness)
+
+        assert np.allclose(running_completeness.values, completeness_from_code)
