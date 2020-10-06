@@ -181,20 +181,20 @@ class Test_find_nearest():
 
 class Test_select_stars_for_tile():
 
-    def check_wrong_star_type_raises_error(self):
+    def test_wrong_star_type_raises_error(self):
 
         star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3]))
         tile_df = pd.DataFrame(dict(RA=[0], DEC=[0]))
 
-        with pytest.rasies(NameError):
+        with pytest.raises(NameError):
             T.select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='wrong_value')
 
-    def check_stars_sorted_properly_standards(self):
+    def test_stars_sorted_properly_standards(self):
 
         star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], R_MAG_AUTO=[10, 11, 10.5, 9]))
         tile_df = pd.DataFrame(dict(RA=[-1], DEC=[-1]))
 
-        non_clashing_stars = select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='standards')
+        non_clashing_stars = T.select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='standards')
 
         # This array should be sorted by priority in a _descending_ order. Check this is true...
         vals = non_clashing_stars['priority'].values
@@ -203,12 +203,12 @@ class Test_select_stars_for_tile():
 
         assert np.array_equal(vals, sorted_desending)
 
-    def check_stars_sorted_properly_guides(self):
+    def test_stars_sorted_properly_guides(self):
 
         star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], R_MAG_AUTO=[10, 11, 10.5, 9]))
         tile_df = pd.DataFrame(dict(RA=[-1], DEC=[-1]))
 
-        non_clashing_stars = select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='guides')
+        non_clashing_stars = T.select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='guides')
 
         # This array should be sorted by priority in a _descending_ order. Check this is true...
         vals = non_clashing_stars['R_MAG_AUTO'].values
