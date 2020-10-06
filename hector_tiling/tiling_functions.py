@@ -139,19 +139,6 @@ def find_clashes(df1, df2, proximity):
     return clashes
 
 
-def find_clashes_from_df_and_array(df1, RA, DEC, proximity):
-    """
-    Find clashes between one dataframe and one position only (an RA and a DEC)
-    """
-
-    XA = np.atleast_2d(df1.loc[:, ['RA', 'DEC']].values)
-    XB = np.atleast_2d(np.column_stack((RA, DEC)))
-
-    clashes = _calc_clashes(XA, XB, proximity)
-
-    return clashes
-
-
 def _calc_clashes(XA, XB, proximity):
     """
     Given two lists of coordinates, return a boolean mask highlighting only those which clash within some minimum proximity. Note that we ignore self clashes by ignoring clashes with a distance = 0.0
@@ -670,82 +657,3 @@ def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, til
     return 0
 
 ############################################################################################################
-
-
-if __name__ == '__main__':
-    """
-    Example Usage
-    """
-    import pandas_tools as P
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('cluster_number')
-    args = parser.parse_args()
-
-    cluster_number = args.cluster_number
-
-    df_targets = P.load_FITS_table_in_pandas(f'/Users/samvaughan/Science/Hector/Tiling/SAMI_clusters_tests/Data/SAMI_Clusters_TARGET_catalogue_SPV_cluster_{cluster_number}.fits')
-    df_guide_stars = P.load_FITS_table_in_pandas(f'/Users/samvaughan/Science/Hector/Tiling/SAMI_clusters_tests/Data/SAMI_Clusters_GUIDE_STAR_catalogue_SPV_cluster_{cluster_number}.fits')
-    df_standard_stars = P.load_FITS_table_in_pandas(f'/Users/samvaughan/Science/Hector/Tiling/SAMI_clusters_tests/Data/SAMI_Clusters_STANDARD_STAR_catalogue_SPV_cluster_{cluster_number}.fits')
-
-    df_targets = df_targets.rename(columns=dict(r_Petro='r_mag'))
-    df_guide_stars = df_guide_stars.rename(columns=dict(ROWID='CoADD_ID'))
-    df_standard_stars = df_standard_stars.rename(columns=dict(ROWID='CoADD_ID'))
-
-    df_targets.loc[df_targets['Rad_over_rtwo'] < 1, 'PRI_SAMI'] -= 1
-
-    # Add the empty columns which we'll update
-    df_targets['ALREADY_TILED'] = False
-    df_targets['Tile_number'] = -999
-    df_targets['isel'] = -999
-
-    tiling_type = 'greedy'
-    proximity = 300
-    Nsel = 30
-    N_targets_per_Hector_field = 19
-    Nsel_guides = 100
-    Nsel_standards = 100
-    TwoDF_FOV_radius = 1.0
-    exclusion_zone = 10 * 15.22 / 3600.0  # This is 10mm in arcseconds
-    Hector_FOV_radius = TwoDF_FOV_radius - exclusion_zone - proximity/3600.0  # Things can't have their centre be nearer than 'proximity' to the edge of the zone
-
-    tiling_parameters = dict(Hector_FOV_radius=Hector_FOV_radius, proximity=proximity, Nsel=Nsel, Nsel_guides=Nsel_guides, Nsel_standards=Nsel_standards, N_targets_per_Hector_field=N_targets_per_Hector_field)
-
-    N_tiles = 100
-    best_tile_RAs = []
-    best_tile_Decs = []
-
-    print(f"Total Targets in field: {len(df_targets[df_targets['ALREADY_TILED']==False])}")
-    for i in range(N_tiles):
-
-        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = make_best_tile(df_targets, df_guide_stars, df_standard_stars, tiling_parameters=tiling_parameters, tiling_type=tiling_type, selection_type='random')
-
-        # These are the top 19 targets which we pick for this field
-        top_targets = tile_df.iloc[:min(N_targets_per_Hector_field, len(tile_df))]
-
-        # When we get close to the end, some of these things might have already been obsevred before. So new targets are things with isel > 1
-        new_targets_indices = top_targets.index[np.where(top_targets['isel'] > 1)[0]]
-
-        # Change the TILED flag for targets we've added to a tile
-        df_targets.loc[new_targets_indices, 'ALREADY_TILED'] = True
-        # And include the tile number for each target
-        df_targets.loc[new_targets_indices, 'Tile_number'] = i
-
-        save_tile_outputs(f'SAMI_cluster_outputs_cluster_{cluster_number}', df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number=i, plot=True)
-
-        best_tile_RAs.append(tile_RA)
-        best_tile_Decs.append(tile_Dec)
-
-        print(f"Tile {i}: Tiled targets: {df_targets['ALREADY_TILED'].sum()}. New targets selected for this tile: {len(new_targets_indices)}. Remaining targets in field: {len(df_targets[df_targets['ALREADY_TILED']==False])}. ")
-
-        if df_targets['ALREADY_TILED'].sum() == len(df_targets):
-            print("\n\n")
-            print("Done!")
-            break
-
-    tile_positions = [best_tile_RAs, best_tile_Decs]
-    #df_targets.to_csv(f'SAMI_cluster_outputs_cluster_{cluster_number}/df_targets.csv')
-    fig, ax = plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tiling_parameters, fig=None, ax=None, completion_fraction_to_calculate=0.95, verbose=True)
-    #fig.savefig(f'SAMI_cluster_outputs_cluster_{cluster_number}/survey_plot.pdf', bbox_inches='tight')
-    plt.show()

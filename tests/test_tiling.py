@@ -285,3 +285,17 @@ class Test_select_targets():
         tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
 
         assert len(tile_members) == 1
+
+
+    def test_select_targets_raises_error_when_wrong_selection_type(self, inputs_for_select_targets):
+
+        """
+        When we add in a selection type which isn't 'random' or 'clashing', check this raises an error
+        """
+
+        proximity = 200
+        Nsel = 19
+
+        with pytest.raises(NameError):
+            tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='wrong_value', fill_spares_with_repeats=False)
+
