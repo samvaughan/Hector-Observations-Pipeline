@@ -1,0 +1,11 @@
+font.sans-serif : Helvetica
+ps.useafm  : True
+pdf.use14corefonts  : True
+text.usetex  : False
+
+
+font.size: 5
+axes.titlesize: 7
+axes.labelsize: 7
+xtick.labelsize: 6
+ytick.labelsize: 6

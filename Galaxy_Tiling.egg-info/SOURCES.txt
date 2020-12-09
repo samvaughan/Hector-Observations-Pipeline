@@ -1,6 +1,0 @@
-README.md
-setup.py
-Galaxy_Tiling.egg-info/PKG-INFO
-Galaxy_Tiling.egg-info/SOURCES.txt
-Galaxy_Tiling.egg-info/dependency_links.txt
-Galaxy_Tiling.egg-info/top_level.txt
