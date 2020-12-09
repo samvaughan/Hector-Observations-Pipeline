@@ -5,7 +5,7 @@ import pandas as pd
 from collections import Counter
 import os
 
-from hector_tiling import tiling_functions as T
+from hop.tiling import tiling_functions as T
 
 np.random.seed(12345)
 class Test_find_clashes():

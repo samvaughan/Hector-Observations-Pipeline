@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 import pandas as pd
-import hector_tiling.pandas_tools as P
+import hop.tiling.pandas_tools as P
 import os
 from tqdm import tqdm 
-import hector_tiling.tiling_functions as T
+import hop.tiling.tiling_functions as T
 import matplotlib.pyplot as plt 
 
 np.random.seed(12345)

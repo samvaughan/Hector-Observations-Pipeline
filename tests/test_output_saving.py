@@ -3,8 +3,8 @@ import pytest
 import unittest
 import pandas as pd
 
-import hector_tiling.tiling_functions as T
-import hector_tiling.pandas_tools as P
+import hop.tiling.tiling_functions as T
+import hop.tiling.pandas_tools as P
 
 """
 Test that the save_tile_text_file and save_guide_text_file functions are doing sensible things

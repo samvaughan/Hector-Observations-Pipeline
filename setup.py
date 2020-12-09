@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
-setup(name='Galaxy-Tiling',
-      version='0.0.2',
-      description='Tile some galaxy fields',
+setup(name='Hector-Observations-Pipeline',
+      version='0.0.3',
+      description='Hector Galaxy Survey Observations pipeline',
       author='Sam Vaughan',
       author_email='sam.vaughan@sydney.edu.au',
       url='',

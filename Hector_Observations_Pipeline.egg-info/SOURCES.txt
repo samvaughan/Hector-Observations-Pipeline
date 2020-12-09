@@ -1,0 +1,6 @@
+README.md
+setup.py
+Hector_Observations_Pipeline.egg-info/PKG-INFO
+Hector_Observations_Pipeline.egg-info/SOURCES.txt
+Hector_Observations_Pipeline.egg-info/dependency_links.txt
+Hector_Observations_Pipeline.egg-info/top_level.txt
