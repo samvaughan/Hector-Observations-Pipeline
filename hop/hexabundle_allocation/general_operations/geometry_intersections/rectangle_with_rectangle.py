@@ -1,5 +1,5 @@
-from general_operations.geometry_intersections.segment_with_segment import segments_intersection
-from general_operations.geometry_shapes.segment import segment
+from ...general_operations.geometry_intersections.segment_with_segment import segments_intersection
+from ...general_operations.geometry_shapes.segment import segment
 
 def rectangle_rectangle_intersection(rectangle1, rectangle2):
 

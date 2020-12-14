@@ -1,7 +1,7 @@
-from general_operations.geometry_shapes.circle import circle
-from hector.constants import circular_magnet_radius,robot_arm_width
+from ...general_operations.geometry_shapes.circle import circle
+from ...hector.constants import circular_magnet_radius,robot_arm_width
 from math import sin, cos, pi
-from hector.magnets.pickup_areas import tangential_right,tangential_left,radial_inward,radial_outward
+from ...hector.magnets.pickup_areas import tangential_right,tangential_left,radial_inward,radial_outward
 
 
 class circular_magnet(circle):

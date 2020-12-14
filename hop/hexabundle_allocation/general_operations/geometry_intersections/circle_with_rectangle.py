@@ -1,5 +1,5 @@
-from general_operations.geometry_shapes.segment import segment
-from general_operations.geometry_intersections.circle_with_segment import create_circle_segment_equation
+from ...general_operations.geometry_shapes.segment import segment
+from ...general_operations.geometry_intersections.circle_with_segment import create_circle_segment_equation
 
 def circle_rectangle_intersection(circle,rectangle):
 

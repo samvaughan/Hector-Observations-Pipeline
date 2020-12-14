@@ -2,7 +2,7 @@ import numpy as np
 import string
 import sys
 import re
-from general_operations.trigonometry import convert_radians_to_degrees
+from ..general_operations.trigonometry import convert_radians_to_degrees
 
 
 def assign_magnet_labels(magnet,index1):

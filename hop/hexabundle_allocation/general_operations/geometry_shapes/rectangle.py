@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians
-from hector.constants import robot_center_x,robot_center_y
+from ...general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians
+from ...hector.constants import robot_center_x,robot_center_y
 from math import pi, cos, sin
 
 class rectangle:

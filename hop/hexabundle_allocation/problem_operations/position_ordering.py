@@ -1,17 +1,17 @@
-from problem_operations.conflicts.functions import create_list_of_blocking_magnets,\
+from .conflicts.functions import create_list_of_blocking_magnets,\
                                 all_blocking_magnets_are_fully_blocked
-from general_operations.trigonometry import convert_radians_to_degrees
-from problem_operations.hexabundle import create_Magnet_Dictionary, get_probe_count, star_hexabundle_allocation, \
+from ..general_operations.trigonometry import convert_radians_to_degrees
+from .hexabundle import create_Magnet_Dictionary, get_probe_count, star_hexabundle_allocation, \
                                 cores91_hexabundles_sortedByMstar, resolve_hexabundle_allocation_repeats, \
                                 resolve_unallocated_hexabundle, check_for_hexabundle_allocation_repeats, \
                                 check_for_unallocated_hexabundle, update_galaxyIDrecord_withHexabundle, \
                                 hexabundle_allocation_fromMagnetDict, overall_hexabundle_size_allocation_operation_version1, \
                                 overall_hexabundle_size_allocation_operation_version2_median, \
                                 overall_hexabundle_size_allocation_operation_version3_largerBundlePriority
-from problem_operations.robot_parameters import assign_magnet_labels, add_pickupDirection, \
+from ..problem_operations.robot_parameters import assign_magnet_labels, add_pickupDirection, \
                                                 assign_preferable_pickupDirection, calculate_pickup_putdown_angles, \
                                                 check_for_negative_twopi_angle, check_for_unresolvable_conflict
-from hector.constants import robot_center_x,robot_center_y
+from ..hector.constants import robot_center_x,robot_center_y
 import numpy as np
 import string
 import sys

@@ -1,9 +1,9 @@
-from hector.constants import circular_rectangle_magnet_center_distance,HECTOR_plate_radius
+from .constants import circular_rectangle_magnet_center_distance,HECTOR_plate_radius
 from math import pi, cos, sin, atan
 import numpy as np
-from general_operations.trigonometry import convert_radians_to_degrees, convert_modulus_angle, convert_degrees_to_radians
-from hector.magnets.circular import circular_magnet
-from hector.magnets.rectangular import rectangular_magnet
+from ..general_operations.trigonometry import convert_radians_to_degrees, convert_modulus_angle, convert_degrees_to_radians
+from .magnets.circular import circular_magnet
+from .magnets.rectangular import rectangular_magnet
 
 class probe:
 

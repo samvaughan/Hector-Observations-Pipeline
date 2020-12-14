@@ -1,5 +1,5 @@
-from hector.magnets.circular import is_circular_magnet
-from hector.magnets.rectangular import is_rectangular_magnet
+from ...hector.magnets.circular import is_circular_magnet
+from ...hector.magnets.rectangular import is_rectangular_magnet
 
 def circle_and_circle_magnets(pair):
 

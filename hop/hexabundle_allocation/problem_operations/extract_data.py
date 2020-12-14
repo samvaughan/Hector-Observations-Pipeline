@@ -1,5 +1,5 @@
 import numpy as np
-from hector.probe import probe
+from ..hector.probe import probe
 
 def parse_col(s):
     try:

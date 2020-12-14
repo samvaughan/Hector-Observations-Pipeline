@@ -45,10 +45,13 @@ def create_output_directories(output_folder):
         os.makedirs(output_folder)
 
     # Make the subdirectories if they don't exist
-    for folder in ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation"]:
-        folder_path = f'{output_folder}/{folder}'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+    subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
+    folders = [f'{output_folder}/{subfolder}' for subfolder in subfolders_to_be_made]
+    for f in folders:
+        if not os.path.exists(f):
+            os.makedirs(f)
+
+    return folders
 
 def set_up_loggers(config):
     """

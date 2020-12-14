@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.cm as cm
-from hector.magnets.circular import is_circular_magnet
-from hector.magnets.rectangular import is_rectangular_magnet
-from hector.constants import robot_center_x,robot_center_y
+from ..hector.magnets.circular import is_circular_magnet
+from ..hector.magnets.rectangular import is_rectangular_magnet
+from ..hector.constants import robot_center_x,robot_center_y
 import re
 import numpy as np
 from math import pi, cos, sin
 import pandas as pd
-from general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
+from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
 
 plt.rc('font', size=30)          # controls default text sizes
 plt.rc('axes', titlesize=30)     # fontsize of the axes title

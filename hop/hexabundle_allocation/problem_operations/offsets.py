@@ -1,5 +1,5 @@
-from general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
-from hector.constants import robot_center_x,robot_center_y
+from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
+from ..hector.constants import robot_center_x,robot_center_y
 import numpy as np
 import string
 import sys

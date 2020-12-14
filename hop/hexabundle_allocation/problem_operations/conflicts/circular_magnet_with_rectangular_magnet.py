@@ -1,8 +1,8 @@
-from problem_operations.conflicts.blocked_magnet import conflicted_magnet
-from general_operations.geometry_intersections.circle_with_rectangle import circle_rectangle_intersection
-from general_operations.geometry_intersections.rectangle_with_rectangle import rectangle_rectangle_intersection
-from hector.magnets.circular import is_circular_magnet
-from hector.magnets.rectangular import is_rectangular_magnet
+from ...problem_operations.conflicts.blocked_magnet import conflicted_magnet
+from ...general_operations.geometry_intersections.circle_with_rectangle import circle_rectangle_intersection
+from ...general_operations.geometry_intersections.rectangle_with_rectangle import rectangle_rectangle_intersection
+from ...hector.magnets.circular import is_circular_magnet
+from ...hector.magnets.rectangular import is_rectangular_magnet
 
 
 def circle_blocking_rectangle(circle,rectangle):

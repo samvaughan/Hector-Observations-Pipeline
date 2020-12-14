@@ -1,5 +1,5 @@
-from general_operations.geometry_intersections.rectangle_with_rectangle import rectangle_rectangle_intersection
-from problem_operations.conflicts.blocked_magnet import conflicted_magnet
+from ...general_operations.geometry_intersections.rectangle_with_rectangle import rectangle_rectangle_intersection
+from ...problem_operations.conflicts.blocked_magnet import conflicted_magnet
 
 def check_conflict_rectangle_rectangle_magnets(magnet_pair):
 

@@ -25,7 +25,8 @@ def arrange_guidesFile(fileNameGuides,proxyGuideFile):
     cols = cols[1:]
     rows = list(zip(*cols))
 
-    open(proxyGuideFile, 'w').writelines([' '.join(row) for row in rows[1:]])
+    with open(proxyGuideFile, 'w') as f:
+        f.writelines([' '.join(row) for row in rows[1:]])
 
 def merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file, clusterNum, tileNum):
 

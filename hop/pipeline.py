@@ -1,11 +1,13 @@
 import numpy as np 
 import os
 import glob
+from pathlib import Path
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
 from hop.tiling import tiling_functions as tiling
-import hop.hexabundle_allocation.problem_operations as problem_operations
+from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters
+
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
 
 class HectorPipe:
@@ -32,7 +34,17 @@ class HectorPipe:
         self.best_tile_Decs = []
 
         # Set up the output folders
-        misc_tools.create_output_directories(self.config['output_folder'])
+        folders = misc_tools.create_output_directories(self.config['output_folder'])
+        # Add these as class attributes
+        self.logfile_location = Path([string for string in folders if "Logs" in string][0])
+        self.configuration_location = Path([string for string in folders if "Configuration" in string][0])
+        self.tile_location = Path([string for string in folders if "Tiles" in string][0])
+        self.plot_location = Path([string for string in folders if "Plots" in string][0])
+        self.distortion_corrected_tile_location = Path([string for string in folders if "DistortionCorrected" in string][0])
+        self.allocation_files_location_base = Path([string for string in folders if "Allocation" in string][0])
+        self.allocation_files_location_tiles = Path([string for string in folders if "tile_outputs" in string][0])
+        self.allocation_files_location_robot = Path([string for string in folders if "tile_outputs" in string][0])
+
 
         # Set up the log files
         self.logger, self.logger_R_code = misc_tools.set_up_loggers(self.config)
@@ -172,64 +184,67 @@ class HectorPipe:
         #Save the overall dataframe
         self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/overall_targets_dataframe.csv")
 
+        self.N_tiles = current_tile
 
 
-    def allocate_hexabundles(self):
+    def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameGuides = ('For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Configuration/HECTORConfig_Guides_Cluster_%d_tile_%03d.txt' % (clusterNum, clusterNum, tileNum))
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
 
         # proxy file to arrange guides in required format to merge with hexa probes
-        proxyGuideFile = 'galaxy_fields/newfile.txt'
+        proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
 
         # Adding ID column and getting rid of the header line of Guides cluster to add to the hexa cluster
-        problem_operations.file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
+        file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
 
         # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameHexa = ('For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Configuration/HECTORConfig_Hexa_Cluster_%d_tile_%03d.txt' % (clusterNum, clusterNum, tileNum))
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
 
-        plate_file = ('For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Output/Hexa_and_Guides_Cluster_%d_tile_%03d.txt' % (clusterNum, clusterNum, tileNum))
+        plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
 
         # Adding guides cluster txt file to hexa cluster txt file
-        problem_operations.file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file, clusterNum, tileNum)
+        file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file, self.config['output_filename_stem'], tile_number)
 
         # extracting all the magnets and making a list of them from the plate_file
-        all_magnets = problem_operations.extract_data.create_list_of_all_magnets_from_file(get_file(plate_file))
+        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file))
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
-        all_magnets = problem_operations.offsets.hexaPositionOffset(all_magnets)
+        all_magnets = offsets.hexaPositionOffset(all_magnets)
 
         # create magnet pickup areas for all the magnets
-        problem_operations.plots.create_magnet_pickup_areas(all_magnets)
+        plots.create_magnet_pickup_areas(all_magnets)
 
-        #************** # creating plots and drawing pickup areas
-        plt.clf()
-        plt.close()
-        HECTOR_plate().draw_circle('r')
-        problem_operations.plots.draw_magnet_pickup_areas(all_magnets, '--c')
-        #**************
+        if plot:
+            #************** # creating plots and drawing pickup areas
+            plt.clf()
+            plt.close()
+            HECTOR_plate().draw_circle('r')
+            plots.draw_magnet_pickup_areas(all_magnets, '--c')
+            #**************
 
 
         # test for collision and detect magnets which have all pickup directions blocked
-        conflicted_magnets = problem_operations.conflicts.functions.find_all_blocked_magnets(all_magnets)
+        conflicted_magnets = conflicts.functions.find_all_blocked_magnets(all_magnets)
 
         # create a list of the fully blocked magnets
-        fully_blocked_magnets = problem_operations.conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
+        fully_blocked_magnets = conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
 
         # print the fully blocked magnets out in terminal and record in conflicts file
-        conflictsRecord = 'galaxy_fields/Conflicts_Index.txt'
-        problem_operations.conflicts.blocked_magnet.print_fully_blocked_magnets(fully_blocked_magnets,conflictsRecord, fileNameHexa)
+        conflictsRecord = f'{self.allocation_files_location_base}/Conflicts_Index.txt'
+        conflicts.blocked_magnet.print_fully_blocked_magnets(fully_blocked_magnets,conflictsRecord, fileNameHexa)
 
-        conflictFile = 'galaxy_fields/unresolvable_conflicts.txt'
-        flagsFile = 'galaxy_fields/Flags.txt'
+        conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
+        flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
-        positioning_array,galaxyIDrecord = problem_operations.position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
+        positioning_array,galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
                                       conflicted_magnets, galaxyIDrecord, clusterNum, tileNum, conflictFile, flagsFile)
 
-        # draw all the magnets in the plots created earlier
-        figureFile = ('figures/Cluster_%d/savedPlot_cluster_%d_tile_%03d.pdf' % (clusterNum,clusterNum,tileNum))
-        problem_operations.plots.draw_all_magnets(all_magnets,clusterNum,tileNum,figureFile)  #***********
+        if plot:
+            # draw all the magnets in the plots created earlier
+            figureFile = f"{self.plot_location}/savedPlot_{self.config['output_filename_stem']}_tile_{tile_number}.pdf"
+            plots.draw_all_magnets(all_magnets,clusterNum,tileNum,figureFile)  #***********
 
         # checking positioning_array prints out all desired parameters
         print(positioning_array)
@@ -239,25 +254,27 @@ class HectorPipe:
         newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle']
 
         # final two output files
-        outputFile = ('For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_Cluster_%d_tile_%03d.txt' \
-                    % (clusterNum, clusterNum, tileNum))
-                    # ('GAMA_'+batch+'/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_GAMA_'+batch+'_tile_%03d.txt' % (tileNum)
-        robotFile = ('For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Output_for_Robot/Robot_Cluster_%d_tile_%03d.txt' \
-                     % (clusterNum, clusterNum, tileNum))
-                    #('GAMA_'+batch+'/Output_for_Robot/Robot_GAMA_'+batch+'_tile_%03d.txt' % (tileNum)
+        outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
+        robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
 
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = problem_operations.file_arranging.create_robotFileArray(positioning_array,robotFile,newrow)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow)
 
         # adjusting the positioning array to merge only selected parameters to the output file
-        positioning_array, positioning_array_circular = problem_operations.file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
+        positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
 
         # produce final files with consistent layout and no extra commas
-        problem_operations.file_arranging.finalFiles(outputFile, robotFile)
+        file_arranging.finalFiles(outputFile, robotFile)
 
         # just to check each tile's whole operation time
-        print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
+        # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
 
         # Comment out all ***** marked plot functions above(lines 81-84,105s)
         # to run whole batch of tiles fast without plots
+
+
+    def allocate_hexabundles_for_all_tiles(self):
+
+        for tile_number in range(self.N_tiles):
+            self.allocate_hexabundles_for_single_tile(tile_number)

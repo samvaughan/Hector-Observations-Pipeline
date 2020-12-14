@@ -1,5 +1,5 @@
-from hector.constants import rectangle_magnet_length, robot_arm_width,robot_arm_length,circular_magnet_radius
-from general_operations.geometry_shapes.rectangle import rectangle
+from ...hector.constants import rectangle_magnet_length, robot_arm_width,robot_arm_length,circular_magnet_radius
+from ...general_operations.geometry_shapes.rectangle import rectangle
 
 class rectangular_magnet_pickup_area(rectangle):
 

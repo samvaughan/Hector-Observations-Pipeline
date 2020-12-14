@@ -1,6 +1,6 @@
 import sys
 
-from hector.magnets.pickup_areas import tangential_right, tangential_left, radial_inward,radial_outward,inward,outward
+from ...hector.magnets.pickup_areas import tangential_right, tangential_left, radial_inward,radial_outward,inward,outward
 
 class conflicted_magnet:
 
