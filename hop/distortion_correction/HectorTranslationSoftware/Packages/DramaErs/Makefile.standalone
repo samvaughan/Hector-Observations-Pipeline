@@ -1,0 +1,35 @@
+#  ERS Standalone (without DRAMA) Build Makefile.
+#
+#     @(#) $Id: ACMM:DramaErs/Makefile.standalone,v 3.19 09-Dec-2020 17:17:02+11 ks $
+#
+#  Modified:
+#      8th Dec 2020. Now makes use of pre-build versions of Ers_Err.h and
+#                    Ers_Err_msgt.h kept in a separate Standalone directory
+#                    to allow this to be built on systems that don't have a
+#                    copy of messgen. KS.
+
+CC=gcc 
+CFLAGS = -ansi -Wall -DERS_STANDALONE
+
+OBJECTS=ers.o erssprintf.o ersvsprintf.o
+
+all :  libers.a Ers.h
+
+Ers_Err.h : Standalone/Ers_Err.h
+	cp -f Standalone/Ers_Err.h .
+
+Ers_Err_msgt.h : Standalone/Ers_Err_msgt.h
+	cp -f Standalone/Ers_Err_msgt.h .
+
+libers.a : $(OBJECTS)
+	$(RM) $@
+	$(AR) crv $@ $(OBJECTS)
+	ranlib $@
+
+clean ::
+	$(RM) *.o libers.a Ers_Err.h Ers_Err_msgt.h
+
+ers.o : ers.c Ers.h Ers_Err.h
+erssprintf.o : erssprintf.c Ers.h Ers_Err.h
+ersvsprintf.o : ersvsprintf.c Ers.h Ers_Err.h
+

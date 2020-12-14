@@ -1,0 +1,309 @@
+# "@(#) $Id: ACMM:sds/old_standalone/Makefile_old,v 3.94 09-Dec-2020 17:15:37+11 ks $"
+#
+# THIS IS THE ORIGNAL SCCS Makefile - it is being kept as a source
+# for rebuilding the Standalone release functions.
+#
+#  Makefile to extract releases of SDS for various machines from the SCCS
+#  library
+#
+#  This is SDS version 1.4
+#
+#  Author:
+#     Jeremy Bailey
+#
+#  Version Date:
+#     21-Oct-1994
+
+REL_DIR = .
+DOC_DIR = .
+MAN_DIR = man
+HTML_DIR=html
+FORCONV = forconv
+WFLMAN=wflman
+STAR_DIR = .
+DRAMASRC_HTML=/instsoft/dramasrc/html
+
+
+.SCCS_GET: 
+	acmmRcsCo sds -s $@ -G$(REL_DIR)/$@
+
+
+RELEASE_FILES = sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sdsfindbyname.c \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h strtoul.c \
+   sdscompiler.h sdslexer.c sdsparser.c sdsparser.h makefile_starlink mk
+
+#  Starlink release
+
+starlink_release : $(RELEASE_FILES)
+	chmod u+w $(RELEASE_FILES)
+	cp makefile_starlink $(STAR_DIR)/makefile
+	cp mk $(STAR_DIR)/mk
+	chmod a+x $(STAR_DIR)/mk
+	chmod u+w $(STAR_DIR)/makefile
+	tar -cvf $(STAR_DIR)/sds_source.tar $(RELEASE_FILES)
+	sccs clean
+
+
+# Create the lexer file.  We have to remove some junk which stuffs up the
+# VAXC compilation as well as renamed it from lex.yy.c to sdslexer.l
+sdslexer.c : sdslexer.l
+	lex $(REL_DIR)/sdslexer.l
+	sed 's/#pragma.*//' lex.yy.c | sed 's/\"stdio.h\"/<stdio.h>/' |  sed 's/FILE \*yyin = {stdin}, \*yyout = {stdout};/FILE *yyin,*yyout;/'  > $(REL_DIR)/sdslexer.c 
+	rm lex.yy.c
+
+
+# Generate the parser using yacc.  yacc write the files y.tab.c and y.tab.h
+# which we rename to more convient files.  -d writes the .h files.
+# We also have to remove some junk which stuffs up the VAXC compilation.
+# Note, one of the things we remove is the include of values.h, which
+# does not seem to be needed, but I must be there for some reason, so we
+# may have to replace it at some stage.
+sdsparser.c : sdsparser.y
+	yacc -d $(REL_DIR)/sdsparser.y 
+	sed 's/#ifdef __STDC__/#if defined(__STDC__) || defined(VMS)/' y.tab.c | sed 's/#pragma.*//' | sed 's/#include <values.h>//' > $(REL_DIR)/sdsparser.c
+	mv y.tab.h $(REL_DIR)/sdsparser.h
+	rm -f y.tab.c
+
+
+sdsparser.h : sdsparser.c
+
+#  VAX/VMS release - we have to run the fortran programs through $(FORCONV)
+#  to change the include file syntax. We run yacc and lex here and just
+#  pass the resulting C source on to the VAX system.
+
+vax_release : sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f sds2hds_link.com hds2sds_link.com sds.tex \
+   sdsc.c sdscompiler.c sdscompiler.ed sdscompiler.h sdslexer.l \
+   sdsparser.y getopt.c getopt.h getopt1.c ers.c Ers.h status.h \
+   vax_include.sub sds_build.com arg.c argfort.c arg.h arg_err.h sdsfindbyname.c
+	-$(FORCONV) -q -s$(REL_DIR)/vax_include.sub -i$(REL_DIR)/hds2sdsf.f -o$(REL_DIR)/hds2sdsf.for
+	-$(FORCONV) -q -s$(REL_DIR)/vax_include.sub -i$(REL_DIR)/sds2hdsf.f -o$(REL_DIR)/sds2hdsf.for
+	rm -f $(REL_DIR)/hds2sdsf.f
+	rm -f $(REL_DIR)/sds2hdsf.f
+	rm -f $(REL_DIR)/vax_include.sub
+	mv $(REL_DIR)/sds_err $(REL_DIR)/sds_err.inc
+	mv $(REL_DIR)/Ers.h $(REL_DIR)/ers.h
+	yacc -d $(REL_DIR)/sdsparser.y 
+	mv y.tab.c $(REL_DIR)/sdsparser.c
+	mv y.tab.h $(REL_DIR)/sdsparser.h
+	lex $(REL_DIR)/sdslexer.l
+	sed 's/\"stdio.h\"/<stdio.h>/' lex.yy.c |  sed 's/FILE \*yyin = {stdin}, \*yyout = {stdout};/FILE *yyin,*yyout;/'  > $(REL_DIR)/sdslexer.c 
+	rm lex.yy.c
+	rm $(REL_DIR)/sdsparser.y
+	rm $(REL_DIR)/sdslexer.l
+	rm $(REL_DIR)/sdscompiler.ed
+
+#  Sun 4 release
+
+sun_release : sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sdsfindbyname.c \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h strtoul.c \
+   sdscompiler.ed sdscompiler.h sdslexer.l sdsparser.y makefile.sun
+	mv $(REL_DIR)/makefile.sun $(REL_DIR)/makefile
+
+#  Alpha/OSF1 release
+
+alpha_release : sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sdsfindbyname.c \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h strtoul.c \
+   sdscompiler.ed sdscompiler.h sdslexer.l sdsparser.y makefile.alpha
+	mv $(REL_DIR)/makefile.alpha $(REL_DIR)/makefile
+
+
+
+#  Solaris release
+
+solaris_release : sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sdsfindbyname.c \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h strtoul.c \
+   sdscompiler.ed sdscompiler.h sdslexer.l sdsparser.y makefile.solaris
+	mv $(REL_DIR)/makefile.solaris $(REL_DIR)/makefile
+
+#  VxWorks release - This doesn't include the Fortran interface stuff
+#   or sdsc
+
+vxworks_release : sds.c sdsutil.c sds_err.h sds.h sdstest.c \
+   readtest_vxworks.c sdslist_vxworks.c sdstimes.c vxworks_timer.c \
+   makefile.vxworks sdscompiler.c sdscompiler.h sdslexer.l sdsparser.y \
+   arg.c arg.h arg_err.h ers.c Ers.h status.h sdsfindbyname.c
+	mv $(REL_DIR)/sdslist_vxworks.c $(REL_DIR)/sdslist.c
+	mv $(REL_DIR)/readtest_vxworks.c $(REL_DIR)/readtest.c
+	mv $(REL_DIR)/makefile.vxworks $(REL_DIR)/makefile
+
+
+#  Decstation release
+
+decstation_release : sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sds.h \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h sdsfindbyname.c \
+   sdscompiler.ed sdscompiler.h sdslexer.l sdsparser.y makefile.dec
+	mv $(REL_DIR)/makefile.dec $(REL_DIR)/makefile
+
+
+#  Macintosh release
+
+mac_release : sds.c sdsutil.c sds_err.h sds.h sdstest.c readtest.c sdslist.c \
+   sdstimes.c mac_timer.c mac_sdstest.make mac_readtest.make mac_sdslist.make \
+   mac_sdstimes.make arg.c arg.h arg_err.h sdscompiler.c sdscompiler.h \
+   sdslexer.l sdsparser.y ers.c Ers.h status.h sdsfindbyname.c
+	yacc -d $(REL_DIR)/sdsparser.y 
+	mv y.tab.c $(REL_DIR)/sdsparser.c
+	mv y.tab.h $(REL_DIR)/sdsparser.h
+	lex $(REL_DIR)/sdslexer.l
+	sed 's/\"stdio.h\"/<stdio.h>/' lex.yy.c |  sed 's/FILE \*yyin = {stdin}, \*yyout = {stdout};/FILE *yyin,*yyout;/'  > $(REL_DIR)/sdslexer.c 
+	rm lex.yy.c
+	rm $(REL_DIR)/sdsparser.y
+	rm $(REL_DIR)/sdslexer.l
+	mv $(REL_DIR)/mac_timer.c $(REL_DIR)/timer.c
+	mv $(REL_DIR)/mac_sdstest.make $(REL_DIR)/sdstest.make
+	mv $(REL_DIR)/mac_readtest.make $(REL_DIR)/readtest.make
+	mv $(REL_DIR)/mac_sdslist.make $(REL_DIR)/sdslist.make
+	mv $(REL_DIR)/mac_sdstimes.make $(REL_DIR)/sdstimes.make
+
+RELEASE = sds.c sdsutil.c sdsfort.c sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f vax_include.sub arg.c arg.h argfort.c arg_err.msg \
+   dmakefile  gen_move.f sds.c sdscompiler.c sdsparser.y \
+   sdslexer.l sdstimes.c sds_dramastart.com unix_timer.c \
+   sdscompiler.h sdsc.c strtoul.c sdslistpath.c sdsdump.c sdspoke.c sdscpp.C \
+   sdstcl.c sdstcl.h sdstclinit.c sdsfindbyname.c
+
+drama_release : $(RELEASE) sdslexer.c sdsparser.c sdsparser.h
+	-(cd $(REL_DIR) ; $(FORCONV) -q -svax_include.sub -ihds2sdsf.f -ohds2sdsf.for)
+	-(cd $(REL_DIR) ; $(FORCONV) -q -svax_include.sub -isds2hdsf.f -osds2hdsf.for)
+	rm -f $(REL_DIR)/vax_include.sub
+
+MESSGEN = $$MESSGEN_DEV/messgen
+win32_release : drama_release sdscpp.cpp sds_err.h sds_err_msgt.h arg_err.h arg_err_msgt.h
+
+sdscpp.cpp : sdscpp.C
+	cp -f $(REL_DIR)/sdscpp.C $(REL_DIR)/sdscpp.cpp
+
+sds_err.h sds_err_msgt.h : sds_err.msg
+	(cd $(REL_DIR) ; $(MESSGEN) -o -c -t sds_err)
+	
+arg_err.h arg_err_msgt.h : arg_err.msg
+	(cd $(REL_DIR) ; $(MESSGEN) -o -c -t arg_err)
+	
+
+# Documentation generation source lists.
+# 	MAN1_SRCS lists the program sources
+# 	MAN3_SRCS lists the program sources
+MAN3_SRCS_SDS = sds.c sdsutil.c sdscompiler.c  sdsfindbyname.c
+MAN3_SRCS_ARG = arg.c
+MAN3_SRCS =  $(MAN3_SRCS_SDS) $(MAN3_SRCS_ARG)
+MAN1_SRCS =  sdsc.c sdslist.c sds2hds.c hds2sds.c sdsdump.c sdspoke.c sdslistpath.c
+
+# Man pages, broken into man1 (programs) and man3 (C functions)
+man : man1 man3
+
+man3 : $(MAN3_SRCS) 
+	(DATE=`date +"%d-%h-19%y"` 				;\
+	cd $(REL_DIR) 						;\
+	$(WFLMAN) -oman -nsds -O"3 $$DATE DRAMA DRAMA" $(MAN3_SRCS)  	;\
+	if [ ! -d $(MAN_DIR)/man3 ] ; then  mkdir $(MAN_DIR)/man3; fi; \
+	for I in *.man ; do \
+	    a=`echo $$I | sed 's/\.man/\.3/'` 	;\
+	    tbl $$I > $(MAN_DIR)/man3/$$a 	;\
+	    /bin/rm -f $$I			   	;\
+	done)
+	mv $(REL_DIR)/sds.man_summary $(MAN_DIR)/man3/SdsIntro.3
+
+man1 : $(MAN1_SRCS)
+	(DATE=`date +"%d-%h-19%y"` 				;\
+	cd $(REL_DIR) 						;\
+	$(WFLMAN) -nsds -oman -O"1 $$DATE DRAMA DRAMA" $(MAN1_SRCS)  ;\
+	if [ ! -d $(MAN_DIR)/man1 ] ; then  mkdir $(MAN_DIR)/man1; fi; \
+	for I in *.man ; do \
+	    a=`echo $$I | sed 's/\.man/\.1/'` 	;\
+	    tbl $$I > $(MAN_DIR)/man1/$$a 	;\
+	    /bin/rm -f $$I			   	;\
+	done)
+	mv $(REL_DIR)/sds.man_summary $(MAN_DIR)/man1/SdsIntro.1
+
+catman :
+	catman -w -M $(MAN_DIR)
+
+	
+
+doc : sds.tex
+	( cd $(REL_DIR) ; mv sds.tex $(DOC_DIR) )
+
+# html pages.  Break it up the same way an the man pages, but need to leave
+# moving summary pages to correct spot until last to avoid problems when
+# HTML_DIR is the current the same as REL_DIR
+html : dramahtml html1 html3 
+
+# Ensure the DRAMA standard html stuff is there.  Note, we need to pass
+# the value of $(HTML_DIR) to another make file, but need to ensure
+# that if relative, we prefix the current default directory
+dramahtml :
+	if [ ! -d $(HTML_DIR) ] ; then  mkdir $(HTML_DIR); fi;
+	( DIR=$(HTML_DIR) ;FIRSTCHAR=`echo $(HTML_DIR) | cut -c 1` ; \
+	 if [ "$$FIRSTCHAR" != "/" ]; then DIR=`pwd`/$(HTML_DIR); fi; \
+	 cd $(DRAMASRC_HTML) ; $(MAKE) HTML_DIR=$$DIR $(MAKEFLAGS))
+
+html1 : $(MAN1_SRCS) sds.prog.wflman.opts progsum_prefix.html.incl
+	(cd $(REL_DIR) ; $(WFLMAN) -nsds_programs -ohtml -Ooptfile=sds.prog.wflman.opts $(MAN1_SRCS) )
+	(cd $(REL_DIR) ; if [ ! -d $(HTML_DIR)/programs ] ;\
+              then  mkdir $(HTML_DIR)/programs; fi; \
+	for I in *.html ; do \
+	    mv $$I $(HTML_DIR)/programs ;\
+	done)
+	mv $(HTML_DIR)/programs/*.summary.html $(HTML_DIR)
+	mv $(HTML_DIR)/programs/*.frames.html $(HTML_DIR)
+	/bin/rm -f $(HTML_DIR)/programs/*.intro.html 
+
+
+
+
+html3 : $(MAN3_SRCS) sds.rout.wflman.opts routsum_prefix.html.incl \
+		arg.rout.wflman.opts arg_prefix.html.incl
+	(cd $(REL_DIR) ; $(WFLMAN) -ohtml -nsds_routines -Ooptfile=sds.rout.wflman.opts $(MAN3_SRCS_SDS) )
+	(cd $(REL_DIR) ; $(WFLMAN) -ohtml -narg_routines -Ooptfile=arg.rout.wflman.opts $(MAN3_SRCS_ARG) )
+	(cd $(REL_DIR) ; if [ ! -d $(HTML_DIR)/routines ] ;\
+              then  mkdir $(HTML_DIR)/routines; fi; \
+	for I in *.html ; do \
+	    mv $$I $(HTML_DIR)/routines ;\
+	done)
+	mv $(HTML_DIR)/routines/*.summary.html $(HTML_DIR)
+	mv $(HTML_DIR)/routines/*.frames.html $(HTML_DIR)
+	/bin/rm -f $(HTML_DIR)/routines/*.intro.html
+
+newclass :
+	@ if [ "$(CLASS)" = "" ]; then echo No class name supplied; exit 1;fi
+	@ if [ "$(REMARK)" = "" ]; then echo No remark supplied; exit 1; fi
+	@ if [ -f SCCS/s.class-$(CLASS) ]; then echo  class $(CLASS) already exists ; exit 1 ; fi
+	@ echo "#Class $(CLASS) created by $$USER at "`date` >class-$(CLASS)
+	@ echo "#$(REMARK) " >> class-$(CLASS)
+	@ echo "# " >> class-$(CLASS)
+	sccs prs -d"acmmRcsCo sds :M: -r:I:" $(RELEASE) >> class-$(CLASS)
+	acmmRcsCo sds -e -p dmakefile |  sed 's/RELEASE=.*/RELEASE=$(CLASS)/' >dmakefile
+	sccs delta dmakefile -y"$(REMARK)"
+	sccs create class-$(CLASS)
+	sccs clean	
+	rm -f ,class-$(CLASS)
+
+# Create a checkpoint.
+checkpoint :
+	@ if [ "$(CHECKPOINT)" = "" ]; then echo No class name supplied; exit 1;fi
+	@ if [ "$(REMARK)" = "" ]; then echo No remark supplied; exit 1; fi
+	@ if [ -f SCCS/s.class-$(CHECKPOINT) ]; then echo  class $(CHECKPOINT) already exists ; exit 1 ; fi
+	@ echo "#Checkpoint $(CHECKPOINT) created by $$USER at "`date` >checkpoint-$(CHECKPOINT)
+	@ echo "#$(REMARK) " >> checkpoint-$(CHECKPOINT)
+	@ echo "# " >> checkpoint-$(CHECKPOINT)
+	sccs prs -d"acmmRcsCo sds :M: -r:I:" $(RELEASE) >> checkpoint-$(CHECKPOINT)
+	sccs create checkpoint-$(CHECKPOINT)
+	rm -f ,checkpoint-$(CHECKPOINT)
+	sccs clean	
+
+
+
+

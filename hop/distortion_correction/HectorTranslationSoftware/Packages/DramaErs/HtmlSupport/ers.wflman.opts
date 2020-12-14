@@ -1,0 +1,16 @@
+# wflman html options for all DUL routine pages
+#
+#  WARNING, knows about the location of the dramasrc directory structure.
+#
+# Author: Tony Farrell
+#
+# History:
+#	02-Mar-1997 - TJF - Original version.
+#
+#     @(#) $Id: ACMM:DramaErs/HtmlSupport/ers.wflman.opts,v 3.19 09-Dec-2020 17:17:02+11 ks $
+#
+#
+link=routines/
+title=DRAMA/Ers Library
+summary_prefix=sumprefix.html.incl
+optfile=../DramaHtml/drama.wflman.opts

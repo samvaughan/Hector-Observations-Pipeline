@@ -1,0 +1,252 @@
+/*		d m a k e f i l e
+ * File:
+  	dmakefile
+ * Function:
+  	Drama makefile source for SDS sub system
+  
+ * Description:
+  	The program dmkmf should be run in the directory containing this
+  	file to generate a Makefile or descrip.mms file for the desired
+  	target
+
+	Sds is quite complex since it has optinal parts which depend
+	on having Fortran compliers and the starlink software collection.
+	
+	Under Unix, if you have starlink and drama has been configured
+	for it, you should do 
+		source /star/etc/login
+	after doing ~drama/dramastart but before making Sds.
+
+	Under VMS, if you have starlink and drama has been configured
+	for it, you should do
+		@SSC:LOGIN
+		EMS_DEV
+		CNF_DEF
+		HDS_DEV
+		DEFINE SDS_ERR SDS_ERR.INC
+
+	Before making Sds (dramastart can be done before or after this)
+
+	In addtion, please read though the Config section as some
+	things may need changing.
+	
+  
+ * Author: Tony Farrell
+
+ *  @(#) $Id: ACMM:sds/dmakefile,v 3.94 09-Dec-2020 17:15:24+11 ks $
+ 
+ * History:
+ 	24-Jun-1993 - TJF - Original version.
+	06-Oct-1993 - TJF - Add CONFIG_DIR to include file list
+	31-Oct-1994 - TJF - Version r1_2_5
+	06-MAr-1995 - TJF - Version r1_4
+	28-Aug-1995 - TJF - Version r1_4_2 -> add SdsReadFree()
+	13-Oct-1995 - TJF - Version r1_4_3
+	29-Apr-1996 - TJF - Version r1_4_4
+	02-May-1996 - TJF - Version r1_4_5
+	27-Aug-1996 - TJF - Version r1_4_6
+	10-Dec-1996 - TJF - Dont depend on FortranOnly() as even for fontran
+			    stuff we need starlink CNF.
+	04-Nov-1997 - TJF - Add DramaReleaseCheck() target.
+	06-Nov-1997 - TJf - Goto version r1_4_7
+	03-Nov-1998 - TJF - Goto version r1_4_8.  Add SDS TCL stuff.
+	09-Dec-1998 - TJF - Remove libsds.o. There is a better way, done in Git.
+	11-Jun-1999 - TJF - The previous change does not work in all cases,
+			    make it dependent on having a new gnu ld.
+	26-Sep-2002 - TJF - Add sdsfindbyname.c (from Nick Rees) and bump ver.
+	17-Mar-2003 - TJF - Include ACMM_RELEASE in RELEASE spec but dont
+			    override main SDS version.
+	05-Apr-2004 - TJF - SdsFindByName() now part of sdsutil.c.
+	xx-Apr-2005 - TJF - Add sdsCppTest.
+        13-Feb-2009 - TJF - Remove  startlink related bits .
+
+ */
+#BeginConfig			/* Begin the configuration section */
+#Generated from dmakefile for SDS /* For Makefile		   */
+#DramaSystem                    /* Indicates we are part of drama itself */
+
+ACMM_RELEASE=3_94$(ACMMBUILDVER)
+RELEASE=r1_4_$(ACMM_RELEASE)
+SYSTEM=sds			/* System name (lower case )		*/
+USERCCOPTIONS = AnsiCFull()	/* Enable Ansi C compatibilty		*/
+USERCCCOPTIONS = AnsiCCFull()	/* Enable Ansi C++ compatibilty		*/
+
+/*
+ * Backward compatibilty, this is provided by drama in later versions.
+ */
+#ifndef NoStrtoul
+#define NoStrtoul(a) UnixOnly(a)
+#endif
+
+/*
+ * Define the macro DEFAULTCPP, which sets the C pre-preprocess to be
+ * used by sdsc. Under Unix, /usr/lib/cpp is the normal choice. 
+ * Under VMS, you need to have the gnu c pre-preprocessor. You dont 
+ * need the rest of the Gnu-c VMS distribution, just CPP.
+ * 
+ * The macro VxWorksDefinesINT64 can be set if the local version of
+ * VxWorks defines the types INT64 and UINT64.  This might be done
+ * in "vxTypesOld.h" from VxWorks version 5.5
+ *
+ */
+#ifdef VxWorksDefinesINT64
+DEFINES = DefaultCpp() -DINT64_ALREADY_DEFINED
+#else
+DEFINES = DefaultCpp()
+#endif
+
+
+/*
+ *  Include directories.  On VMS, we assume the various command mentioned
+ *  in the description have been executed.  Tcl must be before starlink
+ *  since there is a version of TCL in starlink
+ */
+INCLUDES1=CurrentDirIncludes()  IDir(CONFIG_DIR) IDir(ERS_DIR) IDir(STATUS_DIR) IDir(MESSGEN_DIR) IDir(CONFIG_DIR)
+INCLUDES2=VmsOnly(IDir(DRAMAUTIL_DIR))
+INCLUDES3=TclOnly(TclTkIncl)
+INCLUDES4=
+INCLUDES5= StringDefine(SDS_VERNUM,$(RELEASE))
+
+/*
+ *  If we have TCL, add the TCL include files to the list.
+ */
+
+INCLUDES= $(INCLUDES1) $(INCLUDES2) $(INCLUDES3) $(INCLUDES4) $(INCLUDES5)
+
+#EndConfig			/* End the configuration section	*/
+
+NormalRules()			/* Enable Rules				*/
+
+/*
+ * Macro of objects for main and fortran libraries
+ */
+OBJECTS = Obj(sds) NoEmbedded(Obj(sdscompiler) Obj(sdsparser) Obj(sdslexer)) \
+    Obj(sdsutil) NoStrtoul(Obj(strtoul)) CPlusPlusOnly(Obj(sdscpp)) \
+    Obj(arg) NoEmbedded(TclOnly(Obj(sdstcl) Obj(sdstclinit))) 
+
+TIMER_OBJ = VmsOnly(Obj(timer)) EmbeddedOnly(Obj(vxworks_timer)) UnixOnly(Obj(unix_timer))
+/*
+ * Sources for makedepend
+ */
+SRC1 = sds.c sdsutil.c sdscompiler.c sdsparser.c arg.c TclOnly(sdstcl.c sdstclinit.c) 
+SRC2 = NoEmbedded(readtest.c CPlusPlusOnly(sdsCppTest.C sdscpp.C) sdsc.c sdsdump.c sdslexer.c sdslist.c) 
+SRC3 = NoEmbedded(sdstest.c sdstimes.c sdspoke.c sdslistpath.c testgen.c CPlusPlusOnly(argtest.C)) 
+
+/*
+ * Target all 
+ *
+ * Note that sdsCppTest is built as an executable on Unix if C++ support
+ * is available.  On VxWorks, only the object sdsCppTest.o is built - to ensure
+ * we can built it.  We can not link it.
+ */
+T1 = includes Lib(sds)  
+T2 = NoEmbedded(testgen sdstest readtest sdslist sdslistpath sdstimes sdsc sdsdump sdspoke argtest)
+T3 = EmbeddedOldGnuLD(Obj(libsds)) NoCPlusPlus(message) UnixOnly(CPlusPlusOnly(sdsCppTest)) EmbeddedOnly(CPlusPlusOnly(Obj(sdsCppTest)))
+
+DummyTarget(all,NotVms(checktarget) $(T1) $(T2) $(T3) AutoTest(UnixOnly(run_tests)))
+
+DramaCheckTarget()
+/*
+ * Warn about C++ stuff not being built
+ */
+VmsOnly(MESSAGE=@ write sys$error "+++ ^GSds Warning C++ code not being built +++")
+NotVms(MESSAGE=@ echo "+++ Sds Warning C++ code not being built +++" 1>&2)
+message :
+	$(MESSAGE)
+
+/*
+ * We use an includes target for include files which need to be built.  This
+ * is only really necessary if make depend has not been run
+ */
+DummyTarget(includes, ForErr(sds_err) ForErr(arg_err) sds_err.h sds_err_msgt.h arg_err.h arg_err_msgt.h TclOnly(sdstcl.h) sds_err.java sds_err.tcl arg_err.tcl arg_err.java)
+/*
+ *	Object libraries
+ */
+ObjectLibraryTarget(sds,$(OBJECTS),)
+
+/*
+ * Now the object containing the entire library, which we require in
+ * the embedded systems stuff when using the old version of GNU LD, as
+ * distributed with VxWorks.
+ */
+EmbeddedOldGnuLD(ComplexObject(libsds, $(OBJECTS),,,))
+/*
+ * Include files
+ */
+ErrorIncludeFiles(sds_err)
+FortranErrorIncludeFile(sds_err)
+ErrorIncludeFiles(arg_err) 
+FortranErrorIncludeFile(arg_err)
+DramaJavaErrorFile(sds_err)
+DramaJavaErrorFile(arg_err)
+TclErrorFile(sds_err)
+TclErrorFile(arg_err)
+/*
+ * Lex and Yacc releated targets
+ */
+NoEmbedded(LexObjectFixed(sdslexer, sdsparser.h,SdsY))
+NoEmbedded(YaccObjectFixed(sdsparser,,SdsY))
+/*
+ * Exe files which don't use starlink
+ */
+NoEmbedded(NormalProgramTarget(sdsc,Obj(sdsc),Lib(sds),LinkLib(sds) $(LIB_DRAMAUTIL),$(LEX_LIB) $(YACC_LIB)))
+NoEmbedded(NormalProgramTarget(sdstest,Obj(sdstest),Lib(sds),LinkLib(sds),$(LIB_ERS) $(LIB_MESSGEN) ))
+NoEmbedded(NormalProgramTarget(testgen,Obj(testgen),Lib(sds),LinkLib(sds),$(LIB_ERS) $(LIB_MESSGEN) ))
+NoEmbedded(NormalProgramTarget(readtest,Obj(readtest),Lib(sds),LinkLib(sds),))
+NoEmbedded(NormalProgramTarget(sdslist,Obj(sdslist),Lib(sds),LinkLib(sds),))
+NoEmbedded(NormalProgramTarget(sdsdump,Obj(sdsdump),Lib(sds),LinkLib(sds),))
+NoEmbedded(NormalProgramTarget(sdspoke,Obj(sdspoke),Lib(sds),LinkLib(sds),))
+NoEmbedded(NormalProgramTarget(sdslistpath,Obj(sdslistpath),Lib(sds),LinkLib(sds),))
+NoEmbedded(NormalProgramTarget(sdstimes,Obj(sdstimes) $(TIMER_OBJ),Lib(sds),LinkLib(sds),))
+
+NoEmbedded(NormalProgramTarget(test_write,Obj(test_write) ,Lib(sds),LinkLib(sds), $(LIB_ERS) -lm))
+NoEmbedded(NormalProgramTarget(test_read,Obj(test_read) ,Lib(sds),LinkLib(sds), $(LIB_ERS) -lm))
+NoEmbedded(CPPProgramTarget(sdsCppTest,Obj(sdsCppTest) ,Lib(sds),LinkLib(sds), $(LIB_ERS) $(LIB_MESSGEN) -lm))
+NoEmbedded(CPPProgramTarget(sdstest2,Obj(sdstest2) ,Lib(sds),LinkLib(sds), $(LIB_ERS) $(LIB_MESSGEN) -lm))
+NoEmbedded(CPPProgramTarget(argtest,Obj(argtest) ,Lib(sds),LinkLib(sds), $(LIB_ERS) $(LIB_MESSGEN) -lm))
+
+/*
+ * sdstest.cpp is just sdstest.c  We compile it with  C++ rather then C.
+ */
+
+sdstest2.cpp : sdstest.c
+	$(CP) sdstest.c sdstest2.cpp
+
+clean ::
+	$(RM) sdstest2.cpp test.sds
+	
+/*
+ *  run test programs - pretty basic at the moment but we can
+ *  add more here as we create them.  We only do this under Unix - VMS is	*  a little hard and VxWorks not possible.
+ */
+#ifdef UnixArchitecture
+run_tests : includes sdstest readtest CPlusPlusOnly(sdstest2 sdsCppTest argtest) testgen
+	@ echo "Running SDS C test programs"
+	./testgen >/dev/null
+	$(RM) argtest.sds
+	./sdstest  >/dev/null
+	./readtest test.sds >/dev/null
+	$(RM) test.sds
+	CPlusPlusOnly(./sdstest2 >/dev/null) #
+	CPlusPlusOnly(./sdsCppTest >/dev/null) #
+	CPlusPlusOnly(./argtest >/dev/null) #
+	@ echo "SDS test programs were run successfully."
+
+
+#endif
+
+
+
+/*
+ * Release targets
+ */
+DramaReleaseCheck()
+AutoTest(UnixOnly(release :: run_tests))
+DramaReleaseCommon(FortranOnly(ForErr(sds_err) ForErr(arg_err)) sds_err.h sds_err_msgt.h sds.h sdsport.h arg_err.h arg_err_msgt.h arg.h TclOnly(sdstcl.h) sds_err.java sds_err.tcl arg_err.tcl arg_err.java)
+DramaReleaseTarget( NoEmbedded(Exe(sdstest) Exe(readtest) Exe(sdslist) Exe(sdsdump) Exe(sdspoke) Exe(sdslistpath) Exe(sdstimes) Exe(sdsc)), Lib(sds) ,,EmbeddedOldGnuLD(Obj(libsds)) )
+DramaReleaseDramaStart()
+/*
+ * Target to enable this system.
+ */
+DramaEnable()
+DramaDirs()

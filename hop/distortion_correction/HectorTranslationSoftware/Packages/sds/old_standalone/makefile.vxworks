@@ -1,0 +1,70 @@
+# "@(#) $Id: ACMM:sds/old_standalone/makefile.vxworks,v 3.94 09-Dec-2020 17:15:42+11 ks $"
+#
+#   Makefile for VxWorks version of SDS
+#
+#   Version 1.3
+#
+#   Author:
+#     Jeremy Bailey
+#
+#   Version Date:
+#     4-Aug-1993
+
+
+.c.o :
+	$(CC) $(CFLAGS) -c $<
+
+INCLUDES = -I. -I$(VW)/h
+DEFINES = -DCPU=MC68020 -DHOST_SUN -DVxWorks -DDPOSIX_1
+CFLAGS_MC68020 = -fvolatile -O -fstrength-reduce
+CFLAGS = -O $(INCLUDES) $(DEFINES) $(CFLAGS_MC68020) $(EXTFLAGS)
+
+OBJECTS = sds.o sdsutil.o arg.o ers.o
+
+
+CC = cc68k
+AR = ar68k
+RANLIB = ranlib68k
+LD = ld68k
+LDFLAGS = -r
+
+All : libsds.a sdstest.o readtest.o sdslist.o sdstimes.o
+
+libsds.a : $(OBJECTS)
+	$(AR) vru libsds.a $(OBJECTS)
+	$(RANLIB) libsds.a
+
+sds.h : sds_err.h
+
+sds.o : sds.c sds.h
+
+arg.o : arg.c arg.h sds.h Ers.h
+
+ers.o : ers.c Ers.h
+
+sdsutil.o : sdsutil.c sds.h
+
+
+sdstest.o : sdstest.c sds.h
+	sed 's/main()/sdstest()/g' sdstest.c > temp.c
+	$(CC) $(CFLAGS) -c -o temp.o temp.c
+	$(LD) $(LDFLAGS) -o $@ temp.o libsds.a
+
+readtest.o : readtest.c sds.h
+	sed 's/main(/readtest(/g' readtest.c > temp.c
+	$(CC) $(CFLAGS) -c -o temp.o temp.c
+	$(LD) $(LDFLAGS) -o $@ temp.o libsds.a
+
+sdslist.o : sdslist.c sds.h
+	sed 's/main(/sdslist(/g' sdslist.c > temp.c
+	$(CC) $(CFLAGS) -c -o temp.o temp.c
+	$(LD) $(LDFLAGS) -o $@ temp.o libsds.a
+
+sdstimes.o : sdstimes.c sds.h timer.o
+	sed 's/main(/sdstimes(/g' sdstimes.c > temp.c
+	$(CC) $(CFLAGS) -c -o temp.o temp.c
+	$(LD) $(LDFLAGS) -o $@ temp.o timer.o libsds.a
+
+timer.o : vxworks_timer.c
+	$(CC) $(CFLAGS) -c -o timer.o vxworks_timer.c
+

@@ -1,0 +1,91 @@
+#		M a k e f i le . a m
+#+
+# File:
+#       Makefile.am
+#
+# Function:
+#       Gnu automake source file for Ers.
+# 
+# Description:
+#       This file is an experimental GNU automake source for the ERS library. 
+#       It is currently set up for use with 2dfdr.  
+#
+#       Builds the Ers library and the Ers_Err include files.
+#
+# Author: Tony Farrell
+#
+#  Copyright (c) Anglo-Australian Telescope Board, 2009.
+#   Not to be used for commercial purposes without AATB permission.
+# 
+#     @(#) $Id: ACMM:DramaErs/GNUmakefile.am,v 3.19 09-Dec-2020 17:17:03+11 ks $
+#  
+# History:
+# 	19-Aug-2009 - TJF - Original version.
+#       27-Jan-2011 - TJF - Rename from Makefile.am to GNUmakefile.am.
+#                           Add Ers_Err.msg to the distribution using 
+#				EXTRA_DIST.
+#       28-Feb-2011 - TJF - Fix some comments.
+
+#
+#-
+
+#
+# Get rules for processing .msg files and other DRAMA information.
+#
+include $(top_srcdir)/Makefile.drama_rules
+
+# All of these are generated from Ers_Err.msg
+BUILT_SOURCES = Ers_Err.h Ers_Err.tcl Ers_Err_msgt.h
+
+
+#
+# Autoconfigure doesn't work out it needs to distribte this automatically.
+#
+EXTRA_DIST=Ers_Err.msg
+
+# Have to do this one by hand since the relevant  rule included from
+# Makefile.drama_rules builds Ers_Err.h.
+#
+Ers_Err_msgt.h : Ers_Err.msg
+	$(MESSGEN) -o -t -x $@ $<
+
+
+#
+# Reference the include files we need.  These are in the source, not the
+# build directories (which may in theor be different spots).  Also add
+# the DRAMA defines we need.
+#
+AM_CPPFLAGS =  $(DRAMA_INCLUDES) $(DRAMA_DEFINES)
+
+#
+# Build the ers library - but don't install it (not for 2dFdr anyway, we will
+#   want to install it if we autoconfigure DRAMA)
+#
+noinst_LIBRARIES=libers.a
+
+#
+# Indicate that we don't want this header installed (not for 2dFdr anyway, we
+# will want to install it if we autoconfigure DRAMA)
+#
+noinst_HEADERS=Ers.h
+
+
+#
+# Sources for the library.
+#
+libers_a_SOURCES = ers.c erssprintf.c ersvsprintf.c 
+
+
+#
+# Ensure this dependency is set up - since Ers_Err.h is built,
+# can be missed when working out dependencies and the build order 
+# might end up wrong.
+#
+ers.$(OBJEXT): Ers_Err.h
+
+
+# Clean up the built files
+
+clean-local :
+	- $(RM) $(BUILT_SOURCES)
+
