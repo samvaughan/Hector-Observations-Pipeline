@@ -71,7 +71,7 @@ output_folder: Outputs/example
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Parameters used in the code
 
-fresh_start : False
+fresh_start : True
 MAX_TRIES: 999
 configure_field : True
 

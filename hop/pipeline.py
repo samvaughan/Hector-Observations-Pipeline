@@ -2,11 +2,12 @@ import numpy as np
 import os
 import glob
 from pathlib import Path
+import pandas as pd
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
 from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters
+from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
 
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
 
@@ -189,8 +190,10 @@ class HectorPipe:
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
+        ### FIXME
+        galaxyIDrecord = {}
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # proxy file to arrange guides in required format to merge with hexa probes
         proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
@@ -199,9 +202,9 @@ class HectorPipe:
         file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
 
         # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
-        plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
+        plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
 
         # Adding guides cluster txt file to hexa cluster txt file
@@ -238,13 +241,12 @@ class HectorPipe:
         conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
         flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
-        positioning_array,galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
-                                      conflicted_magnets, galaxyIDrecord, clusterNum, tileNum, conflictFile, flagsFile)
+        positioning_array,galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, galaxyIDrecord, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
 
         if plot:
             # draw all the magnets in the plots created earlier
-            figureFile = f"{self.plot_location}/savedPlot_{self.config['output_filename_stem']}_tile_{tile_number}.pdf"
-            plots.draw_all_magnets(all_magnets,clusterNum,tileNum,figureFile)  #***********
+            figureFile = f"{self.plot_location}/savedPlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], tile_number,figureFile)  #***********
 
         # checking positioning_array prints out all desired parameters
         print(positioning_array)
@@ -254,8 +256,8 @@ class HectorPipe:
         newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle']
 
         # final two output files
-        outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
-        robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number}.txt"
+        outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow)
