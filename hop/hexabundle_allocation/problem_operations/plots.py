@@ -260,12 +260,12 @@ def draw_all_magnets(magnets,clusterNum,tileNum,figureFile):
     # plt.savefig("image.png", bbox_inches='tight', dpi=100)
     plt.savefig(figureFile)
 
-    # f = plt.figure(1)
-    # f1 = plt.figure(2)
-    # f.clear()
-    # f1.clear()
-    # plt.close(f)
-    # plt.close(f1)
+    f = plt.figure(1)
+    f1 = plt.figure(2)
+    f.clear()
+    f1.clear()
+    plt.close(f)
+    plt.close(f1)
 
 def create_magnet_pickup_areas(magnets):
 
