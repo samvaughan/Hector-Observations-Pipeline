@@ -36,9 +36,12 @@ def calculate_placement_ordering_of_blocked_magnet(blocked_magnet,list_of_confli
             for magnet in blocking_magnets:
                 blocking_magnets.append(create_list_of_blocking_magnets(list_of_conflicts, magnet))
 
+
     if i == 49:
         blocked_magnet.placement_index = None
         print('Error ! ',blocked_magnet.__class__.__name__,int(blocked_magnet.index),' cannot be placed')
+
+
 
 def calculate_placement_ordering_of_all_blocked_magnets(list_of_fully_blocked_magnets,list_of_conflicts):
 
@@ -92,8 +95,8 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         ## ** Might need to change center coordinates of magnets to different scale for considering optical and other type of distortion **
 
         # storing all the parameters in positioning array
-        f = np.append([magnet.__class__.__name__, str(magnet.magnet_label), str(robot_center_x+magnet.center[0]), \
-                       str(robot_center_y+magnet.center[1]), str(magnet.rotation_pickup), str(round(magnet.rotation_putdown,2)), \
+        f = np.append([magnet.__class__.__name__, str(magnet.magnet_label), str(robot_center_x+magnet.view_x), \
+                       str(robot_center_y+magnet.view_y), str(magnet.rotation_pickup), str(round(magnet.rotation_putdown,2)), \
                        str(order), available_pickup, str(float(magnet.IDs)), str(int(magnet.index))], str(magnet.hexabundle))
         position_ordering_array.append(np.array(f))
 
