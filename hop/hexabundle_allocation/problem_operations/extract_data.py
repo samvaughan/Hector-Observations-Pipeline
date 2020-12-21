@@ -56,9 +56,19 @@ def create_list_of_probes_from_file(file):
 
     return list_of_probes
 
-def create_list_of_circular_and_rectangular_magnets_from_file(file):
+def create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_offset):
 
     list_of_probes = create_list_of_probes_from_file(file)
+
+    ## ***** offset adjustments for magnet pair
+    for item in magnetPair_offset:
+        for each_probe in list_of_probes:
+            if item[0] == each_probe.index:
+                print(each_probe.circular_magnet_center)
+                each_probe.circular_magnet_center[0] += item[1]
+                each_probe.circular_magnet_center[1] += item[2]
+                print(each_probe.circular_magnet_center)
+    ## *****
 
     list_of_circular_magnet = []
 
@@ -72,9 +82,9 @@ def create_list_of_circular_and_rectangular_magnets_from_file(file):
 
     return list_of_circular_magnet,list_of_rectangular_magnet
 
-def create_list_of_all_magnets_from_file(file):
+def create_list_of_all_magnets_from_file(file,magnetPair_offset):
 
-    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file)
+    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_offset)
 
     return np.concatenate([circular_magnets, rectangular_magnets])
 

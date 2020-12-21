@@ -124,7 +124,25 @@ def create_list_of_fully_blocked_magnets(list_of_blocked_magnets):
 
             fully_blocked_magnets.append(conflict.blocked_magnet)
 
+
     return remove_multiple_occurrences_in_list(fully_blocked_magnets)
+
+def blocking_magnets_for_fully_blocked_magnets(list_of_blocked_magnets):
+
+    fully_blocked_magnets_dictionary = {}
+
+    for conflict in list_of_blocked_magnets:
+
+        blocked_pickup_areas = create_list_of_blocked_pickup_areas(conflict.blocked_magnet, list_of_blocked_magnets)
+
+        if is_magnet_fully_blocked(conflict.blocked_magnet, blocked_pickup_areas):
+            conflict_magnet = 'For ' + conflict.blocked_magnet.__class__.__name__ + ' ' + str(int(conflict.blocked_magnet.index)) + ': ' + \
+                              conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index)) + '\n'
+            print(conflict_magnet)
+            fully_blocked_magnets_dictionary[conflict.blocked_magnet.__class__.__name__ +' '+ str(int(conflict.blocked_magnet.index))] = \
+                            conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
+
+    print(fully_blocked_magnets_dictionary)
 
 def create_list_of_blocking_magnets(list_of_conflicts, blocked_magnet):
 

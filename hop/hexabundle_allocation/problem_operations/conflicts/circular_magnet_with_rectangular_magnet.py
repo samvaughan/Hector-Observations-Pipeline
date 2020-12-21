@@ -29,6 +29,7 @@ def circle_blocking_rectangle(circle,rectangle):
 
             all_blocked_pickup_areas.append(conflicted_magnet(circle, rectangle, pickup_area))
 
+
     return all_blocked_pickup_areas
 
 def rectangle_blocking_circle(circle,rectangle):
@@ -70,6 +71,7 @@ def check_conflict_circle_rectangle_magnets(magnet_pair):
             if blocked_pickup_area:
 
                 all_blocked_pickup_areas.extend(blocked_pickup_area)
+
 
         elif is_rectangular_magnet(magnet_pair[magnet_1]):
 

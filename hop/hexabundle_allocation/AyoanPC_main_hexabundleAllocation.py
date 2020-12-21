@@ -42,11 +42,14 @@ def allocate_hexas(clusterNum, tileNum, galaxyIDrecord, plot):
     plate_file = (Location+'/For_Ayoan_14p5_exclusion_Clusters/Cluster_%d/Output/Hexa_and_Guides_Cluster_%d_tile_%03d.txt' % (clusterNum, clusterNum, tileNum))
     # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
 
+    #### Offset function: thermal coefficient based movement of magnet pair as a whole
+    plate_file,magnetPair_offset = offsets.magnetPairPositionOffset(plate_file)
+
     # Adding guides cluster txt file to hexa cluster txt file
-    file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file, clusterNum, tileNum)
+    file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file)
 
     # extracting all the magnets and making a list of them from the plate_file
-    all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file))
+    all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file),magnetPair_offset)
 
     #### Offset functions- still a work in progress- need to determine input source and add column to output file
     all_magnets = offsets.hexaPositionOffset(all_magnets)
@@ -68,6 +71,8 @@ def allocate_hexas(clusterNum, tileNum, galaxyIDrecord, plot):
 
     # create a list of the fully blocked magnets
     fully_blocked_magnets = conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
+
+    conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
 
     # print the fully blocked magnets out in terminal and record in conflicts file
     conflictsRecord = Location+'/galaxy_fields/Conflicts_Index.txt'
@@ -139,5 +144,5 @@ for clusterNum in range(2,3):
         limit = 26
     elif (clusterNum == 6):
         limit = 16
-    for tileNum in range(7,10):
+    for tileNum in range(21,22):
         allocate_hexas(clusterNum,tileNum,galaxyIDrecord, plot=True)
