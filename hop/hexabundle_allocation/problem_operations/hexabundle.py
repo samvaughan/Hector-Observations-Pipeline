@@ -465,7 +465,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
 
     print('\nLarger hexabundles more than 61 have been allocated.\n')
 
-    X = 21.5
+    X = 22.5
     print('mu_1re cutoff, X = ' + str(X))
     # Allocating all 61 hexabundles based on mu_1Re < X
     for magnet in Mstar_Sort:  # Spector
