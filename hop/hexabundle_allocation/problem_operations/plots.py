@@ -256,7 +256,7 @@ def draw_all_magnets(magnets,clusterNum,tileNum,figureFile):
     # axes = plt.gca()
     # axes.set_xlim([-350, 350])
     # axes.set_ylim([-350, 350])
-    # plt.show() ## for showing the figure of magnets with pickup area
+    # plt.show()                ## for showing the figure of magnets with pickup area
     # plt.savefig("image.png", bbox_inches='tight', dpi=100)
     plt.savefig(figureFile)
 
