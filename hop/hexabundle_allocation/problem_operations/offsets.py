@@ -1,5 +1,6 @@
 from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
 from ..hector.constants import robot_center_x,robot_center_y
+from math import atan,sin,cos
 import numpy as np
 import pandas as pd
 import string
@@ -55,15 +56,35 @@ def hexaPositionOffset(all_magnets):
 
 
 # thermal expansion related offset which will move the magnet pair as a whole based on certain coefficients
-def magnetPairPositionOffset(plate_file):
+def magnetPair_radialPositionOffset(plate_file):
 
     ## read off a certain table from csv file or derived off some equations and calculations to identify the magnet pair
     ## to be adjusted with the determined offset values, VARIABLE 'offset_distance' used for testing function's usability
 
-    offset_distance_x = 0.1  # to be derived
-    offset_distance_y = 0.1  # to be derived
+    offset_radialDistance = 20  # to be derived
 
-    # store magnet pair index and x,y offset coordinates accordingly, to be derived
-    magnetPair_offset = [(14,20,0),(2,0,0)]
+    # store magnet pair index and offset distance accordingly, to be derived
+    magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
     return plate_file, magnetPair_offset
+
+# radial Position offset being adjusted in the extract_data.py file before all_magnets are being produced
+def radialPositionOffset(list_of_probes,magnetPair_offset):
+
+    for item in magnetPair_offset:
+        for each_probe in list_of_probes:
+            if item[0] == each_probe.index:
+
+                print(each_probe.circular_magnet_center)
+
+                theta = atan(each_probe.circular_magnet_center[1] / each_probe.circular_magnet_center[0])
+                # x values in positive range and -ve range move in opposite radial directions, so this step ensure same direction movement
+                if each_probe.circular_magnet_center[0] >= 0:
+                    each_probe.circular_magnet_center = (each_probe.circular_magnet_center[0] + (cos(theta) * item[1]), \
+                                                         each_probe.circular_magnet_center[1] + (sin(theta) * item[1]))
+                else:
+                    each_probe.circular_magnet_center = (each_probe.circular_magnet_center[0] - (cos(theta) * item[1]), \
+                                                         each_probe.circular_magnet_center[1] - (sin(theta) * item[1]))
+                print(each_probe.circular_magnet_center)
+
+    return list_of_probes

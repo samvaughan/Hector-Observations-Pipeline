@@ -1,5 +1,7 @@
 import numpy as np
 from ..hector.probe import probe
+from ..problem_operations. offsets import radialPositionOffset
+
 
 def parse_col(s):
     try:
@@ -60,14 +62,19 @@ def create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_of
 
     list_of_probes = create_list_of_probes_from_file(file)
 
+    list_of_probes = radialPositionOffset(list_of_probes, magnetPair_offset)
     ## ***** offset adjustments for magnet pair
-    for item in magnetPair_offset:
-        for each_probe in list_of_probes:
-            if item[0] == each_probe.index:
-                print(each_probe.circular_magnet_center)
-                each_probe.circular_magnet_center[0] += item[1]
-                each_probe.circular_magnet_center[1] += item[2]
-                print(each_probe.circular_magnet_center)
+    # for item in magnetPair_offset:
+    #     for each_probe in list_of_probes:
+    #         if item[0] == each_probe.index:
+    #             # print(each_probe.circular_magnet_center)
+    #             # each_probe.circular_magnet_center[0] += item[1]
+    #             # each_probe.circular_magnet_center[1] += item[2]
+    #             # print(each_probe.circular_magnet_center)
+    #
+    #             theta = atan(each_probe.circular_magnet_center[1] / each_probe.circular_magnet_center[0])
+    #             each_probe.circular_magnet_center = (each_probe.circular_magnet_center[0] + (cos(theta) * item[1]), \
+    #                                                  each_probe.circular_magnet_center[1] + (sin(theta) * item[1]))
     ## *****
 
     list_of_circular_magnet = []
@@ -89,11 +96,11 @@ def create_list_of_all_magnets_from_file(file,magnetPair_offset):
     # ***** working function for adjusting magnet pair position, needs to be moved to offsets and be controlled from main
     for magnet in circular_magnets:
         if magnet.index == 13:
-            magnet.center[0] += 10
+            magnet.center[0] += 20
 
     for magnet in rectangular_magnets:
         if magnet.index == 13:
-            magnet.center[0] += 10
+            magnet.center[0] += 20
 
 
     return np.concatenate([circular_magnets, rectangular_magnets])
