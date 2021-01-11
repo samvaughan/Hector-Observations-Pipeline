@@ -1,3 +1,4 @@
+
 from ...hector.magnets.magnet_pair import circle_and_circle_magnets, circle_rectangle_magnets, rectangle_rectangle_magnets
 from .circular_magnet_with_circular_magnet import check_conflict_circle_circle_magnets
 from .circular_magnet_with_rectangular_magnet import check_conflict_circle_rectangle_magnets
@@ -124,7 +125,6 @@ def create_list_of_fully_blocked_magnets(list_of_blocked_magnets):
 
             fully_blocked_magnets.append(conflict.blocked_magnet)
 
-
     return remove_multiple_occurrences_in_list(fully_blocked_magnets)
 
 def blocking_magnets_for_fully_blocked_magnets(list_of_blocked_magnets):
@@ -139,8 +139,16 @@ def blocking_magnets_for_fully_blocked_magnets(list_of_blocked_magnets):
             conflict_magnet = 'For ' + conflict.blocked_magnet.__class__.__name__ + ' ' + str(int(conflict.blocked_magnet.index)) + ': ' + \
                               conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index)) + '\n'
             print(conflict_magnet)
-            fully_blocked_magnets_dictionary[conflict.blocked_magnet.__class__.__name__ +' '+ str(int(conflict.blocked_magnet.index))] = \
-                            conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
+
+            key = conflict.blocked_magnet.__class__.__name__ +' '+ str(int(conflict.blocked_magnet.index))
+            value = conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
+
+            fully_blocked_magnets_dictionary.setdefault(key, [])
+            if value not in fully_blocked_magnets_dictionary[key]:
+                fully_blocked_magnets_dictionary[key].append(value)
+
+            # fully_blocked_magnets_dictionary[conflict.blocked_magnet.__class__.__name__ +' '+ str(int(conflict.blocked_magnet.index))] = \
+            #                 conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
 
     print(fully_blocked_magnets_dictionary)
 

@@ -93,18 +93,16 @@ def create_list_of_all_magnets_from_file(file,magnetPair_offset):
 
     [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_offset)
 
-    # ***** working function for adjusting magnet pair position, needs to be moved to offsets and be controlled from main
-    for magnet in circular_magnets:
-        if magnet.index == 13:
-            magnet.center[0] += 20
-
-    for magnet in rectangular_magnets:
-        if magnet.index == 13:
-            magnet.center[0] += 20
-
+    # # ***** working function for adjusting magnet pair position, needs to be moved to offsets and be controlled from main
+    # for magnet in circular_magnets:
+    #     if magnet.index == 13:
+    #         magnet.center[0] += 20
+    #
+    # for magnet in rectangular_magnets:
+    #     if magnet.index == 13:
+    #         magnet.center[0] += 20
 
     return np.concatenate([circular_magnets, rectangular_magnets])
-
 
 
 def get_file(filename):
