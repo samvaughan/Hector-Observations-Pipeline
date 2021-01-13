@@ -50,6 +50,9 @@ class HectorPipe:
         # Set up the log files
         self.logger, self.logger_R_code = misc_tools.set_up_loggers(self.config)
 
+        # The galaxy ID dictionary for the hexabundle allocation
+        self.galaxyIDrecord = {}
+
     def load_input_catalogue(self):
         """
         Load an input target catalogue, guide star catalogue and standard star catalogue
@@ -191,7 +194,7 @@ class HectorPipe:
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
         ### FIXME
-        galaxyIDrecord = {}
+        
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
         fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
@@ -207,11 +210,14 @@ class HectorPipe:
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
 
+        #### Offset function: thermal coefficient based movement of magnet pair as a whole
+        plate_file,magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
+
         # Adding guides cluster txt file to hexa cluster txt file
-        file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file, self.config['output_filename_stem'], tile_number)
+        file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
-        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file))
+        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), magnetPair_offset)
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         all_magnets = offsets.hexaPositionOffset(all_magnets)
@@ -234,6 +240,8 @@ class HectorPipe:
         # create a list of the fully blocked magnets
         fully_blocked_magnets = conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
 
+        conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
+
         # print the fully blocked magnets out in terminal and record in conflicts file
         conflictsRecord = f'{self.allocation_files_location_base}/Conflicts_Index.txt'
         conflicts.blocked_magnet.print_fully_blocked_magnets(fully_blocked_magnets,conflictsRecord, fileNameHexa)
@@ -241,7 +249,7 @@ class HectorPipe:
         conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
         flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
-        positioning_array,galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, galaxyIDrecord, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
+        positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, self.galaxyIDrecord, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
 
         if plot:
             # draw all the magnets in the plots created earlier
