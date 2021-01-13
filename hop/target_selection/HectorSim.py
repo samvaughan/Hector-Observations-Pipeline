@@ -4,7 +4,7 @@ import pandas as pd
 import yaml
 import bisect
 # For reading fits tables
-import pandas_tools as P 
+from ..misc import pandas_tools as P 
 import os
 
 from ..misc import misc_tools as misc
