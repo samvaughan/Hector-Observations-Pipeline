@@ -1,11 +1,14 @@
 # This is an example configuration file to the full Hector Survey simulator.
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # General options
 
 # Where to collect all the output files. In here, we'll make folders called 'Configuration', 'Plots', 'Tiles' and 'Logs'
 # This folder is made if it doesn't exist
 output_folder: D:/Hector/Hector_project_files/Hector/magnet_position/For_Ayoan_14p5_exclusion_Clusters/Cluster_2
 
+# Stem to attach to all the tile files we'll make. Will have an underscore after it
+output_filename_stem: Cluster_2
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,13 +72,6 @@ final_catalogue_name : None
 guide_star_filename: None
 standard_star_filename: None
 
-# Stem to attach to all the tile files we'll make. Will have an underscore after it
-output_filename_stem: GAMA_G12
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Parameters used in the code
 
 fresh_start : True
 MAX_TRIES: 999
