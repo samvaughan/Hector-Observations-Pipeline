@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import yaml
 # For reading fits tables
-import pandas_tools as P 
+from . import pandas_tools as P 
 import os
 import logging
 from logging import handlers
