@@ -151,6 +151,7 @@ def blocking_magnets_for_fully_blocked_magnets(list_of_blocked_magnets):
             #                 conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
 
     print(fully_blocked_magnets_dictionary)
+    return fully_blocked_magnets_dictionary
 
 def create_list_of_blocking_magnets(list_of_conflicts, blocked_magnet):
 
