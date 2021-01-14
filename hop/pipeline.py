@@ -3,6 +3,7 @@ import os
 import glob
 from pathlib import Path
 import pandas as pd
+import matplotlib.pyplot as plt
 import subprocess
 
 from hop.misc import misc_tools
@@ -348,7 +349,7 @@ class HectorPipe:
         # create a list of the fully blocked magnets
         fully_blocked_magnets = conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
 
-        conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
+        fully_blocked_magnets_dictionary = conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
 
         # print the fully blocked magnets out in terminal and record in conflicts file
         conflictsRecord = f'{self.allocation_files_location_base}/Conflicts_Index.txt'
@@ -376,7 +377,7 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
@@ -386,7 +387,6 @@ class HectorPipe:
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
-
 
         # Comment out all ***** marked plot functions above(lines 81-84,105s)
         # to run whole batch of tiles fast without plots
