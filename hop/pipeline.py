@@ -3,6 +3,7 @@ import os
 import glob
 from pathlib import Path
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P

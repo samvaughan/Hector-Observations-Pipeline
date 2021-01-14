@@ -64,7 +64,8 @@ def magnetPair_radialPositionOffset(plate_file):
     offset_radialDistance = 20  # to be derived
 
     # store magnet pair index and offset distance accordingly, to be derived
-    magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
+    magnetPair_offset = []
+    # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
     return plate_file, magnetPair_offset
 

@@ -54,8 +54,8 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
 
     # rePosition_col = ['0'] * len(positioning_array[:, 8])
     # Creates a list containing 5 lists, each of 8 items, all set to 0
-    w, h = len(positioning_array[:, 8])+1,1;
-    rePosition_col = [['0' for x in range(w)] for y in range(h)]
+    w, h = len(positioning_array[:, 8])+1,1
+    rePosition_col = [['[0]' for x in range(w)] for y in range(h)]
 
     # rePosition_col = np.transpose(rePosition_col)
     print(len(positioning_array[:, 8]))
@@ -65,9 +65,7 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
     for each_magnet in fully_blocked_magnets_dictionary:
         for i in range(len(robotFilearray)):
             if (robotFilearray[i][0] + ' ' + str(robotFilearray[i][9])) == each_magnet:
-                rePosition_col[0][i] = str(fully_blocked_magnets_dictionary[each_magnet])
-                rePosition_col[0][i] = rePosition_col[0][i].replace('"[',"")
-                rePosition_col[0][i] = rePosition_col[0][i].replace(']"',"")
+                rePosition_col[0][i] = '['+str(fully_blocked_magnets_dictionary[each_magnet])+']'
 
     rePosition_col[0][0] = 'rePosition_magnets'
     rePosition_col = np.transpose(rePosition_col)
@@ -85,13 +83,6 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
     with open(robotFile, 'w+') as robotFile:
         writer = csv.writer(robotFile, delimiter=' ')
         writer.writerows(robotFilearray)
-
-
-
-    # for each_magnet in fully_blocked_magnets_dictionary:
-    #     for i in range(1,len(robotFilearray)):
-    #         if (robotFilearray[i][0]+' '+str(robotFilearray[i][9])) == each_magnet:
-    #             print("MATCH")
 
     return positioning_array,robotFilearray
 
@@ -135,8 +126,8 @@ def finalFiles(outputFile, robotFile):
     df3 = pd.read_csv(outputFile, header=0)
     df3.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
-    df4 = pd.read_csv(robotFile, header=0, error_bad_lines=False)
-    df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ',)
+    # df4 = pd.read_csv(robotFile, header=0, error_bad_lines=False)
+    # df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
     # df3 = pd.read_csv('GAMA_'+batch+'/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_GAMA_'+batch+'_tile_%03d.txt' % (tileNum), header=0)
     # df3.to_csv('GAMA_'+batch+'/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_GAMA_'+batch+'_tile_%03d.txt' % (tileNum), \
