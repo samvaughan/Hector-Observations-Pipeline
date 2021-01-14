@@ -7,6 +7,7 @@ import os
 import logging
 from logging import handlers
 from datetime import datetime
+from pathlib import Path
 
 
 def _load_config(filename):
@@ -46,10 +47,9 @@ def create_output_directories(output_folder):
 
     # Make the subdirectories if they don't exist
     subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
-    folders = [f'{output_folder}/{subfolder}' for subfolder in subfolders_to_be_made]
+    folders = [Path(f'{output_folder}/{subfolder}') for subfolder in subfolders_to_be_made]
     for f in folders:
-        if not os.path.exists(f):
-            os.makedirs(f)
+        f.mkdir(parents=True, exist_ok=True)
 
     return folders
 

@@ -1,0 +1,34 @@
+#
+# This file is included by the TexDocs, ManPages and HtmlSupport pages.  
+# It defines sets of files used by all there and other things common to 
+# running wflman for each set of documentation.
+#
+#     @(#) $Id: ACMM:sds/makefile.release_files,v 3.94 09-Dec-2020 17:15:25+11 ks $
+#
+#
+
+
+
+WFLMAN=wflman
+
+
+
+
+RELEASE_FILES = sds.c sdsutil.c sdsfort.c sds_err sds_err.h sds_err.msg sds.h \
+   sdstest.c readtest.c sdslist.c sdstimes.c unix_timer.c sds2hds.c hds2sds.c \
+   sds2hdsf.f hds2sdsf.f gen_move.f sdsc.c sdscompiler.c sdsfindbyname.c \
+   arg.c argfort.c arg.h arg_err.h ers.c Ers.h status.h strtoul.c \
+   sdscompiler.h sdslexer.c sdsparser.c sdsparser.h makefile_starlink mk \
+   sdslexer.c sdsparser.c sdsparser.h
+
+
+
+# Documentation generation source lists.
+# 	MAN1_SRCS lists the program sources
+# 	MAN3_SRCS lists the program sources
+MAN3_SRCS_SDS = sds.c sdsutil.c sdscompiler.c  sdsfindbyname.c
+MAN3_SRCS_ARG = arg.c
+MAN3_SRCS =  $(MAN3_SRCS_SDS) $(MAN3_SRCS_ARG)
+MAN1_SRCS =  sdsc.c sdslist.c sds2hds.c hds2sds.c sdsdump.c sdspoke.c sdslistpath.c
+
+

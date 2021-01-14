@@ -1,0 +1,15 @@
+# wflman html options for all SDS program pages
+#
+#  WARNING, knows about the location of the dramasrc directory structure.
+#
+# Author: Tony Farrell
+#
+# History:
+#	02-Mar-1997 - TJF - Original version.
+#
+#     @(#) $Id: ACMM:sds/sds.prog.wflman.opts,v 3.94 09-Dec-2020 17:15:24+11 ks $
+#
+link=programs/
+title=DRAMA/Sds Library
+summary_prefix=progsum_prefix.html.incl
+optfile=/instsoft/dramasrc/html/drama.wflman.opts

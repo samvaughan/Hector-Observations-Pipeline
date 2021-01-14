@@ -1,0 +1,45 @@
+#/bin/sh
+#		M o v e u n i x
+# Program Name:
+#	moveunix
+# 
+# Function:
+#	Move ers files named in fully lower case to correct names
+#
+# Description:
+#       When transferred from VMS to Unix, the case of ers file names are
+#	normally completly lowercase.  In order to be used under unix, the
+#	case must be corrected.  This shell procedure move the ers files
+#	to the correct name
+#       
+# Author: Tony Farrell, AAO
+#
+#  Copyright (c) Anglo-Australian Telescope Board, 1995.
+#  Not to be used for commercial purposes without AATB permission.
+#
+#     @(#) $Id: ACMM:DramaErs/ers_moveunix,v 3.19 09-Dec-2020 17:17:02+11 ks $
+#
+# History: 
+#	27-Nov-1992 - TJF - Start history
+#
+#
+# The mvit procedure moves one file to another, but correctly handles 
+# all possibilities.
+mvit ()
+{
+    if [ -f $1 ] ; then
+	if [ -f $2 ] ; then
+	    echo "  Overwriting $2 with $1"
+        else
+	    echo "  Moving $1 to $2"
+	fi
+	mv $1 $2
+    elif [ -f $2 ] ; then
+	echo "  $1 does not exist, but $2 does"
+    else
+	echo "# Neither $1 nor $1 exist"
+    fi
+}
+# Now move the files
+mvit ers.h Ers.h
+mvit ers_err.msg Ers_Err.msg

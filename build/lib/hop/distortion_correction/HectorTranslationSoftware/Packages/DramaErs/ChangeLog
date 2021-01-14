@@ -1,0 +1,135 @@
+Tue Dec 08 15:06:20 2020 <ks@Keiths-MacBook-Pro.local>  DramaErs version: 3.19
+
+    Tried to set up a way of building Ers simply on systems without a DRAMA
+    installation. Created a new Standalone directory. In this I generated the
+    two messgen-generated files (using the latest DRAMA messgen), Ers_Err.h and
+    Ers_Err_msgt.h,together with a CONTENTS file saying more or less what this
+    says here. At top level I added a Makefile.standalone file.
+
+    It should be possible to build a standalone version of Ers using
+                   "make -f Makefile.standalone"
+    - this doesn't release any files, but it builds a libers.a.
+
+    This has now been tested under OS X (High Sierra) and Linux (on aaolxp)
+
+    Note that if anyone decides to define a new ERS error code in Ers_Err.msg,
+    they should regenerate the various messgen-created files in Standalone:
+    cd Standalone
+    messgen -c -o -t ../Ers_Err.msg
+
+Tue Aug 18 11:33:48 2020 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.18
+
+	Ensure release target builds.
+
+Tue Aug 18 08:37:23 2020 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.17
+
+      Remove all the DPUBLIC, DPROTOTYPES etc. macros - presume modern C compiler.
+
+      Add sprintftest.c, and a test target in dmakefile.  This allows us to do
+	basic tests on ErsSPrintf() and ErsSVPrintf().
+
+	Need to add more tests 	here to check rest of ERS, but do to handle not 
+	building with DRAMA.
+	
+      Replace BSD version of ErsVSPrintf() by the use of the modern portable
+	implementation - vsnprintf().  ErsVSPrintf() and ErsSPrintf() both
+	now call that routine for the formatting.  As well as removing the 
+	BSD license code, this will ensure we are as up to date as the OS is in
+	terms of printf() formatting support.
+	
+Tue Oct 25 13:25:48 2016 <instswtest@Yosemite-VM-On-aaomc39so.local>  DramaErs version: 3.16
+
+       Add ERS___M___NOFMT flag, allows internal DRAMA code which was using
+	ERS_M_NOFMT and still needs to (for compatiblity isues) to avoid
+	the deprecated warning.  
+
+      Move from finite() to isfinite() since finite() has been deprecated.
+
+Thu Sep 03 13:13:43 2015 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.15
+
+	In the previous change, the check on the use of ERS_M_NOFMT was faulty, picked
+        up by CLang.  Now fixed.
+
+Tue Aug 18 08:03:03 2015 <tjf@aatlix.10.80.10.9>  DramaErs version: 3.14
+
+	Starting to get into lots of trouble due to ERS_M_NOFMT flag and checks
+	in modern complers which complain if you don't have a format string.   Add
+	ErsRepNF() function as an alternative.
+					 
+Fri Apr 04 09:30:48 2014 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.13
+
+	Add ErsGetAtCtx().  
+	
+Mon Feb 28 09:26:09 2011 <tjf@aaomc7.aao.gov.au>  DramaErs version: 3.12
+
+	Improve commenting in DramaErs.
+
+Fri Jan 28 09:58:04 2011 <instswtest@aaomc.aao.gov.au>  DramaErs version: 3.11
+
+	Rename Makefile.am to GNUmakefile.am, since 2dfdr_ac is moving
+	to using this name all the time.  Release Ers_Err.msg into distribution
+	by specifying it in the EXTRA_DIST list.
+	
+
+Thu Sep 17 11:22:35 2009 <tjf@aaomc7.aao.GOV.AU>  DramaErs version: 3.10
+
+        Fix SRC<n> macro definitions in dmakefile.  Wrap release tests
+        in AutoTest() and UnixOnly() macros.
+
+Fri Aug 28 14:13:49 2009 <tjf@aaomc.aao.GOV.AU>  DramaErs version: 3.9
+
+     Add Makefile.am - used by 2dFdr to autoconfigure DramaErs.
+
+
+Wed Jan 14 10:54:30 2009 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.8
+
+    Fix typo in ErsOut documentation.
+
+Wed Jun 04 09:04:28 2008 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.7
+
+    html/Makefile drops use of $(MAKEFLAGS) - not needed and causing
+     problems on Linux.
+
+
+Fri Jun 29 10:43:24 2007 <tjf@aaolxp.aao.gov.au>  DramaErs version: 3.6
+
+    Release Java and Tcl versions of error include file.
+
+Tue Apr 19 09:54:28 2005 <tjf@aatssy.aao.gov.au>  DramaErs version: 3.5
+
+    When doing ErsEnableTask  under VxWorks, lock the task if not in
+	 interrupt context - to get the same effect.  
+
+    Check for real interrupt context under VxWorks to ensure we don't get
+	messed up by errant tasks.
+
+Mon Mar 29 11:51:14 2004 <tjf@aaoprog.aao.gov.au>  DramaErs version: 3.4
+
+    Fix use_rcsId definitions to work with solaris cc.
+    Fix some other solaris cc problems.
+
+Mon Sep 08 09:11:56 2003 <tjf@aaoprog.aao.gov.au>  DramaErs version: 3.3
+
+   Log annul and flush operations.
+
+Wed Jan 29 04:18:07 2003 <tjf@aaoprog.aao.gov.au>  DramaErs version: 3.2 
+
+   Set up for release of DRAMA using ACMM.  Mods to makefiles etc.
+	
+Fri Jan 17 10:50:22 2003 <tjf@aaossf.aao.gov.au>  DramaErs version: 3.1 
+	
+   Tidy up after loading into ACMM.
+        Deleted DramaSCCSClasses and DramaSCCSCheckpoints directories.
+        Created HtmlDocs and ManSupport subdirectory.
+        Makefile split between makefile.release_files and Makefiles in
+             TexDocs, HtmlSupport and ManSupport directories.
+        Move *html* and *wflman* files to HtmlSupport directory.
+        Modified dmakefile to use ACMM_RELEASE.
+        Add makefile.support which supports DRAMA release.
+
+Fri Jan 17 10:49:48 2003 <tjf@aaossf.aao.gov.au> DramaErs version: 3.0
+
+	Created from orignal SCCS archive by acmmCreateSubFromSCCS
+
+"@(#) $Id: ACMM:DramaErs/ChangeLog,v 3.19 09-Dec-2020 17:17:02+11 ks $"
+

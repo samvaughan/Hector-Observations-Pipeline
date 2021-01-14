@@ -1,0 +1,13 @@
+# "@(#) $Id: ACMM:sds/Testing/makefile.ftest,v 3.94 09-Dec-2020 17:15:54+11 ks $"
+
+# Makefile to build the ftest program - a test of SDS's fortran interfaces.
+
+DRAMALIBS=-L$$SDS_LIB -lsdsf -lsds -L$$ERS_LIB -lers
+SDSLIBS=$(DRAMALIBS) -L/star/lib `cnf_link` `err_link`
+
+ftest : ftest.o
+	$(FC) -o ftest ftest.o $(SDSLIBS)
+
+
+ftest.o : ftest.f
+	$(FC) -c ftest.f

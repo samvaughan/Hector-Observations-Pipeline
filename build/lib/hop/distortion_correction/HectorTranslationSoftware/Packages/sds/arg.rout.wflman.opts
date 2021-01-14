@@ -1,0 +1,17 @@
+# wflman html options for all DUL routine pages
+#
+#  WARNING, knows about the location of the dramasrc directory structure.
+#
+# Author: Tony Farrell
+#
+# History:
+#	02-Mar-1997 - TJF - Original version.
+#       03-Nov-1997 - TJF - Create Arg version from sds version.
+#
+#
+#     @(#) $Id: ACMM:sds/arg.rout.wflman.opts,v 3.94 09-Dec-2020 17:15:24+11 ks $#
+#
+link=routines/
+title=DRAMA/Arg routines
+summary_prefix=arg_prefix.html.incl
+optfile=/instsoft/dramasrc/html/drama.wflman.opts
