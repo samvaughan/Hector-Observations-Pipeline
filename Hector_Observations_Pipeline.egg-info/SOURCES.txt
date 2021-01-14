@@ -4,3 +4,12 @@ Hector_Observations_Pipeline.egg-info/PKG-INFO
 Hector_Observations_Pipeline.egg-info/SOURCES.txt
 Hector_Observations_Pipeline.egg-info/dependency_links.txt
 Hector_Observations_Pipeline.egg-info/top_level.txt
+hop/__init__.py
+hop/pipeline.py
+hop/misc/__init__.py
+hop/misc/misc_tools.py
+hop/misc/pandas_tools.py
+hop/target_selection/HectorSim.py
+hop/target_selection/__init__.py
+hop/tiling/__init__.py
+hop/tiling/tiling_functions.py
