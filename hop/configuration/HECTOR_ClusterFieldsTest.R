@@ -108,12 +108,12 @@ for (f in SAMIFields_Targets){
   
   #Combining guides and targets:
   #* I've changed these column headings to match the outputs of my tiling code
-  fdata=rbind(tile_data[,c('ID','x','y','mag','type')],gdata[,c('ID','x','y','mag','type')])
+  fdata=rbind(tile_data[,c('ID','MagnetX','MagnetY','mag','type')],gdata[,c('ID','MagnetX','MagnetY','mag','type')])
   
-  # #Converting coordinates into X and Y.
+  # Converting coordinates into mm
   
-  # fdata[,'x'] = -1*(fdata[,'RA'] - fcentre$ra) # * cos(fcentre$dec*pi/180.)
-  # fdata[,'y'] = fdata[,'DEC'] - fcentre$dec
+  fdata[,'x'] = fdata[,'MagnetX'] / 1000.0 # * cos(fcentre$dec*pi/180.)
+  fdata[,'y'] = fdata[,'MagnetY'] / 1000.0
   
   fdata[,'r'] = sqrt(fdata$x**2+fdata$y**2)
   
