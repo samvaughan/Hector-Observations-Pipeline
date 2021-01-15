@@ -17,13 +17,16 @@ library(DescTools)
 library(PBSmapping)
 library(R.utils)
 library(rgeos)
+library(yaml)
 
 #Probe shape definition as global variables (currently has a head/tip, a body/probe and a cable zone of avoidance (all should be in mm):
 #plate_scale"/mm scaling
 #plate_scale <<- 15.008
+#! Added by Sam to use the same constants file as Ayoan's code uses
+hector_constants <<- read_yaml(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'),"constants/HECTOR_CONSTANTS.yaml", sep='/'))
 
 #Field dimensions and parameters:
-fov <<- 226*2  #diameter of the field in mm
+fov <<- hector_constants$HECTOR_plate_radius*2  #diameter of the field in mm
 skybuffer<<-8 #clear-edge buffer
 wceg <<- 2.* 15  #Width of the cable exit gap (this is the 2*n where n=15mm initially in Julia's notes)
 ceg_pos <<- cbind(x=fov/2.*cosd(c(-90,30,150)),y=fov/2.*sind(c(-90,30,150)), deg=c(-90,30,150))

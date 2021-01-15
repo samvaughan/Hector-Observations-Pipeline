@@ -55,9 +55,9 @@ args <- parser$parse_args(tmp_args)
 #args <- parser$parse_args()
 
 if (args$run_local) {
-  source("/Users/samvaughan/Science/Hector/Tiling/Caros_Code/HECTOR_Config_v2.0.R")
+  source("hop/configuration/HECTOR_Config_v3.2.R")
 } else {
-  source("/suphys/svau7351/Science/Hector/Tiling/Caros_Code/HECTOR_Config_v2.0.R")
+  source("hop/configuration/HECTOR_Config_v3.2.")
 }
 
 
@@ -111,12 +111,12 @@ for (f in SAMIFields_Targets){
   
   #Combining guides and targets:
   #* I've changed these column headings to match the outputs of my tiling code
-  fdata=rbind(tile_data[,c('ID','RA','DEC','mag','type')],gdata[,c('ID','RA','DEC','mag','type')])
+  fdata=rbind(tile_data[,c('ID','x','y','mag','type')],gdata[,c('ID','x','y','mag','type')])
   
-  #Converting coordinates into X and Y.
+  # #Converting coordinates into X and Y.
   
-  fdata[,'x'] = -1*(fdata[,'RA'] - fcentre$ra) # * cos(fcentre$dec*pi/180.)
-  fdata[,'y'] = fdata[,'DEC'] - fcentre$dec
+  # fdata[,'x'] = -1*(fdata[,'RA'] - fcentre$ra) # * cos(fcentre$dec*pi/180.)
+  # fdata[,'y'] = fdata[,'DEC'] - fcentre$dec
   
   fdata[,'r'] = sqrt(fdata$x**2+fdata$y**2)
   

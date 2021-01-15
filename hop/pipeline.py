@@ -29,6 +29,9 @@ class HectorPipe:
         Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.
         """
 
+        # Firstly, set the directory of the 'hop' folder as a bash environment variable, so that we can access it in R
+        os.environ['HECTOROBSPIPELINE_LOC'] = Path(__file__).parent.as_posix()
+
         self.config_filename = config_filename
         self.config = misc_tools._load_config(config_filename)
 
