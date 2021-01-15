@@ -3,6 +3,7 @@ from setuptools.command.install import install
 import distutils.command.install as orig
 import subprocess
 import inspect
+import pathlib
 
 class CustomInstall(install):
 
@@ -34,13 +35,28 @@ class CustomInstall(install):
 
 
 
+
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# The text of the README file
+README = (HERE / "README.md").read_text()
+
+
 setup(name='Hector-Observations-Pipeline',
       version='0.2.1',
       description='Hector Galaxy Survey Observations pipeline',
+      long_description=README,
+      long_description_content_type="text/markdown",
       author='Sam Vaughan',
       author_email='sam.vaughan@sydney.edu.au',
-      url='',
+      url='https://github.com/samvaughan/Hector-Observations-Pipeline',
+      license="GNU",
+      classifiers=[
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7"],
       packages=find_packages(),
       include_package_data = True,
       cmdclass={'install': CustomInstall}
      )
+

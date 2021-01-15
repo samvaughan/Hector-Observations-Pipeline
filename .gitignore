@@ -5,3 +5,4 @@ Outputs/*
 *.o
 *.a
 *.h
+*.pdf

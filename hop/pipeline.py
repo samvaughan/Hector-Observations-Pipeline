@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
+import sys
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -193,34 +194,32 @@ class HectorPipe:
             tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
             if apply_distortion_correction == True:
-
                 DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
                 self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
 
             if configure_tiles == True:
                 # Place holder variable to see if the configuration code has completed
                 configured = False
-                for j in range(self.MAX_TRIES):
+                for j in range(self.config['MAX_TRIES']):
     
                     # Now call Caro's code
-                    logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
-                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{output_filename_stem}_', '--out-dir', f'{output_folder}/Configuration/', '--run_local']
+                    self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
+                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/', '--run_local']
                     #proc = subprocess.check_call(, stdout=f, stderr=g, universal_newlines=True)
                     
-                    process = subprocess.Popen(Configuration_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    output, error = process.communicate()
-                    logger_R_code.info(output.decode("utf-8"))
+                    process = subprocess.run(Configuration_bash_code, text=True, capture_output=True)
+                    self.logger_R_code.info(process.stdout)
                         
                     # If we've done the tile, break out of the inner 'Max tries' loop
                     if process.returncode == 0:
                         configured = True
                         break
                     elif process.returncode == 10:
-                        logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
-                        logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
+                        self.logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
+                        self.logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
                     else:
-                        logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
-                        logger.info("\t**Error in the configuration code! Exiting to debug**")
+                        self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
+                        self.logger.info("\t**Error in the configuration code! Exiting to debug**")
                         sys.exit()
                         #logger_R_code.error(error.decode("utf-8"))
 
@@ -230,11 +229,10 @@ class HectorPipe:
                     tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
                     if apply_distortion_correction == True:
-
                         DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
 
                 if not configured:
-                    raise ValueError(f"Couldn't configure this tile after {MAX_TRIES} attempts.")
+                    raise ValueError(f"Couldn't configure this tile after {self.config['MAX_TRIES']} attempts.")
 
             # Now find which targets have been selected in this tile
             selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])

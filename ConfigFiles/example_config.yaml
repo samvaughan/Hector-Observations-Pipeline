@@ -95,3 +95,7 @@ fraction_to_reobserve : 0.0
 Rescale_proximity: True
 
 fill_spares_with_repeats: True
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Configuration options
+MAX_TRIES : 999
