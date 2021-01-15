@@ -24,6 +24,9 @@
 #Setting working directory:
 #* setwd('~/Science/Hector/Tiling/MAXI/Cluster_tests/HectorC1_tests_01/')
 
+#! Source the Hector Config file
+source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'),"/configuration/HECTOR_Config_v3.2.R", sep='/')
+
 #* Adding Argparse, for use as a script from the command line
 library("argparse")
 parser = ArgumentParser(description='Configure a Hector tile such that all targets are observable')
@@ -53,12 +56,6 @@ tmp_args=c('/Users/samvaughan/Science/Hector/full_simulations/Testing_Distortion
 
 args <- parser$parse_args(tmp_args)
 #args <- parser$parse_args()
-
-if (args$run_local) {
-  source("hop/configuration/HECTOR_Config_v3.2.R")
-} else {
-  source("hop/configuration/HECTOR_Config_v3.2.")
-}
 
 
 #* Get the targets. We'll use Sys.glob in case a wildcard was passed.
