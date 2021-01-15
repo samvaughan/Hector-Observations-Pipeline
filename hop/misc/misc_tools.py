@@ -47,9 +47,9 @@ def create_output_directories(output_folder):
 
     # Make the subdirectories if they don't exist
     subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
-    folders = [Path(f'{output_folder}/{subfolder}') for subfolder in subfolders_to_be_made]
-    for f in folders:
-        f.mkdir(parents=True, exist_ok=True)
+    folders = dict(zip(subfolders_to_be_made, [Path(f'{output_folder}/{subfolder}') for subfolder in subfolders_to_be_made]))
+    for name, p in folders.items():
+        p.mkdir(parents=True, exist_ok=True)
 
     return folders
 

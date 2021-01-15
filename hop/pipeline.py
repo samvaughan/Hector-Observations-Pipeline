@@ -42,14 +42,18 @@ class HectorPipe:
         # Set up the output folders
         folders = misc_tools.create_output_directories(self.config['output_folder'])
         # Add these as class attributes
-        self.logfile_location = Path([string for string in folders if "Logs" in string][0])
-        self.configuration_location = Path([string for string in folders if "Configuration" in string][0])
-        self.tile_location = Path([string for string in folders if "Tiles" in string][0])
-        self.plot_location = Path([string for string in folders if "Plots" in string][0])
-        self.distortion_corrected_tile_location = Path([string for string in folders if "DistortionCorrected" in string][0])
-        self.allocation_files_location_base = Path([string for string in folders if "Allocation" in string][0])
-        self.allocation_files_location_tiles = Path([string for string in folders if "tile_outputs" in string][0])
-        self.allocation_files_location_robot = Path([string for string in folders if "tile_outputs" in string][0])
+
+        ubfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
+
+
+        self.logfile_location = folders['Logs']
+        self.configuration_location = folders['Configuration']
+        self.tile_location = folders['Tiles']
+        self.plot_location = folders['Plots']
+        self.distortion_corrected_tile_location = folders['DistortionCorrected']
+        self.allocation_files_location_base = folders['Allocation']
+        self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
+        self.allocation_files_location_robot = folders['Allocation/robot_outputs']
 
 
         # Set up the log files
@@ -59,16 +63,17 @@ class HectorPipe:
         self.galaxyIDrecord = {}
 
         # Get the location of the distortion correction executable and the R code
-        self.DistortionCorrection_binary_location = Path("hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil").absolute()
+        self.DistortionCorrection_binary_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil")
         if not self.DistortionCorrection_binary_location.exists():
             raise NameError("The Distortion Correction binary seems to not exist")
 
-        self.TdF_distortion_file_location = Path("hop/distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds").absolute()
+            Path(hop.__file__).parent
+        self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds")  
         if not self.TdF_distortion_file_location.exists():
             raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
         os.environ['TDF_DISTORTION'] = self.TdF_distortion_file_location.as_posix()
 
-        self.ConfigurationCode_location = Path("hop/configuration/HECTOR_ClusterFieldsTest.R").absolute()
+        self.ConfigurationCode_location = Path(__file__).parent / Path("configuration/HECTOR_ClusterFieldsTest.R")
         if not self.ConfigurationCode_location.exists():
             raise FileNotFoundError("The Configuration Code seems to not exist")
 
