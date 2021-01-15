@@ -9,6 +9,8 @@ import numpy as np
 from ...hector.magnets.rectangular import rectangular_magnet, is_rectangular_magnet
 from ...hector.magnets.circular import circular_magnet, is_circular_magnet
 
+## The function names with no comments have self-defining names
+
 def minimum_magnet_proximity():
     return rectangle_magnet_length + robot_arm_width
 

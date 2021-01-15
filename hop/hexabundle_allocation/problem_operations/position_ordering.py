@@ -17,6 +17,7 @@ import string
 import sys
 import re
 
+# 
 def calculate_placement_ordering_of_blocked_magnet(blocked_magnet,list_of_conflicts,list_of_fully_blocked_magnets):
 
     blocking_magnets = create_list_of_blocking_magnets(list_of_conflicts, blocked_magnet)
@@ -36,26 +37,27 @@ def calculate_placement_ordering_of_blocked_magnet(blocked_magnet,list_of_confli
             for magnet in blocking_magnets:
                 blocking_magnets.append(create_list_of_blocking_magnets(list_of_conflicts, magnet))
 
-
     if i == 49:
         blocked_magnet.placement_index = None
         print('Error ! ',blocked_magnet.__class__.__name__,int(blocked_magnet.index),' cannot be placed')
 
-
-
+# calculating placement ordering number of all the blocked magnets
 def calculate_placement_ordering_of_all_blocked_magnets(list_of_fully_blocked_magnets,list_of_conflicts):
 
     for blocked_magnet in list_of_fully_blocked_magnets:
         calculate_placement_ordering_of_blocked_magnet(blocked_magnet,list_of_conflicts,list_of_fully_blocked_magnets)
 
-
+# creating position ordering array which is one of the main outputs of the whole magnet collision code
 def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, galaxyIDrecord, \
-                                   clusterNum, tileNum, conflictFile, flagsFile):
+                                                                clusterNum, tileNum, conflictFile, flagsFile):
 
+    # calculating placement ordering of all the blocked magnets
     calculate_placement_ordering_of_all_blocked_magnets(fully_blocked_magnets, conflicted_magnets)
 
+    # maximum placement ordering number is derived
     max_order = max(magnet.placement_index for magnet in all_magnets if magnet.placement_index is not None)
 
+    # output array created
     position_ordering_array = []
 
     # magnet label and guide hexabundle index
@@ -98,8 +100,9 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         f = np.append([magnet.__class__.__name__, str(magnet.magnet_label), str(robot_center_x+magnet.view_x), \
                        str(robot_center_y+magnet.view_y), str(magnet.rotation_pickup), str(round(magnet.rotation_putdown,2)), \
                        str(order), available_pickup, str(float(magnet.IDs)), str(int(magnet.index))], str(magnet.hexabundle))
-        position_ordering_array.append(np.array(f))
 
+        # appending each magnet with its established parameters to the position ordering array
+        position_ordering_array.append(np.array(f))
 
     return np.array(position_ordering_array),galaxyIDrecord
 

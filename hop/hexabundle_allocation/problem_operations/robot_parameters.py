@@ -7,6 +7,7 @@ from ..general_operations.trigonometry import convert_radians_to_degrees
 
 # assigning magnet labels based on type
 def assign_magnet_labels(magnet, index1):
+
     # adding labels for rectangular magnet
     if magnet.__class__.__name__ == 'rectangular_magnet':
         magnet.magnet_label = 'R%02d' % (index1)
@@ -28,6 +29,7 @@ def assign_magnet_labels(magnet, index1):
 
 # flagging unresolvable conflicts by recording them in file and assigning '0' placement order to them
 def check_for_unresolvable_conflict(magnet, conflictFile, max_order, clusterNum, tileNum):
+
     # placement index checking and assigning placement order accordingly
     if magnet.placement_index == None:
         order = 0
@@ -47,6 +49,7 @@ def check_for_unresolvable_conflict(magnet, conflictFile, max_order, clusterNum,
 
 # when having more than 1 placement orders, the magnets with 1st placement order are to be assigned any pickup direction
 def add_pickupDirection(magnet, available_pickup):
+
     # magnets with placement order of 1 are placed at first so can be placed from any pickup direction
     if available_pickup == []:
         if magnet.__class__.__name__ == 'circular_magnet':
