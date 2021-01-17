@@ -1185,7 +1185,7 @@ void WriteOutputFile (
       //  item, which is the list exactly as read from the galaxy input file,
       //  plus the two values calculated by the program, MagnetX and MagnetY.
       
-      std::string FieldList = ProgDetails->ListOfFields + ", MagnetX, MagnetY\n";
+      std::string FieldList = ProgDetails->ListOfFields + ",MagnetX,MagnetY\n";
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {

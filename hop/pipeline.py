@@ -218,6 +218,7 @@ class HectorPipe:
                         self.logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
                         self.logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
                     else:
+                        self.logger_R_code.info(process.stderr)
                         self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
                         self.logger.info("\t**Error in the configuration code! Exiting to debug**")
                         sys.exit()

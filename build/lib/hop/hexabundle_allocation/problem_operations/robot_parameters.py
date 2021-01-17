@@ -72,9 +72,12 @@ def assign_preferable_pickupDirection(available_pickup):
     elif 'RI' in available_pickup:
         available_pickup = []
         available_pickup = 'RI'
-    elif 'I' in available_pickup:  ### REMEMBER TO CHANGE Inwards to Toward and Outwards to Away ###
+    elif 'I' in available_pickup:
         available_pickup = []
         available_pickup = 'I'
+    elif 'O' in available_pickup:  ### REMEMBER TO CHANGE Inwards to Toward and Outwards to Away ###
+        available_pickup = []
+        available_pickup = 'O'
 
     return available_pickup
 

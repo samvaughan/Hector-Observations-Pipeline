@@ -3,6 +3,9 @@ import os
 import glob
 from pathlib import Path
 import pandas as pd
+import matplotlib.pyplot as plt
+import subprocess
+import sys
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -27,6 +30,9 @@ class HectorPipe:
         Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.
         """
 
+        # Firstly, set the directory of the 'hop' folder as a bash environment variable, so that we can access it in R
+        os.environ['HECTOROBSPIPELINE_LOC'] = Path(__file__).parent.as_posix()
+
         self.config_filename = config_filename
         self.config = misc_tools._load_config(config_filename)
 
@@ -37,14 +43,18 @@ class HectorPipe:
         # Set up the output folders
         folders = misc_tools.create_output_directories(self.config['output_folder'])
         # Add these as class attributes
-        self.logfile_location = Path([string for string in folders if "Logs" in string][0])
-        self.configuration_location = Path([string for string in folders if "Configuration" in string][0])
-        self.tile_location = Path([string for string in folders if "Tiles" in string][0])
-        self.plot_location = Path([string for string in folders if "Plots" in string][0])
-        self.distortion_corrected_tile_location = Path([string for string in folders if "DistortionCorrected" in string][0])
-        self.allocation_files_location_base = Path([string for string in folders if "Allocation" in string][0])
-        self.allocation_files_location_tiles = Path([string for string in folders if "tile_outputs" in string][0])
-        self.allocation_files_location_robot = Path([string for string in folders if "tile_outputs" in string][0])
+
+        ubfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
+
+
+        self.logfile_location = folders['Logs']
+        self.configuration_location = folders['Configuration']
+        self.tile_location = folders['Tiles']
+        self.plot_location = folders['Plots']
+        self.distortion_corrected_tile_location = folders['DistortionCorrected']
+        self.allocation_files_location_base = folders['Allocation']
+        self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
+        self.allocation_files_location_robot = folders['Allocation/robot_outputs']
 
 
         # Set up the log files
@@ -52,6 +62,22 @@ class HectorPipe:
 
         # The galaxy ID dictionary for the hexabundle allocation
         self.galaxyIDrecord = {}
+
+        # Get the location of the distortion correction executable and the R code
+        self.DistortionCorrection_binary_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil")
+        if not self.DistortionCorrection_binary_location.exists():
+            raise NameError("The Distortion Correction binary seems to not exist")
+
+            Path(hop.__file__).parent
+        self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds")  
+        if not self.TdF_distortion_file_location.exists():
+            raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
+        os.environ['TDF_DISTORTION'] = self.TdF_distortion_file_location.as_posix()
+
+        self.ConfigurationCode_location = Path(__file__).parent / Path("configuration/HECTOR_ClusterFieldsTest.R")
+        if not self.ConfigurationCode_location.exists():
+            raise FileNotFoundError("The Configuration Code seems to not exist")
+
 
     def load_input_catalogue(self):
         """
@@ -121,7 +147,7 @@ class HectorPipe:
     def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True):
 
         """
-        Tile an entire input catalogue
+        Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
         """
 
         # Check that we have our three input catalogues
@@ -149,28 +175,67 @@ class HectorPipe:
 
             tile_out_fname = os.path.expanduser(f"{self.config['output_folder']}/Tiles/tile_{current_tile:03}.fld")
             guide_tile_out_fname = os.path.expanduser(f"{self.config['output_folder']}/Tiles/guide_tile_{current_tile:03}.fld")
-            keith_output_filename = f"{self.config['output_folder']}/DistortionCorrected/DC_tile_{current_tile:03}.fld"
+            tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/DC_tile_{current_tile:03}.fld"
             guide_tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/guide_DC_tile_{current_tile:03}.fld"
 
-            self.logger.info(f"Tile {current_tile}: \n\tSaving to {tile_out_fname}...")
+            # If we're applying distortion correction, make sure that the configuration code is looking at the correct file
+            if configure_tiles:
+                if apply_distortion_correction:
+                    tile_file_for_configuration = tile_out_fname_after_DC
+                else:
+                    tile_file_for_configuration = tile_out_fname
+
+            self.logger.info(f"Tile {current_tile}:")
             
             self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
 
-            if apply_distortion_correction:
-                raise NotImplementedError("TODO")
+            self.logger.info(f"\tSaving to {tile_out_fname}...")
+
+            tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+
+            if apply_distortion_correction == True:
+                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
+                self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
 
             if configure_tiles == True:
-                raise NotImplementedError("ToDo")
+                # Place holder variable to see if the configuration code has completed
+                configured = False
+                for j in range(self.config['MAX_TRIES']):
+    
+                    # Now call Caro's code
+                    self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
+                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/', '--run_local']
+                    #proc = subprocess.check_call(, stdout=f, stderr=g, universal_newlines=True)
+                    
+                    process = subprocess.run(Configuration_bash_code, text=True, capture_output=True)
+                    self.logger_R_code.info(process.stdout)
+                        
+                    # If we've done the tile, break out of the inner 'Max tries' loop
+                    if process.returncode == 0:
+                        configured = True
+                        break
+                    elif process.returncode == 10:
+                        self.logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
+                        self.logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
+                    else:
+                        self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
+                        self.logger.info("\t**Error in the configuration code! Exiting to debug**")
+                        sys.exit()
+                        #logger_R_code.error(error.decode("utf-8"))
 
-            else:
-                self.logger.info(f"Tile {current_tile}: \n\tSaving to {tile_out_fname}...")
+                    # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
+                    self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
 
-                self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
+                    tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
-                tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+                    if apply_distortion_correction == True:
+                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
 
-                selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])
+                if not configured:
+                    raise ValueError(f"Couldn't configure this tile after {self.config['MAX_TRIES']} attempts.")
 
+            # Now find which targets have been selected in this tile
+            selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])
 
             # Find which targets are being tiled for the first time
             new_targets = (selected_targets_mask) & (self.df_targets['ALREADY_TILED'] == False)
@@ -196,9 +261,54 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False):
+
+        """
+        Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
+        """
+
+        # Now call Keith's code
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC]
+
+        process = subprocess.Popen(DC_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output, error = process.communicate()
+        if verbose:
+            self.logger.info(output.decode("utf-8"))
+        if process.returncode != 0:
+            raise ValueError(output.decode("utf-8"))
+
+
+        # Now take Keith's code and separate the one output file which contains galaxies, standard stars and guides into two: one which has galaxies and standard stars and one which just has the guides. This is a bit messy, but reflects the way that Caro's code reads things in. It's easier to do it in Python, where I know exactly which rows are guides/galaxies/standards, rather than guessing in R using the naming convention 
+
+        with open(tile_out_fname_after_DC,"r") as fi:
+            header = []
+            for ln in fi:
+                if ln.startswith("#"):
+                    header.append(ln)
+
+        header.insert(0, f"# Tile file after distortion correction applied\n")
+        header.insert(1, f"# {tile_RA} {tile_Dec}\n")
+
+        DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, skiprows=6)
+        guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.CoADD_ID)
+        with open(guide_tile_out_fname_after_DC, 'w') as f:
+            for ln in header:
+                f.write(ln)
+            DC_corrected_output_file.loc[guide_rows].to_csv(f, index=False)
+
+        with open(tile_out_fname_after_DC, 'w') as g:
+            for ln in header:
+                g.write(ln)
+            DC_corrected_output_file.loc[~guide_rows].to_csv(g, index=False)
+        
+        return DC_corrected_output_file
+
+
+
+
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
-        ### FIXME
+        ### FIXME- add documentation here
         
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
         fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
@@ -245,7 +355,7 @@ class HectorPipe:
         # create a list of the fully blocked magnets
         fully_blocked_magnets = conflicts.functions.create_list_of_fully_blocked_magnets(conflicted_magnets)
 
-        conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
+        fully_blocked_magnets_dictionary = conflicts.functions.blocking_magnets_for_fully_blocked_magnets(conflicted_magnets)
 
         # print the fully blocked magnets out in terminal and record in conflicts file
         conflictsRecord = f'{self.allocation_files_location_base}/Conflicts_Index.txt'
@@ -273,7 +383,7 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
@@ -283,7 +393,6 @@ class HectorPipe:
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
-
 
         # Comment out all ***** marked plot functions above(lines 81-84,105s)
         # to run whole batch of tiles fast without plots

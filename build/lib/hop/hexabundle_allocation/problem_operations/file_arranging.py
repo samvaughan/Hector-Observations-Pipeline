@@ -43,7 +43,7 @@ def merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file):
     print("Filename being checked for conflicts:")
     print(fileNameHexa)
 
-def create_robotFileArray(positioning_array,robotFile,newrow):
+def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
 
     positioning_array[:, 8] = [i if i != 'nan' else -999999 for i in positioning_array[:, 8]]
     for i in range(len(positioning_array[:, 8])):
@@ -51,6 +51,33 @@ def create_robotFileArray(positioning_array,robotFile,newrow):
 
     robotFilearray = sorted(positioning_array, key=lambda x: x[6])
     robotFilearray = np.insert(robotFilearray, 0, np.array(newrow), 0)
+
+    # rePosition_col = ['0'] * len(positioning_array[:, 8])
+    # Creates a list containing 5 lists, each of 8 items, all set to 0
+    w, h = len(positioning_array[:, 8])+1,1
+    rePosition_col = [['[0]' for x in range(w)] for y in range(h)]
+
+    # rePosition_col = np.transpose(rePosition_col)
+    print(len(positioning_array[:, 8]))
+    print(len(rePosition_col))
+    # positioning_array = np.hstack((positioning_array[:, :8], rePosition_col, positioning_array[:, 8:]))
+
+    for each_magnet in fully_blocked_magnets_dictionary:
+        for i in range(len(robotFilearray)):
+            if (robotFilearray[i][0] + ' ' + str(robotFilearray[i][9])) == each_magnet:
+                rePosition_col[0][i] = '['+str(fully_blocked_magnets_dictionary[each_magnet])+']'
+
+    rePosition_col[0][0] = 'rePosition_magnets'
+    rePosition_col = np.transpose(rePosition_col)
+    print(rePosition_col)
+
+    print(rePosition_col.shape)
+    print(robotFilearray.shape)
+
+    # print(np.append(robotFilearray, rePosition_col, axis=1))
+    robotFilearray = np.hstack((robotFilearray[:, :8], rePosition_col, robotFilearray[:, 8:]))
+    print(robotFilearray)
+
     # CSV file for the robot
     # with open('GAMA_'+batch+'/Output_for_Robot/Robot_GAMA_'+batch+'_tile_%03d.txt' % (tileNum),'w+') as robotFile:
     with open(robotFile, 'w+') as robotFile:
@@ -99,8 +126,8 @@ def finalFiles(outputFile, robotFile):
     df3 = pd.read_csv(outputFile, header=0)
     df3.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
-    df4 = pd.read_csv(robotFile, header=0)
-    df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    # df4 = pd.read_csv(robotFile, header=0, error_bad_lines=False)
+    # df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
     # df3 = pd.read_csv('GAMA_'+batch+'/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_GAMA_'+batch+'_tile_%03d.txt' % (tileNum), header=0)
     # df3.to_csv('GAMA_'+batch+'/Output_with_Positioning_array/Hexa_and_Guides_with_PositioningArray_GAMA_'+batch+'_tile_%03d.txt' % (tileNum), \

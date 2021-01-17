@@ -44,7 +44,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.2.1',
+      version='0.2.3',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -54,7 +54,7 @@ setup(name='Hector-Observations-Pipeline',
       license="GNU",
       classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7"],
+        "Programming Language :: Python :: 3.8"],
       packages=find_packages(),
       include_package_data = True,
       cmdclass={'install': CustomInstall}
