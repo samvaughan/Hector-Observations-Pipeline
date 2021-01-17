@@ -5,7 +5,9 @@ from ...hector.magnets.pickup_areas import inward, outward
 
 class rectangular_magnet(rectangle):
 
+    # initializing a rectangular magnet with all respective parameters
     def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs):
+
         length = rectangle_magnet_length
         width  = rectangle_magnet_width
         super().__init__(center,length,width,orientation)
@@ -24,6 +26,7 @@ class rectangular_magnet(rectangle):
         self.rectangular_magnet_input_orientation = rectangular_magnet_input_orientation
         self.IDs = IDs
 
+    # calculating the distance between magnet center to pickup area center
     def calculate_center_magnet_to_center_pickup_area_length(self):
 
         # center_magnet_to_center_pickup_area_length = 0.25 * (self.length + robot_arm_width)  # Tiphaine's version
@@ -37,6 +40,7 @@ class rectangular_magnet(rectangle):
 
         return center_magnet_to_center_pickup_area_length
 
+    # calculating the center coordinate of pickup area- Outward
     def calculate_center_coordinate_outward_pickuparea(self):
 
         center_coordinates = \
@@ -45,6 +49,7 @@ class rectangular_magnet(rectangle):
 
         return center_coordinates
 
+    # calculating the center coordinate of pickup area- Inwards
     def calculate_center_coordinate_inward_pickuparea(self):
 
         center_coordinates = \
@@ -53,6 +58,7 @@ class rectangular_magnet(rectangle):
 
         return center_coordinates
 
+    # calculating pickup areas using their respective center coordinates
     def create_pickup_areas(self):
 
         self.pickup_areas = \
@@ -61,5 +67,6 @@ class rectangular_magnet(rectangle):
 
         return self.pickup_areas
 
+# check for the magnet being rectangular type
 def is_rectangular_magnet(magnet):
     return isinstance(magnet, rectangular_magnet)

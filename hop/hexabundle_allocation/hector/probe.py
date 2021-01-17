@@ -7,6 +7,7 @@ from .magnets.rectangular import rectangular_magnet
 
 class probe:
 
+    # intializing a probe with all the respective parameters
     def __init__(self, probe_index, circular_magnet_center, rectangular_magnet_input_orientation, galaxyORstar, Re, mu_1re, Mstar, magnet_label, hexabundle, rads, rotation_pickup, rotation_putdown, azAngs, IDs):
 
         self.index = probe_index
@@ -25,11 +26,8 @@ class probe:
         self.azAngs = azAngs
         self.IDs = IDs
 
-        # self.circular_magnet_center[0] = - (self.circular_magnet_center[0])
-
+    # calculating circular magnet orientation based on magnet center, categorizing them in four quadrants
     def calculate_circular_magnet_orientation(self):
-
-        # print(self.circular_magnet_center) #test case 2
 
         if self.circular_magnet_center[0] >= 0 and self.circular_magnet_center[1] >= 0:
 
@@ -51,12 +49,12 @@ class probe:
             self.circular_magnet_orientation = \
             2 * pi - atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
 
-        # print(self.circular_magnet_orientation)  # test case
-
+        # converting orientation form from radians to degrees
         self.circular_magnet_orientation = convert_radians_to_degrees(self.circular_magnet_orientation)
 
         return self.circular_magnet_orientation
 
+    # calculating the rectangular magnet orientation with respect to the circular magnet
     def calculate_rectangular_magnet_orientation(self):
 
        probe.calculate_circular_magnet_orientation(self)
@@ -66,6 +64,7 @@ class probe:
 
        return self.rectangular_magnet_absolute_orientation_degree
 
+    # calculating the rectangular magnet center coordinates from its orientation, and categorizing in four quadrants
     def calculate_rectangular_magnet_center_coordinates(self):
 
         probe.calculate_rectangular_magnet_orientation(self)
