@@ -221,7 +221,7 @@ class HectorPipe:
                         self.logger_R_code.info(process.stderr)
                         self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
                         self.logger.info("\t**Error in the configuration code! Exiting to debug**")
-                        sys.exit()
+                        raise subprocess.CalledProcessError("\t**Error in the configuration code! Exiting to debug*")
                         #logger_R_code.error(error.decode("utf-8"))
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
