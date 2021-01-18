@@ -66,6 +66,20 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
     # the title row is inserted at the first row of the array
     robotFilearray = np.insert(robotFilearray, 0, np.array(newrow), 0)
 
+    # add the reposition column to robot file by using the fully blocked magnets dictionary
+    robotFilearray = add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocked_magnets_dictionary)
+
+    # TEST PRINT
+    print(robotFilearray)
+
+    # write the robot file array into the CSV file for the robot
+    with open(robotFile, 'w+') as robotFile:
+        writer = csv.writer(robotFile, delimiter=' ')
+        writer.writerows(robotFilearray)
+
+    return positioning_array,robotFilearray
+
+def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocked_magnets_dictionary):
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h = len(positioning_array[:, 8])+1, 1
@@ -93,15 +107,7 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
     # add the 'list' column to the robot file array in desired position
     robotFilearray = np.hstack((robotFilearray[:, :8], rePosition_col, robotFilearray[:, 8:]))
 
-    # TEST PRINT
-    print(robotFilearray)
-
-    # write the robot file array into the CSV file for the robot
-    with open(robotFile, 'w+') as robotFile:
-        writer = csv.writer(robotFile, delimiter=' ')
-        writer.writerows(robotFilearray)
-
-    return positioning_array,robotFilearray
+    return robotFilearray
 
 def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular):
 
