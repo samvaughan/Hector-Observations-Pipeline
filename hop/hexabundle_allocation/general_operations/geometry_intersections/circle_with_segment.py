@@ -62,6 +62,7 @@ class circle_line_intersection_equation():
 # creating a circle segment equation by calculating the required parameters
 def create_circle_segment_equation(circle,segment):
 
+    # changes in x and y calculated
     dx = segment.start_point[0] - circle.center[0]
     dy = segment.start_point[1] - circle.center[1]
 

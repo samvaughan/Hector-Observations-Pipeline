@@ -6,6 +6,7 @@ from math import pi, cos, sin
 
 class rectangle:
 
+    # initializing a rectangle shape with the respective parameters
     def __init__(self,center,length,width,orientation):
         self.center = center
         self.length = length
@@ -17,7 +18,7 @@ class rectangle:
         self.view_x = - self.center[1]
         # self.view_orientation = self.orientation# - 90
 
-
+    # calculating four corners of the rectangular shape
     def calculate_4corners(self):
 
         rotation_matrix = rotational_matrix(convert_degrees_to_radians(self.orientation))
@@ -36,7 +37,7 @@ class rectangle:
 
         return [self.corner1,self.corner2,self.corner3,self.corner4]
 
-
+    # plotting the rectangle on respective figures
     def draw_rectangle(self,colour):
 
         rectangle.calculate_4corners(self)
@@ -57,6 +58,7 @@ class rectangle:
         plt.axis('scaled')
 ################################################################
 
+    # plotting the four corners of rectangle on respective figures
     def plot_corners(self):
 
         rectangle.calculate_4corners(self)
@@ -74,6 +76,8 @@ class rectangle:
         plt.plot(self.corner3[0] + robot_center_x, self.corner3[1] + robot_center_y, 'xb')
         plt.plot(self.corner4[0] + robot_center_x, self.corner4[1] + robot_center_y, 'xb')
 ###############################################
+
+    # plotting the corner labels on respective figures
     def label_corners_on_plot(self):
 
         rectangle.calculate_4corners(self)
