@@ -207,21 +207,26 @@ class HectorPipe:
                     Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/', '--run_local']
                     #proc = subprocess.check_call(, stdout=f, stderr=g, universal_newlines=True)
                     
-                    process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
-                    self.logger_R_code.info(process.stdout)
+                    try:
+                        process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
+                        self.logger_R_code.info(process.stdout)
+                        return_code = process.returncode
+                    except subprocess.TimeoutExpired:
+                        return_code = 10
+                        pass
                         
                     # If we've done the tile, break out of the inner 'Max tries' loop
-                    if process.returncode == 0:
+                    if return_code == 0:
                         configured = True
                         break
-                    elif process.returncode == 10:
+                    elif return_code == 10:
                         self.logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
                         self.logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
                     else:
                         self.logger_R_code.info(process.stderr)
                         self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
                         self.logger.info("\t**Error in the configuration code! Exiting to debug**")
-                        raise subprocess.CalledProcessError(process.returncode, Configuration_bash_code)
+                        raise subprocess.CalledProcessError(return_code, Configuration_bash_code)
                         #logger_R_code.error(error.decode("utf-8"))
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
