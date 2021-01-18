@@ -144,7 +144,7 @@ class HectorPipe:
         return starting_tile
 
 
-    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True):
+    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None):
 
         """
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
@@ -207,7 +207,7 @@ class HectorPipe:
                     Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/', '--run_local']
                     #proc = subprocess.check_call(, stdout=f, stderr=g, universal_newlines=True)
                     
-                    process = subprocess.run(Configuration_bash_code, text=True, capture_output=True)
+                    process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
                     self.logger_R_code.info(process.stdout)
                         
                     # If we've done the tile, break out of the inner 'Max tries' loop
@@ -221,7 +221,7 @@ class HectorPipe:
                         self.logger_R_code.info(process.stderr)
                         self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
                         self.logger.info("\t**Error in the configuration code! Exiting to debug**")
-                        raise subprocess.CalledProcessError("\t**Error in the configuration code! Exiting to debug*")
+                        raise subprocess.CalledProcessError(process.returncode, Configuration_bash_code)
                         #logger_R_code.error(error.decode("utf-8"))
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 

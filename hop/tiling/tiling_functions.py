@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from operator import itemgetter
 import warnings
+from ..hexabundle_allocation.hector import constants as hector_constants
 
 
 def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, n_xx_yy=100):
@@ -418,7 +419,8 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
         * A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns CATID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!
         * A text file called guide_tile_{i}.fld, which contains guide stars (observed with the Hector guide bundles). This has columns RA, DEC, mag
         * A plot of the field with the Nsel best targets selected by this code. Note that this may not resemble the final tile selected by the configuration code!
-    These outputs will be bundled together in a single outfolder" folder, which contains subfolders 'Tiles' and 'Plots'
+    Note that we also make two new columns called "MagnetX_noDC" and "MagnetY_noDC" which correspond to the xy positions of the galaxies on the Hector plate in microns from the centre. These have *NOT* been corrected for the optical distortions- that's done by the "DistortionCorrection" code, which happens after each time has been saved.
+    These outputs will be bundled together in a single folder, which contains subfolders 'Tiles' and 'Plots'
     Inputs:
         outfolder (str): Location for the output files
         df_targets (dataframe): Dataframe of all targets. This is used for plotting
@@ -434,6 +436,16 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
 
     tile_out_name = f"tile_{tile_number:03}.fld"
     guide_out_name = f"guide_tile_{tile_number:03}.fld"
+
+    # Add in the MagnetX and MagnetY values, using the Hector plate radius from the constants file
+    tile_df['MagnetX_noDC'] = (tile_df['RA'] - tile_RA) * hector_constants.HECTOR_plate_radius * 1e3
+    tile_df['MagnetY_noDC'] = (tile_df['DEC'] - tile_Dec) * hector_constants.HECTOR_plate_radius * 1e3
+
+    standard_stars_for_tile['MagnetX_noDC'] = (standard_stars_for_tile['RA'] - tile_RA) * hector_constants.HECTOR_plate_radius * 1e3
+    standard_stars_for_tile['MagnetY_noDC'] = (standard_stars_for_tile['DEC'] - tile_Dec) * hector_constants.HECTOR_plate_radius * 1e3
+
+    guide_stars_for_tile['MagnetX_noDC'] = (guide_stars_for_tile['RA'] - tile_RA) * hector_constants.HECTOR_plate_radius * 1e3
+    guide_stars_for_tile['MagnetY_noDC'] = (guide_stars_for_tile['DEC'] - tile_Dec) * hector_constants.HECTOR_plate_radius * 1e3
 
     save_tile_text_file(outfolder, tile_out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
     save_guide_text_file(outfolder, guide_out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
@@ -617,7 +629,7 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
        'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r',
        'IFU_diam_2Re', 'MassHIpred',  'PRI_SAMI',
        'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag',
-       'priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type']]
+       'priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']]
 
     # Write a CSV file with the header we want
     with open(f"{outfolder}/Tiles/{out_name}", 'w') as f:
