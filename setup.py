@@ -44,10 +44,9 @@ class CustomInstall(install):
         print()
         HERE = pathlib.Path(__file__).parent
 
-        import shlex
         all_clean_command = ['make', 'all_clean', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
         make_command = ['make', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
-        print(shlex.join(make_command))
+        print(make_command)
         subprocess.call(all_clean_command)
         subprocess.call(make_command)
         print("...Done!")
