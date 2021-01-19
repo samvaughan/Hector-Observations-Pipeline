@@ -1,0 +1,67 @@
+#  makefile.support -> Provides targets which support
+#     the deployment of DRAMA - prior to the stage of dmkmf being
+#     used.   This makefile is normally used by the standard DRAMA
+#     release script.
+#
+#
+#     @(#) $Id: ACMM:DramaErs/makefile.support,v 3.19 09-Dec-2020 17:17:02+11 ks $
+#
+HTML_DIR=html
+MAN_DIR=man
+DOC_DIR=.
+
+
+all :
+	@echo "No default target allowed for this makefile"
+	@exit 1
+
+html :
+	cd HtmlSupport && $(MAKE) HTML_DIR=$(HTML_DIR) $@
+
+doc :
+	cd TexDocs && $(MAKE) DOC_DIR=$(DOC_DIR) $@
+
+man :
+	cd ManSupport && $(MAKE) MAN_DIR=$(MAN_DIR) $@
+
+# Hooks to set up for release for a given target. Unix is the
+# default 
+release :
+vaxvms_release : vms_release
+alphavms_release : vms_release
+
+# For VMS - we need lower case only versions of ers.h and ers_err.msg.
+vms_release : ers.h ers_err.msg
+
+ers.h : Ers.h
+	cp -f Ers.h ers.h
+
+ers_err.msg : Ers_Err.msg
+	cp -f Ers_Err.msg ers_err.msg
+
+
+# For Windows - we need the same files as vms and
+# we need to generate the error files.
+win32_release : vms_release ers_err_msgt.h ers_err.h
+
+MESSGEN = $$MESSGEN_DEV/messgen
+ers_err_msgt.h ers_err.h : ers_err.msg
+	$(MESSGEN) -o -c -t ers_err
+
+
+
+acmmcheck : clean
+	(cd .. ; acmmCheck DramaErs)
+
+
+clean :
+	$(RM) *~ */*~ core  ers_spec_4.tex .dmakefile_rebuilt Makefile 
+	$(RM) ers.h ers_err.msg ers_err_msgt.h ers_err.h descrip.mms
+	$(RM) -rf man HtmlSupport/html
+
+
+
+
+
+
+

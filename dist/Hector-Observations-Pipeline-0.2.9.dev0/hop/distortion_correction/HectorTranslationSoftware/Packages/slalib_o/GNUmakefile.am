@@ -1,0 +1,258 @@
+
+#		G N U m a k e f i le . a m
+#+
+# File:
+#       GNUmakefile.am
+#
+# Function:
+#       Gnu automake source file for slalib.
+# 
+# Description:
+#       This file is an experimental GNU automake source for the 2dFdr
+#	slalib library.
+#
+#       Builds the libsla.a library.
+#
+# Author: Tony Farrell
+#
+#  Copyright (c) Anglo-Australian Telescope Board, 2009.
+#   Not to be used for commercial purposes without AATB permission.
+# 
+#     @(#) $Id: ACMM:slalib_o/GNUmakefile.am,v 1.6 06-Apr-2017 11:44:54+10 mnb $
+#  
+# History:
+# 	22-Feb-2017 - MNB - Original version based on copy in nswc module
+#
+#-
+include ../Makefile.2dfdr_rules
+
+# Indicate that we don't want these headers installed,but we do distribute them.
+#
+noinst_HEADERS=slalib.h  slamac.h
+
+#
+# Build the slalib library.  We don't want to install it - 2dFdr will link
+# to the version built in this directory
+#
+noinst_LIBRARIES=libsla.a
+
+libsla_a_SOURCES=         \
+        zd.c              \
+        xy2xy.c           \
+        vxv.c             \
+        vn.c              \
+        vdv.c             \
+        v2tp.c            \
+        unpcd.c           \
+        ue2pv.c           \
+        ue2el.c           \
+        tpv2c.c           \
+        tps2c.c           \
+        tp2v.c            \
+        tp2s.c            \
+        svdsol.c          \
+        svdcov.c          \
+        svd.c             \
+        supgal.c          \
+        subet.c           \
+        sp.c              \
+        smat.c            \
+        slatest.c         \
+        sepv.c            \
+        sep.c             \
+        s.c               \
+        s2tp.c            \
+        rvlsrk.c          \
+        rvlsrd.c          \
+        rvlg.c            \
+        rvgalc.c          \
+        rverot.c          \
+        refz.c            \
+        refv.c            \
+        refro.c           \
+        refcoq.c          \
+        refco.c           \
+        rdplan.c          \
+        rcc.c             \
+        ranorm.c          \
+        range.c           \
+        pxy.c             \
+        pvobs.c           \
+        pv2ue.c           \
+        pv2el.c           \
+        prenut.c          \
+        precl.c           \
+        preces.c          \
+        prec.c            \
+        prebn.c           \
+        pomom.c           \
+        polmo.c           \
+        pneqx.c           \
+        pncio.c           \
+        pm.c              \
+        plantu.c          \
+        plante.c          \
+        planet.c          \
+        planel.c          \
+        pfw.c             \
+        pertue.c          \
+        pertel.c          \
+        permut.c          \
+        pdq2h.c           \
+        pda2h.c           \
+        pcd.c             \
+        pav.c             \
+        pa.c              \
+        obs.c             \
+        oapqk.c           \
+        oap.c             \
+        o2iqk.c           \
+        o2i.c             \
+        nutc.c            \
+        nutc80.c          \
+        nut.c             \
+        nu.c              \
+        nu00a.c           \
+        mxv.c             \
+        mxm.c             \
+        moon.c            \
+        mapqkz.c          \
+        mapqk.c           \
+        mappa.c           \
+        map.c             \
+        m2av.c            \
+        kbj.c             \
+        invf.c            \
+        intin.c           \
+        int2in.c          \
+        imxv.c            \
+        i2oqk.c           \
+        i2opat.c          \
+        i2opad.c          \
+        i2opa.c           \
+        i2o.c             \
+        i2cqk.c           \
+        i2c.c             \
+        hfk5z.c           \
+        h2fk5.c           \
+        h2e.c             \
+        gst.c             \
+        gmst.c            \
+        gmsta.c           \
+        geoc.c            \
+        ge50.c            \
+        galsup.c          \
+        galeq.c           \
+        g2ixys.c          \
+        fw2xy.c           \
+        fw2m.c            \
+        flotin.c          \
+        fk5hz.c           \
+        fk54z.c           \
+        fk52h.c           \
+        fk524.c           \
+        fk45z.c           \
+        fk425.c           \
+        fitxy.c           \
+        evp.c             \
+        euler.c           \
+        etrms.c           \
+        era.c             \
+        eqgal.c           \
+        eqeqx.c           \
+        eqecl.c           \
+        epv.c             \
+        epj.c             \
+        epj2d.c           \
+        epco.c            \
+        epb.c             \
+        epb2d.c           \
+        eors.c            \
+        eo.c              \
+        el2ue.c           \
+        eg50.c            \
+        ecor.c            \
+        ecmat.c           \
+        ecleq.c           \
+        earth.c           \
+        e2h.c             \
+        dvxv.c            \
+        dvn.c             \
+        dvdv.c            \
+        dv2tp.c           \
+        dtt.c             \
+        dtpv2c.c          \
+        dtps2c.c          \
+        dtp2v.c           \
+        dtp2s.c           \
+        dtf2r.c           \
+        dtf2d.c           \
+        dt.c              \
+        dsepv.c           \
+        dsep.c            \
+        ds2tp.c           \
+        ds2c6.c           \
+        dranrm.c          \
+        drange.c          \
+        dr2tf.c           \
+        dr2af.c           \
+        dpav.c            \
+        dmxv.c            \
+        dmxm.c            \
+        dmoon.c           \
+        dmat.c            \
+        dm2av.c           \
+        djcl.c            \
+        djcal.c           \
+        dimxv.c           \
+        dh2e.c            \
+        dfltin.c          \
+        deuler.c          \
+        de2h.c            \
+        dd2tf.c           \
+        dcs2c.c           \
+        dcmpf.c           \
+        dcc2s.c           \
+        dc62s.c           \
+        dbjin.c           \
+        dbear.c           \
+        dav2m.c           \
+        dat.c             \
+        dafin.c           \
+        daf2r.c           \
+        ctf2r.c           \
+        ctf2d.c           \
+        cs2c.c            \
+        cs2c6.c           \
+        cr2tf.c           \
+        cr2af.c           \
+        combn.c           \
+        clyd.c            \
+        cldj.c            \
+        cd2tf.c           \
+        cc62s.c           \
+        cc2s.c            \
+        calyd.c           \
+        caldj.c           \
+        caf2r.c           \
+        c2iqkz.c          \
+        c2iqk.c           \
+        c2ipas.c          \
+        c2ipad.c          \
+        c2ipa.c           \
+        c2i.c             \
+        bear.c            \
+        av2m.c            \
+        atmdsp.c          \
+        aopqk.c           \
+        aoppat.c          \
+        aoppa.c           \
+        aop.c             \
+        ampqk.c           \
+        amp.c             \
+        altaz.c           \
+        airmas.c          \
+        afin.c            \
+        addet.c
+
+

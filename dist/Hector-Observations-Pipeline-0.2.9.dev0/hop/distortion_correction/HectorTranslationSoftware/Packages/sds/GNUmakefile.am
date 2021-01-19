@@ -1,0 +1,101 @@
+#		M a k e f i le . a m
+#+
+# File:
+#       Makefile.am
+#
+# Function:
+#       Gnu automake source file for sds.
+# 
+# Description:
+#       This file is an experimental GNU automake source for the SDS library. 
+#       It is currently set up for use with 2dfdr.  
+#
+#       Builds the sds library and the sds_err include files.
+#
+# Author: Tony Farrell
+#
+#  Copyright (c) Anglo-Australian Telescope Board, 2009.
+#   Not to be used for commercial purposes without AATB permission.
+# 
+#     @(#) $Id: ACMM:sds/GNUmakefile.am,v 3.94 09-Dec-2020 17:15:33+11 ks $
+#  
+# History:
+# 	19-Aug-2009 - TJF - Original version.
+#       27-Jan-2010 - TJF - Rename from Makefile.am to GNUmakefile.am.
+#                           Include sdsport.h, arg.h, sdscompiler.h and 
+#				sdstcl.h  in list of headers needed.
+#                           Add sds_err.msg and arg_err.msg to the 
+#			        distribution using EXTRA_DIST
+#       02-Feb-2010 - TJF - Add sdslexer.c,sdsparser.c to list of build sources
+#       08-Feb-2010 - TJF - Fix error in previous change.
+#                           Add *~ files to those to be cleaned.
+#       23-Dec-2015 - TJF - VPATH must be specified and include the Fortran
+#                             sub-directory, so that when the top-level configure.ac
+#                             specifies the subdir-objects option (to AM_INIT_AUTOMAKE),
+#                             which will become the default in automake, it works.
+#-
+
+# Get rules for processing .msg files
+include $(top_srcdir)/Makefile.drama_rules
+
+# Ensure we find the Fortran files.
+VPATH=Fortran
+
+# All of these are generated from sds_err.msg and arg_err.h, except 
+#   sdsparser.h, which comes from sdsparser.l.
+#
+BUILT_SOURCES = sds_err.h sds_err.tcl sds_err_msgt.h \
+	 arg_err.h arg_err.tcl arg_err_msgt.h sdsparser.h sdslexer.c sdsparser.c
+
+# Autoconfigure doesn't work out it needs to distribte this automatically
+EXTRA_DIST=sds_err.msg arg_err.msg
+
+# Have to do this one by hand
+sds_err_msgt.h : sds_err.msg
+	$(MESSGEN) -o -t -x $@ $<
+arg_err_msgt.h : arg_err.msg
+	$(MESSGEN) -o -t -x $@ $<
+
+# Reference the include files we need.
+# These are in the source, not the build directories (may be different spots)
+#
+# Note SdsYylineNo and SdsYyparse definitions are because sdscompiler.c
+# presumes have renamed yacc function numbers to these names
+# Don't (yet) do this in this iteration
+#
+# -DSDS_NO_POSIX_THREADS ensures that SDS does not try to use
+#  posix thread releated features, which are not needed for 2dFdr
+AM_CPPFLAGS =  $(DRAMA_INCLUDES) $(DRAMA_DEFINES) \
+	-DSdsYylineno=yylineno -DSdsYyparse=yyparse \
+	-I../../tcl/Tcl/generic -DSDS_NO_POSIX_THREADS
+
+# Build the sds library - but don't install it (not for 2dFdr anyway, might
+#   want to install it for DRAMA)
+noinst_LIBRARIES=libsds.a
+
+# Indicate that we don't want this header installed (not for 2dFdr anyway, will
+#   wait to install it for DRAMA), but we do distribute them.
+noinst_HEADERS=sds.h sdsport.h arg.h sdstcl.h sdscompiler.h
+
+# Build sdsc program, but don't install it
+noinst_PROGRAMS=sdsc
+
+# Sources for library
+libsds_a_SOURCES = sds.c sdsutil.c arg.c sdstcl.c sdstclinit.c sdscpp.C \
+    Fortran/arg_c.c Fortran/arg_fort.F95
+
+# Ensure have error include files before buliding these objects
+sds.$(OBJEXT) : sds_err.h
+arg.$(OBJEXT) : sds_err.h arg_err.h
+
+# Build sdsparser.h and sdsparser.y from sdsparser.c, using YACC/BISON.
+# Need AM_YFLAGS spec to ensure getting .h file, and then must indicate its name
+AM_YFLAGS = -d
+
+sdsc_SOURCES=sdsc.c sdscompiler.c sdsparser.y sdslexer.l sdsutil.c sds.c
+
+# Clean built files and other junk that may get left behind
+clean-local :
+	- $(RM) $(BUILT_SOURCES)
+	- $(RM) *~
+

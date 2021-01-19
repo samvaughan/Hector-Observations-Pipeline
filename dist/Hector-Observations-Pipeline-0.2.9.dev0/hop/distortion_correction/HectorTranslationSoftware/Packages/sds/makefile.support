@@ -1,0 +1,109 @@
+#  makefile.support -> Provides targets which support
+#     the deployment of DRAMA - prior to the stage of dmkmf being
+#     used.   This makefile is normally used by the standard DRAMA
+#     release script.
+#
+#
+#     @(#) $Id: ACMM:sds/makefile.support,v 3.94 09-Dec-2020 17:15:24+11 ks $
+#
+
+HTML_DIR=html
+MAN_DIR=man
+DOC_DIR=..
+
+## These are required to support VMS and Windows.
+
+.SUFFIXES: .C .cpp .cxx
+
+.C.cpp:
+	cp -f $< $@
+
+.C.cxx:
+	cp -f $< $@
+
+all :
+	@echo "No default target allowed for this makefile"
+	@exit 1
+
+html :
+	cd HtmlSupport && $(MAKE) HTML_DIR=$(HTML_DIR) $@
+
+doc :
+	cd TexDocs && $(MAKE) DOC_DIR=$(DOC_DIR) $@
+
+man :
+	cd ManSupport && $(MAKE) MAN_DIR=$(MAN_DIR) $@
+
+# Hooks to set up for release for a given target. Unix is the
+# default 
+release : drama_release  
+vaxvms_release : vms_release
+alphavms_release : vms_release
+
+vms_release : drama_release sdsparser.c sdsparser.h  sdslexer.c \
+	sdscpp.cxx sdscpptest.cxx
+
+drama_release : 
+
+
+sdscpptest.cxx : sdsCppTest.C
+	cp -f $< $@
+
+sdscpptest.cpp : sdsCppTest.C
+	cp -f $< $@
+
+
+acmmcheck : clean
+	(cd .. ; acmmCheck sds)
+
+ 
+clean :
+	if [ -f Makefile ]; then make clean ; fi
+	$(RM) *~ */*~ core   .dmakefile_rebuilt Makefile sds.tex
+	$(RM) -rf man HtmlSupport/html  sds_err.h sds_err_msgt.h forconv
+	$(RM) sdsparser.c sdsparser.h sdslexer.c *.for *.cpp *.cxx
+	$(RM) -rf cpp_html arg_err.h arg_err_msgt.h
+
+
+## These will be needed, but am not sure how they will be run yet.
+
+
+PARSER_PREFIX=SdsY
+
+# Create the lexer file.  We have to remove some junk which stuffs up the
+# VAXC compilation and run the symbol Fix code normally run by
+# LexObjectFixed() mcro,  as well as renaming it from lex.yy.c to sdslexer.l
+sdslexer.c : sdslexer.l
+	lex sdslexer.l
+	sed 's/#pragma.*//' lex.yy.c |sed -f $$CONFIG_DIR/LexerFix.sed | sed 's/FIX-Y/$(PARSER_PREFIX)/g' | sed 's/\"stdio.h\"/<stdio.h>/' |  sed 's/FILE \*yyin = {stdin}, \*yyout = {stdout};/FILE *yyin,*yyout;/'  > sdslexer.c 
+	rm lex.yy.c
+
+
+# Generate the parser using yacc.  yacc write the files y.tab.c and y.tab.h
+# which we rename to more convient files.  -d writes the .h files.
+# We also have to remove some junk which stuffs up the VAXC compilation.
+# Note, one of the things we remove is the include of values.h, which
+# does not seem to be needed, but I must be there for some reason, so we
+# may have to replace it at some stage.
+sdsparser.c : sdsparser.y
+	yacc -d sdsparser.y 
+	sed 's/#ifdef __STDC__/#if defined(__STDC__) || defined(VMS)/' y.tab.c | sed 's/#pragma.*//' | sed 's/#include <values.h>//' | sed -f $$CONFIG_DIR/ParserFix.sed  |  sed 's/FIX-Y/$(PARSER_PREFIX)/g' > sdsparser.c
+	mv y.tab.h sdsparser.h
+	rm -f y.tab.c
+
+
+sdsparser.h : sdsparser.c
+
+
+win32_release : drama_release sdscpp.cpp sds_err.h sds_err_msgt.h \
+	arg_err.h arg_err_msgt.h sdsparser.c sdsparser.h  sdslexer.c \
+	sdscpp.cpp sdscpptest.cpp
+
+
+MESSGEN = $$MESSGEN_DEV/messgen
+sds_err.h sds_err_msgt.h : sds_err.msg
+	$(MESSGEN) -o -c -t sds_err
+
+arg_err.h arg_err_msgt.h : arg_err.msg
+	$(MESSGEN) -o -c -t arg_err
+
