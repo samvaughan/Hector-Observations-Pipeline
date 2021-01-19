@@ -2,7 +2,4 @@
 *.pyc
 *.fld
 Outputs/*
-*.o
-*.a
-*.h
 *.pdf
