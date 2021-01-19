@@ -4,11 +4,13 @@ from ..hector.constants import HECTOR_plate_center_coordinate,HECTOR_plate_radiu
 
 class HECTOR_plate(circle):
 
+    # initializing Hector plate with all respective parameters
     def __init__(self):
         self.center = HECTOR_plate_center_coordinate
         self.radius = HECTOR_plate_radius
         self.orientation = 0
 
+# plotting the Hector plate in figures
 def plot_plate(HECTOR_plate):
 
     # # setting aspect ratio

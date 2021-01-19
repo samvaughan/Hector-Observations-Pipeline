@@ -45,7 +45,7 @@ def tile_for_testing(tile_RA, tile_Dec):
 
     tiling_parameters = dict(proximity=200)
 
-    columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred',  'PRI_SAMI',   'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type']
+    columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred',  'PRI_SAMI',   'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
 
     tile_df = pd.DataFrame(np.zeros((2, len(columns))), columns=columns)
     tile_df['type'] = 1.0
@@ -107,7 +107,7 @@ class Test_save_target_outfile():
 
     def test_correct_column_names_for_targets(self, tile_for_testing):
 
-        columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred', 'PRI_SAMI', 'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type']
+        columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred', 'PRI_SAMI', 'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
 
         test_df = pd.read_csv(tile_for_testing, comment='#')
 
