@@ -1,0 +1,66 @@
+#  SDS Standalone (without DRAMA) Build Makefile.
+#
+#  This builds a subset of the full SDS structured data system library that can
+#  be used for standalone programs that need to be able to access SDS files, but
+#  need to be built on a system that does not have a full DRAMA installation.
+#
+#  @(#) $Id: ACMM:sds/Makefile.standalone,v 3.94 09-Dec-2020 17:15:25+11 ks $
+#
+#  History:
+#      8th Dec 2020. Original version, KS.
+
+CC=gcc
+COPY = -O
+CFLAGS = -ansi -Wall -D_GNU_SOURCE $(COPT)
+
+#  The idea is to run this from the main sds directory. When SDS is built under
+#  DRAMA, the DRAMA messgen utility will be run to generate the sds_err.h and
+#  arg_err.h and related files from sds_err.msg and arg_err.msg, but if DRAMA
+#  is not available on this machine, the messgen utility can't be used, and
+#  we fall back on copies made on a machine that did have DRAMA and held in
+#  the Standalone directory, which will also have copies of the standard
+#  drama.h and status.h files used by all DRAMA programs.
+#
+#  SDS makes use of the DRAMA Ers error reporting library, and so needs
+#  at least the Ers.h include file. This makefile assumes that this is
+#  in a directory called DramaErs alongside the current directory. If that is
+#  not the case, ERS_DIR may have to be redefined accordingly.
+
+SDS_SRC = .
+STANDALONE_DIR = ./Standalone
+ERS_DIR = ../DramaErs
+INC = -I $(SDS_SRC) -I $(ERS_DIR) -I $(STANDALONE_DIR)
+
+SDS_OBJECTS = $(SDS_SRC)/sds.o $(SDS_SRC)/sdsutil.o $(SDS_SRC)/arg.o
+
+#  sdslist is a utility program for examining SDS files. It can be a useful
+#  diagnostic tool.
+
+sdslist : $(SDS_SRC)/sdslist.c libsds.a
+	$(CC) $(CFLAGS) $(INC) $(SDS_SRC)/sdslist.c  -o sdslist libsds.a -lpthread
+
+#  Include file dependencies
+
+arg.o : $(SDS_SRC)/arg.c $(STANDALONE_DIR)/status.h $(ERS_DIR)/Ers.h \
+                                       $(SDS_SRC)/sds.h $(SDS_SRC)/arg.h
+	$(CC) $(CFLAGS) $(INC) -c -o arg.o $(SDS_SRC)/arg.c
+
+sds.o : $(SDS_SRC)/sds.c $(STANDALONE_DIR)/status.h $(SDS_SRC)/sds.h
+	$(CC) $(CFLAGS) $(INC) -c -o sds.o $(SDS_SRC)/sds.c
+
+sdslist.o : $(SDS_SRC)/sdslist.c $(STANDALONE_DIR)/status.h $(SDS_SRC)/sds.h
+	$(CC) $(CFLAGS) $(INC) -c -o sdslist.o $(SDS_SRC)/sdslist.c
+
+sdstest.o : $(SDS_SRC)/sdstest.c $(STANDALONE_DIR)/status.h $(SDS_SRC)/sds.h
+	$(CC) $(CFLAGS) $(INC) -c -o sdstest.o $(SDS_SRC)/sdstest.c
+
+sdsutil.o : $(SDS_SRC)/sdsutil.c $(STANDALONE_DIR)/status.h $(SDS_SRC)/sds.h
+	$(CC) $(CFLAGS) $(INC) -c -o sdsutil.o $(SDS_SRC)/sdsutil.c
+
+libsds.a : $(SDS_OBJECTS)
+	$(RM) $@
+	$(AR) crv $@ $(SDS_OBJECTS)
+	ranlib $@
+
+clean ::
+	$(RM) *.o libsds.a

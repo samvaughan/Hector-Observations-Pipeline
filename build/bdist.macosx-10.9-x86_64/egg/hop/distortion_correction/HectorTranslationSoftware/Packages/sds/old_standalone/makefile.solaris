@@ -1,0 +1,144 @@
+# "@(#) $Id: ACMM:sds/old_standalone/makefile.solaris,v 3.94 09-Dec-2020 17:15:35+11 ks $"
+#
+#  SDS makefile for SunOS 5.x (Solaris)
+#
+#  Author:
+#    Jeremy Bailey
+#
+#  History:
+#    12-Jan-1994 - JAB - Initial version
+
+
+CFLAGS = -O -Dsolaris2 
+
+
+CC = cc $(WARNINGS) $(CFLAGS)
+
+
+all : libsds.a sdstest readtest sdstimes sdslist sdsc
+
+allfor : libsds.a libsdsf.a sdstest readtest sdstimes sdslist sds2hds hds2sds \
+sdsc
+
+OBJECTS = sds.o sdsutil.o sdsparser.o sdscompiler.o sdslexer.o arg.o ers.o \
+strtoul.o
+
+FOBJECTS = sdsfort.o argfort.o
+
+libsds.a : libsds.a($(OBJECTS))
+	ar -r $@ $?
+
+libsds.a(%.o) : %.o
+	@true
+
+libsdsf.a : libsdsf.a($(FOBJECTS))
+	ar -r $@ $?
+
+libsdsf.a(%.o) : %.o
+	@true
+
+
+#  The parser
+sdsparser.o : sdsparser.c sdscompiler.h sdsparser.h
+	$(CC) -c sdsparser.c
+
+# Generate the parser using yacc.  yacc write the files y.tab.c and y.tab.h
+# which we rename to more convient files.  -d writes the .h files.
+sdsparser.h sdsparser.c : sdsparser.y
+	yacc -d sdsparser.y 
+	mv y.tab.c sdsparser.c
+	mv y.tab.h sdsparser.h
+
+# The lexer3
+sdslexer.o : sdslexer.c sdsparser.h sdscompiler.h
+	$(CC) -c $(LEXDEBUG) sdslexer.c	
+
+# Generate the lexer using lex. We run the lexer through sed to get rid of 
+# constructs incompatable with VMS C.  lex produces the file lex.yy.c.  we
+# want it in sdsparser.c
+sdslexer.c : sdslexer.l sdscompiler.h sdsparser.h
+	lex sdslexer.l
+	sed 's/\"stdio.h\"/<stdio.h>/' lex.yy.c |  sed 's/FILE \*yyin = {stdin}, \*yyout = {stdout};/FILE *yyin,*yyout;/'  > sdslexer.c 
+	rm lex.yy.c
+
+
+# The compiler
+sdscompiler.o : sdscompiler.c sdscompiler.h
+	$(CC) -c sdscompiler.c
+
+# Tidy up
+clean :
+	rm sdsparser.h sdsparser.c sdslexer.c *.o 
+
+# Create the grammer for documentation purposes
+sdscompiler.gram : sdsparser.y sdscompiler.ed
+	ed - < sdscompiler.ed >sdscompiler.gram
+
+sds.h : sds_err.h
+
+# The sds kernel
+sds.o : sds.c sds.h
+	$(CC) -c sds.c
+
+# The sds utility library
+sdsutil.o : sdsutil.c sds.h
+	$(CC) -c sdsutil.c
+
+# The arg library
+arg.o : arg.c sds.h arg.h Ers.h
+	$(CC) -c arg.c
+
+ers.o : ers.c Ers.h
+	$(CC) -c ers.c
+
+strtoul.o : strtoul.c
+	$(CC) -c strtoul.c
+
+sdsfort.o : sdsfort.c sds.h 
+	$(CC) -I/star/include -c sdsfort.c
+
+argfort.o : argfort.c sds.h arg.h
+	$(CC) -I/star/include -c argfort.c
+
+sdstest : sdstest.c libsds.a sds.h 
+	$(CC) sdstest.c libsds.a -o sdstest
+
+# The Stand alone SDS compiler.
+sdsc : sdsc.o $(objects) 
+	$(CC) -o sdsc sdsc.o libsds.a 
+
+sdsc.o : sdsc.c sdscompiler.h
+	$(CC) -DDEFAULTCPP=\"/usr/lib/cpp\" -c sdsc.c
+
+readtest : readtest.c libsds.a sds.h
+	$(CC) readtest.c libsds.a -o readtest
+
+sdslist : sdslist.c libsds.a sds.h
+	$(CC) sdslist.c libsds.a -o sdslist
+
+sdstimes : sdstimes.c libsds.a unix_timer.c sds.h
+	$(CC) sdstimes.c libsds.a unix_timer.c -o sdstimes
+
+sds2hdsf.o : sds2hdsf.f
+	f77 -c sds2hdsf.f
+
+hds2sdsf.o : hds2sdsf.f
+	f77 -c hds2sdsf.f
+
+gen_move.o : gen_move.f
+	f77 -c gen_move.f
+
+sds2hds : sds2hds.o sds2hdsf.o gen_move.o libsds.a libsdsf.a sds_err
+	f77 sds2hds.o sds2hdsf.o gen_move.o libsdsf.a \
+libsds.a -L/star/lib `hds_link` \
+`cnf_link` `err_link` -o sds2hds 
+
+sds2hds.o : sds2hds.c
+	$(CC) -I/star/include sds2hds.c -c
+
+hds2sds : hds2sds.o hds2sdsf.o gen_move.o libsds.a libsdsf.a sds_err
+	f77 hds2sds.o hds2sdsf.o gen_move.o libsdsf.a \
+libsds.a -L/star/lib `hds_link` `cnf_link` `err_link` -o hds2sds
+
+hds2sds.o : hds2sds.c
+	$(CC) -I/star/include hds2sds.c -c

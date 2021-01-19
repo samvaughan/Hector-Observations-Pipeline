@@ -1,37 +1,54 @@
 from setuptools import setup, find_packages, Command
-from setuptools.command.install import install
-import distutils.command.install as orig
+#from setuptools.command.install import install
+#import distutils.command.install as orig
+
+from distutils.command.build import build
 import subprocess
 import inspect
 import pathlib
 
-class CustomInstall(install):
 
-    user_options = install.user_options
+class CustomBuild(build):
 
-    def initialize_options(self):
-        install.initialize_options(self)
+  def run(self):
+        # run original build code
+        build.run(self)
 
-    def finalize_options(self):
-        install.finalize_options(self)
 
-    def run(self):
-
-        # Copied from the original setup.command.install functions
-        if not install._called_from_setup(inspect.currentframe()):
-            # Run in backward-compatibility mode to support bdist_* commands.
-            orig.install.run(self)
-        else:
-            install.do_egg_install()
-
-        # and now adding in my own bit
-        print("...building the Hector Translation code")
-        subprocess.call(
-            ['make', 
-            '-C', 
-            'hop/distortion_correction/HectorTranslationSoftware/Code']
+        def compile():
+            subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code']
         )
-        print("...Done!")
+
+        self.execute(compile, [], 'Compiling Distortion Correction binary')
+
+
+# class CustomInstall(install):
+
+#     user_options = install.user_options
+
+#     def initialize_options(self):
+#         install.initialize_options(self)
+
+#     def finalize_options(self):
+#         install.finalize_options(self)
+
+#     def run(self):
+
+#         # Copied from the original setup.command.install functions
+#         if not install._called_from_setup(inspect.currentframe()):
+#             # Run in backward-compatibility mode to support bdist_* commands.
+#             orig.install.run(self)
+#         else:
+#             install.do_egg_install()
+
+#         # and now adding in my own bit
+#         print("...building the Hector Translation code")
+#         subprocess.call(
+#             ['make', 
+#             '-C', 
+#             'hop/distortion_correction/HectorTranslationSoftware/Code']
+#         )
+#         print("...Done!")
 
 
 
@@ -42,9 +59,11 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
+packages = find_packages() + ["hop.distortion_correction.HectorTranslationSoftware.Code"]
+
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.2.5',
+      version='0.2.8dev',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -55,8 +74,9 @@ setup(name='Hector-Observations-Pipeline',
       classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8"],
-      packages=find_packages(),
+      packages=packages,
       include_package_data = True,
-      cmdclass={'install': CustomInstall}
+      python_requires='>=3',
+      cmdclass={'build': CustomBuild}
      )
 
