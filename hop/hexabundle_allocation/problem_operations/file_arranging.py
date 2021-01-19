@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import csv
+import re
 import time
 
 # arranging the guides files in consistent format with hexas files
@@ -82,18 +83,47 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
 def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocked_magnets_dictionary):
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
-    w, h = len(positioning_array[:, 8])+1, 1
+    w, h = len(positioning_array[:, 8]) + 1, 1
+    nameColumn = [['[0]' for x in range(w)] for y in range(h)]
+
+    j=0
+    for i in robotFilearray:
+        if hasNumbers(i[1]):
+            nameColumn[0][j] = i[1]
+        else:
+            nameColumn[0][j] = i[1] + str(i[9])
+        j += 1
+
+    print(nameColumn)
+
+    # transposing the list to a column with a title assigned
+    nameColumn[0][0] = 'Magnet_title'
+    nameColumn = np.transpose(nameColumn)
+
+    # add the 'list' column to the robot file array in desired position
+    robotFilearray = np.hstack((robotFilearray[:, :8], nameColumn, robotFilearray[:, 8:]))
+
+    # Creates a list containing w lists, each of h item/s, all filled with 0
+    w, h = len(positioning_array[:, 9]) + 1, 1
     rePosition_col = [['[0]' for x in range(w)] for y in range(h)]
 
     # TEST PRINT to check the arrays
     print(len(positioning_array[:, 8]))
     print(len(rePosition_col))
+    print(len(nameColumn))
 
     # filling out the created list with the blocked magnets dictionary in order with the robot file array
     for each_magnet in fully_blocked_magnets_dictionary:
         for i in range(len(robotFilearray)):
-            if (robotFilearray[i][0] + ' ' + str(robotFilearray[i][9])) == each_magnet:
-                rePosition_col[0][i] = '['+str(fully_blocked_magnets_dictionary[each_magnet])+']'
+            if (robotFilearray[i][0] + ' ' + str(robotFilearray[i][10])) == each_magnet:
+                for j in range(len(fully_blocked_magnets_dictionary[each_magnet])):
+                    if j>0:
+                        rePosition_col[0][i] += '_'
+                    else:
+                        rePosition_col[0][i] = ''
+                    for k in range(len(robotFilearray)):
+                        if robotFilearray[k][0]+' '+str(robotFilearray[k][10]) == fully_blocked_magnets_dictionary[each_magnet][j]:
+                            rePosition_col[0][i] += str(robotFilearray[k][8])
 
     # transposing the list to a column with a title assigned
     rePosition_col[0][0] = 'rePosition_magnets'
@@ -105,9 +135,12 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     print(robotFilearray.shape)
 
     # add the 'list' column to the robot file array in desired position
-    robotFilearray = np.hstack((robotFilearray[:, :8], rePosition_col, robotFilearray[:, 8:]))
+    robotFilearray = np.hstack((robotFilearray[:, :9], rePosition_col, robotFilearray[:, 9:]))
 
     return robotFilearray
+
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
 
 def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular):
 

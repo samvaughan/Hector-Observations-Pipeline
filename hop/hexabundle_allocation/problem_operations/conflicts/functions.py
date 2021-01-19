@@ -165,22 +165,19 @@ def blocking_magnets_for_fully_blocked_magnets(list_of_blocked_magnets):
 
             # magnet conflicts stated out with each fully blocked magnet and its list of blocking magnets
             conflict_magnet = 'For ' + conflict.blocked_magnet.__class__.__name__ + ' ' + str(int(conflict.blocked_magnet.index)) + ': ' + \
-                              conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index)) + '\n'
+                            conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index)) + '\n'
 
             ## TEST PRINT
             print(conflict_magnet)
 
             # blocked magnet stored as key and the blocking magnets as values in the fully blocked magnets dictionary
             key = conflict.blocked_magnet.__class__.__name__ + ' ' + str(int(conflict.blocked_magnet.index))
-            value = conflict.blocking_magnet.__class__.__name__[0].upper() + str('%02d' % int(conflict.blocking_magnet.index))
+            value = conflict.blocking_magnet.__class__.__name__ + ' ' + str(int(conflict.blocking_magnet.index))
 
             # store the values by creating the keys if necessary and adding multiple values to same key if required
             fully_blocked_magnets_dictionary.setdefault(key, [])
             if value not in fully_blocked_magnets_dictionary[key]:
-                if fully_blocked_magnets_dictionary[key] == []:
-                    fully_blocked_magnets_dictionary[key] = value
-                else:
-                    fully_blocked_magnets_dictionary[key] += ',' + value
+                fully_blocked_magnets_dictionary[key].append(value)
 
     ## TEST PRINT
     print(fully_blocked_magnets_dictionary)
