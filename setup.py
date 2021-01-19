@@ -41,8 +41,15 @@ class CustomInstall(install):
 
         # and now adding in my own bit
         print("...building the Hector Translation code")
-        subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-        subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
+        print()
+        HERE = pathlib.Path(__file__).parent
+
+        import shlex
+        all_clean_command = ['make', 'all_clean', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
+        make_command = ['make', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
+        print(shlex.join(make_command))
+        subprocess.call(all_clean_command)
+        subprocess.call(make_command)
         print("...Done!")
 
 
