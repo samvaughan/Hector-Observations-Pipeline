@@ -67,7 +67,7 @@ def output_folder(input_dataframes):
 
         tile_out_fname = os.path.expanduser(f"{output_folder}/Tiles/tile_{current_tile:03}.fld")
 
-        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = T.make_best_tile(df_targets, df_guide_stars, df_standard_stars, tiling_parameters=tiling_parameters, tiling_type=tiling_type, selection_type='random', fill_spares_with_repeats=fill_spares_with_repeats)
+        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = T.make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity=proximity, tiling_parameters=tiling_parameters, tiling_type=tiling_type, selection_type='random', fill_spares_with_repeats=fill_spares_with_repeats)
         T.save_tile_outputs(f'{output_folder}', df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number=current_tile, plot=True)
 
         best_tile_RAs.append(tile_RA)

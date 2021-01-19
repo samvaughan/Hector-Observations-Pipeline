@@ -2,6 +2,7 @@ import numpy as np
 
 class circle_line_intersection_equation():
 
+    # initializing the circle line intersection equation with the respective parameters
     def __init__(self,A,B,C,line_segment):
         self.parameter_A = A
         self.parameter_B = B
@@ -9,11 +10,13 @@ class circle_line_intersection_equation():
 
         self.segment = line_segment
 
+    # calculating determinant via: b^2 - 4ac
     def calculate_determinant(self):
 
         self.determinant = self.parameter_B ** 2 - 4 * self.parameter_A * self.parameter_C
         return self.determinant
 
+    # determining intersection by checking whether it's greater than or equal to zero
     def intersection(self):
 
         if self.calculate_determinant() >= 0:
@@ -21,6 +24,7 @@ class circle_line_intersection_equation():
         else:
             return False
 
+    # solving the intersection for roots using the quadratic formula
     def solve_intersection_times(self):
 
         if self.intersection():
@@ -29,6 +33,7 @@ class circle_line_intersection_equation():
 
             return t1,t2
 
+    # solving for intersection points by multiply roots with the vector then adding with start point
     def solve_intersecting_points(self):
 
         if self.intersection():
@@ -37,12 +42,14 @@ class circle_line_intersection_equation():
                     [self.segment.start_point[0] + self.solve_intersection_times()[1] * self.segment.vector()[0],
                      self.segment.start_point[1] + self.solve_intersection_times()[1] * self.segment.vector()[1]]]
 
+    # solving for all the intersection points of segment with circle
     def solve_segment_intersects_with_circle(self):
 
         circle_line_intersection_points = self.solve_intersecting_points()
 
         circle_segment_intersection_points = []
 
+        # adding all the circle segment intersection points in list
         if circle_line_intersection_points:
             for point in circle_line_intersection_points:
 
@@ -52,8 +59,10 @@ class circle_line_intersection_equation():
 
         return circle_segment_intersection_points
 
+# creating a circle segment equation by calculating the required parameters
 def create_circle_segment_equation(circle,segment):
 
+    # changes in x and y calculated
     dx = segment.start_point[0] - circle.center[0]
     dy = segment.start_point[1] - circle.center[1]
 
@@ -63,6 +72,7 @@ def create_circle_segment_equation(circle,segment):
 
     return circle_line_intersection_equation(parameter_A,parameter_B,parameter_C,segment)
 
+# checking whether point is on segment by the range of start point to end point coordinates
 def point_is_on_segment(point, segment):
 
     if min(segment.start_point[0],segment.end_point[0]) <= point[0] <= max(segment.start_point[0],segment.end_point[0]):

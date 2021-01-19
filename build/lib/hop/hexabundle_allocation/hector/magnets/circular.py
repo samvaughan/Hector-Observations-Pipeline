@@ -3,10 +3,11 @@ from ...hector.constants import circular_magnet_radius,robot_arm_width
 from math import sin, cos, pi
 from ...hector.magnets.pickup_areas import tangential_right,tangential_left,radial_inward,radial_outward
 
-
 class circular_magnet(circle):
 
+    # initializing a circular magnet with all respective parameters
     def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs):
+
         radius = circular_magnet_radius
         super().__init__(center,radius,orientation)
         self.index = index
@@ -23,13 +24,14 @@ class circular_magnet(circle):
         self.azAngs = azAngs
         self.IDs = IDs
 
-
+    # calculating the distance between magnet center to pickup area center
     def calculate_center_magnet_to_center_pickup_area_length(self):
 
         center_magnet_to_center_pickup_area_length = 0.5 * (0.5 * robot_arm_width + self.radius)
 
         return center_magnet_to_center_pickup_area_length
 
+    # calculating the center coordinate of pickup area- Tangential Right
     def calculate_center_coordinate_tangential_right_pickuparea(self):
 
         center_coordinates = \
@@ -38,6 +40,7 @@ class circular_magnet(circle):
 
         return center_coordinates
 
+    # calculating the center coordinate of pickup area- Tangential Left
     def calculate_center_coordinate_tangential_left_pickuparea(self):
 
         center_coordinates = \
@@ -46,6 +49,7 @@ class circular_magnet(circle):
 
         return center_coordinates
 
+    # calculating the center coordinate of pickup area- Radial Inward
     def calculate_center_coordinates_radial_inward_pickuparea(self):
 
         center_coordinates = \
@@ -54,6 +58,7 @@ class circular_magnet(circle):
 
         return center_coordinates
 
+    # calculating the center coordinate of pickup area- Radial Outward
     def calculate_center_coordinates_radial_outwards_pickuparea(self):
 
         center_coordinates = \
@@ -62,6 +67,7 @@ class circular_magnet(circle):
 
         return center_coordinates
 
+    # calculating pickup areas using their respective center coordinates
     def create_pickup_areas(self):
 
         self.pickup_areas = \
@@ -72,6 +78,7 @@ class circular_magnet(circle):
 
         return self.pickup_areas
 
+# check for the magnet being circular type
 def is_circular_magnet(magnet):
     return isinstance(magnet, circular_magnet)
 

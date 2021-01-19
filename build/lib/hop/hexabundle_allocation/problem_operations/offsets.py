@@ -63,6 +63,9 @@ def magnetPair_radialPositionOffset(plate_file):
 
     offset_radialDistance = 20  # to be derived
 
+    # T_observed > T_configured then radial inward movement by magnet
+    # T_observed < T_configured then radial outward movement by magnet
+
     # store magnet pair index and offset distance accordingly, to be derived
     magnetPair_offset = []
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
@@ -72,13 +75,20 @@ def magnetPair_radialPositionOffset(plate_file):
 # radial Position offset being adjusted in the extract_data.py file before all_magnets are being produced
 def radialPositionOffset(list_of_probes,magnetPair_offset):
 
+    # iterating through each magnet in the offset list and the probes list
     for item in magnetPair_offset:
         for each_probe in list_of_probes:
+
+            # looking for match of items in offset and probes list
             if item[0] == each_probe.index:
 
+                ### TEST PRINT
                 print(each_probe.circular_magnet_center)
 
+                # calculating the angle of the magnet with respect to x-axis
                 theta = atan(each_probe.circular_magnet_center[1] / each_probe.circular_magnet_center[0])
+
+                # calculating sine and cosine angle adjustment to offset distance for the radial movement
                 # x values in positive range and -ve range move in opposite radial directions, so this step ensure same direction movement
                 if each_probe.circular_magnet_center[0] >= 0:
                     each_probe.circular_magnet_center = (each_probe.circular_magnet_center[0] + (cos(theta) * item[1]), \
@@ -86,6 +96,8 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
                 else:
                     each_probe.circular_magnet_center = (each_probe.circular_magnet_center[0] - (cos(theta) * item[1]), \
                                                          each_probe.circular_magnet_center[1] - (sin(theta) * item[1]))
+
+                ### TEST PRINT
                 print(each_probe.circular_magnet_center)
 
     return list_of_probes

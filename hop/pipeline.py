@@ -9,6 +9,7 @@ import sys
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
+from hop.misc import plotting_tools as plotting_tools
 from hop.tiling import tiling_functions as tiling
 from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
 
@@ -52,6 +53,7 @@ class HectorPipe:
         self.tile_location = folders['Tiles']
         self.plot_location = folders['Plots']
         self.distortion_corrected_tile_location = folders['DistortionCorrected']
+        self.distortion_corrected_plot_location = folders['DistortionCorrected/Plots']
         self.allocation_files_location_base = folders['Allocation']
         self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
         self.allocation_files_location_robot = folders['Allocation/robot_outputs']
@@ -178,6 +180,9 @@ class HectorPipe:
             tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/DC_tile_{current_tile:03}.fld"
             guide_tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/guide_DC_tile_{current_tile:03}.fld"
 
+            # filename for a plot which compares the tile before/after distortion correction
+            DC_correction_comparison_plot_filename = f"{self.distortion_corrected_plot_location}/Tile_{current_tile:03}_comparison.pdf"
+
             # If we're applying distortion correction, make sure that the configuration code is looking at the correct file
             if configure_tiles:
                 if apply_distortion_correction:
@@ -186,27 +191,33 @@ class HectorPipe:
                     tile_file_for_configuration = tile_out_fname
 
             self.logger.info(f"Tile {current_tile}:")
-            
-            self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
+
+            # Run the tiling
+            self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=self.config['proximity'], tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
 
             self.logger.info(f"\tSaving to {tile_out_fname}...")
 
+            # And save the outputs
             tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
             if apply_distortion_correction == True:
-                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
+                # Run the distortion correction
+                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename)
                 self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
+
 
             if configure_tiles == True:
                 # Place holder variable to see if the configuration code has completed
                 configured = False
                 for j in range(self.config['MAX_TRIES']):
-    
+
+                    # If we're having trouble with a tile, rescale the proximity by 10 % for every five tiles we've tried
+                    if self.config['Rescale_proximity'] is True:
+                        proximity = self.config['proximity'] * (1 + (j // 5) * 0.1)
+
                     # Now call Caro's code
                     self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
-                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}",  f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/', '--run_local']
-                    #proc = subprocess.check_call(, stdout=f, stderr=g, universal_newlines=True)
-                    
+                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}", f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/']
                     try:
                         process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
                         self.logger_R_code.info(process.stdout)
@@ -220,22 +231,25 @@ class HectorPipe:
                         configured = True
                         break
                     elif return_code == 10:
-                        self.logger.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
-                        self.logger_R_code.info("\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile**")
+                        timeout_message = f"\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity}**"
+                        self.logger.info(message)
+                        self.logger_R_code.info(message)
                     else:
+                        tiling_error_message = "\t***Error in the tiling code! Exiting to debug***\n"
                         self.logger_R_code.info(process.stderr)
-                        self.logger_R_code.error("\n***Error in the tiling code! Exiting to debug***\n")
-                        self.logger.info("\t**Error in the configuration code! Exiting to debug**")
+                        self.logger_R_code.error(tiling_error_message)
+                        self.logger.info(tiling_error_message)
                         raise subprocess.CalledProcessError(return_code, Configuration_bash_code)
-                        #logger_R_code.error(error.decode("utf-8"))
+                        
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
-                    self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
+                    self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
 
                     tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
                     if apply_distortion_correction == True:
-                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile)
+                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename)
+
 
                 if not configured:
                     raise ValueError(f"Couldn't configure this tile after {self.config['MAX_TRIES']} attempts.")
@@ -267,10 +281,12 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
+
+        If plot_save_filename is not None, save an image of the tile before/after the correction is applied
         """
 
         # Now call Keith's code
@@ -306,6 +322,11 @@ class HectorPipe:
             for ln in header:
                 g.write(ln)
             DC_corrected_output_file.loc[~guide_rows].to_csv(g, index=False)
+
+        if plot_save_filename is not None:
+            fig, ax = plotting_tools.plot_distortion_correction_before_after(tile_out_fname_after_DC, title_text=f"{tile_out_fname_after_DC}")
+            fig.savefig(f"{plot_save_filename}", bbox_inches='tight')
+            plt.close(fig)
         
         return DC_corrected_output_file
 

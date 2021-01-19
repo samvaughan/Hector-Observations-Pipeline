@@ -3,7 +3,9 @@ from ...general_operations.geometry_shapes.rectangle import rectangle
 
 class rectangular_magnet_pickup_area(rectangle):
 
+    # intializing pickup area of rectangular magnet with the respective parameters
     def __init__(self,center,orientation):
+
         #length = 0.5 * (rectangle_magnet_length + 3* robot_arm_width) # Tiphaine's calculation
         if (robot_arm_width < ((rectangle_magnet_length - robot_arm_width) / 2)):
             length = (robot_arm_width + rectangle_magnet_length) / 2
@@ -16,11 +18,14 @@ class rectangular_magnet_pickup_area(rectangle):
 
 class circular_magnet_pickup_area(rectangle):
 
+    # intializing pickup area of rectangular magnet with the respective parameters
     def __init__(self,center,orientation):
         length = (3.0/2) * robot_arm_width + circular_magnet_radius
         width  = robot_arm_length
         super().__init__(center,length,width,orientation)
 
+
+## Pickup Areas of circular and rectangular magnets created as classes
 
 class inward(rectangular_magnet_pickup_area):
     kind = 'inward (toward circular magnet) pickup area'

@@ -344,7 +344,7 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
     return tile_df, isel_values
 
 
-def make_best_tile(df_targets, df_guide_stars, df_standard_stars, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False):
+def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
@@ -364,7 +364,6 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, tiling_paramet
 
     Hector_FOV_outer_radius = tiling_parameters['Hector_FOV_outer_radius']
     Hector_FOV_inner_radius = tiling_parameters['Hector_FOV_inner_radius']
-    proximity = tiling_parameters['proximity']
     Nsel = tiling_parameters['Nsel']
     Nsel_guides = tiling_parameters['Nsel_guides']
     Nsel_standards = tiling_parameters['Nsel_standards']
