@@ -8,3 +8,4 @@ astropy
 coverage
 coveralls
 pytest-cov
+yaml
