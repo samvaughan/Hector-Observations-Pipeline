@@ -16,7 +16,7 @@ class CustomBuild(build):
 
 
         def compile():
-          subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code']
+          subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
           subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
 
         self.execute(compile, [], 'Compiling Distortion Correction binary')
