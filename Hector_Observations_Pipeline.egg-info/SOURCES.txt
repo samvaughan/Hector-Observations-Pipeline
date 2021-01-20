@@ -17,6 +17,8 @@ hop/configuration/HECTOR_ClusterFieldsTest.R
 hop/configuration/HECTOR_Config_v3.0.R
 hop/configuration/HECTOR_Config_v3.2.R
 hop/constants/HECTOR_CONSTANTS.yaml
+hop/distortion_correction/__init__.py
+hop/distortion_correction/HectorTranslationSoftware/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil
 hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil.cpp
 hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil.o
@@ -29,8 +31,10 @@ hop/distortion_correction/HectorTranslationSoftware/Code/HectorStructures.h
 hop/distortion_correction/HectorTranslationSoftware/Code/Makefile
 hop/distortion_correction/HectorTranslationSoftware/Code/ProfitSkyCheck.cpp
 hop/distortion_correction/HectorTranslationSoftware/Code/ProfitSkyCheck.h
+hop/distortion_correction/HectorTranslationSoftware/Code/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Code/build.csh
 hop/distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds
+hop/distortion_correction/HectorTranslationSoftware/Packages/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/.mid
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/ChangeLog
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/Ers.h
@@ -39,6 +43,7 @@ hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/Ers_Err.ms
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/GNUmakefile.am
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/Makefile.standalone
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/README.txt
+hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/dmakefile
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/ers.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/ers.o
@@ -73,6 +78,7 @@ hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/Makefile.stand
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/TcsUtil.cpp
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/TcsUtil.h
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/TcsUtil.o
+hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/gen_qfmed.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/gen_qfmed.o
 hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/tdfxy.c
@@ -85,6 +91,7 @@ hop/distortion_correction/HectorTranslationSoftware/Packages/sds/ChangeLog
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/GNUmakefile.am
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/Makefile.standalone
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/README.txt
+hop/distortion_correction/HectorTranslationSoftware/Packages/sds/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/arg.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/arg.h
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/arg.o
@@ -183,6 +190,7 @@ hop/distortion_correction/HectorTranslationSoftware/Packages/sds/old_standalone/
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/old_standalone/sdscompiler.ed
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/old_standalone/sdslist_vxworks.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/sds/old_standalone/status.h
+hop/distortion_correction/HectorTranslationSoftware/Packages/slalib/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib/include/slalib.h
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib/include/slamac.h
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib/lib/libsla.a
@@ -190,6 +198,7 @@ hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/.mid
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/ChangeLog
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/GNUmakefile.am
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/README.txt
+hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/addet.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/afin.c
 hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/airmas.c
