@@ -1,49 +1,59 @@
 from setuptools import setup, find_packages, Command
-from setuptools.command.install import install
-import distutils.command.install as orig
+from distutils.command.build import build
+#import distutils.command.install as orig
 import subprocess
 import inspect
 import pathlib
 
 
-# class CustomBuild(build):
+class CustomBuild(build):
 
-#   def run(self):
-#         # run original build code
-#         build.run(self)
-
-
-#         def compile():
-#           subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-#           subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-
-#         self.execute(compile, [], 'Compiling Distortion Correction binary')
+  def run(self):
+        # run original build code
+        build.run(self)
 
 
-class CustomInstall(install):
+        def compile():
+          subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
+          subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
 
-    user_options = install.user_options
+        self.execute(compile, [], 'Compiling Distortion Correction binary')
 
-    def initialize_options(self):
-        install.initialize_options(self)
 
-    def finalize_options(self):
-        install.finalize_options(self)
+# class CustomInstall(install):
 
-    def run(self):
+#     user_options = install.user_options
 
-        # Copied from the original setup.command.install functions
-        if not install._called_from_setup(inspect.currentframe()):
-            # Run in backward-compatibility mode to support bdist_* commands.
-            orig.install.run(self)
-        else:
-            install.do_egg_install(self)
+#     def initialize_options(self):
+#         install.initialize_options(self)
 
-        # and now adding in my own bit
-        print("...building the Hector Translation code")
-        subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-        subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-        print("...Done!")
+#     def finalize_options(self):
+#         install.finalize_options(self)
+
+#     def run(self):
+
+#         # Copied from the original setup.command.install functions
+#         if not install._called_from_setup(inspect.currentframe()):
+#             # Run in backward-compatibility mode to support bdist_* commands.
+#             orig.install.run(self)
+#         else:
+#             install.do_egg_install(self)
+
+#         # and now adding in my own bit
+#         print("...building the Hector Translation code")
+#         print()
+#         HERE = pathlib.Path(__file__).parent
+
+#         all_clean_command = ['make', 'all_clean', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
+#         make_command = ['make', '-C', f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code']
+#         print(make_command)
+#         subprocess.call(all_clean_command)
+#         subprocess.call(make_command)
+#         binary_location = pathlib.Path(f'{HERE}/hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil')
+#         print(f"Does the binary exist at {binary_location.as_posix()}? {binary_location.is_file()}")
+
+#         print("Made ")
+#         print("...Done!")
 
 
 
@@ -53,7 +63,6 @@ HERE = pathlib.Path(__file__).parent
 
 # The text of the README file
 README = (HERE / "README.md").read_text()
-
 
 setup(name='Hector-Observations-Pipeline',
       version='0.2.9dev',
@@ -68,8 +77,9 @@ setup(name='Hector-Observations-Pipeline',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8"],
       packages=find_packages(),
+      package_data={"":["hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil"]},
       include_package_data = True,
       python_requires='>=3',
-      cmdclass={'install': CustomInstall}
+      cmdclass={'build': CustomBuild}
      )
 
