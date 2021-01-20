@@ -3,6 +3,7 @@ from ..hector.constants import robot_center_x,robot_center_y
 from math import atan,sin,cos
 import numpy as np
 import pandas as pd
+import csv
 import string
 import sys
 import re
@@ -42,6 +43,7 @@ def hexaPositionOffset(all_magnets):
                 angle_adjusted = angle_adjusted - 360
 
             rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
+
             # subtracting offset distance moves circular magnet closer to rectangular
             i.center = (i.center[0] - rotation_matrix_circle[0][0] * offset_distance, \
                                       i.center[1] - rotation_matrix_circle[0][1] * offset_distance)
@@ -65,10 +67,23 @@ def magnetPair_radialPositionOffset(plate_file):
 
     # T_observed > T_configured then radial inward movement by magnet
     # T_observed < T_configured then radial outward movement by magnet
+    # coeff. of thermal expansion =  1.2 × 10−6 K^(−1)
 
     # store magnet pair index and offset distance accordingly, to be derived
     magnetPair_offset = []
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
+
+    # csv_input = pd.read_csv(plate_file)
+    # csv_input['Berries'] = 'NEW'
+    # csv_input.to_csv(plate_file, index=False, sep=' ')
+
+    # r = csv.reader(open(plate_file))
+    # row0 = next(r)
+    # row0.append('berry')
+    #
+    # for item in r:
+    #     item.append(item[0])
+    #     # print(item)
 
     return plate_file, magnetPair_offset
 
