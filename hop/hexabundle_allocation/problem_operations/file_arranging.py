@@ -86,12 +86,14 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     w, h = len(positioning_array[:, 8]) + 1, 1
     nameColumn = [['[0]' for x in range(w)] for y in range(h)]
 
-    j=0
-    for i in robotFilearray:
-        if hasNumbers(i[1]):
-            nameColumn[0][j] = i[1]
+    j=1
+    for i in range(1,len(robotFilearray)):
+        if hasNumbers(robotFilearray[i][1]):
+            nameColumn[0][j] = robotFilearray[i][1]
         else:
-            nameColumn[0][j] = i[1] + str(i[9])
+            x = np.int16(robotFilearray[i][9])
+            print(x)
+            nameColumn[0][j] = robotFilearray[i][1] + str('%02d' % x)
         j += 1
 
     print(nameColumn)
@@ -120,10 +122,11 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
                     if j>0:
                         rePosition_col[0][i] += '_'
                     else:
-                        rePosition_col[0][i] = ''
+                        rePosition_col[0][i] = '['
                     for k in range(len(robotFilearray)):
                         if robotFilearray[k][0]+' '+str(robotFilearray[k][10]) == fully_blocked_magnets_dictionary[each_magnet][j]:
                             rePosition_col[0][i] += str(robotFilearray[k][8])
+                rePosition_col[0][i] += ']'
 
     # transposing the list to a column with a title assigned
     rePosition_col[0][0] = 'rePosition_magnets'
