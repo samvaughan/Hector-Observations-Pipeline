@@ -71,7 +71,7 @@ class HectorPipe:
         # if not self.DistortionCorrection_binary_location.exists():
         #     raise NameError("The Distortion Correction binary seems to not exist")
 
-            Path(hop.__file__).parent
+        Path(hop.__file__).parent
         self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds")  
         if not self.TdF_distortion_file_location.exists():
             raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
