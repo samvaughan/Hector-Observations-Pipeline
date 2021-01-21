@@ -6,6 +6,9 @@ from collections import Counter
 import os
 
 from hop.tiling import tiling_functions as T
+import logging 
+
+logger = logging.getLogger(__name__)
 
 np.random.seed(12345)
 class Test_find_clashes():

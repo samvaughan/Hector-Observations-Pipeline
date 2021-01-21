@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import hop.misc.pandas_tools as P
 import hop.tiling.tiling_functions as T
 
+import logging 
+
+logger = logging.getLogger(__name__)
 
 np.random.seed(12345)
 
