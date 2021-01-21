@@ -164,7 +164,7 @@ class HectorPipe:
     def _run_tiling_code(self, proximity, current_tile):
 
             # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
-        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'], logger=self.logger)
+        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
 
         tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
@@ -254,7 +254,7 @@ class HectorPipe:
                         configured = True
                         break
                     elif return_code == 10:
-                        timeout_message = f"\t**Tiling code couldn't configure and timed out... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity:.3f}, {remaining_targets} remaining**"
+                        timeout_message = f"\t**Tiling code couldn't configure and timed out... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity:.3f}, {remaining_targets} targets remaining**"
                         self.logger.info(timeout_message)
                         self.logger_R_code.info(timeout_message)
                     else:
