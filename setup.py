@@ -49,7 +49,7 @@ data_files = [(f'/{installation_location}/hop/distortion_correction/HectorTransl
 
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.3.3',
+      version='0.3.5',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
