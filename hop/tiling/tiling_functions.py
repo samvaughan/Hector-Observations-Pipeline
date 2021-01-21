@@ -203,7 +203,7 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
     return non_clashing_stars.iloc[:Nsel]
 
 
-def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashing', fill_spares_with_repeats=False, logger=None):
+def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Given a dataframe of targets, select Nsel galaxies to observe. These can't be nearer to each other than 'proximity'. Return a dataframe of just the new tile we've made.
     Inputs:
@@ -353,7 +353,7 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
     return tile_df, isel_values
 
 
-def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False, logger=None):
+def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
@@ -405,7 +405,7 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     inner_standards = df_standard_stars.loc[check_if_in_fov(df_standard_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
 
     # Select which targets to keep
-    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats, logger=logger)
+    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats)
 
     # Add the 'isel' values to the main dataframe
     df_targets.loc[tile_members.index, 'isel'] = isel_values
