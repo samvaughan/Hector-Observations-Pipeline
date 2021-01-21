@@ -73,9 +73,15 @@ def magnetPair_radialPositionOffset(plate_file):
     magnetPair_offset = []
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
-    # csv_input = pd.read_csv(plate_file)
-    # csv_input['Berries'] = 'NEW'
-    # csv_input.to_csv(plate_file, index=False, sep=' ')
+    csv_input = pd.read_csv(plate_file)
+    csv_input['magnetPair_offset'] = '0.000'
+    csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE,escapechar=' ')
+    # csv_input = pd.read_csv(plate_file, header=0)
+    # csv_input['Berries'] = '0.000'
+    # csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+
+    csv_read = pd.read_csv(plate_file)
+    print(csv_read)
 
     # r = csv.reader(open(plate_file))
     # row0 = next(r)
@@ -83,7 +89,7 @@ def magnetPair_radialPositionOffset(plate_file):
     #
     # for item in r:
     #     item.append(item[0])
-    #     # print(item)
+    #     print(item)
 
     return plate_file, magnetPair_offset
 

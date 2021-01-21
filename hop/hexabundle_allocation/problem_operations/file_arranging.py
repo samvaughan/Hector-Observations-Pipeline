@@ -86,16 +86,19 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     w, h = len(positioning_array[:, 8]) + 1, 1
     nameColumn = [['[0]' for x in range(w)] for y in range(h)]
 
-    j=1
+    # creating a magnet name column, which will be used to refer to when repositioning magnets are required
     for i in range(1,len(robotFilearray)):
+
+        # rectangular magnet being named as 'R01,R02...R27'
         if hasNumbers(robotFilearray[i][1]):
-            nameColumn[0][j] = robotFilearray[i][1]
+            nameColumn[0][i] = robotFilearray[i][1]
+
+        # circular magnet being named as 'Mag01,Gre02...Blu27'
         else:
             x = np.int16(robotFilearray[i][9])
-            print(x)
-            nameColumn[0][j] = robotFilearray[i][1] + str('%02d' % x)
-        j += 1
+            nameColumn[0][i] = robotFilearray[i][1] + str('%02d' % x)
 
+    # TEST PRINT
     print(nameColumn)
 
     # transposing the list to a column with a title assigned
@@ -109,23 +112,27 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     w, h = len(positioning_array[:, 9]) + 1, 1
     rePosition_col = [['[0]' for x in range(w)] for y in range(h)]
 
-    # TEST PRINT to check the arrays
-    print(len(positioning_array[:, 8]))
-    print(len(rePosition_col))
-    print(len(nameColumn))
 
     # filling out the created list with the blocked magnets dictionary in order with the robot file array
     for each_magnet in fully_blocked_magnets_dictionary:
         for i in range(len(robotFilearray)):
+
+            # checking for match of blocked magnets with robotfile array
             if (robotFilearray[i][0] + ' ' + str(robotFilearray[i][10])) == each_magnet:
                 for j in range(len(fully_blocked_magnets_dictionary[each_magnet])):
+
+                    # formatting as required for the rePosition column
                     if j>0:
                         rePosition_col[0][i] += '_'
                     else:
                         rePosition_col[0][i] = '['
+
+                    # checking for match of each blocking magnet with robotfile array to add to rePosition column
                     for k in range(len(robotFilearray)):
                         if robotFilearray[k][0]+' '+str(robotFilearray[k][10]) == fully_blocked_magnets_dictionary[each_magnet][j]:
                             rePosition_col[0][i] += str(robotFilearray[k][8])
+
+                # formatting as required for the rePosition column
                 rePosition_col[0][i] += ']'
 
     # transposing the list to a column with a title assigned
