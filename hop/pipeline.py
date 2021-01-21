@@ -375,11 +375,11 @@ class HectorPipe:
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
 
-        #### Offset function: thermal coefficient based movement of magnet pair as a whole
-        plate_file,magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
-
         # Adding guides cluster txt file to hexa cluster txt file
         file_arranging.merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file)
+
+        #### Offset function: thermal coefficient based movement of magnet pair as a whole
+        plate_file, magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
         all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), magnetPair_offset)
