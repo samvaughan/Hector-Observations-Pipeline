@@ -49,7 +49,7 @@ def plot_distortion_correction_before_after(DC_tile_filename, title_text=None):
 
     ax.scatter(0, 0, marker='+', c='k')
     ax.legend(fontsize=font_size, loc='lower left')
-    ax.set_box_aspect(1)
+    #ax.set_box_aspect(1)
 
     ax.set_xlabel("X (mm)")
     ax.set_ylabel("Y (mm)")

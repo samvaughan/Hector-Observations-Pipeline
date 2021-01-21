@@ -7,6 +7,9 @@ from operator import itemgetter
 import warnings
 from ..hexabundle_allocation.hector import constants as hector_constants
 
+# Set up the logging
+import logging
+logger = logging.getLogger(__name__)
 
 def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, n_xx_yy=100):
     """
@@ -200,7 +203,7 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
     return non_clashing_stars.iloc[:Nsel]
 
 
-def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashing', fill_spares_with_repeats=False):
+def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashing', fill_spares_with_repeats=False, logger=None):
     """
     Given a dataframe of targets, select Nsel galaxies to observe. These can't be nearer to each other than 'proximity'. Return a dataframe of just the new tile we've made.
     Inputs:
@@ -295,11 +298,14 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
                 isel_values.extend([1.0] * len(repeats_to_fill_hexabundles))
 
                 if len(tile_df) < Nsel:
-                    print(f"Can only select {len(targets)} new targets for this field. Can only select {N_to_append} repeats. Tile length is only {len(tile_df)}!!!")
+                    message = f"Can only select {len(targets)} new targets for this field. Can only select {N_to_append} repeats. Tile length is only {len(tile_df)}!!!"
                 else:
-                    print(f"Can only select {len(targets)} new targets for this field. Select {N_to_append} repeats. Tile length is {len(tile_df)}")
+                    message = f"Can only select {len(targets)} new targets for this field. Select {N_to_append} repeats. Tile length is {len(tile_df)}"
             else:
-                print(f"Can only select {len(targets)} new targets for this field. Can't select any repeats. Tile length is only {len(tile_df)}!!!")
+                message = f"Can only select {len(targets)} new targets for this field. Can't select any repeats. Tile length is only {len(tile_df)}!!!"
+
+            
+            logger.info(message)
 
     # # # If we don't fill a tile, append already observed galaxies till we get to the right number
     # # # These are set an isel value of 1.
@@ -329,12 +335,15 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
 
     if len(tile_df) < Nsel:
         if (len(all_targets_df) > len(tile_df)):
-            print(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV and {len(tile_df)} in tile!")
+            message = f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV and {len(tile_df)} in tile!"
+
         else:
             targets_not_already_in_tile = all_targets_df[~all_targets_df.index.isin(tile_df.index)]
             clashes = find_clashes(targets_not_already_in_tile, tile_df, proximity=proximity)
             n_clashes = clashes.sum(axis=1)
-            print(f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV; {len(tile_df)} in tile; {len(targets_not_already_in_tile)} are in FOV but not tiled, of which each one clashes {n_clashes} times")
+            message = f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV; {len(tile_df)} in tile; {len(targets_not_already_in_tile)} are in FOV but not tiled, of which each one clashes {n_clashes} times"    
+        
+        logger.info(message)
 
     # Check if we clash with ourself- this should never happen
     clashes = find_clashes(tile_df, tile_df, proximity)
@@ -344,7 +353,7 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
     return tile_df, isel_values
 
 
-def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False):
+def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False, logger=None):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
@@ -396,7 +405,7 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     inner_standards = df_standard_stars.loc[check_if_in_fov(df_standard_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
 
     # Select which targets to keep
-    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats)
+    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats, logger=logger)
 
     # Add the 'isel' values to the main dataframe
     df_targets.loc[tile_members.index, 'isel'] = isel_values

@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
 import sys
+import itertools
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -121,8 +122,8 @@ class HectorPipe:
         """
         Find any tiles which have already been configured in the output folders.
         """
-        pre_made_and_configured_files = np.sort(glob.glob(os.path.expanduser(f"{self.config['output_folder']}/Configuration/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_*.txt")))
-        pre_made_tiles = np.sort(glob.glob(os.path.expanduser(f"{self.config['output_folder']}/Tiles/tile_*.fld")))
+        pre_made_and_configured_files = np.sort(glob.glob(f"{self.configuration_location}/HECTORConfig_Hexa_*.txt"))
+        pre_made_tiles = np.sort(glob.glob(os.path.expanduser(f"{self.tile_location}/tile_*.fld")))
 
         starting_tile = 0
         for configuration_file, tile_file in zip(pre_made_and_configured_files, pre_made_tiles):
@@ -146,6 +147,32 @@ class HectorPipe:
         return starting_tile
 
 
+    def get_remaining_targets(self, df_targets):
+        """
+        Get the number of targets remaining in the field to tile
+        """
+
+        remaining_targets = len(df_targets) - df_targets['ALREADY_TILED'].sum()
+
+        if remaining_targets > 0:
+            return remaining_targets
+        else:
+            self.logger.info("\n\n")
+            self.logger.info("Done!")
+            return 0
+
+
+    def _run_tiling_code(self, proximity, current_tile):
+
+            # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
+        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'], logger=self.logger)
+
+        tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+
+        return df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec
+
+
+
     def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None):
 
         """
@@ -164,41 +191,38 @@ class HectorPipe:
         if not self.config['fresh_start']:
             starting_tile = self.find_premade_tiles()
         
-
         # Now do the tiling
-        self.logger.info(f"Total Targets in field to tile: {len(self.df_targets[self.df_targets['ALREADY_TILED']==False])}")
-        N_tiles = 9999
-        for current_tile in range(starting_tile, N_tiles):
+        remaining_targets = self.get_remaining_targets(self.df_targets)
+        self.logger.info(f"Total Targets in field to tile: {remaining_targets}\n")
 
-            if self.df_targets['ALREADY_TILED'].sum() == len(self.df_targets):
-                self.logger.info("\n\n")
-                self.logger.info("Done!")
+        for count in itertools.count():
+
+            remaining_targets = self.get_remaining_targets(self.df_targets)
+            if remaining_targets == 0:
                 break
 
-            tile_out_fname = os.path.expanduser(f"{self.config['output_folder']}/Tiles/tile_{current_tile:03}.fld")
-            guide_tile_out_fname = os.path.expanduser(f"{self.config['output_folder']}/Tiles/guide_tile_{current_tile:03}.fld")
-            tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/DC_tile_{current_tile:03}.fld"
-            guide_tile_out_fname_after_DC = f"{self.config['output_folder']}/DistortionCorrected/guide_DC_tile_{current_tile:03}.fld"
+            current_tile = count + starting_tile
+            self.logger.info(f"Tile {current_tile}:")
+            self.logger.info(f"\tRemaining Targets: {remaining_targets}")
+
+            # Set up the tile filenames
+            tile_out_fname = Path(f"{self.tile_location}/tile_{current_tile:03}.fld")
+            guide_tile_out_fname = Path(f"{self.tile_location}/guide_tile_{current_tile:03}.fld")
+            tile_out_fname_after_DC = Path(f"{self.distortion_corrected_tile_location}/DC_tile_{current_tile:03}.fld")
+            guide_tile_out_fname_after_DC = Path(f"{self.distortion_corrected_tile_location}/guide_DC_tile_{current_tile:03}.fld")
 
             # filename for a plot which compares the tile before/after distortion correction
-            DC_correction_comparison_plot_filename = f"{self.distortion_corrected_plot_location}/Tile_{current_tile:03}_comparison.pdf"
+            DC_correction_comparison_plot_filename = Path(f"{self.distortion_corrected_plot_location}/Tile_{current_tile:03}_comparison.pdf")
 
-            # If we're applying distortion correction, make sure that the configuration code is looking at the correct file
+            # Make sure that the configuration code is looking at the correct file, whether or not we're applying the distortion correction
             if configure_tiles:
                 if apply_distortion_correction:
                     tile_file_for_configuration = tile_out_fname_after_DC
                 else:
                     tile_file_for_configuration = tile_out_fname
 
-            self.logger.info(f"Tile {current_tile}:")
-
             # Run the tiling
-            self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=self.config['proximity'], tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
-
-            self.logger.info(f"\tSaving to {tile_out_fname}...")
-
-            # And save the outputs
-            tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+            self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=self.config['proximity'], current_tile=current_tile)
 
             if apply_distortion_correction == True:
                 # Run the distortion correction
@@ -224,16 +248,16 @@ class HectorPipe:
                         return_code = process.returncode
                     except subprocess.TimeoutExpired:
                         return_code = 10
-                        pass
+                        
                         
                     # If we've done the tile, break out of the inner 'Max tries' loop
                     if return_code == 0:
                         configured = True
                         break
                     elif return_code == 10:
-                        timeout_message = f"\t**Tiling code couldn't configure after 10 minutes... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity}**"
-                        self.logger.info(message)
-                        self.logger_R_code.info(message)
+                        timeout_message = f"\t**Tiling code couldn't configure and timed out... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity:.3f}, {remaining_targets} remaining**"
+                        self.logger.info(timeout_message)
+                        self.logger_R_code.info(timeout_message)
                     else:
                         tiling_error_message = "\t***Error in the tiling code! Exiting to debug***\n"
                         self.logger_R_code.info(process.stderr)
@@ -243,9 +267,7 @@ class HectorPipe:
                         
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
-                    self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
-
-                    tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+                    self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile)
 
                     if apply_distortion_correction == True:
                         DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename)
@@ -256,7 +278,6 @@ class HectorPipe:
 
             # Now find which targets have been selected in this tile
             selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])
-
             # Find which targets are being tiled for the first time
             new_targets = (selected_targets_mask) & (self.df_targets['ALREADY_TILED'] == False)
             # Change the TILED flag for targets we've added to a tile
@@ -269,6 +290,9 @@ class HectorPipe:
 
             self.logger.info(f"FINISHED TILE {current_tile}\n\n")
 
+            # Save the overall database in its current form
+            self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/in_progress_targets_dataframe.csv")
+
         self.tile_positions = np.array([self.best_tile_RAs, self.best_tile_Decs])
 
         if plot:
@@ -276,7 +300,7 @@ class HectorPipe:
             fig.savefig(f"{self.config['output_folder']}/Plots/{self.config['output_filename_stem']}_field_plot.pdf", bbox_inches='tight')
         
         #Save the overall dataframe
-        self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/overall_targets_dataframe.csv")
+        self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/completed_targets_dataframe.csv")
 
         self.N_tiles = current_tile
 
