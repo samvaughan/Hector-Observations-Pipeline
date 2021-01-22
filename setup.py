@@ -49,7 +49,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.3.5',
+      version='0.3.6',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
