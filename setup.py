@@ -61,7 +61,6 @@ setup(name='Hector-Observations-Pipeline',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8"],
       packages=find_packages(),
-      include_package_data = True,
       package_data={
   'hop.distortion_correction.HectorTranslationSoftware.Code': ['*'],
 },
