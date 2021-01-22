@@ -361,7 +361,7 @@ class HectorPipe:
         ### FIXME- add documentation here
         
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
 
         # proxy file to arrange guides in required format to merge with hexa probes
         proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
@@ -370,7 +370,7 @@ class HectorPipe:
         file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
 
         # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
 
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
@@ -450,5 +450,9 @@ class HectorPipe:
 
     def allocate_hexabundles_for_all_tiles(self):
 
-        for tile_number in range(self.N_tiles):
+        all_configured_tiles = np.sort(glob.glob(f"{self.configuration_location}/HECTORConfig_Hexa_*.txt"))
+
+        tile_numbers = [int(t.split("_")[-1].split(".")[0]) for t in all_configured_tiles]
+
+        for tile_number in tile_numbers:
             self.allocate_hexabundles_for_single_tile(tile_number)

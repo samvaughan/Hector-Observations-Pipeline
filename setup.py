@@ -39,12 +39,12 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 
-data_files = [(f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Code', ['hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil'] + glob('hop/distortion_correction/HectorTranslationSoftware/Code/*.o')), 
-      (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/Misc', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/*.o')), 
-      (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/sds', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/sds/*.o')),
-      (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/*.o')),
-      (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/*.o'))
-      ]
+# data_files = [(f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Code', ['hop/distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil'] + glob('hop/distortion_correction/HectorTranslationSoftware/Code/*.o')), 
+#       (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/Misc', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/Misc/*.o')), 
+#       (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/sds', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/sds/*.o')),
+#       (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/DramaErs/*.o')),
+#       (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/*.o'))
+#       ]
 
 
 
@@ -62,7 +62,9 @@ setup(name='Hector-Observations-Pipeline',
         "Programming Language :: Python :: 3.8"],
       packages=find_packages(),
       include_package_data = True,
-      data_files=data_files,
+      package_data={
+  'hop.distortion_correction.HectorTranslationSoftware.Code': ['*'],
+},
       python_requires='>=3',
       cmdclass={'build': CustomBuild}
      )

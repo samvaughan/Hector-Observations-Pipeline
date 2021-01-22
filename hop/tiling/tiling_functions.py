@@ -25,12 +25,46 @@ def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, 
     # Make the grid
     grid_coords = _get_grid(RA, Dec, n_xx_yy)
 
-    n_targets_in_FOV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0).sum(axis=1) - _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0).sum(axis=1)
+    # These are True/False masks for each galaxy if a tile was placed at each grid coord. They're shapes (n_grid_coords x number of galaxies left to tile)
+    galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
+    galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
 
-    # This will return the first position in the grid where n_targets_in_FOV is equal to its max value
-    index = np.argmax(n_targets_in_FOV)
+    n_targets_in_FOV = galaxies_in_outer_FoV.sum(axis=1) - galaxies_in_inner_FoV.sum(axis=1)
+
+    # Find the positions where the number of targets in the FoV is at its max
+    possible_tile_centres = np.where(n_targets_in_FOV == np.max(n_targets_in_FOV))[0]
+    targets_in_best_tiles_mask = (galaxies_in_outer_FoV & ~galaxies_in_inner_FoV)[possible_tile_centres]
+
+    # If we have more than one possible centre, choose a random centre
+    # However, weight this choice by how far each target in the FoV is from the centre of the tile
+    # This is to avoid tiles where every target is right at one edge
+    if len(possible_tile_centres) > 1:
+        index = _decide_upon_best_tile_centre(n_targets_in_FOV, possible_tile_centres, grid_coords, targets_in_best_tiles_mask, RA, Dec)
+    else:
+        index = np.argmax(n_targets_in_FOV)
 
     return grid_coords[index, 0], grid_coords[index, 1]
+
+
+def _decide_upon_best_tile_centre(n_targets_in_FOV, possible_tile_centres, grid_coords, targets_in_best_tiles_mask, RA, Dec):
+    """
+    If we have a few choices for which tile to pick, prefer to select the one which places targets near the centre. This is to avoid some of the funny tiles I've seen where every galaxy is right at one edge.
+    To do this, I'm making a random choice from all possible tile centres but weighting that choice by the sum of all the squared distances from the tile centre. Not sure that this is the best idea (could use a convex hull area, including the tile centre point, maybe? Not sure) but it's better than just making a totally random selection
+    """
+    # This is a mask showing which galaxies would be selected in each of the "best" tiles
+    # It's shaped as (number_of_possible_tile_centres x number_of_galaxies_left)
+    
+    distances_from_centre = np.zeros(len(possible_tile_centres))
+    for i, (centre, targets_mask) in enumerate(zip(possible_tile_centres, targets_in_best_tiles_mask)):
+        distances_from_centre[i] = np.sum(np.sqrt((RA[targets_mask] - grid_coords[centre, 0])**2 + (Dec[targets_mask] - grid_coords[centre, 1])**2), axis=0)
+
+    # Catch any values which are exactly 0 and give them a small buffer value
+    distances_from_centre[distances_from_centre == 0.0] = 0.1
+    weights = (1./distances_from_centre)
+    norm_weights = weights / weights.sum()
+    index = np.random.choice(np.where(n_targets_in_FOV == np.max(n_targets_in_FOV))[0], p=norm_weights)
+
+    return index
 
 
 def get_best_tile_centre_dengreedy(master_df, targets_df, outer_FOV_radius, inner_FoV_radius, n_xx_yy=100):
