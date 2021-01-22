@@ -49,7 +49,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.3.6',
+      version='0.4',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -62,7 +62,7 @@ setup(name='Hector-Observations-Pipeline',
         "Programming Language :: Python :: 3.8"],
       packages=find_packages(),
       package_data={
-  'hop.distortion_correction.HectorTranslationSoftware.Code': ['*'],
+  'hop': ['distortion_correction/HectorTranslationSoftware/Code/*'],
 },
       python_requires='>=3',
       cmdclass={'build': CustomBuild}

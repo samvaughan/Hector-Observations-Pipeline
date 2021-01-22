@@ -121,18 +121,19 @@ class HectorPipe:
         """
         Find any tiles which have already been configured in the output folders.
         """
+        try:
+            self.df_targets = pd.read_csc(f"{self.tile_location}/in_progress_targets_dataframe.csv")
+        except FileNotFoundError:
+            self.logger.info(f"No 'in_progress_targets_dataframe.csv' file found, so no pre-made tiles will be loaded")
+            return 0
+
         pre_made_and_configured_files = np.sort(glob.glob(f"{self.configuration_location}/HECTORConfig_Hexa_*.txt"))
         pre_made_tiles = np.sort(glob.glob(os.path.expanduser(f"{self.tile_location}/tile_*.fld")))
 
         starting_tile = 0
         for configuration_file, tile_file in zip(pre_made_and_configured_files, pre_made_tiles):
-            tile_number = int(configuration_file.split('_')[-1].split('.')[0])
-            tile_members = pd.read_csv(configuration_file, delim_whitespace=True)
-            already_tiled_mask = self.df_targets['CATAID'].isin(tile_members.IDs)
-            # Change the TILED flag for targets we've added to a tile
-            self.df_targets.loc[already_tiled_mask, 'ALREADY_TILED'] = True
-            # And include the tile number for each target
-            self.df_targets.loc[already_tiled_mask, 'Tile_number'] = tile_number
+            #tile_number = int(configuration_file.split('_')[-1].split('.')[0])
+            #tile_members = pd.read_csv(configuration_file, delim_whitespace=True)
             starting_tile +=1
 
             # Now get the centres of the tile
