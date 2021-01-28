@@ -12,7 +12,7 @@ from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
 from hop.misc import plotting_tools as plotting_tools
 from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
+from hop.hexabundle_allocation.problem_operations import extract_data, fibres, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
 
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
 
@@ -362,7 +362,7 @@ class HectorPipe:
         ### FIXME- add documentation here
         
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # proxy file to arrange guides in required format to merge with hexa probes
         proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
@@ -371,7 +371,7 @@ class HectorPipe:
         file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
 
         # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
@@ -445,8 +445,15 @@ class HectorPipe:
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
-        # Comment out all ***** marked plot functions above(lines 81-84,105s)
-        # to run whole batch of tiles fast without plots
+        # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
+        # # fibre input file to be read
+        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo_Cluster_3_tile_010.xlsx"
+        #
+        # # fibre output file to be written to
+        # output_fibre = f"{self.allocation_files_location_base}/Fibre_output_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        #
+        # fibre_array = fibres.extract_fibreInfo(fibre_file)
+
 
 
     def allocate_hexabundles_for_all_tiles(self):
