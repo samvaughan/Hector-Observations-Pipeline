@@ -447,12 +447,12 @@ class HectorPipe:
 
         # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
         # # fibre input file to be read
-        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo_Cluster_3_tile_010.xlsx"
+        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
         #
         # # fibre output file to be written to
         # output_fibre = f"{self.allocation_files_location_base}/Fibre_output_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         #
-        # fibre_array = fibres.extract_fibreInfo(fibre_file)
+        # fibre_array = fibres.extract_fibreInfo(fibre_file,all_magnets,robotFilearray)
 
 
 

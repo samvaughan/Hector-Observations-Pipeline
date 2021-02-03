@@ -15,7 +15,7 @@ def hexaPositionOffset(all_magnets):
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 8:
+        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 10:
 
             # getting the orientation of rectangular magnet with respect to North(up)
             ang = i.orientation
@@ -24,16 +24,16 @@ def hexaPositionOffset(all_magnets):
             if ang < 360:
                 ang = ang + 360
 
-            # print('orientation_rectangular='+str(ang))
+            print('orientation_rectangular = '+str(ang))
             azAngs = convert_radians_to_degrees(i.azAngs)
-            # print('azAngs_rectangular'+str(azAngs))
+            print('azAngs_rectangular = '+str(azAngs))
             ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
-            # print('ang_azAngs_rectangular' + str(ang_azAngs))
+            print('ang_azAngs_rectangular = ' + str(ang_azAngs))
 
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'circular_magnet' and i.index == 8:
+        if i.__class__.__name__ == 'circular_magnet' and i.index == 5:
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
             angle_adjusted = 450+ang
@@ -49,7 +49,7 @@ def hexaPositionOffset(all_magnets):
                                       i.center[1] - rotation_matrix_circle[0][1] * offset_distance)
             i.offset = offset_distance
 
-            # print('orientation_circular=' + str(ang))
+            # print('orientation_circular = ' + str(i.orientation))
             azAngs = convert_radians_to_degrees(i.azAngs)
             # print('azAngs_circular=' + str(azAngs))
 
@@ -81,7 +81,7 @@ def magnetPair_radialPositionOffset(plate_file):
     # csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
     csv_read = pd.read_csv(plate_file)
-    print(csv_read)
+    # print(csv_read)
 
     # r = csv.reader(open(plate_file))
     # row0 = next(r)
@@ -122,3 +122,10 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
                 print(each_probe.circular_magnet_center)
 
     return list_of_probes
+
+def magnetOffsets_asColumns_toFile():
+
+    #
+
+
+    return
