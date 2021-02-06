@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import string
 import csv
 import re
 
@@ -11,7 +12,7 @@ def extract_fibreInfo(fibre_file,all_magnets,robotFilearray):
     print(fibre_data)
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
-    w, h = 7, 1674
+    w, h = 11, 1674
     new_array = [['0' for x in range(w)] for y in range(h)]
     print(len(new_array))
 
@@ -24,8 +25,19 @@ def extract_fibreInfo(fibre_file,all_magnets,robotFilearray):
         elif str(i) == 'H':
             new_array[j][1] = 'P'
         new_array[j][2] = new_array[j][6] = fibre_data['Bundle/plate'][j]
-        new_array[j][3] = fibre_data['Fibre_number'][j]
-        new_array[j][5] = 'Good'
+        if fibre_data['Fibre_number'][j] > 0:
+            new_array[j][3] = round(fibre_data['Fibre_number'][j])
+        else:
+            new_array[j][3] = 'nan'
+        if fibre_data['no.cores'][j] > 0:
+            new_array[j][5] = 'Good'
+            new_array[j][8] = round(fibre_data['no.cores'][j])
+        else:
+            new_array[j][5] = 'nan'
+        new_array[j][7] = fibre_data['slitlet'][j]
+        new_array[j][9] = fibre_data['ring'][j]
+        new_array[j][10] = fibre_data['position on slit'][j]  #*** Might need to swap places with fibre number **
+
         j += 1
 
 
@@ -42,7 +54,6 @@ def extract_fibreInfo(fibre_file,all_magnets,robotFilearray):
                             ang = ang + 360
 
                         new_array[k[0]-1][4] = ang
-
 
     print(new_array)
 
