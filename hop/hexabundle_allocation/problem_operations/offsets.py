@@ -15,14 +15,14 @@ def hexaPositionOffset(all_magnets):
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 10:
+        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 18:
 
             # getting the orientation of rectangular magnet with respect to North(up)
             ang = i.orientation
 
             # check to adjust angle within 0 to -360 range
-            if ang < 360:
-                ang = ang + 360
+            # if ang < 360:
+            #     ang = ang + 360
 
             print('orientation_rectangular = '+str(ang))
             azAngs = convert_radians_to_degrees(i.azAngs)
@@ -30,10 +30,13 @@ def hexaPositionOffset(all_magnets):
             ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
             print('ang_azAngs_rectangular = ' + str(ang_azAngs))
 
+            circular_centre = i.center
+            print(circular_centre)
+
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'circular_magnet' and i.index == 5:
+        if i.__class__.__name__ == 'circular_magnet' and i.index == 18:
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
             angle_adjusted = 450+ang
@@ -49,10 +52,15 @@ def hexaPositionOffset(all_magnets):
                                       i.center[1] - rotation_matrix_circle[0][1] * offset_distance)
             i.offset = offset_distance
 
-            # print('orientation_circular = ' + str(i.orientation))
+            print('orientation_circular = ' + str(i.orientation))
             azAngs = convert_radians_to_degrees(i.azAngs)
             # print('azAngs_circular=' + str(azAngs))
 
+            rectangular_centre = i.center
+            print(rectangular_centre)
+
+    angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
+    print(angle)
 
     return all_magnets
 
@@ -126,6 +134,7 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
 def magnetOffsets_asColumns_toFile():
 
     #
+
 
 
     return
