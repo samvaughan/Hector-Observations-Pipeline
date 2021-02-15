@@ -11,6 +11,7 @@ from .hexabundle import create_Magnet_Dictionary, get_probe_count, star_hexabund
 from ..problem_operations.robot_parameters import assign_magnet_labels, add_pickupDirection, \
                                                 assign_preferable_pickupDirection, calculate_pickup_putdown_angles, \
                                                 check_for_negative_twopi_angle, check_for_unresolvable_conflict
+from .fibres import convert_rectangularMagnetOrientation
 from ..hector.constants import robot_center_x,robot_center_y
 import numpy as np
 import string
@@ -96,20 +97,14 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
 
         ## ** Might need to change center coordinates of magnets to different scale for considering optical and other type of distortion **
 
-        if magnet.__class__.__name__ == 'rectangular_magnet':
-            probe_orientation = magnet.orientation
-            while probe_orientation > 180:
-                probe_orientation = probe_orientation - 360
-            while probe_orientation < -180:
-                probe_orientation = probe_orientation + 360
-        elif magnet.__class__.__name__ == 'circular_magnet':
-            probe_orientation = 0
+        # deriving probe_orientation column to be stored in positioning array for the fibres
+        probe_orientation = convert_rectangularMagnetOrientation(magnet)
 
         # storing all the parameters in positioning array
         f = np.append([magnet.__class__.__name__, str(magnet.magnet_label), str(robot_center_x+magnet.view_x), \
                        str(robot_center_y+magnet.view_y), str(magnet.rotation_pickup), str(round(magnet.rotation_putdown,2)), \
                        str(order), available_pickup, str(float(magnet.IDs)), str(int(magnet.index)), str(probe_orientation)], str(magnet.hexabundle))
-        # f[:,:-1] =
+
         # appending each magnet with its established parameters to the position ordering array
         position_ordering_array.append(np.array(f))
 

@@ -457,7 +457,7 @@ class HectorPipe:
         # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         #
         # # create the fibre spectrograph files for each of AAOmega and Spector
-        # fibre_array = fibres.extract_fibreInfo(fibre_file,all_magnets,robotFilearray,output_fibreAAOmega,output_fibreSpector)
+        # fibre_array = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
         #
         # # create the hexabundle fibre coordinate data files
         # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
