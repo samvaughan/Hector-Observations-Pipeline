@@ -426,12 +426,12 @@ class HectorPipe:
         print(positioning_array)
 
         # insert column heading and print only rectangular magnet rows in the csv file
-        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle']
-        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle']
+        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'probe_orientation', 'Hexabundle']
+        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'probe_orientation', 'Hexabundle']
 
         # final two output files
         outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary)
@@ -450,10 +450,17 @@ class HectorPipe:
         # fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
         #
         # # fibre output file to be written to
-        # output_fibre = f"{self.allocation_files_location_base}/Fibre_output_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        # output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
+        # output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
         #
-        # fibre_array = fibres.extract_fibreInfo(fibre_file,all_magnets,robotFilearray)
-
+        # output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
+        # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        #
+        # # create the fibre spectrograph files for each of AAOmega and Spector
+        # fibre_array = fibres.extract_fibreInfo(fibre_file,all_magnets,robotFilearray,output_fibreAAOmega,output_fibreSpector)
+        #
+        # # create the hexabundle fibre coordinate data files
+        # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
 
 
     def allocate_hexabundles_for_all_tiles(self):
