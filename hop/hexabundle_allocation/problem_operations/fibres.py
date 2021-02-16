@@ -203,12 +203,12 @@ def convert_rectangularMagnetOrientation(magnet):
 
 def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
 
+    print((new_arrayAAOmega))
     print('figure being created')
     # fibre_data = pd.read_excel(fibre_file)
 
-
     plt.figure(3)
-
+    j = 1
     for slitlet_count in range(13):
 
         y_start = 858 - (66 * (slitlet_count+1))
@@ -219,23 +219,42 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
         y = y_start + 62
         x_1 = 20
         x_2 = 40
-        for i in range(63):#zip(df['begin'].values, df['end'].values):
+        for i in range(63):
 
-            if 5>i>0:
-                color = 'blue'
-            else:
-                color = 'orange'
+            if len(str(new_arrayAAOmega[j][2])) == 2:
+                color = 'skyblue'
+            elif len(str(new_arrayAAOmega[j][2])) == 3:
+                color = 'red'
+            elif str(new_arrayAAOmega[j][2]) == 'A':
+                color = 'navy'
+            elif str(new_arrayAAOmega[j][2]) == 'B':
+                color = 'grey'
+            elif str(new_arrayAAOmega[j][2]) == 'C':
+                color = 'brown'
+            elif str(new_arrayAAOmega[j][2]) == 'D':
+                color = 'purple'
+            elif str(new_arrayAAOmega[j][2]) == 'E':
+                color = 'crimson'
+            elif str(new_arrayAAOmega[j][2]) == 'F':
+                color = 'peru'
+            elif str(new_arrayAAOmega[j][2]) == 'G':
+                color = 'green'
+            elif str(new_arrayAAOmega[j][2]) == 'H':
+                color = 'gold'
 
             plt.gcf().gca().add_patch(plt.Rectangle((x_1, y), x_2 - x_1, 1,facecolor=color))
             y = y - 1
+            j += 1
 
-    # ax.autoscale()
-    # ax.set_ylim(-2, 2)
+    # Here is the label and arrow code of interest
+    plt.gcf().gca().add_patch(plt.annotate('SDL', xy=(10, 400), xytext=(5, 400), xycoords='axes fraction',\
+                fontsize=20 * 1.5, ha='center', va='bottom',\
+                bbox=dict(boxstyle='square', fc='white'),\
+                arrowprops=dict(arrowstyle='-[, widthB=7.0, lengthB=1.5', lw=2.0)))
 
-    plt.xlim(0, 100)
+    plt.xlim(0, 60)
     plt.ylim(0, 860)
     plt.show()
-
-
+    print(j)
 
 
