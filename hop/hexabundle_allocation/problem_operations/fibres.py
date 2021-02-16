@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.cm as cm
 import pandas as pd
 import numpy as np
 import datetime
@@ -107,9 +109,7 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
                 writer = csv.writer(output_fibre, delimiter=' ', lineterminator='\n')
                 writer.writerows(fibre_array)
 
-    # print(new_array)
-
-    return fibre_data
+    return new_arrayAAOmega,new_arraySpector
 
 
 def create_hexabundleFibre_coordData(output_hexabundle_coordData):
@@ -200,3 +200,42 @@ def convert_rectangularMagnetOrientation(magnet):
         probe_orientation = 0
 
     return probe_orientation
+
+def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
+
+    print('figure being created')
+    # fibre_data = pd.read_excel(fibre_file)
+
+
+    plt.figure(3)
+
+    for slitlet_count in range(13):
+
+        y_start = 858 - (66 * (slitlet_count+1))
+        plt.gcf().gca().add_patch(patches.Rectangle((20, y_start), 20, 63, edgecolor='black',facecolor='none',lw=2, zorder=3))
+
+        colours = ['#C7980A', '#F4651F', '#82D8A7', '#CC3A05', '#575E76', '#156943', '#0BD055', '#ACD338']
+
+        y = y_start + 62
+        x_1 = 20
+        x_2 = 40
+        for i in range(63):#zip(df['begin'].values, df['end'].values):
+
+            if 5>i>0:
+                color = 'blue'
+            else:
+                color = 'orange'
+
+            plt.gcf().gca().add_patch(plt.Rectangle((x_1, y), x_2 - x_1, 1,facecolor=color))
+            y = y - 1
+
+    # ax.autoscale()
+    # ax.set_ylim(-2, 2)
+
+    plt.xlim(0, 100)
+    plt.ylim(0, 860)
+    plt.show()
+
+
+
+
