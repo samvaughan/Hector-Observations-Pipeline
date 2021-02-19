@@ -260,15 +260,15 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
                 fontsize=fs , ha='right',va='center', rotation=0, color='navy',  \
                 bbox=dict(boxstyle='square', fc='white'),\
                 arrowprops=dict(arrowstyle='-[, widthB=3.0, lengthB=0.5', lw=1.0)))
-    plt.gcf().gca().add_artist(plt.annotate('fibre_num=58', xy=(19, 672), xytext=(16, 672), xycoords='data',\
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=51', xy=(20, 672), xytext=(16, 672), xycoords='data',\
                 fontsize=fs * 0.7 , ha='right',va='center', rotation=0, color='navy', \
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
     plt.gcf().gca().add_artist(plt.annotate('C', xy=(41, 601), xytext=(44, 601), xycoords='data',\
-                fontsize=fs , ha='left',va='center', rotation=0, color='brown',  \
+                fontsize=fs , ha='right',va='center', rotation=0, color='brown',  \
                 bbox=dict(boxstyle='square', fc='white'),\
                 arrowprops=dict(arrowstyle='-[, widthB=2.45, lengthB=0.5', lw=1.0)))
-    plt.gcf().gca().add_artist(plt.annotate('fibre_num=58', xy=(41, 530), xytext=(44, 530), xycoords='data',\
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=52', xy=(40, 672), xytext=(44, 672), xycoords='data',\
                 fontsize=fs * 0.7 , ha='left',va='center', rotation=0, color='brown', \
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
@@ -276,6 +276,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
                 fontsize=fs, ha='right', va='center', rotation=0, color='peru', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+
     # plt.gcf().gca().add_artist(plt.annotate('fibre_num=58', xy=(19, 530), xytext=(16, 530), xycoords='data', \
     #             fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='brown', \
     #             arrowprops=dict(arrowstyle='-', lw=1.0)))
@@ -299,13 +300,23 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
                 fontsize=fs, ha='left', va='center', rotation=0, color='purple', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=1.1, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=16', xy=(40, 245), xytext=(44, 245), xycoords='data',\
+                fontsize=fs * 0.7 , ha='left',va='center', rotation=0, color='purple', \
+                arrowprops=dict(arrowstyle='-', lw=1.0)))
+
     plt.gcf().gca().add_artist(plt.annotate('D', xy=(41, 197), xytext=(44, 197), xycoords='data', \
                 fontsize=fs, ha='left', va='center', rotation=0, color='purple', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=0.3, lengthB=0.5, angleB=1.0', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=54', xy=(40, 208), xytext=(44, 136), xycoords='data',\
+                fontsize=fs * 0.7 , ha='left',va='center', rotation=0, color='purple', \
+                arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=9', xy=(40, 186), xytext=(43, 96), xycoords='data',\
+                fontsize=fs * 0.7 , ha='left',va='center', rotation=0, color='purple', \
+                arrowprops=dict(arrowstyle='-', lw=1.0)))
 
-    plt.gcf().gca().add_artist(plt.annotate('H', xy=(19, 226.5), xytext=(16, 226.5), xycoords='data', \
-                fontsize=fs, ha='right', va='center', rotation=0, color='gold', \
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=17\n H\n fibre_num=53', xy=(19, 226.5), xytext=(16, 226.5), xycoords='data', \
+                fontsize=fs*0.8, ha='right', va='center', rotation=0, color='gold', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=0.7, lengthB=0.5', lw=1.0)))
 
@@ -313,11 +324,13 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
                 fontsize=fs, ha='right', va='center', rotation=0, color='grey', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=3.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=10', xy=(20, 186), xytext=(16, 146), xycoords='data', \
+                fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='grey', \
+                arrowprops=dict(arrowstyle='-', lw=1.0)))
 
-    plt.xlim(0, 60)
+    plt.xlim(5, 55)
     plt.ylim(-10, 870)
-    # plt.axis('off')
+    plt.axis('off')
     plt.show()
     print(j)
-
 
