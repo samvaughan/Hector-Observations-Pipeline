@@ -49,7 +49,7 @@ def calculate_placement_ordering_of_all_blocked_magnets(list_of_fully_blocked_ma
         calculate_placement_ordering_of_blocked_magnet(blocked_magnet,list_of_conflicts,list_of_fully_blocked_magnets)
 
 # creating position ordering array which is one of the main outputs of the whole magnet collision code
-def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, galaxyIDrecord, \
+def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, galaxyIDrecord, mu_1re_cutoff, \
                                                                 clusterNum, tileNum, conflictFile, flagsFile):
 
     # calculating placement ordering of all the blocked magnets
@@ -67,7 +67,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
 
     # carrying out the whole hexabundle allocation algorithm from hexabundles.py script
     galaxyIDrecord, MagnetDict = overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, \
-                                                                        galaxyIDrecord, clusterNum, tileNum, flagsFile)
+                                                                        galaxyIDrecord, mu_1re_cutoff, clusterNum, tileNum, flagsFile)
 
     for magnet in all_magnets:
 
