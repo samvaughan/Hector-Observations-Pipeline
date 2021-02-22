@@ -11,9 +11,6 @@ import pandas as pd
 from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
 
 
-#     ********** Adjust the sky fibre outer region number by 1 font and inner region number to be bolded ****
-
-
 plt.rc('font', size=30)          # controls default text sizes
 plt.rc('axes', titlesize=30)     # fontsize of the axes title
 plt.rc('axes', labelsize=30)     # fontsize of the x and y labels
@@ -127,7 +124,7 @@ def read_sky_fibre_file(filename):
     j = 0
     for i in subplate_name:
         if i[0] == 'S':
-            # print(i[4])
+
             if i[4] == 'A':
                 fib_num = 7
             elif i[4] == 'H':
@@ -147,14 +144,7 @@ def read_sky_fibre_file(filename):
 
         j += 1
 
-            # skyfibreDict[str(subplate_name[i])] = []
-
-    # for i in range(1,len(subplate_name)):
-    #     if str(subplate_name[i]) not in skyfibreDict:
-    #         skyfibreDict[str(subplate_name[i])] = []
-    #     skyfibreDict[str(subplate_name[i])].append({int(fibre_number[i]): int(position[i])})
-
-    print(skyfibreDict)
+    # print(skyfibreDict)
 
     return skyfibreDict
 
@@ -187,7 +177,7 @@ def sky_fibre_annotations(skyfibre_file):
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=90, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle - 20
 
@@ -210,7 +200,7 @@ def sky_fibre_annotations(skyfibre_file):
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=90, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle - 20
 
@@ -233,7 +223,7 @@ def sky_fibre_annotations(skyfibre_file):
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=90, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle + 20
 

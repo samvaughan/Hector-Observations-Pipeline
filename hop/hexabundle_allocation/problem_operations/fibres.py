@@ -328,10 +328,10 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
                 fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='grey', \
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
-    plt.xlim(5, 55)
+    plt.xlim(-10, 70)
     plt.ylim(-10, 870)
     plt.axis('off')
-    #plt.show()
+    plt.show()
     figure = plt.gcf()
 
     figure.set_size_inches(8,12)
