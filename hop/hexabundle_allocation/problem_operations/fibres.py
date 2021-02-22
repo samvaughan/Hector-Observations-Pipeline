@@ -201,7 +201,7 @@ def convert_rectangularMagnetOrientation(magnet):
 
     return probe_orientation
 
-def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
+def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
 
     print((new_arrayAAOmega))
     print('figure being created')
@@ -331,6 +331,9 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector):
     plt.xlim(5, 55)
     plt.ylim(-10, 870)
     plt.axis('off')
-    plt.show()
-    print(j)
+    #plt.show()
+    figure = plt.gcf()
+
+    figure.set_size_inches(8,12)
+    plt.savefig(fibreFigure_AAOmega, dpi=500)
 

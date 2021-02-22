@@ -9,7 +9,7 @@ class rectangular_magnet(rectangle):
     def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs):
 
         length = rectangle_magnet_length
-        width  = rectangle_magnet_width
+        width = rectangle_magnet_width
         super().__init__(center,length,width,orientation)
         self.index = index
         self.placement_index = 0

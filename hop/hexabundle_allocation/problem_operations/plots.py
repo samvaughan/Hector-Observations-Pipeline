@@ -10,6 +10,10 @@ from math import pi, cos, sin
 import pandas as pd
 from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
 
+
+#     ********** Adjust the sky fibre outer region number by 1 font and inner region number to be bolded ****
+
+
 plt.rc('font', size=30)          # controls default text sizes
 plt.rc('axes', titlesize=30)     # fontsize of the axes title
 plt.rc('axes', labelsize=30)     # fontsize of the x and y labels
@@ -18,7 +22,7 @@ plt.rc('ytick', labelsize=30)    # fontsize of the tick labels
 plt.rc('legend', fontsize=30)    # legend fontsize
 plt.rc('figure', titlesize=30)   # fontsize of the figure title
 
-
+# creating annotated text on the magnets to differentiate the type adn size of hexabundles used and for labels
 def annotate_text_in_plot(magnet):
     rotation_matrix = rotational_matrix(convert_degrees_to_radians(magnet.orientation))
 
@@ -48,32 +52,33 @@ def annotate_text_in_plot(magnet):
         z_order = 3
 
     magnet.corner = (magnet.center[0] + rotation_matrix[0][0] * (magnet.width + corner_offset) / 2 + rotation_matrix[1][0] * (magnet.length + 3) / 2, \
-                 magnet.center[1] + rotation_matrix[0][1] * (magnet.width + corner_offset) / 2 + rotation_matrix[1][1] * (magnet.length + 3) / 2)
+                    magnet.center[1] + rotation_matrix[0][1] * (magnet.width + corner_offset) / 2 + rotation_matrix[1][1] * (magnet.length + 3) / 2)
     magnet.circular_center = (magnet.center[0] - rotation_matrix[1][0] * (magnet.length + 27) / 2, \
-                 magnet.center[1] - rotation_matrix[1][1] * (magnet.length + 27) / 2)
+                             magnet.center[1] - rotation_matrix[1][1] * (magnet.length + 27) / 2)
     annotated_text = re.split('(\d+)', magnet.magnet_label)[1]
     annotated_text = str(magnet.hexabundle + '  ' + str(annotated_text))
 
     if (annotated_text[1] == 'S'):
         annotated_text = annotated_text.replace('GS', '')
-        label_color = 'black'# change back to 'yellow'
+        label_color = 'yellow'# change back to 'yellow'
         patch_color = 'black'
     elif ('I'> magnet.hexabundle >='A'):
         label_color = 'black'
         patch_color = 'white'
     elif (magnet.hexabundle >'H'):
-        label_color = 'black'# change back to 'white'
+        label_color = 'white'# change back to 'white'
         patch_color = 'black'
-    ## Increase zorder of the smaller hexabundles over A and B and C- the largest ones
-    #****** previousOne draw_fill = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, length, angle=abs(180 - magnet.orientation),facecolor=patch_color,alpha=0.8,zorder=3)#,edgecolor='black',linewidth=0.5
-    # draw_fill2 = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, (length-12), angle=abs(180 - magnet.orientation), facecolor=patch_color,edgecolor='black',linewidth=0.5, alpha=0.8,zorder=z_order)
-    # draw_fill3 = patches.Circle((magnet.circular_center[0], magnet.circular_center[1]), radius=radius, facecolor=patch_color, edgecolor='black',linewidth=0.5, alpha=0.8,zorder=z_order)
-    # draw_fill4 = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, (length - 11), angle=abs(180 - magnet.orientation),
-    #                                facecolor=patch_color, linewidth=0.5, alpha=0.9,zorder=3)
+
+    # Increase zorder of the smaller hexabundles over A and B and C- the largest ones
+    # ****** previousOne draw_fill = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, length, angle=abs(180 - magnet.orientation),facecolor=patch_color,alpha=0.8,zorder=3)#,edgecolor='black',linewidth=0.5
+    draw_fill2 = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, (length-12), angle=abs(180 - magnet.orientation), facecolor=patch_color,edgecolor='black',linewidth=0.5, alpha=0.8,zorder=z_order)
+    draw_fill3 = patches.Circle((magnet.circular_center[0], magnet.circular_center[1]), radius=radius, facecolor=patch_color, edgecolor='black',linewidth=0.5, alpha=0.8,zorder=z_order)
+    draw_fill4 = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, (length - 11), angle=abs(180 - magnet.orientation),
+                                   facecolor=patch_color, linewidth=0.5, alpha=0.9,zorder=3)
     # plt.gcf().gca().add_artist(draw_fill) ## previous one
-    # plt.gcf().gca().add_artist(draw_fill2)
-    # plt.gcf().gca().add_artist(draw_fill3)
-    # plt.gcf().gca().add_artist(draw_fill4)
+    plt.gcf().gca().add_artist(draw_fill2)
+    plt.gcf().gca().add_artist(draw_fill3)
+    plt.gcf().gca().add_artist(draw_fill4)
 
     magnet.text_center = (magnet.center[0] - rotation_matrix[1][0] * (magnet.length ) / 2, \
                     magnet.center[1] - rotation_matrix[1][1] * (magnet.length ) / 2)
@@ -112,28 +117,53 @@ def coordinates_and_angle_of_skyFibres(angle,radii):
 
 def read_sky_fibre_file(filename):
 
-    dataframe = pd.read_csv(filename, header=0)
-    dataframe.dropna(how="all", inplace=True)
+    dataframe = pd.read_csv(filename,skiprows=lambda x: x in [0,1,2,3,4,5])
     print(dataframe)
 
-    subplate_name = dataframe['SUBPLATE_name']
-    fibre_number = dataframe['Fibre_number']
+    subplate_name = dataframe['ID']
     position = dataframe['Position']
 
     skyfibreDict = {}
-    for i in range(1,len(subplate_name)):
-        if str(subplate_name[i]) not in skyfibreDict:
-            skyfibreDict[str(subplate_name[i])] = []
-        skyfibreDict[str(subplate_name[i])].append({int(fibre_number[i]): int(position[i])})
+    j = 0
+    for i in subplate_name:
+        if i[0] == 'S':
+            # print(i[4])
+            if i[4] == 'A':
+                fib_num = 7
+            elif i[4] == 'H':
+                fib_num = 8
+
+            num = [int(s) for s in i.split('-') if s.isdigit()]
+            num = int(num[0])
+
+            k = 1
+            while num > fib_num:
+                num = num - fib_num
+                k += 1
+
+            if (i[4]+str(k)) not in skyfibreDict:
+                skyfibreDict[i[4]+str(k)] = []
+            skyfibreDict[i[4] + str(k)].append({int(num): int(position[j])})
+
+        j += 1
+
+            # skyfibreDict[str(subplate_name[i])] = []
+
+    # for i in range(1,len(subplate_name)):
+    #     if str(subplate_name[i]) not in skyfibreDict:
+    #         skyfibreDict[str(subplate_name[i])] = []
+    #     skyfibreDict[str(subplate_name[i])].append({int(fibre_number[i]): int(position[i])})
+
+    print(skyfibreDict)
 
     return skyfibreDict
 
-def sky_fibre_annotations():
+def sky_fibre_annotations(skyfibre_file):
     angle_subplate = [7,5,3,1,-1,-3,-5,-7]
     radii = 270
 
-    filename = 'Sky_fibre_position_example.csv'
-    skyfibreDict = read_sky_fibre_file(filename)
+    # filename = 'Sky_fibre_position_example.csv'
+    skyfibreDict = read_sky_fibre_file(skyfibre_file)
     print(skyfibreDict)
     string = str(skyfibreDict['H3'][5].keys())
     print(re.sub('[^0-9]', '', string))
@@ -148,16 +178,16 @@ def sky_fibre_annotations():
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos,342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_top[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=7,ha='center', va='center')
+            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=5,ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
             plt.annotate('▮', (x, y), color='black', rotation=rotation, fontsize=7,ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j+1]), (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
+            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j+1]), (x, y), color='black', rotation=rotation, fontsize=6, weight='bold', ha='center',va='center')
         if skyfibreTitles_top[i][0] == 'H':
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=71, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle - 20
 
@@ -171,16 +201,16 @@ def sky_fibre_annotations():
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos,342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_left[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
+            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=5, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
             plt.annotate('▮', (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=7, ha='center', va='center')
+            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=6, weight='bold', ha='center', va='center')
         if skyfibreTitles_top[i][0] == 'H':
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=71, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle - 20
 
@@ -194,33 +224,38 @@ def sky_fibre_annotations():
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_right[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
+            plt.annotate(fibre_num, (x, y), color='black', rotation=rotation, fontsize=5, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
             plt.annotate('▮', (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=7, ha='center', va='center')
+            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=6, weight='bold', ha='center', va='center')
         if skyfibreTitles_top[i][0] == 'H':
             alpha = 0.4
         elif skyfibreTitles_top[i][0] == 'A':
             alpha = 0.7
-        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=71, facecolor='gray', edgecolor='black',alpha=alpha)
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=80, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle + 20
 
 
-def draw_all_magnets(magnets,clusterNum,tileNum,figureFile):
+def draw_all_magnets(magnets, clusterNum, tileNum, skyfibre_file, robot_figureFile, hexabundle_figureFile):
+    # plt.figure(2)
+    # draw_magnet_pickup_areas(magnets, '--c')
 
     plt.figure(1)
-    # draw_circle = plt.Circle((0, 0), 260, fill=True, color='#E78BE7', alpha=0.4)
-    # draw_circle1 = plt.Circle((0, 0), 213.98, fill=True, color='#f6f93b')
-    # draw_circle2 = plt.Circle((0, 0), 163.02, fill=True, color='#60fb3d')
-    # draw_circle3 = plt.Circle((0, 0), 102.96, fill=True, color='#add8e6')
-    # plt.gcf().gca().add_artist(draw_circle)
-    # plt.gcf().gca().add_artist(draw_circle1)
-    # plt.gcf().gca().add_artist(draw_circle2)
-    # plt.gcf().gca().add_artist(draw_circle3)
-    #
-    # sky_fibre_annotations()
+    draw_circle = plt.Circle((0, 0), 220, fill=True, color='#E78BE7', alpha=0.4)
+    draw_circle1 = plt.Circle((0, 0), (0.823*220), fill=True, color='#f6f93b')
+    draw_circle2 = plt.Circle((0, 0), (0.627*220), fill=True, color='#60fb3d')
+    draw_circle3 = plt.Circle((0, 0), (0.396*220), fill=True, color='#add8e6')
+    plt.gcf().gca().add_artist(draw_circle)
+    plt.gcf().gca().add_artist(draw_circle1)
+    plt.gcf().gca().add_artist(draw_circle2)
+    plt.gcf().gca().add_artist(draw_circle3)
+
+    sky_fibre_annotations(skyfibre_file)
+
+    # plt.figure(2)
+    # draw_magnet_pickup_areas(magnets, '--c')
 
     for magnet in magnets:
 
@@ -229,36 +264,45 @@ def draw_all_magnets(magnets,clusterNum,tileNum,figureFile):
             magnet.draw_circle('r') ## The magnets being drawn
 ###################################################
             plt.figure(2)
+            for pickup_area in magnet.pickup_areas:
+                pickup_area.draw_rectangle('--c',2)
             magnet.draw_circle('r')
+
             #plt.text(magnet.center[0], magnet.center[1], str(int(magnet.index)), fontsize=12, rotation=abs(135-magnet.orientation))
 ###################################################
         if is_rectangular_magnet(magnet):
             plt.figure(1)
-            magnet.draw_rectangle('r') ## The magnets being drawn
+            magnet.draw_rectangle('r',1) ## The magnets being drawn
+            plt.figure(1)
+            annotate_text_in_plot(magnet)
             # plt.text(magnet.center[0], magnet.center[1], str(magnet.magnet_label), fontsize=9, rotation=abs(180-magnet.orientation))  #+'\n'+str(magnet.hexabundle)
-            # annotate_text_in_plot(magnet)
 
             plt.xlabel('mm')
             plt.ylabel('mm')
 ################################################################
             plt.figure(2)
-            magnet.draw_rectangle('r')
+            for pickup_area in magnet.pickup_areas:
+                pickup_area.draw_rectangle('--c',2)
+            magnet.draw_rectangle('r',2)
             plt.text(robot_center_x + magnet.center[0], robot_center_y + magnet.center[1], str(magnet.magnet_label), fontsize=8, \
                      rotation=abs(180 - magnet.orientation),weight='bold')  # +'\n'+str(magnet.hexabundle)
+
 
             plt.xlabel('mm')
             plt.ylabel('mm')
 ################################################################
 
-    # plt.figure(1)
-
-    # plt.axis('off')
-    # axes = plt.gca()
-    # axes.set_xlim([-350, 350])
-    # axes.set_ylim([-350, 350])
+    plt.figure(1)
+    plt.axis('off')
+    axes = plt.gca()
+    axes.set_xlim([-350, 350])
+    axes.set_ylim([-350, 350])
     # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.savefig(hexabundle_figureFile)
     # plt.savefig("image.png", bbox_inches='tight', dpi=100)
-    plt.savefig(figureFile)
+
+    plt.figure(2)
+    plt.savefig(robot_figureFile)
 
     f = plt.figure(1)
     f1 = plt.figure(2)

@@ -15,7 +15,7 @@ def hexaPositionOffset(all_magnets):
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 18:
+        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 24:
 
             # getting the orientation of rectangular magnet with respect to North(up)
             ang = i.orientation
@@ -30,13 +30,13 @@ def hexaPositionOffset(all_magnets):
             ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
             print('ang_azAngs_rectangular = ' + str(ang_azAngs))
 
-            circular_centre = i.center
-            print(circular_centre)
+            rectangular_centre = i.center
+            print(rectangular_centre)
 
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'circular_magnet' and i.index == 18:
+        if i.__class__.__name__ == 'circular_magnet' and i.index == 24:
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
             angle_adjusted = 450+ang
@@ -56,8 +56,8 @@ def hexaPositionOffset(all_magnets):
             azAngs = convert_radians_to_degrees(i.azAngs)
             # print('azAngs_circular=' + str(azAngs))
 
-            rectangular_centre = i.center
-            print(rectangular_centre)
+            circular_centre = i.center
+            print(circular_centre)
 
     angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
     print(angle)
