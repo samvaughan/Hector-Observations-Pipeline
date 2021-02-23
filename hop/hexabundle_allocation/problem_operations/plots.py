@@ -196,9 +196,9 @@ def sky_fibre_annotations(skyfibre_file):
             plt.annotate('▮', (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
             plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=6, weight='bold', ha='center', va='center')
-        if skyfibreTitles_top[i][0] == 'H':
+        if skyfibreTitles_left[i][0] == 'H':
             alpha = 0.4
-        elif skyfibreTitles_top[i][0] == 'A':
+        elif skyfibreTitles_left[i][0] == 'A':
             alpha = 0.7
         draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=90, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)
@@ -206,7 +206,7 @@ def sky_fibre_annotations(skyfibre_file):
 
     # sky fibres right batch
     angle = -160
-    skyfibreTitles_right = ['H5', 'H6', 'A5', 'H7']
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
     for i in range(0, 4):
         x, y, rotation = coordinates_and_angle_of_skyFibres(angle,radii)
         plt.annotate(skyfibreTitles_right[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center', va='center')
@@ -219,9 +219,9 @@ def sky_fibre_annotations(skyfibre_file):
             plt.annotate('▮', (x, y), color='black', rotation=rotation, fontsize=7, ha='center',va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
             plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color='black', rotation=rotation, fontsize=6, weight='bold', ha='center', va='center')
-        if skyfibreTitles_top[i][0] == 'H':
+        if skyfibreTitles_right[i][0] == 'H':
             alpha = 0.4
-        elif skyfibreTitles_top[i][0] == 'A':
+        elif skyfibreTitles_right[i][0] == 'A':
             alpha = 0.7
         draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle-9+90, theta2=angle+9+90, width=90, facecolor='gray', edgecolor='black',alpha=alpha)
         plt.gcf().gca().add_artist(draw_wedge)

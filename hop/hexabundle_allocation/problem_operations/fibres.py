@@ -315,8 +315,8 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
                 fontsize=fs * 0.7 , ha='left',va='center', rotation=0, color='purple', \
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
-    plt.gcf().gca().add_artist(plt.annotate('fibre_num=17\n H\n fibre_num=53', xy=(19, 226.5), xytext=(16, 226.5), xycoords='data', \
-                fontsize=fs*0.8, ha='right', va='center', rotation=0, color='gold', \
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=17\n ★ H ★\n fibre_num=53', xy=(19, 226.5), xytext=(16, 226.5), xycoords='data', \
+                fontsize=fs*0.8, ha='right', va='center', rotation=0, color='black', \
                 bbox=dict(boxstyle='square', fc='white'), \
                 arrowprops=dict(arrowstyle='-[, widthB=0.7, lengthB=0.5', lw=1.0)))
 
@@ -328,12 +328,77 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
                 fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='grey', \
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
+    for i in [793,727,661,595,199,133,67,1]:
+        plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, i), xytext=(45, 400), xycoords='data', \
+                                                fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='red', \
+                                                arrowprops=dict(arrowstyle='-', color='red',lw=0.7)))
+    # plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, 1), xytext=(48, 400), xycoords='data', \
+    #                                             fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='red', \
+    #                                             arrowprops=dict(arrowstyle='-', color='red',lw=0.8)))
+
     plt.xlim(-10, 70)
     plt.ylim(-10, 870)
-    plt.axis('off')
-    plt.show()
+    # plt.axis('off')
+    # plt.show()
     figure = plt.gcf()
 
     figure.set_size_inches(8,12)
     plt.savefig(fibreFigure_AAOmega, dpi=500)
 
+    ## Spector slitelets figure
+
+    plt.figure(4)
+
+    j = 1
+    for slitlet_count in range(19):
+
+        y_start = 915 - (48 * (slitlet_count + 1))
+        plt.gcf().gca().add_patch(patches.Rectangle((20, y_start), 20, 45, edgecolor='black', facecolor='none', lw=2, zorder=3))
+
+        y = y_start + 44
+        x_1 = 20
+        x_2 = 40
+        for i in range(45):
+
+            if len(str(new_arraySpector[j][2])) == 2:
+                color = 'skyblue'
+            elif len(str(new_arraySpector[j][2])) == 3:
+                color = 'red'
+            elif str(new_arraySpector[j][2]) == 'I':
+                color = 'navy'
+            elif str(new_arraySpector[j][2]) == 'J':
+                color = 'brown'
+            elif str(new_arraySpector[j][2]) == 'K':
+                color = 'peru'
+            elif str(new_arraySpector[j][2]) == 'L':
+                color = 'green'
+            elif str(new_arraySpector[j][2]) == 'M':
+                color = 'crimson'
+            elif str(new_arraySpector[j][2]) == 'N':
+                color = 'purple'
+            elif str(new_arraySpector[j][2]) == 'O':
+                color = 'chocolate'
+            elif str(new_arraySpector[j][2]) == 'P':
+                color = 'navy'
+            elif str(new_arraySpector[j][2]) == 'Q':
+                color = 'brown'
+            elif str(new_arraySpector[j][2]) == 'R':
+                color = 'peru'
+            elif str(new_arraySpector[j][2]) == 'S':
+                color = 'green'
+            elif str(new_arraySpector[j][2]) == 'T':
+                color = 'crimson'
+            elif str(new_arraySpector[j][2]) == 'U':
+                color = 'gold'
+
+            plt.gcf().gca().add_patch(plt.Rectangle((x_1, y), x_2 - x_1, 1, facecolor=color))
+            y = y - 1
+            j += 1
+
+        plt.gcf().gca().add_artist(
+            plt.annotate(str(slitlet_count + 1), xy=(30, y + 22), xytext=(30, y + 22), xycoords='data', \
+                         fontsize=10, ha='right', va='center', rotation=0, color='white'))
+
+    plt.xlim(-10, 70)
+    plt.ylim(-10, 930)
+    plt.show()
