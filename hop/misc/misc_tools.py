@@ -39,14 +39,14 @@ def _read_table(fname):
     return table
 
 
-def create_output_directories(output_folder):
+def create_output_directories(output_folder, subfolders_to_be_made):
 
         # Make the folder if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     # Make the subdirectories if they don't exist
-    subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
+    # subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
     folders = dict(zip(subfolders_to_be_made, [Path(f'{output_folder}/{subfolder}') for subfolder in subfolders_to_be_made]))
     for name, p in folders.items():
         p.mkdir(parents=True, exist_ok=True)

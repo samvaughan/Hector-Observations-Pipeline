@@ -1,0 +1,1716 @@
+//  ----------------------------------------------------------------------------
+//
+//                    C o m m a n d  H a n d l e r . c p p
+//
+//  An initial version of code implementing a general purpose command-line
+//  parser. At the moment, the comments are pretty sparse and erratic, as
+//  the structure is still evolving and I don't want to put too much work '
+//  into comments until I'm hapy with the overall structure. At the moment,
+//  this will handle a simple command line with various named parameters,
+//  which is all that's needed for some programs, but it still doesn't have
+//  the helpful prompting for unspecified parameters that I'd really like
+//  to have working. Still a work in progress.
+//
+//  Author: Keith Shortridge, K&V (Keith@KnaveAndVarlet.com.au)
+//
+//  History:
+//     18th Dec 2020. First useful version. Handles a simple command line,
+//                    but no support for prompting for missing parameters. KS.
+
+#include "CommandHandler.h"
+
+#include "TcsUtil.h"
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/errno.h>
+#include <iostream>
+#include <fstream>
+
+using std::string;
+using std::list;
+using std::vector;
+
+//  ----------------------------------------------------------------------------
+//
+//                          C m d  A r g
+
+CmdArg::CmdArg (CmdHandler& Handler,const string& Name,int Posn,long Flags,
+                                   const string& Prompt,const string& Text)
+{
+   I_Handler = &Handler;
+   I_Name = Name;
+   I_Prompt = Prompt;
+   I_Text = Text;
+   I_Flags = Flags;
+   I_Posn = Posn;
+   I_IsActive = true;
+   I_PreviousSet = false;
+   I_IsSet = false;
+   I_Listing = false;
+   I_Type = CMD_ARG_UNKNOWN;
+   if (Flags & VALOPT) {
+      I_Valopt = true;
+   } else if (Flags & VALREQ) {
+      I_Valopt = false;
+   } else {
+      I_Valopt = false;
+   }
+   if (Flags & REQUIRED) {
+      I_Required = true;
+   } else {
+      I_Required = false;
+   }
+   if (Flags & INTERNAL) {
+      I_Internal = true;
+   } else {
+      I_Internal = false;
+   }
+   if (Flags & HIDDEN) {
+      I_Hidden = true;
+   } else {
+      I_Hidden = false;
+   }
+   I_PromptOn = false;
+   I_PromptOff = false;
+   I_ConstructError = "";
+   I_ErrorText = "";
+   if (I_Handler) I_Handler->AddArg(this);
+}
+
+CmdArg::~CmdArg()
+{
+   if (I_Handler) I_Handler->DelArg(this);
+}
+
+void CmdArg::CloseHandler (CmdHandler* Handler)
+{
+   if (I_Handler == Handler) {
+      I_Handler = NULL;
+      I_IsActive = false;
+   }
+}
+
+void CmdArg::Reset (void)
+{
+   //  "Reset' essentially means ignore any previous values, and the easiest
+   //  way to achieve that is to clear the flag that says a previous value
+   //  was set.
+   
+   I_PreviousSet = false;
+}
+
+void CmdArg::SetListing (bool Listing)
+{
+   I_Listing = Listing;
+}
+
+void CmdArg::SetPrompting (const string& OnOffDefault)
+{
+   if (TcsUtil::MatchCaseBlind(OnOffDefault,"On")) {
+      I_PromptOn = true;
+      I_PromptOff = false;
+   } else if (TcsUtil::MatchCaseBlind(OnOffDefault,"Off")) {
+      I_PromptOn = false;
+      I_PromptOff = true;
+   } else if (TcsUtil::MatchCaseBlind(OnOffDefault,"Default")) {
+      I_PromptOn = false;
+      I_PromptOff = false;
+   }
+}
+
+bool CmdArg::MatchName (const std::string& Name)
+{
+   //  Could be extended to implement support for abbreviations.
+   
+   bool Match = false;
+   int Pos = 0;
+   if (Name.substr(0,1) == "-") Pos = 1;
+   if (TcsUtil::MatchCaseBlind(Name.substr(Pos),I_Name)) Match = true;
+   return Match;
+}
+
+string CmdArg::Description (void)
+{
+   string Text = "'" + I_Name + "'";
+   if (I_Prompt != "") Text += " (" + I_Prompt + ")";
+   return Text;
+}
+
+bool CmdArg::TellUser (const string& ReportString)
+{
+   bool ReturnOK = true;
+   if (I_Handler) {
+      CmdInteractor* Interactor = I_Handler->GetInteractor();
+      if (Interactor) {
+         ReturnOK = Interactor->WriteLn(ReportString);
+      }
+   }
+   return ReturnOK;
+}
+
+string CmdArg::PromptUser (const string& Default)
+{
+   bool OK = true;
+   string Value = "";
+   if (I_Handler) {
+      CmdInteractor* Interactor = I_Handler->GetInteractor();
+      if (Interactor) {
+         OK = Interactor->Write(Description() + " [" + Default + "] ? ");
+         if (OK) OK = Interactor->ReadLn(Value);
+         if (!OK) {
+            Value = "";
+         } else {
+            if (Value == "") Value = Default;
+         }
+      }
+   }
+   return Value;
+}
+
+bool CmdArg::CanPrompt (void)
+{
+   bool ReturnOK = false;
+   if (I_Handler) {
+      CmdInteractor* Interactor = I_Handler->GetInteractor();
+      if (Interactor) {
+         ReturnOK = Interactor->IsInteractive();
+      }
+   }
+   return ReturnOK;
+}
+
+bool CmdArg::SetPrevious (const string& /*Value*/)
+{
+   I_ErrorText = "Call to base CmdArg::SetPrevious - internal coding error";
+   return false;
+}
+
+bool CmdArg::SetValue (const std::string& /*Name*/, const string& /*Value*/)
+{
+   I_ErrorText = "Call to base CmdArg::SetValue - internal coding error";
+   return false;
+}
+
+bool CmdArg::SetValue (const string& /*Name*/, bool /*Equals*/,
+       const std::string /*Value*/, bool /*GotValue*/, bool* /*UsedValue*/)
+{
+   I_ErrorText = "Call to base CmdArg::SetValue - internal coding error";
+   return false;
+}
+
+string CmdArg::GetCurrentSpec (void)
+{
+   return "";
+}
+
+bool CmdArg::DontSave (void)
+{
+   return ((I_Flags & NOSAVE) != 0);
+}
+
+
+bool CmdArg::Clear (void)
+{
+   //  Initialises ready for a new parse pass through a new set of argument
+   //  strings. This is also a place to check on whether there are any
+   //  so far unreported arrors - particularly, ones occurring during the
+   //  constructor, which would otherwise go unreported.
+   
+   bool ReturnOK = true;
+   I_IsSet = false;
+   I_Listing = false;
+   if (I_ConstructError != "") {
+      I_ErrorText = I_ConstructError;
+      ReturnOK = false;
+   }
+   return ReturnOK;
+}
+
+string CmdArg::GetError (void)
+{
+   return I_ErrorText;
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          S t r i n g  A r g
+
+StringArg::StringArg (CmdHandler& Handler,const string& Name,int Posn,
+   long Flags,const string& Default,const string& Prompt,const string& Text) :
+      CmdArg (Handler,Name,Posn,Flags,Prompt,Text)
+{
+   I_Previous = "";
+   I_Value = "";
+   I_Default = Default;
+   if (I_Valopt) {
+      I_ConstructError = "String arguments like '" + I_Name +
+      "' cannot have optional arguments - remove VALOPT flag from constructor";
+   }
+   I_Valopt = false;
+}
+
+StringArg::~StringArg()
+{
+}
+
+bool StringArg::SetPrevious (const string& Value)
+{
+   bool ReturnOK = true;
+   I_Previous = Value;
+   I_PreviousSet = true;
+   return ReturnOK;
+}
+
+bool StringArg::SetValue (const std::string& Name, const string& Value)
+{
+   bool ReturnOK = true;
+   if (I_IsSet) {
+      I_ErrorText = "Cannot set argument " + Description() + " to '"
+                         + Value + "' - already set to '" + I_Value + "'";
+      ReturnOK = false;
+   } else {
+      I_Value = Value;
+      I_IsSet = true;
+   }
+   return ReturnOK;
+}
+
+bool StringArg::SetValue (const string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue)
+{
+   //  This is only going to be called if the argument is set up so that
+   //  a value isn't required. It's hard to see that making sense. (Indeed,
+   //  we prevent this in the constructor, so we could actually drop this
+   //  routine entirely and fall back on the base version defined in CmdArg)
+   
+   bool ReturnOK = true;
+   if (GotValue) {
+      *UsedValue = true;
+      ReturnOK = SetValue(Name,Value);
+   } else {
+      ReturnOK = false;
+      I_ErrorText = "Argument " + Description() +
+         " is a string argument. Making the value optional is unsupported.";
+   }
+   return ReturnOK;
+}
+
+string StringArg::GetCurrentSpec (void)
+{
+   return (I_Name + " = \"" + I_Value + "\"");
+}
+
+string StringArg::GetValue (bool* Ok,string* Error)
+{
+   string Value = "";
+   bool WasPrompted = false;
+   if (*Ok) {
+      if (I_IsSet) {
+         Value = I_Value;
+      } else {
+         if (CanPrompt()) {
+            string Default = I_PreviousSet ? I_Previous : I_Default;
+            if ((I_Required || I_PromptOn) && !I_PromptOff) {
+               Value = PromptUser (Default);
+               WasPrompted = true;
+            } else {
+               Value = Default;
+            }
+         } else {
+            if (I_PreviousSet) {
+               Value = I_Previous;
+            } else {
+               if (I_Required) {
+                  *Error = "No value provided for required argument: " +
+                                                                Description();
+                  *Ok = false;
+               } else {
+                  Value = I_Default;
+               }
+            }
+         }
+      }
+   }
+   I_Value = Value;
+   if (I_Listing) {
+      if (!WasPrompted) {
+         string ReportString = Description() + " = " + I_Value;
+         TellUser (ReportString);
+      }
+   }
+   return I_Value;
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          F i l e  A r g
+//
+//  This code treats a FileArg just the same as a StringArg, but it would
+//  be possible to add support for checking to see the name parses properly,
+//  for optionally checking for an existing file, or for getting a default
+//  extension (rather than the whole default filename) from the specified
+//  default string.
+
+FileArg::FileArg (CmdHandler& Handler,const string& Name,int Posn,
+   long Flags,const string& Default,const string& Prompt, const string& Text) :
+      StringArg (Handler,Name,Posn,Flags,Default,Prompt,Text)
+{
+   //  A File argument may have a default which is a list of possible defaults,
+   //  acting as a search path. Pick the first one that is an acceptable option.
+   //  Note that even if there is only one option, this code checks to see
+   //  if it can be expanded, and if so makes the expanded version the default.
+   
+   I_DefNote = "";
+   TcsUtil::Tokenize(I_Default,I_Defaults," ,");
+   if (I_Defaults.size() >= 1) {
+      bool Set = false;
+      for (string& Def : I_Defaults) {
+         string Expanded;
+         if (TcsUtil::ExpandFileName(Def,Expanded)) {
+            if (MustExist() && !FileExists(Expanded)) continue;
+            if (Def != Expanded) {
+               I_DefNote = "'" + Def + "' expands to '" + Expanded + "'";
+            }
+            I_Default = Expanded;
+            Set = true;
+            break;
+         }
+      }
+      
+      //  If none are acceptable, make the default the last one - the final
+      //  fallback. The important thing is only to have one value in I_Default.
+      
+      if (!Set) I_Default = I_Defaults[I_Defaults.size() - 1];
+   }
+
+}
+
+FileArg::~FileArg()
+{
+}
+
+bool FileArg::MustExist (void)
+{
+   return ((I_Flags & MUST_EXIST) != 0);
+}
+
+bool FileArg::FileExists (string& FileName)
+{
+   return (access(FileName.c_str(), F_OK ) != -1);
+}
+
+bool FileArg::AllowedValue (const string& Value)
+{
+   bool Allowed = true;
+   string ExpandedValue;
+   if (TcsUtil::ExpandFileName(Value,ExpandedValue)) {
+      if (Value != ExpandedValue) {
+         if (I_Listing) {
+            TellUser ("Note: '" + Value + "' expands to '" +
+                                                   ExpandedValue + "'");
+         }
+         Value = ExpandedValue;
+      }
+   }
+   if (MustExist() && !FileExists(Value)) {
+      Allowed = false;
+   }
+   return Allowed;
+)
+
+string FileArg::GetValue (bool* Ok,string* Error)
+{
+   bool WasPrompted = false;
+   if (*Ok) {
+      if (I_IsSet) {
+         Value = I_Value;
+      } else {
+         if (CanPrompt()) {
+            bool Prompt = ((I_Required || I_PromptOn) && !I_PromptOff);
+            string Default = I_PreviousSet ? I_Previous : I_Default;
+            string DefOrigin = I_PreviousSet ? "Previous" : "Default";
+            string DefString = FormatValue(Default);
+            if (!AllowedValue(Default)) {
+               Prompt = true;
+               TellUser (DefOrigin + " (" + FormatValue(Default) +
+                  ") for " + I_Name + " is invalid. Must be " + Requirement());
+               DefString = "";
+            }
+            if (Prompt) {
+               for (;;) {
+                  string Reply = PromptUser (DefString);
+                  bool Valid = ValidValue(Reply,&Value);
+                  if (Valid) Valid = AllowedValue(Value);
+                  if (Valid) {
+                     WasPrompted = true;
+                     Origin = "Prompted";
+                     break;
+                  } else {
+                     TellUser("Reply needs to be " + Requirement());
+                  }
+               }
+            } else {
+               Value = Default;
+               Origin = DefOrigin;
+            }
+         } else {
+            if (I_PreviousSet) {
+               Value = I_Previous;
+               Origin = "Previous";
+            } else {
+               if (I_Required) {
+                  *Error = "No value provided for required argument: " +
+                                                                Description();
+                  *Ok = false;
+               } else {
+                  Value = I_Default;
+                  Origin = "Default";
+               }
+            }
+         }
+      }
+   }
+   return Value;
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          B o o l  A r g
+
+BoolArg::BoolArg (CmdHandler& Handler,const string& Name,int Posn,
+   long Flags,bool Default,const string& Prompt,const string& Text) :
+     CmdArg (Handler,Name,Posn,Flags,Prompt,Text)
+{
+   I_Previous = Default;
+   I_Default = Default;
+   I_Value = Default;
+   
+   //  Most argument types default to requiring a value if neither 'value
+   //  required' nor 'value optional' are specified in Flags - which is what
+   //  the CmdArg constructor will have done for us already. The default for
+   //  a boolean argument is that a value is optional.
+   
+   if ((Flags & (VALOPT | VALREQ)) == 0) {
+      I_Valopt = true;
+   }
+}
+
+BoolArg::~BoolArg()
+{
+}
+
+bool BoolArg::SetPrevious (const std::string& Value)
+{
+   bool ReturnOK = true;
+   //  We expect Value to be always one of 'true' or 'false'
+   bool BoolValue;
+   int Len = Value.size();
+   if (TcsUtil::MatchCaseBlind(Value,string("True").substr(0,Len))) {
+      BoolValue = true;
+   } else if (TcsUtil::MatchCaseBlind(Value,string("False").substr(0,Len))) {
+      BoolValue = false;
+   } else {
+      ReturnOK = false;
+      I_ErrorText = "'" + Value +
+              "' is not a valid true/false previous value for argument "
+                                                          + Description();
+   }
+   if (ReturnOK) {
+      I_Previous = BoolValue;
+      I_PreviousSet = true;
+   }
+   return ReturnOK;
+}
+
+bool BoolArg::ValidBoolean (const string& String, bool* Value)
+{
+   bool Valid = true;
+   int Len = String.size();
+   if (TcsUtil::MatchCaseBlind(String,string("Yes").substr(0,Len))) {
+      *Value = true;
+   } else if (TcsUtil::MatchCaseBlind(String,string("True").substr(0,Len))) {
+      *Value = true;
+   } else if (TcsUtil::MatchCaseBlind(String,string("No").substr(0,Len))) {
+      *Value = false;
+   } else if (TcsUtil::MatchCaseBlind(String,string("False").substr(0,Len))) {
+      *Value = false;
+   } else {
+      Valid = false;
+   }
+   return Valid;
+}
+
+bool BoolArg::SetValue (const std::string& Name, const std::string& Value)
+{
+   bool ReturnOK = true;
+   bool BoolValue;
+   bool Neg = NegName(Name);
+   if (!ValidBoolean(Value,&BoolValue)) {
+      I_ErrorText = "'" + Value +
+        "' is not a valid yes/no true/false value for argument "
+                                                        + Description();
+      ReturnOK = false;
+   }
+   if (ReturnOK) {
+      if (I_IsSet) {
+         string OldValue = I_Value ? "true" : "false";
+         I_ErrorText = "Cannot set argument " + Description() + " to '"
+                + Value + "' - already set to '" + OldValue + "'";
+         ReturnOK = false;
+      } else {
+         if (Neg) BoolValue = !BoolValue;
+         I_Value = BoolValue;
+         I_IsSet = true;
+      }
+   }
+   return ReturnOK;
+}
+
+bool BoolArg::SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue)
+{
+   bool ReturnOK = true;
+   *UsedValue = false;
+   //  We can assume the name matches - but is it the -ve version?
+   bool Neg = NegName(Name);
+   if (Equals) {
+      ReturnOK = SetValue(Name,Value);
+      *UsedValue = ReturnOK;
+   } else {
+      bool Used = false;
+      if (GotValue) {
+         Used = SetValue(Name,Value);
+         if (Used) {
+            *UsedValue = true;
+         }
+      }
+      if (!Used) {
+         //  No value, just the name of the option is enough.
+         if (Neg) I_Value = false;
+         else I_Value = true;
+         I_IsSet = true;
+      }
+   }
+   return ReturnOK;
+}
+
+string BoolArg::GetCurrentSpec (void)
+{
+   string Spec = "";
+   if (!I_Internal) {
+      Spec = I_Name + " = " + (I_Value ? "true" : "false");
+   }
+   return Spec;
+}
+
+bool BoolArg::MatchName (const string& Name)
+{
+   bool Match = false;
+   if (PosName(Name)) {
+      Match = true;
+   } else if (NegName(Name)) {
+      Match = true;
+   }
+   return Match;
+}
+
+bool BoolArg::NegName (const string& Name)
+{
+   bool Match = false;
+   int Pos = 0;
+   if (Name.substr(0,1) == "-") Pos = 1;
+   if (TcsUtil::MatchCaseBlind(Name.substr(Pos),"no" + I_Name)) {
+      Match = true;
+   }
+   return Match;
+}
+
+bool BoolArg::PosName (const string& Name)
+{
+   bool Match = false;
+   int Pos = 0;
+   if (Name.substr(0,1) == "-") Pos = 1;
+   if (TcsUtil::MatchCaseBlind(Name.substr(Pos),I_Name)) {
+      Match = true;
+   }
+   return Match;
+}
+
+bool BoolArg::GetValue (bool* Ok,string* Error)
+{
+   bool Value = false;
+   bool WasPrompted = false;
+   if (*Ok) {
+      if (I_IsSet) {
+         Value = I_Value;
+      } else {
+         if (CanPrompt() && !Hidden()) {
+            bool Default = I_PreviousSet ? I_Previous : I_Default;
+            if ((I_Required || I_PromptOn) && !I_PromptOff) {
+               for (;;) {
+                  string Reply = PromptUser (Default ? "true" : "false");
+                  if (ValidBoolean(Reply,&Value)) {
+                     WasPrompted = true;
+                     break;
+                  } else {
+                     TellUser("Reply needs to be one of true/false/yes/no");
+                  }
+               }
+            } else {
+               Value = Default;
+            }
+         } else {
+            if (I_PreviousSet) {
+               Value = I_Previous;
+            } else {
+               if (I_Required) {
+                  *Error = "No value provided for required argument: " +
+                                                                Description();
+                  *Ok = false;
+               } else {
+                  Value = I_Default;
+               }
+            }
+         }
+      }
+   }
+   I_Value = Value;
+   if (*Ok && I_Listing) {
+      if (!WasPrompted) {
+         string ReportString = Description() + " = "
+                                    + (I_Value ? "true" : "false");
+         TellUser (ReportString);
+      }
+   }
+   return I_Value;
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          I n t  A r g
+
+IntArg::IntArg (CmdHandler& Handler,const string& Name,int Posn,
+      long Flags,long Default,long Min,long Max,
+      const string& Prompt,const string& Text) :
+         CmdArg (Handler,Name,Posn,Flags,Prompt,Text)
+{
+   I_Previous = 0;
+   I_Value = 0;
+   I_Default = Default;
+   I_Min = Min;
+   I_Max = Max;
+}
+
+IntArg::~IntArg()
+{
+}
+
+long IntArg::GetValue (bool *Ok,string* Error)
+{
+   long Value = 0;
+   string Origin;
+   bool WasPrompted = false;
+   if (*Ok) {
+      if (I_IsSet) {
+         Value = I_Value;
+         Origin = "Specified";
+      } else {
+         if (CanPrompt()) {
+            bool Prompt = ((I_Required || I_PromptOn) && !I_PromptOff);
+            long Default = I_PreviousSet ? I_Previous : I_Default;
+            string DefOrigin = I_PreviousSet ? "Previous" : "Default";
+            string DefString = FormatValue(Default);
+            if (!AllowedValue(Default)) {
+               Prompt = true;
+               TellUser (DefOrigin + " (" + FormatValue(Default) +
+                  ") for " + I_Name + " is invalid. Must be " + Requirement());
+               DefString = "";
+            }
+            if (Prompt) {
+               for (;;) {
+                  string Reply = PromptUser (DefString);
+                  bool Valid = ValidValue(Reply,&Value);
+                  if (Valid) Valid = AllowedValue(Value);
+                  if (Valid) {
+                     WasPrompted = true;
+                     Origin = "Prompted";
+                     break;
+                  } else {
+                     TellUser("Reply needs to be " + Requirement());;
+                  }
+               }
+            } else {
+               Value = Default;
+               Origin = DefOrigin;
+            }
+         } else {
+            if (I_PreviousSet) {
+               Value = I_Previous;
+               Origin = "Previous";
+            } else {
+               if (I_Required) {
+                  *Error = "No value provided for required argument: " +
+                                                                Description();
+                  *Ok = false;
+               } else {
+                  Value = I_Default;
+                  Origin = "Default";
+               }
+            }
+         }
+      }
+   }
+   if (!AllowedValue(Value)) {
+      I_ErrorText = Origin + " value " + FormatValue(Value) + " for argument "
+            + Description() + " is not " + Requirement();
+      if (Value < I_Min) Value = I_Min;
+      if (Value > I_Max) Value = I_Max;
+      if (*Ok) {
+         *Ok = false;
+         *Error = I_ErrorText;
+      }
+   }
+   I_Value = Value;
+   if (*Ok && I_Listing) {
+      if (!WasPrompted) {
+         string ReportString = Description() + " = " + FormatValue(Value);
+         TellUser (ReportString);
+      }
+   }
+   return I_Value;
+}
+
+bool IntArg::ValidValue (const string& String, long* Value)
+{
+   bool Valid = true;
+   size_t Idx;
+   try {
+      *Value = stol(String,&Idx);
+   } catch (...) {
+      *Value = 0;
+      Valid = false;
+   }
+   if (Valid) {
+      if ((Idx != string::npos) && (Idx != String.size())) Valid = false;
+   }
+   return Valid;
+}
+
+bool IntArg::AllowedValue (long Value)
+{
+   return (Value >= I_Min && Value <= I_Max);
+}
+
+string IntArg::Requirement (void)
+{
+   string Text = "an integer in the range " + FormatValue(I_Min) + " to " +
+                                                          FormatValue(I_Max);
+   return Text;
+}
+
+string IntArg::FormatValue (long Value)
+{
+   char Number[64];
+   snprintf(Number,sizeof(Number),"%ld",Value);
+   return string(Number);
+}
+
+bool IntArg::SetPrevious (const string& Value)
+{
+   bool ReturnOK = true;
+   long IntValue;
+   if (!ValidValue(Value,&IntValue)) {
+      I_ErrorText = "'" + Value +
+        "' is not a valid integer previous value for argument " + Description();
+      ReturnOK = false;
+   }
+   if (ReturnOK) {
+      I_Previous = IntValue;
+      I_PreviousSet = true;
+   }
+   return ReturnOK;
+}
+
+
+bool IntArg::SetValue (const std::string& Name, const string& Value)
+{
+   bool ReturnOK = true;
+   long IntValue;
+   if (!ValidValue(Value,&IntValue)) {
+      I_ErrorText = "'" + Value +
+        "' is not a valid integer value for argument " + Description();
+      ReturnOK = false;
+   }
+   if (ReturnOK) {
+      if (I_IsSet) {
+         I_ErrorText = "Cannot set argument " + Description() + " to " +
+                       Value + " - already set to " + FormatValue(I_Value);
+         ReturnOK = false;
+      } else {
+         I_Value = IntValue;
+         I_IsSet = true;
+      }
+   }
+   return ReturnOK;
+}
+
+bool IntArg::SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue)
+{
+   //  Note that this will only be called if the value is optional.
+   //  We don't expect that to be the case for an integer. If a
+   //  value was supplied, that's fine, use that.
+   
+   bool ReturnOK = true;
+   if (GotValue) {
+      *UsedValue = true;
+      ReturnOK = SetValue(Name,Value);
+   } else {
+   
+      //  So, if the value is unspecified, what do we do? Set it
+      //  to the default, presumably.
+      
+      ReturnOK = SetValue(Name,FormatValue(I_Default));
+   }
+   return ReturnOK;
+}
+
+string IntArg::GetCurrentSpec (void)
+{
+   return (I_Name + " = " + FormatValue(I_Value));
+}
+
+
+//  ----------------------------------------------------------------------------
+//
+//                          R e a l  A r g
+
+RealArg::RealArg (CmdHandler& Handler,const string& Name,int Posn,
+      long Flags,double Default,double Min,double Max,
+      const string& Prompt,const string& Text) :
+         CmdArg (Handler,Name,Posn,Flags,Prompt,Text)
+{
+   I_Previous = 0.0;
+   I_Value = 0.0;
+   I_Default = Default;
+   I_Min = Min;
+   I_Max = Max;
+}
+
+RealArg::~RealArg()
+{
+}
+
+double RealArg::GetValue (bool *Ok,string* Error)
+{
+   double Value = 0;
+   string Origin;
+   bool WasPrompted = false;
+   if (*Ok) {
+      if (I_IsSet) {
+         Value = I_Value;
+         Origin = "Specified";
+      } else {
+         if (CanPrompt()) {
+            bool Prompt = ((I_Required || I_PromptOn) && !I_PromptOff);
+            double Default = I_PreviousSet ? I_Previous : I_Default;
+            string DefOrigin = I_PreviousSet ? "Previous" : "Default";
+            string DefString = FormatValue(Default);
+            if (!AllowedValue(Default)) {
+               Prompt = true;
+               TellUser (DefOrigin + " (" + FormatValue(Default) +
+                  ") for " + I_Name + " is invalid. Must be " + Requirement());
+               DefString = "";
+            }
+            if (Prompt) {
+               for (;;) {
+                  string Reply = PromptUser (DefString);
+                  bool Valid = ValidValue(Reply,&Value);
+                  if (Valid) Valid = AllowedValue(Value);
+                  if (Valid) {
+                     WasPrompted = true;
+                     Origin = "Prompted";
+                     break;
+                  } else {
+                     TellUser("Reply needs to be " + Requirement());
+                  }
+               }
+            } else {
+               Value = Default;
+               Origin = DefOrigin;
+            }
+         } else {
+            if (I_PreviousSet) {
+               Value = I_Previous;
+               Origin = "Previous";
+            } else {
+               if (I_Required) {
+                  *Error = "No value provided for required argument: " +
+                                                                Description();
+                  *Ok = false;
+               } else {
+                  Value = I_Default;
+                  Origin = "Default";
+               }
+            }
+         }
+      }
+   }
+   if (!AllowedValue(Value)) {
+      I_ErrorText = Origin + " value " + FormatValue(Value) + " for argument "
+            + Description() + " is not " + Requirement();
+      if (Value < I_Min) Value = I_Min;
+      if (Value > I_Max) Value = I_Max;
+      if (*Ok) {
+         *Ok = false;
+         *Error = I_ErrorText;
+      }
+   }
+   I_Value = Value;
+   if (*Ok && I_Listing) {
+      if (!WasPrompted) {
+         string ReportString = Description() + " = " + FormatValue(Value);
+         TellUser (ReportString);
+      }
+   }
+   return I_Value;
+}
+
+bool RealArg::ValidValue (const string& String, double* Value)
+{
+   bool Valid = true;
+   size_t Idx;
+   try {
+      *Value = stod(String,&Idx);
+   } catch (...) {
+      *Value = 0.0;
+      Valid = false;
+   }
+   if (Valid) {
+      if ((Idx != string::npos) && (Idx != String.size())) Valid = false;
+   }
+   return Valid;
+}
+
+bool RealArg::AllowedValue (double Value)
+{
+   return (Value >= I_Min && Value <= I_Max);
+}
+
+string RealArg::Requirement (void)
+{
+   string Text = "a floating point number in the range " +
+                    FormatValue(I_Min) + " to " + FormatValue(I_Max);
+   return Text;
+}
+
+string RealArg::FormatValue (double Value)
+{
+   char Number[64];
+   snprintf(Number,sizeof(Number),"%g",Value);
+   return string(Number);
+}
+
+bool RealArg::SetPrevious (const string& Value)
+{
+   bool ReturnOK = true;
+   double RealValue;
+   if (!ValidValue(Value,&RealValue)) {
+      I_ErrorText = "'" + Value +
+        "' is not a valid floating point previous value for argument " +
+                                                            Description();
+      ReturnOK = false;
+   }
+   if (ReturnOK) {
+      I_Previous = RealValue;
+      I_PreviousSet = true;
+   }
+   return ReturnOK;
+}
+
+
+bool RealArg::SetValue (const std::string& Name, const string& Value)
+{
+   bool ReturnOK = true;
+   double RealValue;
+   if (!ValidValue(Value,&RealValue)) {
+      I_ErrorText = "'" + Value +
+        "' is not a valid floating point value for argument " + Description();
+      ReturnOK = false;
+   }
+   if (ReturnOK) {
+      if (I_IsSet) {
+         I_ErrorText = "Cannot set argument " + Description() + " to " +
+                         Value + " - already set to " + FormatValue(I_Value);
+         ReturnOK = false;
+      } else {
+         I_Value = RealValue;
+         I_IsSet = true;
+      }
+   }
+   return ReturnOK;
+}
+
+bool RealArg::SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue)
+{
+   //  Note that this will only be called if the value is optional.
+   //  We don't expect that to be the case for a real number. If a
+   //  value was supplied, that's fine, use that.
+   
+   bool ReturnOK = true;
+   if (GotValue) {
+      *UsedValue = true;
+      ReturnOK = SetValue(Name,Value);
+   } else {
+   
+      //  So, if the value is unspecified, what do we do? Set it
+      //  to the default, presumably.
+      
+      ReturnOK = SetValue(Name,FormatValue(I_Default));
+   }
+   return ReturnOK;
+}
+
+string RealArg::GetCurrentSpec (void)
+{
+   return (I_Name + " = " + FormatValue(I_Value));
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          C m d  I n t e r a c t o r
+
+CmdInteractor::CmdInteractor (void)
+{
+   I_IsInteractive = isatty(fileno(stdin));
+   I_ErrorText = "";
+}
+
+CmdInteractor::~CmdInteractor()
+{
+}
+
+void CmdInteractor::SetInteractive (bool CanInteract)
+{
+   I_IsInteractive = CanInteract;
+}
+
+bool CmdInteractor::IsInteractive (void)
+{
+   return I_IsInteractive;
+}
+
+bool CmdInteractor::Write (const std::string& Text)
+{
+   std::cout << Text;
+   return true;
+}
+
+bool CmdInteractor::WriteLn (const std::string& Text)
+{
+   std::cout << Text << std::endl;
+   return true;
+}
+
+bool CmdInteractor::ReadLn (std::string& Text)
+{
+   bool ReturnOK = true;
+   if (!I_IsInteractive) {
+      ReturnOK = false;
+      I_ErrorText = "Cannot read from user: program is not interactive.";
+   } else {
+      try {
+         std::getline (std::cin,Text);
+      } catch (std::ifstream::failure e) {
+         I_ErrorText = "Error reading from user: " + string(e.what());
+         ReturnOK = false;
+      }
+   }
+   return ReturnOK;
+}
+
+string CmdInteractor::GetError (void)
+{
+   return I_ErrorText;
+}
+
+//  ----------------------------------------------------------------------------
+//
+//                          C m d  H a n d l e r
+
+CmdHandler::CmdHandler(const string& Program)
+{
+   I_Program = Program;
+   I_Setup = false;
+   I_ErrorText = "";
+   I_ReadPrevious = false;
+   I_ListArg = new BoolArg(*this,"List",0,CmdArg::INTERNAL | CmdArg::HIDDEN,
+                                 false,"List values used for all arguments");
+   I_PromptArg = new BoolArg(*this,"Prompt",0,CmdArg::INTERNAL | CmdArg::HIDDEN,
+                                 false,"Prompt for all arguments");
+   I_ResetArg = new BoolArg(*this,
+             "Reset",0,CmdArg::INTERNAL | CmdArg::HIDDEN,false,
+                 "Reset values to default, ignoring previously used values");
+}
+
+CmdHandler::~CmdHandler()
+{
+   for (CmdArg* Arg : I_CmdArgs) {
+      if (Arg) Arg->CloseHandler(this);
+   }
+   if (I_ListArg) {
+      I_ListArg->CloseHandler(this);
+      delete I_ListArg;
+   }
+   if (I_PromptArg) {
+      I_PromptArg->CloseHandler(this);
+      delete I_PromptArg;
+   }
+   if (I_ResetArg) {
+      I_ResetArg->CloseHandler(this);
+      delete I_ResetArg;
+   }
+   if (I_ErrorText != "") printf ("%s\n",I_ErrorText.c_str());
+}
+
+void CmdHandler::DelArg (CmdArg* Arg)
+{
+   I_CmdArgs.remove(Arg);
+}
+
+bool CmdHandler::RemoveNamedArg (const std::string& Name)
+{
+   bool ReturnOK = true;
+   CmdArg* TargetArg = NULL;
+   for (CmdArg* Arg : I_CmdArgs) {
+      if (Arg->MatchName(Name)) {
+         TargetArg = Arg;
+         break;
+      }
+   }
+   if (TargetArg) {
+      DelArg(TargetArg);
+   } else {
+      I_ErrorText = "Cannot delete argument '" + Name + "'. No such argument.";
+      ReturnOK = false;
+   }
+   return ReturnOK;
+}
+
+void CmdHandler::AddArg (CmdArg* Arg)
+{
+   I_CmdArgs.push_back(Arg);
+}
+
+bool CmdHandler::SaveCurrent (void)
+{
+   bool ReturnOK = true;
+   string SpecString = "";
+   bool First = true;
+   for (CmdArg* Arg : I_CmdArgs) {
+      if (!(Arg->DontSave())) {
+         string ArgSpec = Arg->GetCurrentSpec();
+         if (ArgSpec != "") {
+            if (!First) SpecString += " ";
+            if (Arg) SpecString += ArgSpec;
+            First = false;
+         }
+      }
+   }
+   
+   //  (I think it would actually be better to write each argument value to
+   //  a separate line. That needs changes to this and to ReadPrevious().)
+   
+   string FileName = "/tmp/" + I_Program + "_parameters";
+   FILE* ParamsFile = fopen (FileName.c_str(),"w");
+   if (ParamsFile == NULL) {
+      string Error = string(strerror(errno));
+      I_ErrorText = "Unable to open parameter file '"
+                                             + FileName + "': " + Error;
+      ReturnOK = false;
+   } else {
+      if (fprintf (ParamsFile,"%s\n",SpecString.c_str()) < 0) {
+         string Error = string(strerror(errno));
+         I_ErrorText = "Unable to write to parameter file '"
+                                             + FileName + "': " + Error;
+         ReturnOK = false;
+      }
+      fclose (ParamsFile);
+   }
+      
+   return ReturnOK;
+}
+
+bool CmdHandler::ReadPrevious (void)
+{
+   bool ReturnOK = true;
+   string FileName = "/tmp/" + I_Program + "_parameters";
+   FILE* ParamsFile = fopen (FileName.c_str(),"r");
+   if (ParamsFile == NULL) {
+      string Error = string(strerror(errno));
+      I_ErrorText = "Unable to open saved parameter file '"
+                                             + FileName + "': " + Error;
+      ReturnOK = false;
+   } else {
+      char Line[2048];
+      if (!fgets (Line,sizeof(Line),ParamsFile)) {
+         string Error = string(strerror(errno));
+         I_ErrorText = "Unable to read from saved parameter file '"
+                                             + FileName + "': " + Error;
+         ReturnOK = false;
+      } else {
+         Line[sizeof(Line) - 1] = '\0';
+         int LastNonBlank = -1;
+         for (unsigned int I = 0; I < sizeof(Line); I++) {
+            if (Line[I] == '\0') break;
+            if (Line[I] == '\n' || Line[I] == '\r') {
+               Line[I] = '\0';
+               break;
+            }
+            if (Line[I] != ' ') LastNonBlank = I;
+         }
+         Line[LastNonBlank + 1] = '\0';
+         string LineString = Line;
+         vector<string> Tokens;
+         TcsUtil::Tokenize(LineString,Tokens);
+         int Count = Tokens.size();
+         if ((Count % 3) != 0) {
+            I_ErrorText = "Incorrect token count for saved parameter values in "
+                                                                  + FileName;
+            ReturnOK = false;
+         } else {
+            int Index = 0;
+            while (Index < Count) {
+               string Name = Tokens[Index++];
+               string Equals = Tokens[Index++];
+               string Value = Tokens[Index++];
+               if (Equals != "=") {
+                  I_ErrorText = "Expected '=' got '" + Equals +
+                            "' in saved parameter file " + FileName;
+                  ReturnOK = false;
+                  break;
+               }
+               bool Match = false;
+               for (CmdArg* Arg : I_CmdArgs) {
+                  if (Arg->MatchName(Name)) {
+                     Match = true;
+                     if (!Arg->SetPrevious(Value)) {
+                        I_ErrorText = Arg->GetError();
+                        ReturnOK = false;
+                        break;
+                     }
+                  }
+               }
+               if (!Match) {
+                  I_ErrorText = "Unexpected parameter name '" + Name +
+                                "' in saved parameter file " + FileName;
+                  ReturnOK = false;
+               }
+               if (!ReturnOK) break;
+            }
+         }
+      }
+      fclose (ParamsFile);
+   }
+   
+   return ReturnOK;
+}
+
+bool CmdHandler::IsInteractive (void)
+{
+   return I_Interactor.IsInteractive();
+}
+
+CmdInteractor* CmdHandler::GetInteractor (void)
+{
+   return &I_Interactor;
+}
+
+bool CmdHandler::CheckSetup (void)
+{
+   bool ReturnOK = true;
+   
+   if (!I_Setup) {
+   
+      //  Check the consistency of the positional argument specification.
+      //  This code runs through all the arguments. For each one that
+      //  specifies a position (Posn), array element Flags[Posn - 1] is set
+      //  to the address of that argument. This lets up spot duplicates
+      //  and gaps in the set of positional arguments. (Note that the index
+      //  into Flags is Posn - 1 because position numbers start at 1, a
+      //  Posn value of 0 indicating a non-positional argument. (Annoyingly,
+      //  I can't just declare Flags as a verying length array, because that
+      //  C99 feature isn't in strict C++11.)
+      
+      int Nargs = I_CmdArgs.size();
+      CmdArg** Flags = new CmdArg*[Nargs];
+      for (int I = 0; I < Nargs; I++) {Flags[I] = NULL;}
+      int MaxPosn = 0;
+      for (CmdArg* Arg : I_CmdArgs) {
+         int Posn = Arg->I_Posn;
+         if (Posn < 0) {
+            I_ErrorText = "Argument setup error. " + Arg->Description() +
+                  " specifies a -ve position (" + std::to_string(Posn) + ")";
+            ReturnOK = false;
+            break;
+         }
+         if (Posn > Nargs) {
+            I_ErrorText = "Argument setup error. " + Arg->Description() +
+                                       " specifies too large a position (" +
+                                                  std::to_string(Posn) + ")";
+            ReturnOK = false;
+            break;
+         }
+         if (Posn > 0) {
+            int Index = Posn - 1;
+            if (Flags[Index] != NULL) {
+               I_ErrorText = "Argument setup error. " + Arg->Description() +
+                  " and " + Flags[Index]->Description() +
+                  " both specify position " + std::to_string(Posn);
+               ReturnOK = false;
+               break;
+            }
+            if (Posn > MaxPosn) MaxPosn = Posn;
+            Flags[Index] = Arg;
+         }
+      }
+      if (ReturnOK) {
+         for (int I = 0; I < MaxPosn; I++) {
+            if (Flags[I] == NULL) {
+               I_ErrorText = "Argument setup error. Specified positions are "
+                  "not sequential. No argument specifies position " +
+                                                       std::to_string(I + 1);
+               ReturnOK = false;
+               break;
+            }
+         }
+      }
+      delete[] Flags;
+   
+   }
+   if (ReturnOK) I_Setup = true;
+   
+   return ReturnOK;
+}
+
+bool CmdHandler::ParseArgs (int Argc, char* Argv[])
+{
+   vector<string> Args;
+   for (int I = 1; I < Argc; I++) {
+      Args.push_back(string(Argv[I]));
+   }
+   return ParseArgs (Args);
+}
+
+bool CmdHandler::ParseArgs (const vector<string>& Args)
+{
+   bool ReturnOK = true;
+   
+   //  Make sure initial checks have been performed.
+   
+   ReturnOK = CheckSetup();
+   
+   int ArgCount = Args.size();
+   int Index = 0;
+   int Position = 0;
+   
+   //  Initialise the arguments for this parse
+   
+   if (ReturnOK) {
+      for (CmdArg* Arg : I_CmdArgs) {
+         if (!Arg->Clear()) {
+            I_ErrorText = Arg->GetError();
+            ReturnOK = false;
+            break;
+         }
+       }
+   }
+   
+   while (ReturnOK) {
+      if (Index >= ArgCount) break;
+      string Item = Args[Index];
+      
+      int EndIndex = Index;
+      bool Equals = false;
+      string Value = "";
+      bool GotValue = false;
+      string Name = Item;
+
+      size_t EqPosn = Name.find('=');
+      if (EqPosn != string::npos) {
+         // Item includes an '='
+         Equals = true;
+         if (EqPosn + 1 < Name.size()) {
+            //  Something follows '='. Must be the value
+            Value = Name.substr(EqPosn + 1);
+            GotValue = true;
+         } else {
+            //  Value must be the next item.
+            if (Index + 1 < ArgCount) {
+               //  Get value from next item
+               EndIndex = Index + 1;
+               Value = Args[EndIndex];
+               GotValue = true;
+            }
+         }
+         Name = Name.substr(0,EqPosn);
+      } else {
+         //  Item doesn't include '=', see if the next item is an '=' or
+         //  starts with '='.
+         if (Index + 1 < ArgCount) {
+            Item = Args[Index + 1];
+            if (Item.substr(0,1) == "=") {
+               //  Starts with '='
+               Equals = true;
+               EndIndex = Index + 1;
+               if (Item.size() > 1) {
+                  //  And a value follows the '='
+                  Value = Item.substr(1);
+                  GotValue = true;
+               } else {
+                  //  Just a single '='. Value must be next arg
+                  if (EndIndex + 1 < ArgCount) {
+                     EndIndex++;
+                     Value = Args[EndIndex];
+                     GotValue = true;
+                  }
+               }
+            }
+         }
+      }
+      
+      //  At this point, we've looked at the item string at Args[Index]
+      //  If it included '=', or if the next string in the argument list
+      //  started with '='. then Equals is set. If a value followed the '='.
+      //  GotValue is set, and Value is that value. Name may turn out to be
+      //  the name of a parameter, but really it's just Args[Index]
+      //  including any leading '-' but shorn of any '=' and anything
+      //  following. See if it actually might be a name, and if so of which
+      //  argument.
+      
+      CmdArg* NameArg = NULL;
+      for (CmdArg* Arg : I_CmdArgs) {
+         if (Arg->MatchName(Name)) {
+            NameArg = Arg;
+            break;
+         }
+      }
+      
+      //  We can check a couple of things now. If there was an '=' found,
+      //  then this must be a specification by name, and so the name must match
+      //  that of one of the arguments. There must also be a value specified.
+      
+      if (Equals) {
+         if (!GotValue) {
+            ReturnOK = false;
+            I_ErrorText = "No value follows '=' in given arguments";
+            break;
+         }
+         if (NameArg == NULL) {
+            I_ErrorText = "'" + Name +
+               "' is set to a value, but is not a recognised argument name";
+            ReturnOK = false;
+            break;
+         }
+      }
+      
+      //  If an argument name matches, then this is an argument specified by
+      //  name. Obviously! Now, what is its value? If there was a '=' then
+      //  Equals will be set, and we'll already have a value string in Value,
+      //  and GotValue will be true.
+      
+      if (NameArg) {
+      
+         //  Most arguments require a value. If this does, then if we don't
+         //  have it already, it will be in the next item in the argument list.
+         //  We see if there is such an item. And see if this named argument
+         //  requires a value.
+         
+         bool ValueRequired = true;
+         if (NameArg->ValueOptional()) ValueRequired = false;
+         
+         if (!GotValue) {
+            if (Index + 1 < ArgCount) {
+               Value = Args[Index + 1];
+               GotValue = true;
+            }
+         }
+         if (ValueRequired && !GotValue) {
+            I_ErrorText = "No value specified for argument " +
+                                               NameArg->Description();
+            ReturnOK = false;
+            break;
+         }
+         
+         //  If this is an argument that requires a value, then it's easy,
+         //  we just tell it to set the value we've got. Otherwise, we
+         //  use the longer SetValue() call that lets it decide.
+         
+         bool UsedValue = !Equals;
+         bool SetOK;
+         if (ValueRequired) {
+            SetOK = NameArg->SetValue(Name,Value);
+         } else {
+            SetOK = NameArg->SetValue(Name,Equals,Value,GotValue,&UsedValue);
+         }
+         if (!SetOK) {
+            I_ErrorText = NameArg->GetError();
+            ReturnOK = false;
+            break;
+         }
+         if (!Equals && UsedValue) EndIndex = Index + 1;
+
+      } else {
+      
+         //  If it's not a recognised argument name, then it must be a value
+         //  specified positionally. And we know what position it is, let's see
+         //  what argument that should be.
+      
+         Value = Name;
+         CmdArg* PosnArg = NULL;
+         Position++;
+         for (CmdArg* Arg : I_CmdArgs) {
+            if (Arg->I_Posn == Position) {
+               PosnArg = Arg;
+               break;
+            }
+         }
+         if (PosnArg == NULL) {
+            I_ErrorText = "'" + Value +
+                "' does not correspond to any expected argument";
+            ReturnOK = false;
+         } else {
+            Name = PosnArg->GetName();
+            if (!PosnArg->SetValue(Name,Value)) {
+               I_ErrorText = PosnArg->GetError();
+               ReturnOK = false;
+               break;
+            }
+         }
+      }
+      Index = EndIndex + 1;
+   }
+   
+   //  Implement 'reset' by checking the internal 'Reset' arg.
+   
+   if (ReturnOK) {
+      if (I_ResetArg) {
+         if (I_ResetArg->Active()) {
+            bool Reset = I_ResetArg->GetValue(&ReturnOK,&I_ErrorText);
+            if (ReturnOK && Reset) {
+               for (CmdArg* Arg : I_CmdArgs) {
+                  Arg->Reset();
+               }
+            }
+         }
+      }
+   }
+
+   //  Similarly, implement 'prompt' by checking the internal 'Prompt' arg.
+
+   if (ReturnOK) {
+      if (I_PromptArg) {
+         if (I_PromptArg->Active()) {
+            if (I_PromptArg->IsSet()) {
+               bool Prompt = I_PromptArg->GetValue(&ReturnOK,&I_ErrorText);
+               if (ReturnOK) {
+                  string OnOffDefault = Prompt ? "On" : "Off";
+                  for (CmdArg* Arg : I_CmdArgs) {
+                     if (!(Arg->Hidden())) Arg->SetPrompting(OnOffDefault);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   //  Similarly, implement 'list' by checking the internal 'List' arg.
+   
+   if (ReturnOK) {
+      if (I_ListArg) {
+         if (I_ListArg->Active()) {
+            bool List = I_ListArg->GetValue(&ReturnOK,&I_ErrorText);
+            if (ReturnOK && List) {
+               for (CmdArg* Arg : I_CmdArgs) {
+                  if (!(Arg->Hidden())) Arg->SetListing(List);
+               }
+            }
+         }
+      }
+   }
+   
+   return ReturnOK;
+}
+
+string CmdHandler::GetError (void)
+{
+   return I_ErrorText;
+}
+
+#ifdef COMMAND_TEST
+
+int main (int argc, char* argv[])
+{
+   CmdHandler TheHandler("CommandTest");
+   
+   FileArg GalaxyFileArg(TheHandler,"GalFile",1,CmdArg::REQUIRED,".fld",
+      "Name of file with galaxy positions");
+   FileArg GuideFileArg(TheHandler,"GuideFile",2,CmdArg::REQUIRED,".fld",
+      "Name of file with star positions");
+   FileArg OutputFileArg(TheHandler,"OutputFile",3,CmdArg::REQUIRED,".csv",
+      "Name of output file");
+   StringArg LabelArg(TheHandler,"Label",4,CmdArg::REQUIRED,"",
+      "Label to be written into output file");
+   StringArg PlateIdArg(TheHandler,"PlateId",5,CmdArg::REQUIRED,"",
+      "Plate ID to be written into output file");
+   StringArg DateTimeArg(TheHandler,"DateTime",6,CmdArg::REQUIRED,"",
+      "UT date and time, eg '2020 01 28 15 30 00.0'");
+   RealArg RobotTempArg(TheHandler,"RobotTemp",7,0,15.0,-10.0,60.0,
+      "Temperature in deg C at which the plate is configured");
+   RealArg ObsTempArg(TheHandler,"ObsTemp",8,0,15.0,-10.0,60.0,
+      "Temperature in deg C when the observation will be performed");
+   FileArg DistortionFileArg(TheHandler,"2dFDistortion",0,CmdArg::MUST_EXIST,
+      "$TDF_DISTORTION,tdf_distortion1.sds",
+      "Name of file giving 2dF distortion parameters");
+   FileArg SkyFibreFileArg(TheHandler,"SkyFibres",0,CmdArg::MUST_EXIST,
+       "$SKY_FIBRES,SkyFibres.csv", "Name of file giving sky fibre positions");
+   FileArg ProfitDirArg(TheHandler,"ProfitDir",0,CmdArg::MUST_EXIST,"$PROFIT_DIR",
+      "Name of directory containing ProFit mask files");
+   BoolArg TeleArg(TheHandler,"Tele",0,0,true,
+      "Apply telecentricity corrections");
+   BoolArg OffsetArg(TheHandler,"Mech",0,0,true,
+      "Apply mechanical offset corrections");
+   
+   TheHandler.ReadPrevious();
+   TheHandler.ParseArgs(argc,argv);
+   
+   string GalaxyFile,GuideFile,OutputFile,Label,PlateId,DateTime;
+   string DistortionFile,SkyFibreFile,ProfitDir;
+   double RobotTemp,ObsTemp;
+   bool Tele = false;
+   bool Offset = false;
+   
+   bool Ok = true;
+   string Error = "";
+   GalaxyFile = GalaxyFileArg.GetValue(&Ok,&Error);
+   GuideFile = GuideFileArg.GetValue(&Ok,&Error);
+   OutputFile = OutputFileArg.GetValue(&Ok,&Error);
+   Label = LabelArg.GetValue(&Ok,&Error);
+   PlateId = PlateIdArg.GetValue(&Ok,&Error);
+   DateTime = DateTimeArg.GetValue(&Ok,&Error);
+   RobotTemp = RobotTempArg.GetValue(&Ok,&Error);
+   ObsTemp = ObsTempArg.GetValue(&Ok,&Error);
+   DistortionFile = DistortionFileArg.GetValue(&Ok,&Error);
+   SkyFibreFile = SkyFibreFileArg.GetValue(&Ok,&Error);
+   ProfitDir = ProfitDirArg.GetValue(&Ok,&Error);
+   Tele = TeleArg.GetValue(&Ok,&Error);
+   Offset = OffsetArg.GetValue(&Ok,&Error);
+   if (!Ok) printf ("Error getting values: %s\n",Error.c_str());
+   
+   (void)TheHandler.SaveCurrent();
+   printf ("Closing down\n");
+}
+
+#endif

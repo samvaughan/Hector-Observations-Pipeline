@@ -1,0 +1,2 @@
+# "@(#) $Id: ACMM:DramaErs/ers_star_link.unix,v 3.19 09-Dec-2020 17:17:03+11 ks $"
+echo $ERS_LIB/libers_star.a -lcnf

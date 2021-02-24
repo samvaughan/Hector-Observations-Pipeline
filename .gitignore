@@ -3,3 +3,5 @@
 *.fld
 Outputs/*
 *.pdf
+*.fits
+*.fits.gz

@@ -1,0 +1,139 @@
+/*		d m a k e f i l e
+ * File:
+  	dmakefile
+ * Function:
+  	Drama makefile source for ERS sub system
+  
+ * Description:
+  	The program dmkmf should be run in the directory containing this
+  	file to generate a Makefile or descrip.mms file for the desired
+  	target
+
+	Note that part of this system, the ers_star library, is only
+	built if starlink is available, hence, appropriate bits are
+	wrapped in StarlinkOnly() macros.
+  
+ * Author: Tony Farrell
+ 
+ *  Copyright (c) Anglo-Australian Telescope Board, 1995.
+    Not to be used for commercial purposes without AATB permission.
+  
+ *     @(#) $Id: ACMM:DramaErs/dmakefile,v 3.19 09-Dec-2020 17:17:02+11 ks $
+  
+ * History:
+ 	23-Jun-1993 - TJF - Original version.
+	21-Mar-1994 - TJF - Goto r0.1.2
+        09-Dec-1998 - TJF - Remove libers.o. There is a better way, done 
+			    in Git.
+        11-Jun-1999 - TJF - The previous change does not work in all cases,
+                            make it dependent on having a new gnu ld.
+        20-Jan-2003 - TJF - Support use of ACMM_RELEASE to set RELEASE number.
+
+
+ */
+ 
+#BeginConfig			/* Begin the configuration section */
+#Generated from dmakefile for ERS
+#DramaSystem                    /* Indicates we are part of drama itself */
+ACMM_RELEASE=3_19$(ACMMBUILDVER)
+RELEASE=r$(ACMM_RELEASE)
+SYSTEM=ers			/* System name (lower case		*/
+USERCCOPTIONS = AnsiCFull()	/* Enable full Ansi C compatibilty	*/
+
+/*
+ * Include files allways wanted.
+ */
+INCLUDES1 = IDir(STATUS_DIR) IDir(CONFIG_DIR)
+/*
+ * When on VMS, we want DRAMAUTIL_DIR in the include file list since
+ * we want to pick up strmac.h.  If on a unix starlink machine, we want
+ * the starlink directories.
+ */
+INCLUDES2 = VmsOnly(-IDRAMAUTIL_DIR) UnixOnly(StarlinkOnly(-I/star/include))
+
+INCLUDES = $(INCLUDES1) $(INCLUDES2)
+#EndConfig			/* End the configuration section	*/
+
+NormalCRules()			/* Enable C Language Rules		*/
+
+/*
+ * Macro of objects for main library
+ */
+OBJECTS = Obj(ers) Obj(erssprintf) Obj(ersvsprintf) 
+
+/*
+ * Macro of objects for starlink compatibilty library
+ */
+STAR_OBJECTS = Obj(ers_star) Obj(erssprintf) Obj(ersvsprintf)
+
+/*
+ * All sources (for makedepend)
+ */
+SRC1 = ers.c erssprintf.c ersvsprintf.c
+
+/*
+ * Main target - we want the include files and libraries.
+ */
+DummyTarget(all, NotVms(checktarget) includes Lib(ers) StarlinkOnly(Lib(ers_star)) EmbeddedOldGnuLD(Obj(libers))  AutoTest(UnixOnly(test.out)))
+
+DramaCheckTarget()
+/*
+ * We use an includes target for include file which need to be built.  This
+ * is only really necessary if makedepend has not been run
+ */
+DummyTarget(includes, Ers_Err.h Ers_Err_msgt.h Ers_Err.java Ers_Err.tcl)
+/*
+ *	Object libraries
+ */
+ObjectLibraryTarget(ers,$(OBJECTS),)
+StarlinkOnly(ObjectLibraryTarget(ers_star,$(OBJECTS),))
+
+EmbeddedOldGnuLD(ComplexObject(libers, $(OBJECTS),,,))
+/*
+ * Include files
+ */
+ErrorIncludeFiles(Ers_Err)
+DramaJavaErrorFile(Ers_Err)
+TclErrorFile(Ers_Err)
+
+
+/*
+ * Test program targets.
+ */
+NormalProgramTarget(sprintftest, Obj(sprintftest), Lib(ers) , Lib(ers),)
+
+
+test test.out : test.expected sprintftest 
+	@echo "Basic ERS tests"
+	- $(RM) test.out test.out.tmp
+	./sprintftest > test.out.tmp
+	diff test.out.tmp test.expected
+	mv test.out.tmp test.out
+	@echo "ERS basic test complete."
+
+clean ::
+	$(RM) test.out test.out.tmp
+
+/*
+ * Release targets
+ */
+
+release :: includes
+
+#if defined(UnixArchitecture)
+AutoTest(UnixOnly(release :: test))
+#endif
+
+
+
+DramaReleaseCheck()
+DramaReleaseCommon(Ers_Err.h Ers_Err_msgt.h Ers.h  Ers_Err.java Ers_Err.tcl )
+DramaReleaseTarget( , Lib(ers) StarlinkOnly(Lib(ers_star)),,EmbeddedOldGnuLD(Obj(libers)) )
+
+DramaReleaseDramaStart()
+/*
+ * Target to enable this system.
+ */
+DramaEnable()
+DramaDirs()
+

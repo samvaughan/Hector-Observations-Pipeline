@@ -1,0 +1,938 @@
+ %------------------------------------------------------------------------------
+%+		E R S _ S P E C _ 4 . T E X
+%
+%  Function:
+%
+%
+%  Copyright (c) Anglo-Australian Telescope Board, 1995.
+%  Not to be used for commercial purposes without AATB permission.
+%
+%     @(#) $Id: ACMM:DramaErs/TexDocs/ers_spec_4.texi,v 3.19 09-Dec-2020 17:17:02+11 ks $
+%
+%  History:
+
+\documentstyle[11pt,man]{article}
+
+
+\newcommand{\ltxload}    	{source aao.html.tcl ; source drama.html.tcl}
+\newcommand{\aaodoccite}[2] 	{}
+\newcommand{\aaodoctype}    	{DRAMA Software Report}
+\newcommand{\aaodoclatex}    	{../latex/ers_spec_4.tex}
+\newcommand{\aaodocps} 		{../ps/ers_spec_4.ps}
+\newcommand{\aaodocemail} 	{tjf@aaoepp.aao.gov.au}
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+% Define these commands to have appropriate values for this document
+
+\newcommand{\aaodocname}    {ERS\_SPEC}
+\newcommand{\aaodocnumber}  {4}
+\newcommand{\aaodocversion} {0.3}
+\newcommand{\aaodocauthors} {Tony Farrell}
+\newcommand{\aaodocdate}    {16-Mar-94}
+\newcommand{\aaodoctitle}   {Drama Error reporting system (Ers)}
+
+
+%------------------------------------------------------------------------------
+\renewenvironment{manparametertable}{\begin{description}}{\end{description}}
+\renewcommand{\manparameterentry}[3]{\item[(#1) #2 (#3)]}
+\renewcommand{\manparameterblank}{\par}
+\renewcommand{\mansection}[2]{\newpage \subsection{#1 --- #2}}
+\renewcommand{\manroutine}[3]{\newpage \subsection{#1 --- #2}}
+
+
+%------------------------------------------------------------------------------
+% Make glossary and index. To generate glossary and index do
+% "GLOTEX \aaodocfile" and "IDXTEX \aaodocfile" respectively
+
+\makeglossary
+\makeindex
+
+%------------------------------------------------------------------------------
+% Headings and layout
+
+\newcommand{\aaodocfile}{\aaodocname\_\aaodocnumber}
+\newcommand{\aaodochead}{AAO/\aaodocfile}
+\pagestyle{myheadings}
+\markright{\aaodochead}
+
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% These commands aid in generation of glossary and index
+
+\newcommand{\gl}[1]{#1\glossary{#1}}   % Copy arg and make glossary entry
+\newcommand{\id}[1]{#1\index{#1}}      % Copy arg and make index entry
+\newcommand{\gi}[1]{#1\glossary{#1}\index{#1}} % Copy arg and make glo/ind entries
+
+%------------------------------------------------------------------------------
+% This command inputs a file, but if it doesn't exist it merely warns
+
+\newcommand{\inputifexists}[1]{\openin1 #1 \ifeof1 \typeout
+{No file #1.}\else\closein1 \relax\input #1  \fi}
+
+
+
+%------------------------------------------------------------------------------
+% Permit automatic hyphenation of words containing underscores and dollars
+% (provided they are type-set in teletype font)
+
+\lccode`_=`_
+\lccode`$=`$
+\renewcommand{\_}{{\tt\char'137}}
+
+%------------------------------------------------------------------------------
+% Other generally useful commands
+\newcommand{\DRAMA}{{bf DRAMA}}
+
+%------------------------------------------------------------------------------
+% Start of document
+
+\begin{document}
+
+%------------------------------------------------------------------------------
+% Plain bibliography style
+
+\bibliographystyle{plain}
+
+%------------------------------------------------------------------------------
+% Title
+
+\thispagestyle{empty}
+ANGLO-AUSTRALIAN OBSERVATORY \hfill \aaodochead \\
+{\large\bf DRAMA Software Report \aaodocnumber \\}
+{\large\bf Version \aaodocversion}
+\begin{flushright}
+\aaodocauthors \\
+\aaodocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \aaodoctitle}
+\end{center}
+\vspace{5mm}
+
+
+%------------------------------------------------------------------------------
+%  If you want one, put the table of contents here
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\aaodochead}
+
+\newcommand{\ers}{{\bf Ers}}
+\newcommand{\sds}{{\bf SDS}}
+\newcommand{\typeit}[1]{{\tt #1}}
+
+\section{Introduction}
+The purpose of the Drama Error Reporting System (\ers) is to provide facilities for
+constructing and storing reported error messages and for the delivery of those
+messages to the user via a technique appropriate to the program being run.  
+
+The major design issue in a Error Reporting System is that it allow low level
+packages to report errors using the appropriate output system for the
+application they are contained within,  while ensuring that those packages can
+be written independently of the output systems of any application using them. 
+For example, consider the Self Defining Data  System (\sds).  \sds\ may be used
+in standalone programs, such as one to list \sds\ structures in a file.  In
+such applications, messages are normally just written to the standard output
+device (say using the C language routine {\tt printf}).  But when the \sds\
+routines called in such an application wish to report an error, they  cannot
+assume this is correct, since they could also be part of a {\bf Dits}
+application where the correct user interface to send the message to is an
+X-windows application on another node in a network.
+
+
+\ers\ allows low level packages to report errors in such a way that they can be
+sure it is sent to the correct user interface, while allowing the application
+to remain totally independent of the user interface.
+
+\section{Copyright details}
+Whilst most of this software is subject to the AAO copyright (commerical
+use requires AAT board approval), this product includes software 
+developed by the University of California, Berkeley and its contributors.
+
+
+%
+\section{Why not EMS/ERR}
+You may ask why another package is required to do this job, as Starlink already
+provides a similar facility in the EMS \cite{EMS_DOC} and ERR \cite{ERR_DOC}
+packages.  The following reasons are given for writing yet another package
+\begin{itemize}
+\item EMS/ERR is largely written in Fortran.  This makes it unsuitable for 
+real-time systems for which Fortran is probably not available.
+\item EMS/ERR uses its own formating technique.  This is expensive both in time
+and space.  It is preferable to use the C {\tt printf} style which although it may not
+be more efficient time wise, it is already present in most programs using C, so
+why waste memory implementing another technique.
+\item The interface to EMS/ERR is complicated by the requirements of backward
+compatiabilty with older systems and the use of Fortran.
+\item EMS/ERR provides no support for special attributes attached to messages
+to allow classes of messages to be differentated.
+\item EMS/ERR provides no inbuilt support for logging.
+\item EMS/ERR provides limited support for the ability to send muliple lines in one
+message, such as we can now do using SDS.
+\end{itemize}
+
+
+
+\section{Usage}
+
+\subsection{Overview}
+In a  program or package consisting of many levels of subroutines, each routine which
+has something informative to say about an error should be able to contribute to
+the information the user receives.  This includes:
+\begin{itemize}
+\item The subroutine which first detects the error, as this will probably have
+access to specific information which is hidden from higher level routines.
+\item The chain of subroutines between the main program and the routine in which
+the error originated.  Some of these will usually be able to report on the context
+in which the error occured and so add relevant information which is not available
+to routines at lower levels.
+\end{itemize}
+
+
+This can lead to several error reports arising from a single failure.  In addition,
+it is not always necessary for an error report to reach the user.  For example,
+a high-level subroutine or the main program may decide that it can handle an
+error detected at a lower level safely without informing the user.  In this case,
+it is necessary for error reports associated with that error to be discarded and this
+can only happen if the output of error messages to the user is deferred.
+
+
+\subsubsection{Inherited status checking}
+
+The recommended method of indicating when errors have occurred
+is to use an integer status value in each subroutine argument list. 
+
+This inherited status argument, say STATUS, should always be the last
+argument and every subroutine should check its value on entry. 
+The principle is as follows:
+
+\begin {itemize}
+\item The subroutine returns without action if STATUS is input with a value
+other than 0. 
+
+\item The subroutine leaves STATUS unchanged if it completes successfully.
+
+\item The subroutine sets STATUS to an appropriate error value and reports an
+error message if it fails to complete successfully. 
+
+\item In C, STATUS should be defined as a pointer to a \verb+StatusType+, 
+with the actual status being the value being pointed too.  \verb+StatusType+
+is defined in the \verb+status.h+ include file.  
+\end {itemize}
+
+Here is an example of the use of inherited status within a simple subroutine:
+
+\begin {small}
+\begin{verbatim}
+void routn( int value, StatusType * status)
+{
+
+/*  
+ *    Check the inherited global status. 
+ */
+      if ( *status != 0 ) return;
+
+      <application code>
+
+}
+\end{verbatim}
+\end {small}
+
+If an error occurs within the ``application code'' of such a subroutine, then
+STATUS is set to a value which is not zero, an error is reported (see
+below) and the subroutine aborts. 
+
+Note that it is often useful to use a status argument and inherited status
+checking in subroutines which ``cannot fail''. 
+This prevents them executing, possibly producing a run-time error, if
+their arguments contain rubbish after a previous error.
+Every piece of software that calls such a routine is then saved from making
+an extra status check. 
+Furthermore, if the routine is later upgraded it may acquire the potential
+to fail, and so a status argument will subsequently be required.
+If a status argument is included initially, existing code which calls 
+the routine will not need to be changed.   The only routines which do not require
+a status argument are functions with no other arguments, which cannot fail
+and which return a single value, say a funciton to fetch the current time.
+
+\subsection{Reporting errors}
+
+The subroutine used to report errors is {\tt ErsRep}. 
+It has a calling sequence of the form
+
+\begin {small}
+\begin{verbatim}
+      ErsRep(flags, status, format, [arg ,  [...] );
+\end{verbatim}
+\end{small}
+
+Here, the flags argument in a bit mask which can influence the operation of
+the \ers\ system and are also passed to the logging and output systems (to be
+described later).  Bits 0 to 7 are reserved to the \ers\ while bits bits 8 - 15
+are available for logging systems (described later).  
+The following masks are defined in {\tt Ers.h}
+and may be {\tt OR}ed together for the desired effect-
+\begin{description}
+\item [ERS\_M\_NOFMT] Don't format the string.  Any formating arguments are ignored
+and the format string is used exactly as specified.
+\item [ERS\_M\_HIGHLIGHT]  Suggest to the user interface that the message be
+highlighted in some way (say reverse video or a bold font).
+\item [ERS\_M\_BELL]  Suggest to the user interface that the terminal bell 
+(or an equivalent) should be rung when the message is output
+\item [ERS\_M\_ALARM] Suggest to the user interface that this is an urgent
+message which should be acknowledged by the user.
+\end{description}
+
+The {\tt status} argument is the inherited status.  {\tt ErsRep} breaks the inherited
+status rules on two points.  First the location of the argument, which is comes
+second not last.  This is to allow a variable length argument list.  Second,
+the routine works regardless of the value of the status argument.  
+
+The {\tt format} argument and all following arguments are used to construct the
+message text.  Formating is done using C run time library functions, 
+see the description of the C {\tt printf} function for details.  You should
+not include special characters in the formats (e.g.\
+\verb+\n , \033+ etc.)  since
+you don't know what type of user interface your message is being sent 
+to. Only characters for which the C funciton {\tt isprint} returns true should
+be used \footnote{Messages requiring mulitiple lines should be output using
+multiple calls to {\tt ErsRep}.}.
+
+Here is a simple example of error reporting where part of the application
+code of the previous example detects an invalid value of some kind, sets
+{\tt status}, reports the error and then aborts: 
+
+\begin {small}
+\begin{verbatim}
+    if ( <VALUE INVALID> ) 
+    {
+        *status = myerrorcode;
+        ErsRep(ERS_M_BELL,status,"Value of %d is invalid",value);
+    }
+    else
+        ...
+
+\end{verbatim}
+\end {small}
+
+
+\subsection {The contents of error messages}
+
+The purpose of an error message is to be informative and it should
+therefore provide as much relevant information about the context of the
+error as possible.
+It must also avoid the danger of being misleading, or of containing
+too much irrelevant information which might be confusing to a user. 
+Particular care is necessary when reporting errors from within subroutines
+which might be called by a wide variety of software.
+Such reports must not make unjustified assumptions about what sort of 
+application might be calling them.
+For example, in a routine that adds two arrays, the report
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Error adding two arrays.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+would be preferable to
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Error adding two images.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+if the same routine could be called to add two spectra!
+
+The name of the routine which called {\tt ErsRep} to make an error report can
+often be a vital piece of information when trying to understand what went
+wrong. 
+However, the error report is intended for the user, not the programmer, and so
+the name of an obscure internal routine is more likely to confuse than to
+clarify the nature of the error.
+A good rule of thumb is to include the names of routines in error reports
+only if those names also appear in documentation -- so that the function
+they perform can be discovered without delving into the code.
+An example of this appears in the next section.
+
+
+\subsection {Adding contextual information}
+
+Instead of simply aborting when a status value is set by a called
+subroutine, it is also possible for an application to add further information
+about the circumstances surrounding the error. 
+In the following example, an application makes several calls to a subroutine
+which might return an error status value. 
+In each case, it reports a further error message so that it is clear which 
+operation was being performed when the lower-level error occurred:
+
+\begin {small}
+\begin{verbatim}
+/*  Smooth the sky values. */
+    smooth( nx, ny, sky, status );
+    if ( *status != 0 ) 
+        ErsRep(ERS_M_NOFMT,status,"SKYOFF: Failed to smooth sky values.");
+    else
+    {
+
+/*      Smooth the object values. */
+        smooth( nx, ny, object, status );
+        if ( *status != 0 )
+            ErsRep(ERS_M_NOFMT,status,"SKYOFF: Failed to smooth object values.");
+        else
+                ....
+    }
+\end{verbatim}
+\end{small}
+
+Notice how an additional error report is made in each case, but because
+the original status value contains information about the precise nature of 
+the error which occurred within the subroutine {\tt smooth}, it is left unchanged. 
+
+If the first call to subroutine {\tt smooth} were to fail, say because it could not 
+find any valid pixels in the image it was smoothing, then the error message 
+the user would receive might be 
+
+\begin{quote}
+\begin{small}
+\begin{verbatim}
+Image contains no valid pixels to smooth.
+SKYOFF: Failed to smooth sky values.
+\end{verbatim}
+\end{small}
+\end {quote}
+
+The first part of this message originates from within the subroutine {\tt smooth}, 
+while the second part qualifies the earlier report, making it clear how the 
+error has arisen.
+Since {\tt skyoff} is the name of an application known to the user, it has been 
+included in the contextual error message.
+
+This technique can often be very useful in simplifying error diagnosis, but
+it should not be overdone; the practice of reporting errors at {\em every}
+level in a program hierarchy tends to produce a flood of redundant messages.
+As an example of good practice for a subroutine library, an error report made 
+when an error is first detected, followed by a further contextual error report 
+from the ``top-level'' routine which the user actually called, normally
+suffices to produce very helpful error messages. 
+
+On a side issue, notice the use of the flag {\tt ERS\_M\_NOFMT} in the above calls.
+We set this flag because we have not specified any formating arguments.  
+We don't need to do this, since the formating routine can work this out, but
+it is more efficient to specify the flag as this lets {\tt ErsRep} know the
+time comsuming formating can be avoided.
+
+
+\subsection {Deferred error reporting} \label{errdef_sect}
+
+Although the action of the subroutine {\tt ErsRep} is to report an error to the 
+Error System, the Error System has the capacity to defer the output of
+that message to the user.
+This allows the final delivery of error messages to be controlled within
+applications software, and this control is achieved using the subroutines
+{\tt ErsPush} , {\tt ErsPop}, {\tt ErsFlush} and {\tt ErsAnnul}.
+This section describes the function of these subroutines and how they are
+used.
+
+
+The purpose of deferred error reporting can be illustrated by the following
+example.
+Consider a subroutine, say HELPER, which detects an error during execution. 
+The subroutine HELPER reports the error that has occurred, giving as much
+contextual information about the error as it can.
+It also returns an error status value, enabling the software that called it
+to react to the failure appropriately. 
+However, what may be considered an ``error'' at the level of subroutine
+HELPER, {\em e.g.} an ``end of file'' condition, may be considered by the
+calling module to be a case which can be handled without informing the user,
+{\em e.g.} by simply terminating its input sequence. 
+Thus, although the subroutine HELPER will always report the error condition,
+it is not always necessary for the associated error message to reach the
+user. 
+The deferral of error reporting enables application programs to handle such 
+error conditions internally.
+
+Here is a schematic example of what subroutine HELPER might look like:
+
+\begin{small}
+\begin{verbatim}
+void helper (char *line, StatusType *status)
+{
+    ...
+
+/*
+ *  Check for end-of-file error
+ */
+    if (feof(instream))
+    {
+        *status = <end-of-file error code>;
+        ErsRep(ERS_M_NOFMT,status,"End of input file reached");
+    }
+/*
+ *  Check for input error
+ */
+    else if (ferror(instream))
+    {
+        *status = <input error code>;
+        ErsRep(0,status,"Error encountered during data input, errno = %x",errno);
+    }
+}
+\end{verbatim}
+\end{small}
+
+Suppose HELPER is called and reports an error, returning with {\tt status} set.
+At this point, the error message may, or may not, have been received by the
+user -- this will depend on the environment in which the routine is running,
+and on whether the software which called HELPER took any action to defer the
+error report. 
+HELPER itself does not need to take action (indeed it should {\em not} take 
+action) to ensure delivery of the message to the user; its responsibility 
+ends when it aborts, and responsibility for handling the error condition then
+passes to the software which called it. 
+
+
+Now suppose that the subroutine HELPED calls HELPER and wishes to defer any
+messages from HELPER so that it can decide how to handle error conditions
+itself, rather than troubling the user with spurious messages. 
+It can do this by calling the routine {\tt ErsPush} before it calls HELPER.
+This has the effect of ensuring that all subsequent error messages are
+deferred by the Error System and stored in an ``error table''.
+{\tt ErsPush} also starts a new ``error context'' which is independent of any 
+previous error messages or message tokens.
+A return to the previous context can later be made by calling {\tt ErsPop}, 
+whereupon any messages in the new error context are transferred to the 
+previous context.
+In this way, no existing error messages can be lost through the deferral 
+mechanism.
+Calls to {\tt ErsPush} and {\tt ErsPop} should always occur in matching pairs and can
+be nested if required.
+
+
+The operation of error message deferral can be illustrated by a simple
+example:
+
+\begin{small}
+\begin{verbatim}
+void helped (StatusType *status)
+{
+
+      ...
+
+/*  Create a new error context. */
+      ErsPush();
+
+      /* any error messages from HELPER are now deferred */
+
+      helper( line, status );
+
+/*  Release the current error context. */
+
+      ErsPop();
+
+      ...
+}
+\end{verbatim}
+\end{small}
+
+by calling {\tt ErsPush} before calling HELPER, subroutine HELPED ensures that 
+any error  messages reported by HELPER are deferred, {\em i.e.} held in the 
+error table.  HELPED can then handle the error condition itself in one of 
+two ways:
+
+\begin {itemize}
+\item By calling {\tt ErsAnnul(status)}, which ``annuls'' the error, deleting 
+any deferred error messages in the current context and resetting {\tt status} to 
+zero.
+This effectively causes the error condition to be ignored.
+For instance, it might be used if an ``end of file'' condition was expected, 
+but was to be ignored and some appropriate action taken instead.
+(A call to {\tt ErsRep} could also be used after {\tt ErsAnnul} to replace the 
+initial error condition with another more appropriate one, although this is
+not often done.) 
+
+\item By calling {\tt ErsFlush(status)}, which ``flushes out'' the error, 
+sending any deferred error messages in the current context to the user and
+resetting {\tt status} to zero.
+This notifies the user that a problem has occurred, but allows the 
+application to continue anyway.
+For instance, it might be used if a series of files were being read: if one
+of these files could not be accessed, then the user could be informed of
+this by calling {\tt ErsFlush} before going on to process the next file. 
+\end{itemize}
+
+
+When {\tt ErsPop} is called, the new error context created by {\tt ErsPush} ceases
+to exist and any error messages still remaining in it are transferred to the
+previous context. 
+
+
+Here is the previous example, elaborated to demonstrate the use of {\tt ErsAnnul}.
+It shows how an ``end of file'' condition from HELPER might be detected, 
+annulled, and stored by HELPED in a logical variable EOF for later use:
+
+\begin{small}
+\begin{verbatim}
+void helped (StatusType *status)
+{
+      int eof = 0;              /* end-of-file flag */
+      ...
+
+/*  Create a new error context. */
+      ErsPush();
+
+/*    any error messages from HELPER are now deferred */
+
+      helper( line, status );
+
+/*  Trap end-of-file  status and annul any report messages */
+
+     if (*status == <end-of-file error status> )
+     {
+        ErsAnnul(status);
+        eof = 1;
+     }
+
+
+/*  Release the current error context. */
+
+      ErsPop();
+
+      ...
+}
+\end{verbatim}
+\end{small}
+
+
+
+Note that the routine chooses only to handle ``end of file'' error
+conditions; any other error condition will not be annulled and will
+subsequently cause an abort when STATUS is checked after the call to
+{\tt ErsPop}.
+
+\subsection{ErsOut}
+In some high level code, the sequence
+\begin{small}
+\begin{verbatim}
+    ErsRep(...);
+    ErsFlush(...);
+\end{verbatim}
+\end{small}
+may be common.  This sequence can be replaced by a single call to
+{\tt ErsOut}, which has the same calling sequence as {\tt ErsRep}.  
+Note that {\tt ErsOut}, like {\tt ErsFlush}, removes the ability of
+higher level code to handle the error and thus the use of {\tt  ErsOut} should be
+avoided in libraries which may be used by other applications.
+
+\section{Error output}
+The final thing required is the actual ability to output the error.  As mentioned
+above, errors are output by a call to {\tt ErsFlush}.  But, as this routine could
+be called by library routines which knows nothing about the user interface,
+just how do they get there.
+
+The solution is in the use of {\tt ErsStart} and {\tt ErsStop}.  There should
+be only one call to each of these routines in each application and they should
+be from a level high enough to know about the user interface in use. The
+format of {\tt ErsStart} is
+
+\begin{small}
+\begin{verbatim}
+extern ErsTaskIdType ErsStart(
+                ErsOutRoutineType outRoutine,
+                void * outArg,
+                ErsLogRoutineType logRoutine,
+                void * logArg,
+                StatusType * status);
+\end{verbatim}
+\end{small}
+Where-
+\begin{itemize}
+\item {\bf outRoutine} is the actual output routine called whenever {\tt ErsFlush} is
+called. Its format is-
+\begin {small}
+\begin{verbatim}
+void (*ErsOutRoutineType)(
+        void * outArg,
+        unsigned int count,
+        ErsMessageType messages[],
+        StatusType * status);
+\end{verbatim}
+\end{small}
+\begin{itemize}
+\item {\bf outArg} is the argument supplied to {\tt ErsStart}.
+\item {\bf count} is the number of messages to be output.
+\item {\bf messages} is an array of the messages.  The format is described below.
+\end{itemize}
+
+\item {\bf outArg} is an argument which is passed directly to {\tt outRoutine}.
+\item {\bf logRoutine} a logging routine called whenever {\tt ErsRep} is
+called. Its format is-
+\begin{small}
+\begin{verbatim}
+void (*ErsLogRoutineType)(
+        void * logArg,
+        ErsMessageType const * message,
+        StatusType * status);
+\end{verbatim}
+\end {small}
+\begin{itemize}
+\item {\bf logArg} is the argument supplied to {\tt ErsStart}.
+\item {\bf message} is the message to log.  The format is described below.
+\end{itemize}
+If logging is not required, specify 0.
+
+\item {\bf logArg} is an argument which is passed directly to {\tt logRoutine}.
+\end{itemize}
+
+The type {\tt ErsMessageType} is defined as follows
+\begin {small}
+\begin{verbatim}
+typedef struct {
+        StatusType mesStatus;
+        unsigned int context;
+        int    flags;
+        char   message[ERS_C_LEN];
+            } ErsMessageType;
+\end{verbatim}
+\end {small}
+Where 
+\begin{itemize}
+\item {\bf mesStatus} is the status supplied in the call to {\tt ErsRep}.
+\item {\bf context} is the context level at the time of the call to {\tt ErsRep}.
+\item {\bf flags} is the flags arguments supplied in the call to {\tt ErsRep}.
+\item {\bf message} is the formated message text, as a null terminated
+	string.
+\end{itemize}
+
+If zero is specified as the output routine, then the messages are written
+to the standard error output device using C run time library routines.
+
+If {\tt ErsStart} is not called before calls {\tt ErsRep}, then the messages are
+output immediately  to the standard error output device using C run time library 
+routines.  No defered error reporting occurs and the rest of the \ers\ routines
+have no effect.
+{\tt ErsStop} reverts the system to this state if {\tt ErsStart} has been called,
+after flushing any remaining messages.
+
+The return value from {\tt ErsStatus} is only of use in real time systems 
+such as VxWorks.  It is explained in section~\ref{taskid}.
+
+\subsection{Logging}
+Sometimes it is nice to log all messages reported using {\tt ErsRep}, even if 
+they are later annulled.  The {\tt logRoutine} argument to {\tt ErsStart}
+supports this. It is called for every call to {\tt ErsRep}
+
+\subsection{The Task Id}
+\label{taskid}
+Some systems, such as VxWorks based systems, run all programs in a common 
+address space.  In such systems, static and global variables can be seen
+by all tasks.   To allow tasks to have private copies of static and
+global variables it is possible to have such variables saved and restored
+during task context switching.   Ers uses this technique to store task
+specific information.  In such systems,  it is sometimes necessary
+to call Ers routines outside the context of a task (say in an interrupt
+handler routine), during which the task specific information will be
+unavailable.  The routines {\tt ErsEnableTask} and {\tt ErsRestoreTask}
+allow this.
+
+The technique requires the value returned from {\tt ErsStart} to be available.
+You must supply this value as the first argument to a call to
+{\tt ErsEnableTask}.   In this example, the value is passed as the argument
+to the interrupt handler.  (A type of ErsTaskIdType will fit in a {\tt void *}).
+\begin{verbatim}
+int my_isr(void * parameter)
+{
+    ErsTaskIdType SavedId;
+    ErsEnableTask((ErsTaskIdType)(parameter),&SavedId);
+
+    /* Calls to ErsRep are now possible.  This allows me to call routines
+       in an interrrupt handler which use ErsRep to report problems
+     */
+
+    ErsRestoreTask(SavedId);
+}
+\end{verbatim}
+
+Once Ers is enabled in the interrupt handler, the only call it makes sense
+to invoke is {\tt ErsRep}, which will send the message to some appropriate
+device (No stacking occurs).    Calls to 
+{\tt ErsPush}, {\tt ErsPop} and {\tt ErsAnnul} can be made but will be
+ignored.  A call to {\tt ErsFlush} or {\tt ErsClear} is an error and
+will be reported as such.
+
+\section{Sprintf}
+Many C Run-time library routines which write to strings do not support any
+technique to determine the maximum length of the string which is being
+written.  As a result it is easy to overwrite the stack.  One such routine,
+{\tt sprintf}, is requried by \ers.  In order to avoid stack problems,
+a special version of this routine and an associated routine, {\tt vsprintf}, 
+were written.  The routines {\tt ErsSPrintf} and {\tt ErsVSPrintf} provide
+an extra argument over {\tt sprintf} and {\tt vsprintf}.  The extra argument
+is before the other arguments and indicates the maximum length of the
+output string.
+
+I would like to suggest you use the \ers\ routines instead of the C Run-time
+library routines to avoid stack overwrite problems.
+
+
+%
+\section{Use in Starlink programs}
+Some packages using \ers\ will probably be used in Starlink software environment
+programs (such as ADAM tasks).   In this case,
+it would be nice if the \ers\ routines work nicely with the Starlink EMS/ERR 
+routines.  A special copy of the library provides this support.
+In this version, all the \ers\ routines except {\tt ErsStart} 
+and {\tt ErsStop}
+are mapped to the appropriate Starlink routines.
+
+\section{Availability, Compiling and linking with \ers}
+
+\ers\ has been compiled under VAX/VMS C, the default compilers on  Ultrix and
+SunOS, GNU C on Ultrix, SunOS and under VxWorks, Microsoft Quick C under
+MSDOS and the MPW compiler on a Macintosh.  Under MPW, some modification
+may be required to replace calls to fprintf and fputs (file stderr) with
+an appropriate call for MPW. 
+
+Three include files are provided. {\tt Ers.h} contians the function prototypes
+and defines the various \ers\ constants.
+The file {\tt Ers\_Err.h}
+contains the definitions of the \ers\ error codes, while the file
+{\tt Ers\_Err\_msgt.h} contains the message
+table definition for using in calls to {\tt MessPutFacility}.
+
+We assume here the software organisation described in \cite{DRAMA_ORG}
+for both VMS and UNIX machines.
+
+
+
+\subsection{Building under VMS}
+To build programs using \ers\ under VMS,
+you must first execute the \verb+DRAMASTART+ command.
+
+\subsubsection*{Compilation time - include files}
+The \ers\ include files can now be found in {\tt ERS\_DIR:}.  By using an
+appropriate command line to the C compiler\footnote{See the {\tt /INCLUDE=}
+qualifier to the VMS C compiler.}, 
+you can specify them using simple double quote notation, such
+as-
+\begin{verbatim}
+#include "Ers.h"
+\end{verbatim}
+
+
+\subsubsection*{Link time}
+To use  the normal \ers\ routines, link against the library 
+{\tt ERS\_DIR:ERS.OLB}.
+
+To use the Starlink version, you must execute the local Adam development 
+startup. This is done with the following sequence-
+\begin{verbatim}
+@ssc:login
+adamstart
+adamdev
+ladamstart
+\end{verbatim}
+
+Link against {\tt ERS\_DIR:ERS\_STAR.OLB} and {\tt CNF\_IMAGE/OPT}.
+
+
+
+\subsection{Building under UNIX}
+To build programs using \ers\ under VMS,
+you must first execute the local DRAMA
+development startup. This is done with the command 
+\verb+~drama+\-{\tt /drama\-start}.  
+
+\subsubsection*{Compilation time - include files}
+The \ers\ include files can now be found in the location referenced to by the
+environment variable ERS\_DIR.
+
+In your source code,
+you should specify them using simple double quote notation, such as-
+\begin{verbatim}
+#include "Ers.h"
+\end{verbatim}
+
+\subsubsection*{Link time}
+The normal version of the normal \ers\ library can be found in 
+\$ERS\_LIB/libers.a.
+
+To link against the Starlink version, include `\$ERS\_LIB/ers\_star\_link` on
+the compiler command line.  The quotes surrounding 
+{\bf \$ERS\_LIB/ers\_star\_link} are grave accents (ascii code 60 hex). 
+
+Note that you may need to do the normal Starlink startup  -
+``{\tt source /star/etc/login}'', after doing the {\tt dramastart} command, 
+for this to work.
+
+\subsection{Building under VxWorks}
+To build programs using \ers\ under VMS,
+you must first execute the local DRAMA
+development startup on the development machine (The Sun). 
+This is done with the command  
+``\verb+~drama+\-{\tt /drama\-start vw68k}'' (For 680x0 based VxWorks machines).
+ 
+
+\subsubsection*{Compilation time - include files}
+The Ers include files can now be found in the location referenced to by the
+environment variable ERS\_DIR.
+
+In your source code,
+you should specify them using simple double quote notation, such as-
+\begin{verbatim}
+#include "Ers.h"
+\end{verbatim}
+
+\subsubsection*{Link time}
+The VxWorks version of the normal \ers\ library can be found in 
+ERS\_LIB/libers.a.  There is no Starlink version available under VxWorks
+since Starlink itself is not available under VxWorks.
+
+
+
+
+%------------------------------------------------------------------------------
+
+%\bibliography{docs_refdir:master}
+\begin{thebibliography}{9}
+\bibitem{DRAMA_ORG} Tony Farrell, AAO .
+{\em 23-Dec-1992, DRAMA Software Organisation.}
+Anglo-Australian Observatory \DRAMA\ Software Document 2.
+
+\bibitem{EMS_DOC} P C T Rees, Starlink Project.
+{\em 8-Nov-1991,  EMS Error Message Sevice Programmer's Manual.}
+Starlink User Note 4.3.
+
+\bibitem{ERR_DOC} P C T Rees, Starlink Project.
+{\em 8-Nov-1991,  MSG and ERR Message and Error Reporting Systems,
+Programmer's Manual.}
+Starlink User Note 104.3.
+
+\end{thebibliography}
+
+\markright{\aaodochead}
+
+\newpage
+\appendix
+\section{Detailed Subroutine Descriptions}
+
+\inputifexists {ers.tex_descr}
+
+
+\end{document}

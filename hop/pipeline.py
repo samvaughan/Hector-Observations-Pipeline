@@ -13,6 +13,7 @@ from hop.misc import pandas_tools as P
 from hop.misc import plotting_tools as plotting_tools
 from hop.tiling import tiling_functions as tiling
 from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
+from hop.target_selection import HectorSim
 
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
 
@@ -43,12 +44,10 @@ class HectorPipe:
         self.best_tile_Decs = []
 
         # Set up the output folders
-        folders = misc_tools.create_output_directories(self.config['output_folder'])
+        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres"]
+        folders = misc_tools.create_output_directories(self.config['output_folder'], subfolders_to_be_made)
+
         # Add these as class attributes
-
-        ubfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
-
-
         self.logfile_location = folders['Logs']
         self.configuration_location = folders['Configuration']
         self.tile_location = folders['Tiles']
@@ -67,11 +66,15 @@ class HectorPipe:
         self.galaxyIDrecord = {}
 
         # Get the location of the distortion correction executable and the R code
-        self.DistortionCorrection_binary_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/HectorConfigUtil")
+        self.DistortionCorrection_binary_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/HectorConfigUtility/HectorConfigUtil")
         # if not self.DistortionCorrection_binary_location.exists():
         #     raise NameError("The Distortion Correction binary seems to not exist")
 
-        self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/Code/tdFdistortion0.sds")  
+        # Locations of all the Hector Config code
+        self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds")  
+        self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
+        self.Profit_files_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles")
+
         if not self.TdF_distortion_file_location.exists():
             raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
         os.environ['TDF_DISTORTION'] = self.TdF_distortion_file_location.as_posix()
@@ -122,7 +125,7 @@ class HectorPipe:
         Find any tiles which have already been configured in the output folders.
         """
         try:
-            self.df_targets = pd.read_csc(f"{self.tile_location}/in_progress_targets_dataframe.csv")
+            self.df_targets = pd.read_csv(f"{self.tile_location}/in_progress_targets_dataframe.csv")
         except FileNotFoundError:
             self.logger.info(f"No 'in_progress_targets_dataframe.csv' file found, so no pre-made tiles will be loaded")
             return 0
@@ -173,11 +176,13 @@ class HectorPipe:
 
 
 
-    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None):
+    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, robot_temperature=19, obs_temperature=8, label="", plateID="", date="", check_sky_fibres=True):
 
         """
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
         """
+
+        self.logger.info(f"Robot Temperature: {robot_temperature} C, Obs Temperature: {obs_temperature} C. Label={label}, plateID={plateID}, date={date}\n\n")
 
         # Check that we have our three input catalogues
         if not self.have_targets_catalogue & self.have_standard_star_catalogue & self.have_guide_star_catalogue:
@@ -224,9 +229,12 @@ class HectorPipe:
             # Run the tiling
             self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=self.config['proximity'], current_tile=current_tile)
 
+            self.best_tile_RAs.append(tile_RA)
+            self.best_tile_Decs.append(tile_Dec)
+
             if apply_distortion_correction == True:
                 # Run the distortion correction
-                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename)
+                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=label, plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
                 self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
 
 
@@ -270,7 +278,7 @@ class HectorPipe:
                     self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile)
 
                     if apply_distortion_correction == True:
-                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename)
+                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date="", robot_temp=19, obs_temp=8, label="", plateID="", distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
 
 
                 if not configured:
@@ -284,9 +292,6 @@ class HectorPipe:
             self.df_targets.loc[new_targets, 'ALREADY_TILED'] = True
             # And include the tile number for each target
             self.df_targets.loc[new_targets, 'Tile_number'] = current_tile
-
-            self.best_tile_RAs.append(tile_RA)
-            self.best_tile_Decs.append(tile_Dec)
 
             self.logger.info(f"FINISHED TILE {current_tile}\n\n")
 
@@ -305,7 +310,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="", plateID="", distortion_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -313,8 +318,14 @@ class HectorPipe:
         If plot_save_filename is not None, save an image of the tile before/after the correction is applied
         """
 
+        # Touch the output file so it already exists
+        Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", date, label, plateID, f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f"{sky_fibre_file}", f"{profit_file_dir}"]
+
+        # Turn off the sky fibre checking if check_sky_fibres is False
+        if not check_sky_fibres:
+            DC_bash_code += ["nosky"]
 
         process = subprocess.Popen(DC_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output, error = process.communicate()
@@ -336,7 +347,7 @@ class HectorPipe:
         header.insert(1, f"# {tile_RA} {tile_Dec}\n")
 
         DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, skiprows=6)
-        guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.CoADD_ID)
+        guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.CoADD_ID.astype(str))
         with open(guide_tile_out_fname_after_DC, 'w') as f:
             for ln in header:
                 f.write(ln)

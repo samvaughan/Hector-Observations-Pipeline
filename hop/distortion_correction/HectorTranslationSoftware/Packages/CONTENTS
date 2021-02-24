@@ -1,0 +1,41 @@
+This directory contains a number of packages that are used by the HECTOR
+translation software.
+
+cfitsio    should be a copy of Bill Pence's cfitsio library. This is version
+           3.41, as downloaded from:
+           https://heasarc.gsfc.nasa.gov/fitsio/fitsio.html
+
+DramaErs   should be a copy of the latest version of the ERS library used
+           by DRAMA for error reporting. It's here because it's needed by
+           sds. It has a Makefile.standalone makefile that can be used to
+           build it on a system that does not have DRAMA installed.
+
+sds        should be a copy of the latest version of the SDS library used
+           by DRAMA to access .sds structured data files such as the files
+           used to hold 2dF distortion data. It has a Makefile.standalone
+           makefile that can be used to build it on a system that does not
+           have DRAMA installed.
+
+slalib_o   should be a copy of the latest version of Pat Wallace's SLALIB
+           astrometric library. The '_o' indicates that the code is all in
+           an obfuscated form required by licencing agreements. It has a
+           makefile that can be used to build it. Note that by default this
+           makefile releases the library and include files into an slalib
+           directory in the user's home directory. This is probably not
+           wanted here, and the Makefile used to build the Hector translation
+           software runs this slalib makefile using "INSTALL_DIR=../slalib"
+           which releases the files into the slalib sub-directory of this
+           current directory.
+
+slalib     is an empty directory structure as released, but is the directory
+           into which the Makefile used to build the Hector translation
+           software releases the build slalib library and include files - see
+           above under slalib_o.
+
+wcslib-5.16 should be a copy of Mark Calabretta's wcslib library. This is
+           version 5.16 as downloaded from:
+           http://www.atnf.csiro.au/people/Mark.Calabretta/WCS/
+
+Misc       contains a miscellaneous collection of small pieces of code from
+           a variery of packages that are used by the Hector translation
+           software. It has its own CONTENTS file explaining what these are.

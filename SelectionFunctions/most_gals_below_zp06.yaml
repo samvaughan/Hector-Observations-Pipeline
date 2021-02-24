@@ -1,0 +1,30 @@
+# This yaml file defines the SAMI steps in the mass-redshift plane. 
+# We have a linear rise until some lower limit, then a series of steps at different values of stellar masses
+# It is turned into the following python code:
+
+# y[redshift< lower_lim] = lower_gradient * redshift[redshift< lower_lim] + lower_constant_offset
+# y[(redshift>= lower_lim) & (redshift< limit_2)] = mass_step_2
+# y[(redshift>= limit_2) & (redshift< limit_3)] = mass_step_3
+# y[(redshift>= limit_3) & (redshift< limit_4)] = mass_step_4
+# y[(redshift>= limit_4) & (redshift< limit_5)] = mass_step_5
+# y[(redshift>= limit_5)] = final_mass_step
+
+
+lower_lim : 0.01
+lower_gradient: 62.5
+lower_constant_offset: 6.95
+
+limit_2 : 0.03
+mass_step_2 : 8.0
+
+limit_3: 0.045
+mass_step_3: 8.4
+
+limit_4 : 0.06
+mass_step_4 : 9.2
+
+limit_5 : 0.095
+mass_step_5 : 11.0
+
+final_mass_step : 11.0
+

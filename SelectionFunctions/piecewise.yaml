@@ -1,0 +1,35 @@
+# This yaml file defines a piecewise selection function in the mass-redshift plane. 
+# We have a linear rise until some lower limit, then a series of lines joining each value
+# It is turned into the following python code:
+
+# y[redshift< lower_lim] = lower_gradient * redshift[redshift< lower_lim] + lower_constant_offset
+# y[(redshift>= lower_lim) & (redshift< limit_2)] = mass_step_2
+# y[(redshift>= limit_2) & (redshift< limit_3)] = mass_step_3
+# y[(redshift>= limit_3) & (redshift< limit_4)] = mass_step_4
+# y[(redshift>= limit_4) & (redshift< limit_5)] = mass_step_5
+# y[(redshift>= limit_5)] = final_mass_step
+
+type : piecewise
+
+z_0 : 0.0
+z_1 : 0.012
+z_2 : 0.03
+z_3 : 0.045
+z_4 : 0.06
+z_5 : 0.06000000000000001
+z_6 : 0.095
+z_7 : 0.09500000000000001
+z_8 : 0.09500000000000001
+
+
+f_z0 : 6.9
+f_z1 : 7.7
+f_z2 : 8.3
+f_z3 : 8.7
+f_z4 : 10.1
+f_z5 : 10.6
+f_z6 : 10.6
+f_z7 : 10.9
+f_z8 : 10.9
+
+

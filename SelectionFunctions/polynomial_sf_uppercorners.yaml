@@ -1,0 +1,20 @@
+# This yaml file defines a polynomial (fit to the SAMI steps) in the mass-redshift plane. 
+# The z values MUST start with z, followed by an integer
+# The f(z) values MUST start with z and have an integer corresponding to their z value
+# E.g. z1 and f_z1 correspond to each other
+
+type : curve
+degree : 2
+
+z_0 : 0.0
+z_1 : 0.03
+z_2  : 0.045
+z_3  : 0.06
+z_4  : 0.095
+
+
+f_z0 : 6.95
+f_z1 : 8.6 
+f_z2 : 9.4 
+f_z3 : 10.3 
+f_z4 : 10.9

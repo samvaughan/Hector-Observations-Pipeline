@@ -25,7 +25,8 @@
 #* setwd('~/Science/Hector/Tiling/MAXI/Cluster_tests/HectorC1_tests_01/')
 
 #* Source the Hector Config file
-source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
+#source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
+source("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/configuration/HECTOR_Config_v3.2.R")
 
 library("argparse")
 parser = ArgumentParser(description='Configure a Hector tile such that all targets are observable')
@@ -47,14 +48,14 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #* arguments you'd give on the command line.
 #* To compare to ipython: %run myscript a, b would become tmp_args=c('a', 'b')
 #* DON'T FORGET TO COMMENT OUT LINE 51 TO RUN AS A SCRIPT!!!
-tmp_args=c('/Users/samvaughan/Science/Hector/full_simulations/Testing_Distortion_Correction/DistortionCorrected/DC_tile_000.fld',
+tmp_args=c('/Users/samvaughan/Science/Hector/HectorObservationPipeline/Outputs/GAMA/G09/DistortionCorrected/DC_tile_000.fld',
              'GAMA_G12_',
              '--out-dir',
-             '/Users/samvaughan/Science/Hector/full_simulations/Testing_Distortion_Correction/Configuration/',
+             '/Users/samvaughan/Desktop/',
              '--plot', '--run_local')
 
-#args <- parser$parse_args(tmp_args)
-args <- parser$parse_args()
+args <- parser$parse_args(tmp_args)
+#args <- parser$parse_args()
 
 
 #* Get the targets. We'll use Sys.glob in case a wildcard was passed.
@@ -95,9 +96,9 @@ for (f in SAMIFields_Targets){
   #* And changed the substr call below, as the name of the files is different to the original format
   fieldsfolder = dirname(SAMIFields_Targets)
   f = basename(SAMIFields_Targets)
-  tile_data=read.table(file=paste(fieldsfolder,f, sep='/'), header=TRUE, sep=',', skip=8, check.names = TRUE)
+  tile_data=read.table(file=paste(fieldsfolder,f, sep='/'), header=TRUE, sep=',', skip=8, check.names = TRUE, stringsAsFactors = FALSE)
   g=paste('guide_',f,sep='')
-  gdata=read.table(file=paste(fieldsfolder,g, sep='/'), header=TRUE, skip=8, sep=',', check.names = TRUE)
+  gdata=read.table(file=paste(fieldsfolder,g, sep='/'), header=TRUE, skip=8, sep=',', check.names = TRUE, colClasses = c("ID"="character"))
   
   gdata[,'type']=2
   
@@ -105,9 +106,16 @@ for (f in SAMIFields_Targets){
   fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
   fcentre=data.frame(ra=fcentre[1],dec=fcentre[2])
   
+  # Peel off the sky fibres
+  row_numbers = as.numeric(rownames(tile_data))
+  # Find all rows which have "Sky" in their index
+  sky_fibre_rows = grep("Sky", tile_data$ID)
+  sky_fibre_IDs = tile_data[sky_fibre_rows, 'ID']
+  not_sky_fibre_rows = row_numbers[!(row_numbers %in% sky_fibre_rows)]
+  sky_fibre_data = tile_data[sky_fibre_rows,]
   #Combining guides and targets:
   #* I've changed these column headings to match the outputs of my tiling code
-  fdata=rbind(tile_data[,c('ID','MagnetX','MagnetY','mag','type')],gdata[,c('ID','MagnetX','MagnetY','mag','type')])
+  fdata=rbind(tile_data[not_sky_fibre_rows,c('ID','MagnetX','MagnetY','mag','type')],gdata[,c('ID','MagnetX','MagnetY','mag','type')])
   
   # Converting coordinates into mm
   
@@ -125,6 +133,7 @@ for (f in SAMIFields_Targets){
   stdpos=as.data.frame(fdata[fdata[,'type']==0,c('x','y')])
   guidepos=as.data.frame(fdata[fdata[,'type']==2,c('x','y')])
   pos_master=list(pos=pos, stdpos=stdpos, guidepos=guidepos)
+  
   
   #Checking top 19 probes.
   draw_pos(x=pos_master$pos[c(1:19),'x'],y=pos_master$pos[c(1:19),'y'])
@@ -150,9 +159,30 @@ for (f in SAMIFields_Targets){
   swapsneeded=c(swapsneeded,final_config$swaps)
   
   #* Get the IDs of things which have been tiled, and save these
-  #* IDs=IDs[rownames(pos),] <<- This is wrong! 
-  IDs=IDs[match(rownames(pos),rownames(fdata)),] 
-  selected_objects = tile_data[tile_data$ID %in% IDs,]
+  #* IDs=IDs[rownames(pos),] <<- This is wrong!
+  IDs=IDs[match(rownames(pos),rownames(fdata)),]
+  # This gets the rest of the columns from the tile too for us to save
+  subset_of_IDs_for_saving = (tile_data$ID %in% IDs)
+  selected_objects = tile_data[subset_of_IDs_for_saving,]
+  
+  # Now make the skyfibre rows
+  sky_fibre_data = tile_data[(tile_data$ID %in% sky_fibre_IDs),]
+  sky_fibre_filler_list = rep(NA, nrow(sky_fibre_data))
+  
+  # Now make the tables- one for the hexabundles ("target_table") and one for the sky fibres
+  # I've added NA values for the sky fibre columns which don't make sense (rads, angs, etc)
+  target_table = cbind(probe=c(1:length(angs)),IDs,pos,rads,angs,azAngs,angs_azAng,selected_objects)
+  sky_fibre_table = cbind(probe=sky_fibre_filler_list, 
+                          IDs=sky_fibre_data$ID, 
+                          x=sky_fibre_data$MagnetX / 1000.0, 
+                          y=sky_fibre_data$MagnetY / 1000.0,
+                          rads=sky_fibre_filler_list,
+                          angs=sky_fibre_filler_list,
+                          azAngs=sky_fibre_filler_list,
+                          angs_azAng=sky_fibre_filler_list,
+                          sky_fibre_data)
+  
+  final_table = rbind(target_table, sky_fibre_table)
   #Writing output files:
   #* I've added the ability to save things to a specified output directory
   #* This is passed via argparse as 'out_dir'
@@ -165,7 +195,8 @@ for (f in SAMIFields_Targets){
   print(paste('Writing outputs to ', galaxy_out_name, sep=''))
   print(paste('********************************************'))
   
-  write.table(cbind(probe=c(1:length(angs)),IDs,pos,rads,angs,azAngs,angs_azAng,selected_objects),file=galaxy_out_name, row.names=TRUE)
+  #* Write the final table for the hexabundles and the guides
+  write.table(final_table,file=galaxy_out_name, row.names=TRUE)
   write.table(cbind(probe=c(1:length(gangs)),gpos,grads,gangs,gazAngs,gangs_gazAng),file=guide_out_name, row.names=FALSE)
   
   if (visualise) {

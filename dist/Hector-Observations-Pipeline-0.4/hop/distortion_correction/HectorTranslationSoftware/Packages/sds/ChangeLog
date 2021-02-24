@@ -1,0 +1,763 @@
+Tue Dec 08 19:14:25 2020 <ks@Keiths-MacBook-Pro.local>  sds version: 3.94
+
+    Tried to tidy up the standalone build on systems without a DRAMA
+    installation. The old Standalone directory looked as if it hadn't been
+    used seriously in years - makefiles for DEC Alphas and Solaris machines,
+    but not for OS X or Linux. Renamed the Standalone directory as old_standalone
+    and created a new Standalone directory. In this I generated the various
+    messgen-generated files (using the latest DRAMA messgen), and added the
+    latest versions of the standard DRAMA include files status.h and drama.h,
+    together with a CONTENTS file saying more or less what this says here.
+    Added at top level a Makefile.standalone file.
+
+    It should be possible to build a standalone version of SDS using
+                   "make -f Makefile.standalone"
+    - this doesn't release any files, but it builds a libsds.a. This makefile
+    assumes that there is a directory alongside the SDS directory called DramaErs
+    that has the Ers files (now themselves with a Makefile.standalone and a
+    Standalone directory). If not, ERS_DIR will need to be specified - the old
+    standalone directory included an ERS emulation, but that seems unnecessary
+    when the real thing is easy enough to build standalone separately.
+
+    This has now been tested under OS X (High Sierra) and Linux (on aaolxp)
+
+    Note that if anyone decides to define a new SDS error code in sds_err.msg,
+    they should regenerate the various messgen-created files in Standalone:
+    cd Standalone
+    messgen -c -o -t ../sds_err.msg
+    messgen -c -o -t ../arg_err.msg
+
+Mon Mar 18 15:00:57 2019 <tjf@taipan.10.80.10.9>  sds version: 3.93
+
+    ArgPutu64() was not creating a 64 bit SDS item.  Fixed.
+
+Wed Jul 11 10:29:55 2018 <tjf@aaolxp.aao.gov.au>  sds version: 3.92
+
+    Added the use of the DUNUSED macro in the previous change, but
+    that is not defined when building for aaoConfigure, so added the
+    definition of it if it is not already defined.
+
+Wed Jul 11 09:53:46 2018 <tjf@aaolxp.aao.gov.au>  sds version: 3.91
+
+    New argtest program was not being built during release, fixed.
+
+    Fixed a few compiler warnings.
+	
+Wed Jul 04 14:53:51 2018 <tjf@aaolxp.aao.gov.au>  sds version: 3.90
+
+    Resolved long standing issue in conversion of long 64 array items
+	to strings, in arg, when the item we negative. 
+
+    As part of this, introduced new SdsGetI64toD() and SdsGetU64toD() 
+	functions, provding a standard approach to converting a
+        64 bit long to double.
+
+    Add argtest.C to help test this stuff.  Will be expanded to help
+	test ARG routines in the future.
+	
+Fri Apr 06 09:40:42 2018 <tjf@aaolxp.aao.gov.au>  sds version: 3.89
+
+    Update error include files in Standalone directory.
+
+Wed Apr 04 15:23:40 2018 <tjf@aaolxp.aao.gov.au>  sds version: 3.88
+
+    Rework enum's in SDSC to remove the use of "int" in sdsparser.y.  This
+     does mean we can't have enum types which are not int.
+
+Tue Apr 03 13:20:48 2018 <tjf@aaomc39so.aao.gov.au>  sds version: 3.87
+
+    Fix crashes in the SDSC compiler which occur if "struct" is not used
+	when it should be.
+
+    By default, prohibit the use of "int", "long int" etc, forcing the
+	use of INT32, UINT32 etc so avoid ambigous definitions.  The "-c"
+	option allows the old behaviour to work as before (but this would
+	not necessarly work on 64 bit machines).
+	
+Tue Jul 25 15:28:13 2017 <tjf@aaolxp.aao.gov.au>  sds version: 3.86
+
+        ArgToString was not null terminating the result in all cases, not sure
+              why I was getting away with this, picked up by
+              Google Sanitiser tools
+
+       Was not correctly invalidating all SDS Ids refering to an item when
+          the (internal) item is deleted.  Add Sds__invalidateIdsFor(), which
+          must be invoked after Sds__delete(), to do this.  Picked up by
+          Google Sanitiser tools.
+
+
+       Arg::Get() method, string return version, was calling "delete" rather
+         then delete[] on buffer.   Picked up by
+          Google Sanitiser tools.
+
+
+Wed Dec 21 14:24:48 2016 <tjf@aaolxp.aao.gov.au>  sds version: 3.85
+
+	Update sds_err.h in Standalone directory.
+	
+Wed Dec 21 14:05:35 2016 <tjf@aaolxp.aao.gov.au>  sds version: 3.84
+
+	sds.c now uses the SDS_NO_POSIX_THREADS macro to disable
+	posix thread support.  GNUmakefile.am modified to specify
+	that so that we don't enable posix thread support for 2dFdr,
+	avoiding link time issues for 2dFdr.
+	
+Thu Dec 15 08:28:01 2016 <tjf@aaolxp.aao.gov.au>  sds version: 3.83
+
+	sds.h revamped to ensure things declared in sds.c and sdsutil.c
+	are grouped together.  Ensure we don't allow access to things
+	in sds.c that are only intended for sdsutil.c
+
+	sds.c -> revamp usage and call of Sds__get_new_id() to handle
+	      status such that we can pick up semaphore/mutex failures.
+
+	sds.c -> Major revamp of semaphore usage, particularly on posix
+	      posix machines where it appeared we were not using the
+	      semaphores at all.  Now we have Id semaphores (VxWorks)
+	      and F semaphores (Full semaphores) used on Posix.  The
+	      later are taken using every extern function in sds.c, since
+	      they use a recursive mutex implementation, they are safe
+	      to take multiple times.
+
+	      Much checking added.
+	
+	      Much reformatting of SDS to more standard AAO style as
+	       this was worked through.
+	
+	
+Wed Dec 23 07:19:10 2015 <tjf@aaomc39so.aao.gov.au>  sds version: 3.82
+	
+	Change to GNUMakefile.am to support later versions of automake.
+
+Tue Aug 18 08:03:11 2015 <tjf@aatlix.10.80.10.9>  sds version: 3.81
+
+       Starting to get into lots of trouble due to ERS_M_NOFMT flag and checks
+        in modern complers which complain if you don't have a format string.   Use
+        new ErsRepNF() function as an alternative.
+
+Wed Feb 25 09:42:38 2015 <ks@keithsmacbook.aao.gov.au>  sds version: 3.80
+
+   Modified to get a clean compilation under the latest version of 
+   Clang (6.0) and - significantly - under the latest version of Tcl/Tk
+   (8.6) which has finally deprecated the use of the result field of
+   the TCL interpreter. This has meant all the places in the code where
+   this was used have had to be reworked. In most cases the change needed
+   is trivial and could even be done automatically using a Python
+   script, but in others a bit more re-coding was needed. It may be that
+   some mistakes have been made, particularly in the awkward cases where
+   the result to be returned was larger than the result field could 
+   normally hold, and dynamic memory needed to be allocated for the result.
+   No problems have shown up running TCS with the new code, and that
+   does use SDS from Tcl quite a lot, but this needs to be borne in mind.
+   Really, some more exhaustive test program needs to be written.
+   
+Thu Sep 18 11:04:16 2014 <tjf@aaolxp.aao.gov.au>  sds version: 3.79
+
+	Add SdsNumItems().
+
+	Fix bug in SdsGetCode() - was not correctly returning SDS_STRUCT
+		for external SDS arrays.
+
+Fri Aug 08 16:20:17 2014 <tjf@lapadm6.aao.gov.au>  sds version: 3.78
+
+	Minor fix to dmakefile and sdscompiler.c picked up by
+	build on MacOsX mavericks.
+
+Mon Jun 16 11:05:56 2014 <mnb@lapmnb.aao.gov.au>  sds version: 3.77
+	Added the following c routines in arg_c.c designed to be called
+        from fortran as follows:
+
+           CALL ARG_PUTVR(ARGS,'VEC_NAME',VECR,SIZE,STATUS)
+           CALL ARG_PUTVD(ARGS,'VEC_NAME',VECD,SIZE,STATUS)
+
+        To write vector of reals and doubles into the SDS object ARGS
+        
+
+Mon Feb 10 08:32:20 2014 <tjf@aaolxp.aao.gov.au>  sds version: 3.76
+
+       Add SdsCloneId(), SdsGetName(), SdsGetCode(), SdsGetDims(),
+	   SdsGetExtraLen().  A bunch of convenience function we should
+	   have had from the early days.  Added now as they make 
+	   C++ wrappers easier to implement.
+
+	SdsWrite() returned if SdsSize() fails, rather then continuing
+	and getting memory allocation errors.
+	
+Fri Jan 31 13:31:03 2014 <tjf@aaolxp.aao.gov.au>  sds version: 3.75
+
+       Modified arg.h to include sds.h.
+
+Mon Sep 17 08:39:22 2012 <tjf@aaolxp.aao.gov.au>  sds version: 3.74
+
+	Modified arg.h to resolve a warning output by gcc 4.7.1.
+	   There are others in sds.c and sdscompiler.c, but these
+		are not seen by the general user and are hard to
+		resolve in a portable manner, so ignore them for now.
+
+Mon Jun 04 09:59:35 2012 <tjf@aaolxp.192.231.167.2>  sds version: 3.73
+
+	sds.c Sds__get_new_id() had a varaible steve_unused_ids_counter,
+	which appears to have been somebody's bit of debugging that
+	slipped in.  This was not doing anything real and releated
+	code has been removed.  (Picked up by clang 3.1)
+
+	Fix use of non-literals in printf statements in sdsc.c
+	    (Picked up by clang 3.1)
+
+	Change trigger for protyping yylex.
+	
+	
+Thu May 03 07:07:24 2012 <tjf@aaomc7.aao.gov.au>  sds version: 3.72
+    
+	Remove GNUMakefile which had been errantly put into 3.71.
+	Reinstall Find() method to SdsId which has been lost in 3.71 change.
+	Fix warning in sdstest.c, when built in C++
+	
+Wed May 02 13:13:56 2012 <mnb@lapmnb.192.231.167.2>  sds version: 3.71
+	Added a #define macro to some files ready for use with Tk8.6
+
+Wed Mar 28 06:35:35 2012 <tjf@aaolxp.192.231.167.2>  sds version: 3.70
+
+	Add Find() method to SdsId.
+	
+Tue Feb 14 08:35:50 2012 <tjf@aaolxp.192.231.167.2>  sds version: 3.69
+
+	Fix bug in STclSdsCell() - it had never worked before.
+	
+Fri Dec 02 09:56:59 2011 <instswtest@aaolxp.192.231.167.2>  sds version: 3.68
+
+	Fixing the ArgCvt() issue uncovered problems in 
+	       ArgPuti/ArgGeti/ArgPutui/ArgGetui,
+	which also needed fixing when running on 64 bit machines.
+
+Thu Dec 01 15:29:14 2011 <instswtest@aaolxp.192.231.167.2>  sds version: 3.67
+
+	Fix bug found by Minh in ArgCvt().
+	
+            Hi Tony,
+
+            I think there is an issue with the DTCL ArgPutu command on OSX  Lion. 
+	    It  gave me this error message when i used it "ArgCvt error converting 
+	    "0", destination length too small".
+
+            The command worked fine on 32Bit build.
+
+             To test it
+             Run a dtcl command then :
+             - set arg [ArgNew]
+             - ArgPutu $arg Argument1 0
+
+Mon Nov 14 08:15:52 2011 <tjf@aaomc7.aao.gov.au>  sds version: 3.66
+
+	In sdstcl.c, use Tcl_PrintDouble() rather then implementing
+	intpretation of tcl_precision ourselves.
+	
+Fri Nov 11 11:19:09 2011 <tjf@aaomc7.aao.gov.au>  sds version: 3.65
+
+	ArgToString() was using a 15 rather then 16 character string
+	for an SDS name string length.  Also replace all occurances
+	of 16 in these with SDS_C_NAMELEN in sdsutil.c/sdstcl.c/arg.c/sds.c
+	sds.h
+
+	Fix a few 
+	
+Wed Nov 02 07:22:55 2011 <tjf@aaolxp.192.231.167.2>  sds version: 3.64
+    
+	Last change had errantly included test.sds and this broken the
+	regression testing.  Remove it (by adding to clean target in 
+	dmakefile).
+
+	sdstest.c now formats its error codes to strings and outputs
+	errors to stderr rather then stdout.
+	
+Tue Oct 25 07:52:41 2011 <tjf@aaolxp.192.231.167.2>  sds version: 3.63
+
+	Add ArgPut1DArrayS() and ArgPut1DArraySElem().  Others of this style
+	    - element versions, now use the index as the default dim, if dim
+	    is zero.
+	
+Fri Sep 23 11:04:33 2011 <tjf@aaolxp.192.231.167.2>  sds version: 3.62
+
+	Add SdsListTo() function and C++ method (and to Arg).  
+	Reimplent underlying Sds__List() function to support this.
+
+	Also tidy up error handling in SdsList, SdsListPath, SdsDump, SdsPoke.
+
+Tue Sep 06 12:20:04 2011 <tjf@aaolxp.192.231.167.2>  sds version: 3.61
+
+	Add overloads of Arg.Put() methods which will put 1D arrays (double,
+	    INT32 and unsigned char) and which will put elements of those
+	    arrays.  Based on ArgPut1DArrayI() etc. routines.
+	
+Wed May 18 08:56:59 2011 <rwh>  sds version: 3.60
+	Add building F95 interface routines to GNUmakefile.am
+
+Tue May 03 17:27:11 2011 <rwh>  sds version: 3.59
+	Add F95 interface routines in directory Fortran (used by 2dfdr)
+
+Thu Mar 17 11:38:40 2011 <tjf@aaolxp.192.231.167.2>  sds version: 3.58
+
+	Add ArgPut1DArrayI() and ArgPut1DArrayIElem().
+	Add ArgPut1DArrayB() and ArgPut1DArrayBElem().
+
+Tue Feb 08 08:42:03 2011 <instswtest@aaomc.aao.gov.au>  sds version: 3.57
+
+	Fix error in GNUmakefile.am in previous change.  Remove *~ files.
+
+Mon Feb 07 11:51:28 2011 <instswtest@aaomc.aao.gov.au>  sds version: 3.56
+
+	Had accidently picked up sdslexer.c and sdsparser.c.  Remove them.
+
+Thu Jan 27 12:23:59 2011 <instswtest@aaomc.aao.gov.au>  sds version: 3.55
+
+	Rename Makefile.am to GNUmakefile.am, since 2dfdr_ac is moving
+	to using this name all the time.  Add the various include files
+	and .msg files to the lists to be distrubted..
+
+Mon Mar 01 13:39:36 2010 <tjf@aaomc7.local>  sds version: 3.54
+
+	Add new arg functions -  ArgPut1DArrayD() and ArgPut1DArrayDElem(),
+		to ease access to arrays of 1D data, as used in 2dF robot
+		code (hence C access needed rather then C++).  Might add
+		other data types as found to be needed.
+
+Wed Nov 25 08:39:42 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.53
+
+	Alpha/VMS C supports long-long type - use it for 64 bit mode.
+
+	Fix many cases of comparing unsigned to <= 0, rather then == 0.
+
+	Fix bug in VMS code reading byte swapped IEEE floating point values
+	  into VMS G Floats.  Was calculating the exponent incorrectly.
+
+	Now have a new example test file generated on a VMS machine -
+		sds_vmsalpha.sds.  This has been added to files read and checked by
+		sdstest.c
+
+	Added testgen.c, used to generate the test file read by sdstest.c
+		(sds_bigendian.sds  sds_littleendian.sds  sds_vmsalpha.sds)
+		allowing this to be quickly regenerated as needed.
+
+Tue Nov 24 14:06:04 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.52
+
+	makefile.support must fix the lexer and parser files as per
+		LexObjectFixed() and YaccObjectFixed() macros in
+		the dmakefile.
+
+	Fix problem in sdsport.h picked up by Alpha/VMS build.  Add new macro
+		SDS__64_BECAUSE to tell us why we got 64 bit support and
+		output its value in sdstest.c.
+
+        Allow for Alpha/VMS build with 32 bit pointers - don't yet know
+          if long long is available.
+
+        Output various VMS specific macros from sdstest.
+
+Mon Nov 23 16:10:58 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.51
+
+	Update makefile.support.
+
+Wed Nov 11 10:59:01 2009 <tjf@aaowfi.aao.gov.au>  sds version: 3.50
+
+        Add some extra tests to sdstest.c
+	sdstest.c is now built in both C and C++ since they
+		sometimes give different results (using solaris
+		native compilers on solaris 8 - due to c++ having a
+		native 64 bit integer and the cc compiler not).
+
+	Add new SdsCheckBuild() call to check for consistency of callers
+	sdsport.h to sds.c's sdsport.h.  Invoke this from sdstest.c
+
+	For solaris using the Solairs compilers - we currently need to
+	   define the macro _NO_LONGLONG when compiling C++ code.  This is
+	   due to a conflict between the -Xc option on the C compiler and
+	   the C++ compiler - impacting the include file  /usr/include/sys/int_limits.h
+	   and its definition of UINT64_MAX.  By default, the C compiler with
+	   the -Xc option does not define this.  But by default, the C++ compiler
+	   does compile it.  The result is that the INT64 type if different
+	   depending on if you are building C or C++ code, and they are not
+	   compatible (not sure why as yet).
+
+	   Alternatively, if we drop -Xc, we can also drop the definittion
+	   of _NO_LONG_LONG
+
+	Fun acmmFixRcsStatic on this module.
+
+	Support definition of macro _LP64 to indicate 64 bit long pointers
+	are used.
+
+Tue Nov 03 09:26:34 2009 <tjf@aaomc7.aao.GOV.AU>  sds version: 3.49
+
+        Fix documentation error in SdsSetWatch.
+
+Mon Nov 02 14:19:24 2009 <tjf@aaomc7.aao.GOV.AU>  sds version: 3.48
+
+	Add SdsListInUse() function - to help with debugging SDS problems.
+
+	SdsSetWatch() now supports watching all IDs and calling the watch
+	routine on ID creation events.
+
+Thu Sep 17 11:03:41 2009 <tjf@aaomc7.aao.GOV.AU>  sds version: 3.47
+
+        Fix SRC<n> macro definitions in dmakefile.  Wrap release tests
+        in AutoTest() and UnixOnly() macros.
+
+Wed Sep 09 10:55:17 2009 <tjf@aaomc7.aao.GOV.AU>  sds version: 3.46
+
+	Modify sdstest.c to output details on sdsport.h input and results.
+
+Mon Aug 31 13:15:00 2009 <tjf@aaomc7.aao.GOV.AU>  sds version: 3.45
+
+	Fix commenting error on SdsSetWatch.
+
+Fri Aug 28 14:15:46 2009 <tjf@aaomc.aao.GOV.AU>  sds version: 3.44
+
+       Add Makefile.am - used by 2dFdr to autoconfigure sds.
+
+
+Mon Feb 16 11:21:50 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.43
+
+	Remove forconv.c from makefile.support and associated lines.
+
+Fri Feb 13 14:14:21 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.42
+
+	Starlink defunct.  Remove fortran/starlink interfaces.  Changes to dmakefile and
+	deleted files
+
+		argfort.c  forconv.c  gen_move.f  hds2sds.c  hds2sdsf.f  sds2hds.c  sds2hdsf.f 
+		sdsfort.c  vax_include.sub
+
+Fri Jan 30 08:18:58 2009 <tjf@aaolxp.aao.gov.au>  sds version: 3.41
+
+	Modify sds.h so that we don't get warnings due to "from_where"
+	not being used.
+
+Wed Oct 08 13:00:04 2008 <tjf@aaolxp.aao.gov.au>  sds version: 3.40
+
+      Ensured that Arg contructors which do shallow copy initialise SdsIdType variables
+	so that failures are handled correctly.
+
+      C++ Cleanup() does not use SdsFreeId() macro when SDS_CHECK_FREE is defined,
+	but instead does its own more sensible (for it) thing - to avoid erange messages
+	about problems in the include file.
+
+      SdsFreeId() macro (enabled when SDS_CHECK_FREE is defined) should only add warning
+	text when error code is SDS__CHK_FREE.
+
+Tue Oct 07 10:07:00 2008 <tjf@aatssy.aao.gov.au>  sds version: 3.39
+
+      Fix  bug in VxWorks Semaphore stuff.
+
+      Update Standalone sds_err.h
+
+Thu Sep 25 09:18:10 2008 <tjf@aaolxp.aao.gov.au>  sds version: 3.38
+
+      Add new functions
+	SdsErrorCodeString() -> converts SDS codes to string.  Used in
+		test program.s
+	SdsCheckInit(), SdsCheck() -> used for checking for SDS leaks.
+	SdsFreeIdAndCheck() -> SdsFreeId() but checking that SdsDelete() or
+		SdsReadFree() has been run as appropiate.
+
+     Sempahore stuff revamped, using new Sds___SemTake() and Sds___SemGive()
+		functions - simplifying code dramatically.
+
+Wed Jun 25 13:44:50 2008 <tjf@aaolxp.aao.gov.au>  sds version: 3.37
+
+     SdsWatchID now operates on most/all functions which modify the
+	structure of an SDS item.  Define the SDS_WATCH_EVENT_... series
+	of macros to distingish these events.  Add Sds___WatchEvent() to
+	implement this.
+
+Wed Jun 04 09:14:56 2008 <tjf@aaolxp.aao.gov.au>  sds version: 3.36
+
+    html/Makefile drops use of $(MAKEFLAGS) - not needed and causing
+     problems on Linux.
+
+Fri Mar 14 12:24:44 2008 <tjf@aaomc7.aao.gov.au>  sds version: 3.35
+
+	Modify SdsRead() to ensure it validates a file as an SDS
+		file before allocating memory - to ensure we don't
+		try to allocate excessive memory.
+
+	Ensure SdsRead() deallocates memory if SdsAccess() fails.
+
+	Modify ArgCvt() to only call SdsResize() if it needs more
+		space.
+
+Fri Mar 02 09:13:04 2007 <tjf@aaolx64.aao.gov.au>  sds version: 3.34
+
+	Refactor Sds__get_id() to tidy up semaphore handling on errors.
+
+	UINT64 was incorrectly being defined as long long when long is
+		64 bits.  Fixed.  Flow on fixes in sdstest.c.
+
+	Fix bug in arg.c when converting 32/64 bit unsigned integers
+          integers to strings when long is 64 bits.
+
+Wed Feb 21 16:20:42 2007 <ss@aaopcnss.aao.gov.au>  sds version: 3.33
+
+	Back out last change - failure was in Scott, not build process.
+
+Wed Feb 21 15:02:32 2007 <ss@aaopcnss.aao.gov.au>  sds version: 3.32
+
+	Fix build failure when Java not available.
+
+Fri Jan 12 09:07:24 2007 <tjf@aaolx64.aao.gov.au>  sds version: 3.31
+
+      Fix bug picked up on 64 bit intel Linux.  The last arguments of
+        most Tcl variable argument list functions is specified as being
+        a null.  We were passing 0 (zero) to Tcl_SetErrorCode() which
+        will be a 32 bit value, rather then the 64 bit value expected.
+        Change to using (char *)0.  This is the one case where 0 is
+        not the same as (void *)0.
+
+     Release Tcl and Java version of errror include files, and the
+          fortran version of the arg one.
+
+Tue Nov 07 07:16:08 2006 <tjf@aaomc6.aao.gov.au>  sds version: 3.30
+
+        Support VxWorks defining INT64 based on _WRS_VXWORKS_5_X
+        found by Ricardo
+
+Wed Aug 16 13:48:13 2006 <tjf@aaolxp.aao.gov.au>  sds version: 3.29
+
+	Add new methods DataAddressRW() and DataAddressRO() to
+		SdsArrayAccessHelper().
+
+        sdslist command now handled bad arguments correctly.
+
+Thu Jul 27 15:28:12 2006 <tjf@aaolxp.aao.gov.au>  sds version: 3.28
+
+	Fix bug in previous change.
+
+Fri Jul 21 09:17:18 2006 <tjf@aaolxp.aao.gov.au>  sds version: 3.27
+
+	Add and use new constant SDS_C_MAXARRAYDIMS for the maximumn
+
+	Add new ArgCheckItem function and CheckItem C++ method.
+
+	Add  SDS_C_MAXCODE constant.
+
+	Add constant ARG_NEWCPP_OVERLOADS which might help in working
+		out if we are using the new C++ overloads.
+
+Fri Mar 10 14:31:54 2006 <tjf@aaolxp.aao.gov.au>  sds version: 3.26
+
+     Arg C++ interface for 32 and 64 bit integers no always use
+		INT32/UINT32/INT64/UINT64 to ensure they are consistent
+	accross platforms.  WARNING - may break existing code,
+		particularly the Get() functions.
+
+Thu Feb 16 13:42:39 2006 <tjf@aspersa.priv.phas.ubc.ca>  sds version: 3.25
+
+
+    Get working on 64 bit intel. Add stuff to sdstest.c to read in and
+      examine files created on machines  known to work of each
+      byte order - sds_bigendian.sds and sds_littleendian.sds
+
+    Fix bugs in SdsGetI64 in native 64 bit mode.
+
+    Fix bug in arg.h for native 64 bit mode.
+
+Thu Jul 21 09:03:52 2005 <tjf@aaoprog.aao.gov.au>  sds version: 3.24
+
+     Fix memory link in void Arg::Get(const char *name, std::string *value,
+                 StatusType *status, int buflen = 100) const;
+
+Fri Apr 29 08:03:47 2005 <tjf@aaoprog.aao.gov.au>  sds version: 3.23
+
+     sdsCppTest program cannot be built for VxWorks, but the
+    object can be compiled as a test of the C++ macros.
+
+Fri Apr 15 11:41:53 2005 <tjf@aaolxa.aao.gov.au>  sds version: 3.22
+
+     Fix a bug in sdsCppTest as picked up by Linux.
+
+Thu Apr 14 11:57:11 2005 <tjf@aaomc6.aao.gov.au>  sds version: 3.21
+
+     Add the AccessArray methods to the SdsId class, and the assoicated
+		SdsArrayAccessHelper class and sub-classes.
+
+     Fix an issue in SdsId.DeepCopy() when source is self.
+
+     Add sdsCppTest.C
+
+     Add running of test programs to dmakefile.
+
+Fri Nov 12 08:36:49 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.20
+
+     makefile.support modified to now not generate sdsparser.c/sdsparser.h
+     for the standard release.  Only for win32 and VMS releases.  Note, I'm
+     not sure if the approach used works - they may been to be run through
+     the appropiate files - see the dmakefile generation of them.
+
+Tue Nov 09 11:55:29 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.19
+
+     Fix arg documentation error found by doxygen.  Use new DCF macro
+	(define by DramaHtml module) to set up doxgen links to
+	C functions correctly.
+
+	Improve testing of 64 bit values in sdstest.c.
+	Improve formating of sdstest.c
+	Fix bug in output of 64 bit values when we dont' have a native 64 bit
+	  integer in SdsList.
+
+Tue Sep 14 10:45:00 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.18
+
+    Add SdsSetWatch() function - to help in debugging.
+
+Thu Jul 29 12:24:48 2004 <tjf@aaomc6.aao.gov.au>  sds version: 3.17
+
+    Fix a bug in SdsList() that would cause a crash if the SDS
+    id was invalid.
+
+Fri Jun 25 08:04:24 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.16
+
+    Support use of "long long" under GCC (>2.95) and when compiled
+	for Solaris with 64 bit support.  For VxWorks, the definition
+
+		#define VxWorksDefinesINT64
+
+	should be put in drama_local.cf if using VxWorks 5.5 or later to
+	allow this to work correctly.  (Otherwise an errir about INT64
+	being already defined will appear)
+
+Fri Apr 16 14:08:21 2004 <tjf@aaomc6.aao.gov.au>  sds version: 3.15
+
+    Fix duplication in sds.c.
+
+Mon Mar 29 12:03:04 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.14
+
+    Fix use_rcsId definitions to work with solaris cc.
+    Fix some other solaris cc warnings - in particular, unsigned/signed int
+		pointer conversions.
+
+    Changes from Nick Rees @JACH
+	1.  arg.c -> Support for NATIVE__64.
+	             Support for WIN32.
+		     Support for SdsIsDefined() in ArgCvt().
+
+	2.  sds.c -> Support for NATIVE__64.
+	             Add SdsIsDefined().
+		     Bug fixes to Sds__cell_ext(), SdsDelete(),
+		        Sds__export(), SdsExtract().
+		     Various minor changes.
+	3.  sds.h -> Add SdsIsDefined() prototype.
+	             Revamp 64 Bit integer support - adding
+		           NATIVE__INT64 support under Windows.
+	4.  sdsc.c -> WIN32 support.
+	5.  sdsparser.y -> Add some empty actions (WIN32 support?).
+	6.  sdstest.c -> Add testing of SdsIsDefined().
+	7.  sdstimes.c -> Some minor formating changes.
+	8.  sdsutil.c -> Support for NATIVE__64 and add SdsFindByName()
+	      (deleted the file I had this in).
+
+    Tidy up warnings from sdslexer.c and sdsparser.c on MacOsX and Linux.
+
+    SdsCompiler now uses the Fixed parser and lexer (uses
+	the macros LexObjectFixed() and YaccObjectFixed() in the
+	dmakefile rather then juse LexObject() and YaccObject().  This
+	required changed to sdsc.c and sdscompiler.c to match these up.
+
+Mon Jan 12 09:27:54 2004 <tjf@aaomc6.aao.gov.au>  sds version: 3.13
+
+     Remove doxygen @mainpage target stuff from sds.h.
+
+Tue Jan 06 14:33:33 2004 <tjf@aaoprog.aao.gov.au>  sds version: 3.12
+
+    Add initial support for use of DOXYGEN to generate C++ documentation.
+	Changes to arg.h and sds.h
+	Add doxygen target to HtmlSupport/Makefile
+	makefile.support now removed cpp_html directory, generated by above.
+
+   fix Tcl 8.4 compilation warnings by adding definintion of USE_NON_CONST
+       to sdstcl.h.
+
+   fix a few compiler warnings in the test programs.
+
+Wed Dec 17 11:03:03 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.11
+
+    Add support for std::string in arg.h, if DRAMA_ALLOW_CPP_STDLIB
+    is defined.
+
+Mon Dec 01 22:58:31 2003 <tjf@aatssz.aao.gov.au>  sds version: 3.10
+
+    Fix big in ArgSdsList which was causing it to return errors when
+     but buffer overflowed, rather then just ignoring the problem
+
+   Ensured that Sds__import and SdsNew catch cases where malloc returned
+    zero and set status bad.
+
+Tue Nov 04 07:41:46 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.9
+
+      Fixed bug in arg.c:ArgToString() which was causing stack overrun
+	when the buffer overflowed.
+
+     SdsList will now list extra data on next line within [].
+
+Mon Aug 11 14:44:06 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.8
+
+      sdsc.c must not include drama.h for getopt to work correctly.
+
+Wed Jun 18 12:00:16 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.7
+
+      Fix specification of getopt prototype in sdsc.c
+
+Mon May 12 11:19:53 2003 <tjf@aaossf.aao.gov.au>  sds version: 3.6
+
+      Incorporate changes which had been put in aaoConfigure's version
+      of the sds files - to support compiling on Mac for example.
+
+Wed Mar 19 08:06:57 2003 <tjf@aaomc6.aao.gov.au>  sds version: 3.5
+
+       Don't try to genreatae sdslexer.c from makefile.support, as we
+	are now keeping it about.
+
+Fri Mar 14 15:42:21 2003 <tjf@aaomc6.aao.gov.au>  sds version: 3.4
+
+        sdslexer.l now supports use with flex by looking for input macro
+        not being defined and then declaring YYINPUT macro and
+	yylineno variable.
+
+        Keep sdslexer.c about as it sometimes hard to generate.
+
+        Include ACMM release in RELEASE spec.
+
+        Tidy up various compilation warnings, but note, does not
+        work for sdstcl.c since the Tcl include files change between
+        versions ensuring that we get warnings on some releases but
+        not on others.
+
+Thu Jan 30 03:15:26 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.3
+
+        Fix some problems caused by the conversion to ACMM in
+        sdsc.c and sdscompiler.c
+
+Wed Jan 29 05:51:05 2003 <tjf@aaoprog.aao.gov.au>  sds version: 3.2
+
+	Set up for release of DRAMA using ACMM.  Mods to makefiles etc.
+
+Fri Jan 17 12:22:11 2003 <tjf@aaossf.aao.gov.au>  sds version: 3.1
+
+   Tidy up after loading into ACMM.
+        Deleted DramaSCCSClasses and DramaSCCSCheckpoints directories.
+
+        Created Testing, Standalone, HtmlDocs and ManSupport subdirectories.
+        Moved standalone build files to Standlone directory.
+
+        Makefile split between makefile.release_files and Makefiles in
+             TexDocs, HtmlSupport and ManSupport directories.
+        Move *html* and *wflman* files to HtmlSupport directory.
+        Add makefile.support which supports DRAMA release.
+
+	A copy of the oringal Makefile is also present in the
+	Standalone directory as Makefile_old. It needs to be used
+	to support standalone released.
+
+Fri Jan 17 12:21:29 2003 <tjf@aaossf.aao.gov.au> sds version: 3.0
+
+	Created from orignal SCCS archive by acmmCreateSubFromSCCS
+
+"@(#) $Id: ACMM:sds/ChangeLog,v 3.94 09-Dec-2020 17:15:24+11 ks $"
+
