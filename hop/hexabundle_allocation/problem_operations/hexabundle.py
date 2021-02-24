@@ -266,7 +266,7 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
 
     return galaxyIDrecord, MagnetDict
 
-def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, clusterNum, tileNum, flagsFile):
+def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, mu_1re_cutoff, clusterNum, tileNum, flagsFile):
 
     hexabundleIndexAAOmega = 0
     hexabundleIndexHector = 0
@@ -465,7 +465,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
 
     print('\nLarger hexabundles more than 61 have been allocated.\n')
 
-    X = 22.5
+    X = mu_1re_cutoff
     print('mu_1re cutoff, X = ' + str(X))
     # Allocating all 61 hexabundles based on mu_1Re < X
     for magnet in Mstar_Sort:  # Spector

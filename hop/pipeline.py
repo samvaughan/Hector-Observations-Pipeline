@@ -373,7 +373,7 @@ class HectorPipe:
         ### FIXME- add documentation here
         
         # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # proxy file to arrange guides in required format to merge with hexa probes
         proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
@@ -382,7 +382,7 @@ class HectorPipe:
         file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
 
         # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
-        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_DC_tile_{tile_number:03d}.txt"
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
@@ -437,12 +437,12 @@ class HectorPipe:
         print(positioning_array)
 
         # insert column heading and print only rectangular magnet rows in the csv file
-        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle']
-        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle']
+        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'probe_orientation', 'Hexabundle']
+        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'probe_orientation', 'Hexabundle']
 
         # final two output files
         outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        robotFile = f"{self.allocation_files_location_tiles}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary)
@@ -456,8 +456,22 @@ class HectorPipe:
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
-        # Comment out all ***** marked plot functions above(lines 81-84,105s)
-        # to run whole batch of tiles fast without plots
+        # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
+        # # fibre input file to be read
+        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
+        #
+        # # fibre output file to be written to
+        # output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
+        # output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
+        #
+        # output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
+        # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        #
+        # # create the fibre spectrograph files for each of AAOmega and Spector
+        # fibre_array = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
+        #
+        # # create the hexabundle fibre coordinate data files
+        # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
 
 
     def allocate_hexabundles_for_all_tiles(self):

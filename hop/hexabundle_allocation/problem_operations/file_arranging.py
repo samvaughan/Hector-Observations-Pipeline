@@ -152,14 +152,14 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
 def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
-def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular):
+def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow, newrow_circular):
 
     # splitting positioning array into circular
     positioning_array_circular = np.vsplit(positioning_array, 2)[0]
 
     # adding the title row and getting rid of some columns not required
     positioning_array_circular = np.insert(positioning_array_circular, 0, np.array(newrow_circular), 0)
-    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10], 1)
+    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10, 11], 1)
 
     # splitting positioning array to keep only rectangular ones
     positioning_array = np.vsplit(positioning_array, 2)[1]
