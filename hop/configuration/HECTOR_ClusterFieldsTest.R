@@ -25,8 +25,8 @@
 #* setwd('~/Science/Hector/Tiling/MAXI/Cluster_tests/HectorC1_tests_01/')
 
 #* Source the Hector Config file
-#source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
-source("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/configuration/HECTOR_Config_v3.2.R")
+source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
+#source("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/configuration/HECTOR_Config_v3.2.R")
 
 library("argparse")
 parser = ArgumentParser(description='Configure a Hector tile such that all targets are observable')
@@ -54,8 +54,8 @@ tmp_args=c('/Users/samvaughan/Science/Hector/HectorObservationPipeline/Outputs/G
              '/Users/samvaughan/Desktop/',
              '--plot', '--run_local')
 
-args <- parser$parse_args(tmp_args)
-#args <- parser$parse_args()
+#args <- parser$parse_args(tmp_args)
+args <- parser$parse_args()
 
 
 #* Get the targets. We'll use Sys.glob in case a wildcard was passed.
@@ -105,6 +105,10 @@ for (f in SAMIFields_Targets){
   #Reading in the field centre (ra, dec) from the fld file header (currently second line, i.e n=2):
   fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
   fcentre=data.frame(ra=fcentre[1],dec=fcentre[2])
+
+  # Add in the fraction of the plate radius for debugging
+  tile_data[, 'fraction_plate_radius_X'] = tile_data['MagnetX']/1000/(fov/2)
+  tile_data[, 'fraction_plate_radius_Y'] = tile_data['MagnetY']/1000/(fov/2)
   
   # Peel off the sky fibres
   row_numbers = as.numeric(rownames(tile_data))
