@@ -407,7 +407,7 @@ class HectorPipe:
             plt.clf()
             plt.close()
             HECTOR_plate().draw_circle('r')
-            plots.draw_magnet_pickup_areas(all_magnets, '--c')
+            # plots.draw_magnet_pickup_areas(all_magnets, '--c')
             #**************
 
 
@@ -425,13 +425,17 @@ class HectorPipe:
 
         conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
         flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
+
+        mu_1re_cutoff = 22.5
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
-        positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, self.galaxyIDrecord, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
+        positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, self.galaxyIDrecord, mu_1re_cutoff, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
 
         if plot:
+            skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
             # draw all the magnets in the plots created earlier
-            figureFile = f"{self.plot_location}/savedPlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], tile_number,figureFile)  #***********
+            robot_figureFile = f"{self.plot_location}/robotPlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+            hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], tile_number, skyfibre_file, robot_figureFile, hexabundle_figureFile)  #***********
 
         # checking positioning_array prints out all desired parameters
         print(positioning_array)
@@ -468,10 +472,14 @@ class HectorPipe:
         # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         #
         # # create the fibre spectrograph files for each of AAOmega and Spector
-        # fibre_array = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
+        # new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
         #
         # # create the hexabundle fibre coordinate data files
         # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
+        #
+        # fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitlet_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # # create figure of slitlets
+        # fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega)
 
 
     def allocate_hexabundles_for_all_tiles(self):
