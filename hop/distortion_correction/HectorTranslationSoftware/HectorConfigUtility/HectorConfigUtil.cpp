@@ -124,6 +124,17 @@
 //                     clearance parameter and the nosky option. Fixed some
 //                     problems with the way the sky fibre positions were being
 //                     written to the output file. KS.
+//     24th Feb 2021.  Corrected the way Sky fibres were identified in the
+//                     output file, using one number from 1 up instead of the
+//                     subplate number and fibre number, eg  Sky-A-8 is now
+//                     called Sky-A2-1 (subplate A2, fibre 1, instead of just
+//                     being the 8th 'A' fibre). KS.
+//     24th Feb 2021.  Also now no longer applies the telecentricity and mech
+//                     offset corrections when calculating the Ra,Dec positions
+//                     for the Sky fibres, as these should not be applied for
+//                     these fibres. Revised the programming notes, which had
+//                     got rather out of date. Removed extraneous spaces in
+//                     column headings for MagnetX,MagnetY,Position. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -1365,6 +1376,15 @@ void ConvertSkyFibreCoordinates (
       ProgDetails->Ok = false;
    } else {
    
+      //  Sky fibres should not have the telecentricity and mech offset
+      //  calculation applied, as any such offset is already incorporated in
+      //  the positions given in the sky fibre definition file. We do the
+      //  right thing and restore the previous settings once we've finished
+      //  with the sky fibres.
+      
+      bool PrevTele = ProgDetails->CoordConverter.DisableTelecentricity(true);
+      bool PrevMech = ProgDetails->CoordConverter.DisableMechOffset(true);
+
       //  Work through all the sky fibres in the list we've been passed, converting
       //  the X,Y positions on the plate to Ra,Dec coordinates, and setting the
       //  Ra,Dec values in the structure describing each sky fibre.
@@ -1389,6 +1409,11 @@ void ConvertSkyFibreCoordinates (
          }
          if (!ProgDetails->Ok) break;
       }
+      
+      //  Restore the offset calculations to their previous state.
+      
+      ProgDetails->CoordConverter.DisableTelecentricity(PrevTele);
+      ProgDetails->CoordConverter.DisableMechOffset(PrevMech);
    }
 }
 
@@ -1505,10 +1530,11 @@ void CheckSkyFibresAreClear (
 //  This routine takes the list of sky fibres and applies the sky shuffling that
 //  is required for the Hector spectrograph. This will probably result in some
 //  previously uncapped fibres being flagged as capped in order to achieve the
-//  spacing required.
+//  spacing required. Actually, what it really does is nothing at all, as this
+//  requirement has been dropped.
 
 void ShuffleSkyFibres (
-   vector<HectorSkyFibre> *SkyFibreList,
+   vector<HectorSkyFibre>* /*SkyFibreList*/,
    HectorUtilProgDetails* ProgDetails)
 {
    if (!ProgDetails->Ok) return;
@@ -1572,10 +1598,11 @@ void WriteOutputFile (
       
       //  Now the target details. The field labels come from the ListOfFields
       //  item, which is the list exactly as read from the galaxy input file,
-      //  plus the two values calculated by the program, MagnetX and MagnetY.
+      //  plus the two values calculated by the program, MagnetX and MagnetY
+      //  and the position used by the sky fibres.
       
       std::string FieldList = ProgDetails->ListOfFields +
-           ",MagnetX,MagnetY,Position\n";
+                                          ",MagnetX,MagnetY,Position\n";
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {
@@ -1640,19 +1667,12 @@ void WriteOutputFile (
       //  the fibre, and <N> is the fibre number, eg Sky-H-23.
       
       int SkyFibreCount = SkyFibreList.size();
-      int HCount = 0;
-      int ACount = 0;
       for (int ISky = 0; ISky < SkyFibreCount; ISky++) {
          string Spect{SkyFibreList[ISky].SubplateType};
-         int FibreNo = 0;
-         if (Spect == "H") {
-            HCount++;
-            FibreNo = HCount;
-         } else {
-            ACount++;
-            FibreNo = ACount;
-         }
-         string Name = "Sky-" + Spect + "-" + TcsUtil::FormatInt(FibreNo);
+         int SubplateNo = SkyFibreList[ISky].SubplateNo;
+         int FibreNo = SkyFibreList[ISky].FibreNumber;
+         string Name = "Sky-" + Spect + TcsUtil::FormatInt(SubplateNo) +
+                                            "-" + TcsUtil::FormatInt(FibreNo);
          
          //  Name is the first field for a sky fibre. Most of the rest are
          //  null, except for the Ra,Dec fields and the final X,Y and
@@ -1825,11 +1845,12 @@ int main (int Argc, char* Argv[]) {
 
 /*                        P r o g r a m m i n g  N o t e s
 
-   o As a convention, where I pass a structure to a subroutine, I pass a reference
-     if the structure isn't changed by the subroutine (and declare it as const), and
-     if the structure is changed by the subroutine I pass a pointer to it. This means
-     that if you see an '&' in a call, this structure is potentially changed by
-     the subroutine being called. Personally, I find this useful.
+   o As a convention, where I pass a structure to a subroutine, I pass a
+     reference if the structure isn't changed by the subroutine (and declare it
+     as const), and if the structure is changed by the subroutine I pass a
+     pointer to it. This means that if you see an '&' in a call, this structure
+     is potentially changed by the subroutine being called. Personally, I find
+     this useful.
 
    o There are three temperatures involved: the atmospheric temperature during
      observation; the plate temperature during observing; the plate temperature
@@ -1839,67 +1860,44 @@ int main (int Argc, char* Argv[]) {
      should there be a better way of supplying the observing conditions (not
      just the temperature) assumed and hard-coded in GetObsDetails()?
  
-   o I'd really like to use a more sophisticated command line parsing that would
-     allow various options to be specified using -option type flags. At the moment
-     the parsing allows the two supported options -notele and -noffset to appear
-     anywhere on the command line, but this was bolted on on top of an original
-     design that simply specified a number of positional parameters. With more
-     and more parameters potentially needed, this could be more straightforward
-     and much neater.
- 
-   o At the moment, the parameters connected with the sky fibre processing are
-     a bit of a lash-up, and aren't documented - even in the header comments
-     for this file, which is pretty bad.
- 
-   o This code originally took a specific set of fields from the Hector software
-     document (ASD143) and always wrote those - and only those - to the output file.
-     This was awkward, since in many cases it had no idea how to get some of these
-     fields from the input files and was just using defaults. Now all the fields
-     in the input galaxy file are written to the output file, without knowing
-     what any of them (except Ra and Dec at the moment) mean, followed bu the
-     values calculated by this program - magnet X and Y, at present. The guide files
-     have fewer fields, but we explicitly assume that the fields it does specify
-     are a subset of those in the galaxy file, and the the code has to work out
-     which guide file field goes where in the output file by comparing the names
-     of the fields from the file header.
- 
-   o I have not checked that the positions calculated by the program are actually
-     correct, and frankly, I'm not sure how to do that!
+   o I have not checked that the positions calculated by the program are
+     actually correct, and frankly, I'm not sure how to do that!
 
+   o ListProgDetails() has been allowed to get a bit out of date, and no longer
+     lists everything there.
+ 
    o The error reporting has evolved from an original set of printf() calls to
      a scheme that sets the Error field in ProgDetails whenever an error occurs
      (whenever the Ok flag gets set false, the Error field should be set and the
-     'inherited status' scheme should make the program speed to an exit). However,
-     moving from using printf() to remembering an error string makes some of the
-     formatting messy, and in places I've fallen back on changing the printf() calls
-     to snprintf() into a char array and copying that into the Error string. It
-     works, but it doesn't look very C++.
+     'inherited status' scheme should make the program speed to an exit).
+     However, moving from using printf() to remembering an error string makes
+     some of the formatting messy, and in places I've fallen back on changing
+     the printf() calls to snprintf() into a char array and copying that into
+     the Error string. It works, but it doesn't look very C++.
  
-   o At the moment, a number of things are still unclear.
-     * I believe I now have the input file format understood, but it's not been
-       tested on many sample files as yet. This applies to the target and
-       sky fibre input files.
-     * The observation data is being taken from command line arguments in the
-       format I suggested in the document I sent to Julia and Sam, but I've not
-       yet had any confirmation that they're happy with this - also, I missed
-       the output file name from what I sent them!
-     * The thermal expansion correction is not implemented. AAO have supplied a
-       single coefficient of expansion, which I guess is easy enough to apply, but
-       how this program knows what temperatures to convert between is completely
-       unclear.
-     * The sky shuffling routine is null, since I don't yet really understand the
-       requirements in enough detail. I believe this is no longer required.
-
-   o The telecentricity correction is now implemented - in HectorRaDecXY.cpp, but
-     I am slightly concerned it depends on the height of the magnets used for the
-     hexabundles and/or guide fibres (ie for the target objects) and so may turn
-     out to depend on choices made by the configuration program, particularly
-     near the boundaries of the various angle bands. If that's the case, this
-     would mean that the assumption made here that all the work done by this
-     program can all be done in a single, simple, preliminary step before the main
-     configuration program runs, would not be true, and this code may need to be
-     split into two programs - or there may need to be two modes of running the
-     one program.
-
+   o The debugging options now supported work quite nicely, but it's not clear
+     how best to document them, as it's very easy to add new options very
+     quickly for short-term needs. It's always possible to just specify
+     debug="*" and see what comes out - that at least shows what options are
+     supported, even if it doesn't explain them very well.
+ 
+   o Now that the new CommandHandler code is being used in earnest, it would be
+     possible to handle the default value for the observing time rather more
+     nicely, calculating the default on the basis of the centre of the field
+     and then providing that default to the DateTimeArg object before calling
+     its GetValue() routine. However, this would need a little restructuring,
+     as the original code got all the command line parameters first and then
+     opened the files etc, and the simple break between SetupProgDetails()
+     and the rest of the code - including the ReadInputFile() calls - would have
+     to be revisited.
+ 
+   o The sky shuffling is no longer going to be needed, at least in this
+     program, and could be removed entirely.
+ 
+   o The telecentricity correction is now implemented - in HectorRaDecXY.cpp,
+     but I am slightly concerned it depends on the height of the magnets used
+     for the hexabundles and/or guide fibres (ie for the target objects) and so
+     may turn out to depend on choices made by the configuration program,
+     particularly near the boundaries of the various angle bands.
 
 */

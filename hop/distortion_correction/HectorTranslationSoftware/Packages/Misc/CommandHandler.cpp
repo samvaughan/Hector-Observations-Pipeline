@@ -16,6 +16,11 @@
 //  History:
 //     18th Dec 2020. First useful version. Handles a simple command line,
 //                    but no support for prompting for missing parameters. KS.
+//     24th Feb 2021. Substantial reworking, to use strings internally
+//                    to hold all values, moving almost all the code in
+//                    the individual inheriting classes into the base CmdArg
+//                    class. KS.
+//
 
 #include "CommandHandler.h"
 
@@ -639,6 +644,8 @@ FileArg::FileArg (CmdHandler& Handler,const string& Name,int Posn,
       const string& Text) :
       StringArg (Handler,Name,Posn,Flags,Reset,Prompt,Text)
 {
+   I_FileFlags = 0;
+   
    //  Check any Flags that the base class did not recognise. Pass back any
    //  that remain unhandled (and the base class will handle the messaging).
    
@@ -1398,6 +1405,7 @@ CmdHandler::CmdHandler(const string& Program)
    I_ResetArg = new BoolArg(*this,
              "Reset",0,"Internal,Hidden",false,
                  "Reset values to default, ignoring previously used values");
+   I_Interactor = new CmdInteractor;
 }
 
 CmdHandler::~CmdHandler()
@@ -1417,6 +1425,7 @@ CmdHandler::~CmdHandler()
       I_ResetArg->CloseHandler(this);
       delete I_ResetArg;
    }
+   if (I_Interactor) delete I_Interactor;
    if (I_ErrorText != "") printf ("%s\n",I_ErrorText.c_str());
 }
 
@@ -1578,12 +1587,12 @@ bool CmdHandler::ReadPrevious (bool MustExist)
 
 bool CmdHandler::IsInteractive (void)
 {
-   return I_Interactor.IsInteractive();
+   return I_Interactor->IsInteractive();
 }
 
 CmdInteractor* CmdHandler::GetInteractor (void)
 {
-   return &I_Interactor;
+   return I_Interactor;
 }
 
 bool CmdHandler::CheckSetup (void)

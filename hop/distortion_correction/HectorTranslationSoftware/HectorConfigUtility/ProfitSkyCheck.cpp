@@ -29,6 +29,12 @@
 //                     instead of int for string positions. KS.
 //     18th Jan 2021.  Added use of a DebugHandler to control debugging. KS.
 //     16th Feb 2021.  Fixed a signed/unsigned warning under Linux. KS.
+//     17th Feb 2021.  Trivial commenting fixes and a minor correction to one
+//                     message. KS.
+//     25th Feb 2021.  When more than one Profit pask covers a position, any
+//                     mask showing clear is now assumed to be enough to declare
+//                     the position clear - this assumes false positives are
+//                     most likely to be due to transient objects. KS.
 
 // ----------------------------------------------------------------------------------
 
@@ -100,7 +106,7 @@ ProfitSkyCheck::ProfitSkyCheck (void) : I_Debug("Profit")
    //  If new calls to I_Debug.Log() or I_Debug.Logf() are added, the levels
    //  they use need to be included in this list.
    
-   I_Debug.LevelsList("Files,SkyCheck");
+   I_Debug.LevelsList("Files,SkyCheck,SkyCheckFiles,SkyCheckCoords");
 
 }
 
@@ -276,7 +282,7 @@ bool ProfitSkyCheck::GetCoordsFromFileName (const string& FileName,
    //  find the start of the extensions, since the file presumably has a .fits
    //  .fts etc extension (possibly followed by a .gz). I'm assuming that this is
    //  a file that's been selected on the basis of having a FITS extension, and
-   //  the all start with ".f".
+   //  they all start with ".f".
    
    string LowerName = FileName;
    std::transform(LowerName.begin(),LowerName.end(),LowerName.begin(),
@@ -291,7 +297,7 @@ bool ProfitSkyCheck::GetCoordsFromFileName (const string& FileName,
       size_t UscorePosn = LowerName.rfind('_');
       if (UscorePosn != string::npos) {
       
-         //  Extract the Dec string, try to decode it, trim if from the name
+         //  Extract the Dec string, try to decode it, trim it from the name
          //  string, and look for the underscore delimiting the RA part of the
          //  name and repeat the performance.
          
@@ -340,7 +346,7 @@ bool ProfitSkyCheck::GetCoordsFromFileName (const string& FileName,
 //  it's always possible this may fail (although in tests it usually only needs
 //  about two iterations). If it fails, it returns false as the function value
 //  and puts an error description in I_ErrorText. Most cases of failure should
-//  be becasue the coordinate is outside the range of the mask. In this case,
+//  be because the coordinate is outside the range of the mask. In this case,
 //  Outside will be set true. If the function returns false with Outside set
 //  false, there has been some internal failure to converge.
 
@@ -454,7 +460,7 @@ bool ProfitSkyCheck::LocatePixFromCoords (ProfitFileDetails& FileDetails,
    //  given a point outside the image would do this, for example.
    
    if (Tries >= MaxTries) {
-      I_ErrorText = "Failed to find pixel for RA: " +
+      I_ErrorText = "Failed to find pixel for coordinates: " +
          FormatRaDecDeg(RaDeg,DecDeg) + " after " +
          TcsUtil::FormatInt(MaxTries) + " iterations";
       ReturnOK = false;
@@ -679,7 +685,7 @@ bool ProfitSkyCheck::ReadAndCheckFile (
       //  (Some of this code was based on that used by AAOGlimpse, which would
       //  fall back on the traditional CRPIX and CRDELT etc keywords if it
       //  couldn't find useful WCS information. We assume we don't need to so
-      //  that here.
+      //  that here.)
       
       int NKeys;
       int Nx = Dims[0];
@@ -979,8 +985,11 @@ bool ProfitSkyCheck::CheckUseForSky (
       if (RaDeg > I_RaDecRange[2]) I_RaDecRange[2] = RaDeg;
       if (DecDeg > I_RaDecRange[3]) I_RaDecRange[3] = DecDeg;
 
-      I_Debug.Log ("SkyCheck",
+      I_Debug.Log ("SkyCheckCoords",
                        "Checking coordinates " + FormatRaDecDeg(RaDeg,DecDeg));
+      
+      int FileCount = 0;
+      int ClearCount = 0;
       
       //  Now, this is what all the hard work has been for. We should have a list
       //  of structures, each of which describes one mask file that overlaps at
@@ -992,9 +1001,9 @@ bool ProfitSkyCheck::CheckUseForSky (
       //  notes.)
       
       ReturnOK = true;
-      bool Contaminated = false;
       for (struct ProfitFileDetails& Details : I_FileDetails) {
-         
+         bool Contaminated = false;
+
          //  This code does rather assume that the first axis (the X-axis) of the
          //  data is Ra and the second (the Y-axis) is Dec. If anyone switches
          //  this around in the Profit files, some recoding will be needed.
@@ -1012,14 +1021,15 @@ bool ProfitSkyCheck::CheckUseForSky (
          bool Outside= false;
          if (!LocatePixFromCoords (Details,RaDeg,DecDeg,&PIx,&PIy,&Outside)) {
             if (Outside) {
-               I_Debug.Log ("SkyCheck","Not covered by " + Details.Path);
+               I_Debug.Log ("SkyCheckFiles","Not covered by " + Details.Path);
                continue;  // Not covered by this mask. Try the next.
             }
-            I_Debug.Log ("SkyCheck","WCS error from " + Details.Path);
+            I_Debug.Log ("SkyCheckFiles","WCS error from " + Details.Path);
             ReturnOK = false;
             break;                  // Error from WCS - treat as a real error.
          }
-         I_Debug.Log ("SkyCheck","Checking against data in file " + Details.Path);
+         I_Debug.Log ("SkyCheckFiles",
+                             "Checking against data in file " + Details.Path);
          
          I_Debug.Logf ("SkyCheck","Start pixel [%d,%d], coords %s",PIx,PIy,
                                         FormatRaDecDeg(RaDeg,DecDeg).c_str());
@@ -1075,6 +1085,7 @@ bool ProfitSkyCheck::CheckUseForSky (
          //  circle (RadiusDeg).
          
          Checked = true;
+         FileCount++;
          for (int Ix = Ixst; Ix <= Ixen; Ix++) {
             for (int Iy = Iyst; Iy <= Iyen; Iy++) {
                
@@ -1103,7 +1114,7 @@ bool ProfitSkyCheck::CheckUseForSky (
                //  https://gamedev.stackexchange.com/questions/44483/how-do-i-
                //  calculate-distance-between-a-point-and-an-axis-aligned-rectangle
                //  from Sam Hocevar and isn't quite the fastest possible, but it's
-               //  neat. (If both of the DistRa or DistDec values are < 0.0, then
+               //  neat. If both of the DistRa or DistDec values are < 0.0, then
                //  the point is within the rectangle.)
                
                double DistSq = 0.0;
@@ -1114,6 +1125,10 @@ bool ProfitSkyCheck::CheckUseForSky (
                }
                if (DistSq <= (RadiusDeg * RadiusDeg)) {
                   if (Details.DataArray[Iy - 1][Ix - 1] > 0.0) {
+                  
+                     //  We've found one contaminated pixel, and that's all
+                     //  we need. We have to break out of both the X & Y loops.
+                     
                      I_Debug.Logf ("SkyCheck",
                          "Test pixel [%d,%d], is non-zero (%d)",
                                   Ix,Iy,Details.DataArray[Iy - 1][Ix - 1]);
@@ -1124,18 +1139,40 @@ bool ProfitSkyCheck::CheckUseForSky (
             }
             if (Contaminated) break;
          }
-         if (Contaminated) break;
-         I_Debug.Log ("SkyCheck","Checked all pixels in range. All clear.");
+         
+         //  At this point, we've gone through the pixels in this Profit
+         //  file. If Contaminated is set, then this file shows contamination
+         //  in at least one pixel within the test radius. However, if
+         //  Contaminated is clear, then at least this one file shows no
+         //  contamination, and we take that as an OK to use this position.
+         
+         if (!Contaminated) {
+            I_Debug.Logf ("SkyCheck","Checked all pixels in range. All clear.");
+            *Clear = true;
+            ClearCount++;
+            
+            //  We don't need to check the rest of the Profit files now, since
+            //  we've found one clear, and it may be a useful disgnostic if
+            //  we actually look at all the rest of the files.
+            
+            if (!I_Debug.Active("SkyCheckFiles")) break;
+         }
       }
       
+      if (I_Debug.Active("SkyCheckFiles")) {
+         I_Debug.Logf ("SkyCheckFiles",
+            "Profit files checked %d, files clear %d",FileCount,ClearCount);
+         if (ClearCount != 0 && ClearCount != FileCount) {
+            I_Debug.Log("SkyCheckFiles","Note: Profit files disagree.");
+         }
+      }
+
       //  We've now gone through all the mask files with any overlap with the
       //  field. At least one of them should have had data for this point. If
-      //  none did, the point is probably outdide the specified field - maybe
+      //  none did, the point is probably outside the specified field - maybe
       //  we should have checked that, but this is a more direct test.
       
-      if (Checked) {
-         *Clear = !Contaminated;
-      } else {
+      if (!Checked) {
          I_ErrorText = "No mask found that covers the coordinates " +
                                  FormatRaDecDeg(RaDeg,DecDeg) + ".";
          ReturnOK = false;
@@ -1288,14 +1325,14 @@ void ProfitSkyCheck::ReportRaDecRange (void)
       opening every file just to check the WCS.
  
    o  If a test coordinate is in the region where two (or more) Profit masks
-      overlap, the code at present says the point is contaminated if any of the
-      masks show something at that position. It isn't clear to me if that's the
-      correct thing to do - looking at the images, some show transients that
+      overlap, the code at present says the point is uncontaminated if any of the
+      masks show clear sky aaround that position. I think this is the correct
+      thing to do - looking at the images, some show transients that
       others don't - possibly satellites, asteroids, who knows? - and in this case
       perhaps you'd want to only consider a point as contaminated if all masks
-      show it as contaminated. On the other hand, in some cases one image simply
+      show it as contaminated. (On the other hand, in some cases one image simply
       shows a genuine object as slightly larger than another does, and in this
-      case you'd probably want to take the worst case. I doubt if this makes a lot
+      case you'd probably want to take the worst case.) I doubt if this makes a lot
       of difference in practice.
  
    o  This assumes the main data array in the ProFit files is integer. It may

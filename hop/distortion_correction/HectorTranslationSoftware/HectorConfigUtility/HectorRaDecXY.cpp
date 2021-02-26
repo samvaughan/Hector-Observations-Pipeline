@@ -37,6 +37,12 @@
 //                     the zone based on the X,Y position is not that based on
 //                     the offset X,Y position. Revised the comments about
 //                     how this works. KS.
+//     24th Feb 2021.  No code changes, but comments modified to explain that
+//                     XY2RaDec() can be used for SkyFibres, but that the
+//                     telecentricity and mech offset calculations do not apply
+//                     to the SkyFibres, so these need to be disabled before
+//                     XY2RaDec() is called to calculate the Ra,Dec position
+//                     for a Sky fibre. KS.
 
 #include "HectorRaDecXY.h"
 
@@ -233,7 +239,12 @@ bool HectorRaDecXY::SetObsWavelength (double ObsWave)
 //  Converts X,Y coordinates on the field plate to an apparent RA,Dec position
 //  on the sky. This is an X,Y position at which a Hector magnet is placed, and
 //  so takes into account not only the standard 2dF coordinate conversion, but
-//  also the offsets due to telecentricity and magnet offset.
+//  also the offsets due to telecentricity and magnet offset, and the thermal
+//  correction required. This routine can also be used to calculate the Ra,Dec
+//  position corresponding to the X,Y position of a Hector sky fibre, but
+//  only of the telecentricity and magnet offsets are disabled before this is
+//  called, as the sky fibre positions used for Hector already allow for
+//  such effects.
 //
 //  X       Field plate X coordinate in microns.
 //  Y       Field plate Y coordinate in microns.
@@ -297,7 +308,8 @@ bool HectorRaDecXY::XY2RaDec (
 //  field plate. This is an X,Y position at which a Hector magnet should be
 //  in order to observe a target at that specified Ra,Dec position, and
 //  so takes into account not only the standard 2dF coordinate conversion, but
-//  also the offsets due to telecentricity and magnet offset.
+//  also the offsets due to telecentricity and magnet offset and the thermal
+//  correction required.
 //
 //  Ra      Apparent RA in radians.
 //  Dec     Apparent Dec in radians.
@@ -748,10 +760,20 @@ const std::string HectorRaDecXY::StatusToText (StatusType Status)
  
    o  I had orginally assumed that XY2RaDec() - which allows for the various
       magnet offsets - was what was needed for the calculation of the Ra,Dec
-      equivalent to a sky fibre position, but I now suspect that isn't the
-      case, and the sky fibres don't need the telecentricity or mechanical
-      offsets applied. Do they need the thermal expansion correction? (I
-      suspect they do.)
+      equivalent to a sky fibre position, but it is now (24/2/21) clear that
+      the sky fibres should not have the telecentricity or mechanical
+      offsets applied. They do need the thermal expansion correction. This
+      means XY2RaDec() can be used for SkyFibres, but only if the offset
+      calculations are disabled beforehand - and conveniently, there are the
+      DisableTelecentricity() and DisableMechOffset() calls now available
+      to allow just that. (This isn't quite the way I'd have structured the
+      code if I'd realised this at first, but it's a pretty simple solution
+      to the problem.)
+ 
+   o  Note that normally, the most important use for XY2RaDec() is for
+      SkyFibres, but it's convenient to have it work for the other, magnet
+      based, fibres as well, as this allows XY2RaDec() to be used to check
+      the RaDec2XY() results by reversing the calculation.
  
    o  I have not checked that the positions calculated by the program are actually
       correct, and frankly, I'm not sure how to do that!

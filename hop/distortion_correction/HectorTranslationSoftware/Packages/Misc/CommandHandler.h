@@ -48,8 +48,12 @@
 //     22nd Jan 2021. Original version. KS.
 //     31st Jan 2021. Revised internal structure to use strings internally
 //                    to hold all values, moving almost all the code in
-//                    the individual inhereting classes into the base CmdArg
+//                    the individual inheriting classes into the base CmdArg
 //                    class. Added filename completion for filenames. KS.
+//     24th Feb 2024. Revised protected and private setting for most instance
+//                    variables, adding accessor routines in a number of
+//                    cases. Substantial reorganisation and much expanded
+//                    comments added. KS.
 
 #ifndef __CmdHandler__
 #define __CmdHandler__
@@ -60,7 +64,88 @@
 
 //  Forward declarations
 
-class CmdHandler;
+class CmdArg;
+class BoolArg;
+class CmdInteractor;
+
+//  ----------------------------------------------------------------------------
+//
+//                           C m d  H a n d l e r
+//
+//  A CmdHandler (Command Handler) manages a set of arguments (instances of
+//  classes like RealArg, StringArg, IntArg, BoolArg, FileArg, etc, all of
+//  which inherit from the base CmdArg class), each of which usually corresponds
+//  to one command line argument for a program. Usually, a program creates
+//  a CmdHandler, then all the command arguments it will use, passing them a
+//  reference to the Command handler in their constructors. Then the program
+//  passes the command line arguments (argc,argv) to the command handler's
+//  ParseArgs() routine, which works with the individual arguments to parse
+//  the command line. Then, the GetValue() routine for each argument can be
+//  called to get the value of that argument, prompting if necessary for any
+//  missing argument value.
+//
+//  In addition, the Command Handler can save the argument values for reuse
+//  the next time the program is run, and can retrieve them at the start of
+//  the program.
+//
+//  The CommandHandler has three built-in boolean arguments, 'list', 'reset'
+//  and 'prompt'. If a program doesn't want the functionality these offer,
+//  or wants to implement its own arguments with those names, it can call
+//  RemoveNamedArg() as required before creating its own arguments.
+
+class CmdHandler {
+public:
+   //  Constructor. The string identifies the program when arguments are saved.
+   CmdHandler (const std::string& Program);
+   //  Destructor.
+   ~CmdHandler();
+   //  Read the previous argument values - call prior to parsing.
+   bool ReadPrevious (bool MustExist = false);
+   //  Parses the command line arguments passed to the program
+   bool ParseArgs (int Argc, char* Argv[]);
+   //  An alternative form of ParseArgs that uses a vector of strings
+   bool ParseArgs (const std::vector<std::string>& Args);
+   //  Save the current values of the arguments - use after calls to GetValue()
+   bool SaveCurrent (void);
+   //  Returns a description of the last error
+   std::string GetError (void);
+   //  Returns true if the program is interactive (ie if it can prompt)
+   bool IsInteractive (void);
+   //  Deletes a named argument from those in use.
+   bool RemoveNamedArg (const std::string& Name);
+protected:
+   //  These routines are used by the individual arguments.
+   friend class CmdArg;
+   //  Delete an argument - called from an argument's destructor.
+   void DelArg (CmdArg* Arg);
+   //  Add an argument - called from an argument's constructor.
+   void AddArg (CmdArg* Arg);
+   //  Get access to the interactor used to communicate with the user.
+   CmdInteractor* GetInteractor (void);
+private:
+   //  Returns the name of the file used to save the argument values
+   std::string GetParameterFile(void);
+   //  Checks the setup for consistency prior to parsing arguments
+   bool CheckSetup (void);
+   //  True if the previous argument values have been read
+   bool I_ReadPrevious;
+   //  True if the comamnd handler has been setup and checked.
+   bool I_Setup;
+   //  The name of the program, as passed in the constructor.
+   std::string I_Program;
+   //  Description of the latest error.
+   std::string I_ErrorText;
+   //  The set of command arguments
+   std::list<CmdArg*> I_CmdArgs;
+   //  The built-in argument that handles 'reset'
+   BoolArg* I_ResetArg;
+   //  The built-in argument that handles 'prompt'
+   BoolArg* I_PromptArg;
+   //  The built-in argument that handles 'list'
+   BoolArg* I_ListArg;
+   //  The interactor used to communicate with the user.
+   CmdInteractor* I_Interactor;
+};
 
 //  ----------------------------------------------------------------------------
 //
@@ -174,7 +259,11 @@ public:
    //  and the derived classes turn that into their native tyep. Similarly,
    //  these routines do not include the SetDefault() call that can provide a
    //  native default value. Nothing does by CmdArg uses native argument types
-   //  like int, bool, real - it works entirely in strings.
+   //  like int, bool, real - it works entirely in strings. Usually, all a using
+   //  program has to do is contruct the arguments it needs, get the command
+   //  handler to parse the command arguments, and then call GetValue() for
+   //  each argument. If it works out a sensible default for the argument, it
+   //  can call SetDefault() before calling GetValue().
    //  -------------------------------------------------------------------------
    //  Constructor.
    //  Name    is name of argument
@@ -201,8 +290,55 @@ public:
    std::string Description (void);
 protected:
    //  -------------------------------------------------------------------------
+   //  These are routines called by the base CmdArg() routines that may need
+   //  to be overriden by the derived argument routines. These cover things
+   //  such as validity checks and checks on ranges and for specific strings
+   //  (eg 'max' and 'min' for numeric arguments). They also cover routines
+   //  that handle cases where - as for a real argument - a conventional
+   //  formatted string may not match the internal representation perfectly.
+   //  For those latter routines, an 'exact' string value is a string that
+   //  can be converted back to the internal binary representation of the number
+   //  precisely at the bit level, which a 'display' string is one that
+   //  makes sense to a user, but may not be precisely interchangeable with
+   //  the internal binary representation. For example, a real argument might
+   //  use a hex string that matches the bytes of its internal binary value
+   //  as its 'exact' value string, and a conventionally formatted string (as
+   //  produced by cout(), or printf() with %f or %g formats) as its 'display'
+   //  value string.
+   //  -------------------------------------------------------------------------
+   //  Given a string value (exact or display) returns a display value.
+   virtual std::string DisplayValue (const std::string& Value);
+   //  Returns the default value for an argument whose value was not specified.
+   //  Only applies to arguments where a value need not be specified, such
+   //  as boolean arguments, where this routine will return "true".
+   virtual std::string UnspecifiedValue(void);
+   //  Passed a value, returns the negated version of it. Only needed for
+   //  arguments (such as bools) that support negation, which would return
+   //  'false' if passed 'true' and vice-versa.
+   virtual std::string NegateValue(const std::string& Value);
+   //  Returns true if the value string passed (exact or display) has a
+   //  valid syntax. This does not check if that value is allowed (ie it
+   //  would return true for a real value of "-1.0" even if the allowed range
+   //  were from 0.0 to 10.0).
+   virtual bool ValidValue (const std::string& Value);
+   //  Returns a string describing the requirements for an acceptable value
+   //  for the argument.
+   virtual std::string Requirement (void);
+   //  Allows an argument to modify a string so that special cases such as
+   //  'max' and 'min' for numeric arguments can be supported. An IntArg
+   //  with a range of 0 to 10 passed 'max' would return '10'. The string
+   //  returned should be an 'exact' value string.
+   virtual void ExpandValue (std::string* Value);
+   //  Returns true if the string passed is an allowed value for the argument,
+   //  being both valid and passing all other requirements (eg, a FileArg
+   //  would test to see if a named file had to exist or not, and if it did.)
+   virtual bool AllowedValue (const std::string& Value);
+   //  -------------------------------------------------------------------------
    //  These are utility routines provided for the use of the Command Handler
-   //  and the derived argument classes.
+   //  and the derived argument classes. These should not need to be overriden
+   //  by derived classes. Note that many of these are essentially accessor
+   //  routines that wrap up access to the various private instance variables.
+   //  There are no protected instance variables - that keeps things tidier.
    //  -------------------------------------------------------------------------
    //  Tells the argument that the command handler is closing down
    void CloseHandler (CmdHandler* Handler);
@@ -218,48 +354,70 @@ protected:
    bool DetermineValue (std::string* CurrentValue);
    //  Returns true if the argument can be specified by its name only.
    bool ValueOptional (void) { return I_Valopt; }
+   //  Returns true if the argument has to be specified explicitly by the user.
    bool Required (void) { return I_Flags & REQUIRED; }
+   //  Returns true if the argument has not been 'deleted' by the CmdHandler.
    bool Active (void) { return I_IsActive; }
+   //  Returns true if the current value (I_Value) has been set.
    bool IsSet (void) { return I_IsSet; }
+   //  True if the argument is 'hidden' - it is not prompted for or listed
    bool Hidden (void) { return I_Flags & HIDDEN; }
+   //  True if this is an internal argument like 'list' used by the CmdHandler.
    bool Internal (void) { return I_Flags & INTERNAL; }
+   //  True if the argument can be specified in a negated form (eg 'nolist')
    bool Negatable (void) { return I_Flags & NEGATABLE; }
+   //  True if the argument is required to have a value specified
    bool ValReq (void) { return I_Flags & VALREQ; }
+   //  True if the value for the argument is optional
    bool ValOpt (void) { return I_Flags & VALOPT; }
+   //  Set the argument as being optional or not.
    void SetValOpt (bool Valopt) { I_Valopt = Valopt; }
+   //  Set the 'reset' vaue for the argument.
    void SetReset (const std::string& Reset) { I_Reset = Reset; }
+   //  Set the argument to list its value for the user when GetValue is called.
    void SetListing (bool Listing = true);
+   //  Returns true if the argument has been set to list its value.
    bool IsListing (void) { return I_Listing; }
+   //  Set the prompting for the argument - 'on', 'off' or 'default'
    void SetPrompting (const std::string& OnOffDefault);
+   //  True if the argument is allowed to prompt (depends on the CmdHandler)
    bool CanPrompt (void);
+   //  True if the argument value is not to be saved.
    bool DontSave (void) { return I_Flags & NOSAVE; }
+   //  True if the argument is a file name (this affects the prompting)
    bool IsFile (void) { return I_Flags & IS_FILE; }
+   //  Sets a specific bit in I_Flags.
    void SetFlag (unsigned long Flag) { I_Flags |= Flag; }
+   //  Set the string describing any error in the constructor.
    void SetConstructError (const std::string& Text) { I_ConstructError = Text;}
+   //  Set the string describing the latest error.
    void SetErrorText (const std::string& Text) { I_ErrorText = Text;}
+   //  Get the list of Flag options not recognised by the base class.
    std::vector<std::string> GetUnknownFlags (void);
+   //  Set the list of Flag options not recognised by the base class.
    void SetUnknownFlags (const std::vector<std::string>& Flags);
-   //  These are routines called by the base CmdArg() routines that may need
-   //  to be overriden by the derived argument routines.
-   virtual bool SetPrevious (const std::string& Value);
-   virtual bool TellUser (const std::string& ReportString);
-   virtual bool ValidValue (const std::string& Value);
-   virtual bool AllowedValue (const std::string& Value);
-   virtual std::string PromptUser (const std::string& Default);
-   virtual std::string DisplayValue (const std::string& Value);
-   virtual std::string FormatForRecord (const std::string& Value);
-   virtual void ExpandValue (std::string* Value);
-   virtual bool MatchName (const std::string& Name);
-   virtual bool SetValue (const std::string& Name, const std::string& Value);
-   virtual bool SetValue (const std::string& Name, bool Equals,
+   //  Set the 'previous' value for the argument.
+   bool SetPrevious (const std::string& Value);
+   //  Output a message to the user.
+   bool TellUser (const std::string& ReportString);
+   //  Prompt the user and return their reply.
+   std::string PromptUser (const std::string& Default);
+   //  Modified a string value so it can be recorded (quotes strings if needed)
+   std::string FormatForRecord (const std::string& Value);
+   //  Returns true if a name matches that used by the argument
+   bool MatchName (const std::string& Name);
+   //  Sets the value where a value and an argument name were both given.
+   bool SetValue (const std::string& Name, const std::string& Value);
+   //  Sets the value in cases where values are optional.
+   bool SetValue (const std::string& Name, bool Equals,
                     const std::string Value, bool GotValue, bool* UsedValue);
-   virtual bool NegName (const std::string& Name);
-   virtual bool PosName (const std::string& Name);
-   virtual std::string UnspecifiedValue(void);
-   virtual std::string NegateValue(const std::string& Value);
-   virtual std::string Requirement (void);
+   //  Returns the negated form of the argument's name.
+   bool NegName (const std::string& Name);
+   //  Returns the non-negated (ie the usual) form of the argument name.
+   bool PosName (const std::string& Name);
    //  The Flag values coresponding to the strings that can be passed
-   //  to the constructor in the Flags argument.
+   //  to the constructor in the Flags argument. These are only used internally
+   //  (and a derived class can use a SetFlag() call to set one of these).
    static const unsigned long REQUIRED = 0x1;    // Must be specified
    static const unsigned long VALOPT = 0x2;      // Does not need a value
    static const unsigned long VALREQ = 0x4;      // Must have a value a value
@@ -268,6 +426,7 @@ protected:
    static const unsigned long NEGATABLE = 0x20;  // Argument name can be negated
    static const unsigned long IS_FILE = 0x40;    // Value is a file name
    static const unsigned long INTERNAL = 0x80;   // Set only by command handler
+   //  The CmdHandler has access to a number of these protected routines.
    friend class CmdHandler;
 private:
    //  Pointer to the CmdHandler this argument is working with.
@@ -316,6 +475,16 @@ private:
    std::vector<std::string> I_UnknownFlags;
 };
 
+//  ----------------------------------------------------------------------------
+//
+//                          S t r i n g  A r g
+//
+//  A StringArg inherits from CmdArg, and implements a straightford argument
+//  whose value is just a string. This means that the basic CmdArg does all
+//  that's required for this, and all a StringArg has to do is provide a
+//  constructor with a string 'reset' value, and GetValue() and SetDefault()
+//  calls that work with strings.
+
 class StringArg : public CmdArg {
 public:
    StringArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
@@ -326,6 +495,37 @@ public:
    virtual void SetDefault (const std::string& Default);
 };
 
+//  ----------------------------------------------------------------------------
+//
+//                          F i l e  A r g
+//
+//  A FileArg inherits from StringArg, and implements an argument whose
+//  value is a string, but a string that will be used as the name of a file.
+//  A FileArg accepts a couple of additional strings in the Flags argument:
+//  'MustExist' indicates that the file in question must already exist, and
+//  'IsNull' indicates that a null value (a string with zero length, ie "")
+//  is acceptable - the program can handle this as it chooses.
+//
+//  A FileArg has a constructor that accepts a 'reset' value that is a
+//  comma- or space-separated set of strings. The constructor uses the first
+//  of these that is an acceptable option. Each can include the name of an
+//  environment variable, preceded by a '$', and if this is the case, the
+//  constructor expands the environment variable. (If the environment variable
+//  is not defined, the this string is not an acceptable option.) If 'MustExist'
+//  was specified in Flags, and the string is not the name of an existing
+//  string, then this string is not an acceptable option. Eventually, either
+//  the constructor will have an acceptable reset value, or it will not, and
+//  usually the argument will end up prompting for the value if it is not
+//  specified in some other way.
+//
+//  When a FileArg prompts the user for a file name, it tells the interactor
+//  used to communicate with the user that this is a file name, and the
+//  interactor can use this to do things like filename completion.
+//
+//  The FileArg uses the GetValue() and SetDefault() routines provided by
+//  StringArg, but provides its own AllowedValue(), ExpandValue() and
+//  Requirement() routines.
+
 class FileArg : public StringArg {
 public:
    FileArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
@@ -333,19 +533,47 @@ public:
       const std::string& Prompt = "",const std::string& Text = "");
    virtual ~FileArg();
 protected:
-   virtual bool FileExists (const std::string& FileName);
    virtual bool AllowedValue (const std::string& Value);
    virtual void ExpandValue (std::string* Value);
    virtual std::string Requirement (void);
 private:
    bool NullOk (void) { return I_FileFlags & NULL_OK; }
    bool MustExist (void) { return I_FileFlags & MUST_EXIST; }
+   bool FileExists (const std::string& FileName);
    static const unsigned long MUST_EXIST = 0x10; // File must exist already
    static const unsigned long NULL_OK = 0x100;   // Filename can be null
    unsigned long I_FileFlags;
    void ExpandTildePath (std::string* Path);
    std::vector<std::string> I_ResetValues;
 };
+
+//  ----------------------------------------------------------------------------
+//
+//                          B o o l  A r g
+//
+//  A BoolArg inherits from CmdArg, and implements an argument whose
+//  value is a boolean value, accepting "true","false","yes" or "no" as
+//  explicit values. A BoolArg does not have to be given an associated value
+//  on the command line, and is normally negatable. That is, a BoolArg such as
+//  the 'prompt' argument built-in to the command handler can be specified on
+//  the command line in any of the following ways:
+//
+//  prompt
+//  noprompt
+//  prompt = yes
+//  prompt = no
+//  prompt true
+//  prompt false
+//
+//  If you really want, you can even have:
+//
+//  noprompt = false
+//
+//  which is the same as just 'prompt'.
+//
+//  A BoolArg provides its own GetValue() and SetDefault() and overrides the
+//  ValidValue(), AllowedValue(), NegateValue(), UnspecifiedValue() and
+//  Requirement() calls provided byCmdArg.
 
 class BoolArg : public CmdArg {
 public:
@@ -364,6 +592,23 @@ protected:
 private:
    bool CheckValidValue (const std::string& Value, bool* BoolValue);
 };
+
+//  ----------------------------------------------------------------------------
+//
+//                          I n t  A r g
+//
+//  An IntArg inherits from CmdArg, and implements an argument whose value is
+//  an integer. An IntArg has a constructor that includes three integer values:
+//  a 'reset' value, and a maximum and minimum value for the argument. It
+//  provides its own GetValue() and SetDefault() routines, which work with
+//  integers, and adds a SetRange() routine that can be used to override the
+//  range values set in the constructor. If the Max and Min values are the
+//  same, no range checking is performed. It overrides the ValidValue(),
+//  AllowedValue(), ExpandValue() and Requirement() routines from CmdArg to
+//  provide routines that understand that the strings used for the values
+//  need to represent formatted integers. An integer can be formatted with
+//  full precision, so the 'exact' and 'display' values are just conventionally
+//  formatted strings.
 
 class IntArg : public CmdArg {
 public:
@@ -385,6 +630,26 @@ private:
    long I_Min;
    long I_Max;
 };
+
+//  ----------------------------------------------------------------------------
+//
+//                          R e a l  A r g
+//
+//  An IntArg inherits from CmdArg, and implements an argument whose value is
+//  a floating point number, represented internally as a double. A RealArg has
+//  a constructor that includes three double values: a 'reset' value, and a
+//  maximum and minimum value for the argument. It provides its own GetValue()
+//  and SetDefault() routines, which work with doubles, and adds a SetRange()
+//  routine that can be used to override the range values set in the
+//  constructor. If the Max and Min values are the same, no range checking is
+//  performed. It overrides the ValidValue(), AllowedValue(), ExpandValue(),
+//  Requirement() and DisplayValue() routines from CmdArg to provide routines
+//  that understand that the strings used for the values need to represent
+//  formatted floating point numbers. A floating point number cannot in general
+//  be formatted without loss of precision, so while the 'display' values
+//  are just conventionally formatted strings, the 'exact' values have to be
+//  strings that represent the internal binary double value as a set of hex
+//  digits.
 
 class RealArg : public CmdArg {
 public:
@@ -415,7 +680,7 @@ private:
 class CmdInteractor {
 public:
    CmdInteractor (void);
-   ~CmdInteractor();
+   virtual ~CmdInteractor();
    void SetInteractive (bool CanInteract = true);
    bool IsInteractive (void);
    virtual bool Write (const std::string& Text);
@@ -428,34 +693,5 @@ private:
    std::string I_ErrorText;
 };
 
-class CmdHandler {
-public:
-   CmdHandler (const std::string& Program);
-   ~CmdHandler();
-   bool IsInteractive (void);
-   bool ParseArgs (int Argc, char* Argv[]);
-   bool ParseArgs (const std::vector<std::string>& Args);
-   bool RemoveNamedArg (const std::string& Name);
-   bool ReadPrevious (bool MustExist = false);
-   bool SaveCurrent (void);
-   std::string GetError (void);
-protected:
-   void DelArg (CmdArg* Arg);
-   void AddArg (CmdArg* Arg);
-   CmdInteractor* GetInteractor (void);
-   friend class CmdArg;
-private:
-   std::string GetParameterFile(void);
-   bool CheckSetup (void);
-   bool I_ReadPrevious;
-   bool I_Setup;
-   std::string I_Program;
-   std::string I_ErrorText;
-   std::list<CmdArg*> I_CmdArgs;
-   BoolArg* I_ResetArg;
-   BoolArg* I_PromptArg;
-   BoolArg* I_ListArg;
-   CmdInteractor I_Interactor;
-};
 
 #endif

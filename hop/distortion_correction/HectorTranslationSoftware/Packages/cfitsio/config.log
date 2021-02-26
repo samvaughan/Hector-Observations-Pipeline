@@ -30,14 +30,14 @@ Kernel configured for up to 8 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3 4 5 6 7
 Primary memory available: 8.00 gigabytes
-Default processor set: 390 tasks, 1888 threads, 8 processors
-Load average: 3.14, Mach factor: 4.86
+Default processor set: 383 tasks, 2006 threads, 8 processors
+Load average: 3.87, Mach factor: 4.13
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
 PATH: /Users/samvaughan/.cargo/bin
-PATH: /opt/anaconda3/envs/Hector/bin
+PATH: /opt/anaconda3/bin
 PATH: /opt/anaconda3/condabin
 PATH: /Users/samvaughan/anaconda3/bin
 PATH: /usr/local/bin
@@ -276,7 +276,7 @@ ld: warning: The i386 architecture is deprecated for macOS (remove from the Xcod
 ld: warning: ignoring file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd, missing required architecture i386 in file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd
 Undefined symbols for architecture i386:
   "_ftruncate", referenced from:
-      _main in conftest-35aa1b.o
+      _main in conftest-27b1a2.o
 ld: symbol(s) not found for architecture i386
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:4769: $? = 1
@@ -327,13 +327,13 @@ ld: warning: The i386 architecture is deprecated for macOS (remove from the Xcod
 ld: warning: ignoring file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd, missing required architecture i386 in file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd
 Undefined symbols for architecture i386:
   "_semget", referenced from:
-      _main in conftest-f33e13.o
+      _main in conftest-ceb0fa.o
   "_shmat", referenced from:
-      _main in conftest-f33e13.o
+      _main in conftest-ceb0fa.o
   "_shmdt", referenced from:
-      _main in conftest-f33e13.o
+      _main in conftest-ceb0fa.o
   "_shmget", referenced from:
-      _main in conftest-f33e13.o
+      _main in conftest-ceb0fa.o
 ld: symbol(s) not found for architecture i386
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:4849: $? = 1
@@ -491,7 +491,7 @@ ld: warning: The i386 architecture is deprecated for macOS (remove from the Xcod
 ld: warning: ignoring file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd, missing required architecture i386 in file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd
 Undefined symbols for architecture i386:
   "_gethostbyname", referenced from:
-      _main in conftest-9bb178.o
+      _main in conftest-100239.o
 ld: symbol(s) not found for architecture i386
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5000: $? = 1
@@ -590,7 +590,7 @@ ld: warning: The i386 architecture is deprecated for macOS (remove from the Xcod
 ld: warning: ignoring file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd, missing required architecture i386 in file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd
 Undefined symbols for architecture i386:
   "_connect", referenced from:
-      _main in conftest-c01bdb.o
+      _main in conftest-596fed.o
 ld: symbol(s) not found for architecture i386
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5058: $? = 1
