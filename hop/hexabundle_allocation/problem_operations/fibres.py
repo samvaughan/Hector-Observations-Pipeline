@@ -251,9 +251,6 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
 
     # Adjust the fontsizes on tick labels for this plot
     fs = 9.0
-    # [t.set_fontsize(fs) for t in plt.xaxis.get_majorticklabels()]
-    # [t.set_fontsize(fs) for t in plt.yaxis.get_majorticklabels()]
-    # plt.yaxis.get_offset_text().set_fontsize(fs)
 
     # Here is the label and arrow code of interest
     plt.gcf().gca().add_artist(plt.annotate('A', xy=(19, 763), xytext=(16, 763), xycoords='data',\
@@ -399,6 +396,173 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
             plt.annotate(str(slitlet_count + 1), xy=(30, y + 22), xytext=(30, y + 22), xycoords='data', \
                          fontsize=10, ha='right', va='center', rotation=0, color='white'))
 
+    # Adjust the fontsizes on tick labels for this plot
+    fs = 9.0
+
+    # Here is the label and arrow code of interest
+    plt.gcf().gca().add_artist(plt.annotate('I', xy=(19, 859.5), xytext=(16, 859.5), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='navy', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=2.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=8', xy=(20, 808), xytext=(16, 808), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('J', xy=(41, 774), xytext=(44, 774), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='brown', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=9', xy=(40, 807), xytext=(44, 807), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='brown', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=27', xy=(40, 741), xytext=(44, 741), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='brown', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('K', xy=(19, 704), xytext=(16, 704), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='peru', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=28', xy=(20, 740), xytext=(16, 740), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='peru', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=4', xy=(20, 668), xytext=(16, 668), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='peru', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('L', xy=(41, 634), xytext=(44, 634), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='green', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=5', xy=(40, 667), xytext=(44, 667), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=23', xy=(40, 601), xytext=(44, 601), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('M', xy=(19, 567), xytext=(16, 567), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='crimson', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=24', xy=(20, 600), xytext=(16, 600), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=42', xy=(20,534), xytext=(16,534), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('N', xy=(41, 497), xytext=(44, 497), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='purple', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=43', xy=(40, 533), xytext=(44, 533), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='purple', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=19', xy=(40, 461), xytext=(44, 461), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='purple', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('O', xy=(19, 427), xytext=(16, 427), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=20', xy=(20, 460), xytext=(16, 460), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=38', xy=(20,394), xytext=(16,394), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('P', xy=(41, 357), xytext=(44, 357), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='navy', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=39', xy=(40, 393), xytext=(44, 393), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=15', xy=(40, 321), xytext=(44, 321), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('Q', xy=(19, 287), xytext=(16, 287), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=16', xy=(20, 320), xytext=(16, 320), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=34', xy=(20,254), xytext=(16,254), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('R', xy=(41, 249), xytext=(44, 249), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=0.3, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=35', xy=(40, 254), xytext=(44, 284), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('R', xy=(41, 170), xytext=(44, 170), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=39', xy=(40, 201), xytext=(44, 210), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=6', xy=(40, 138), xytext=(44, 130), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('Q', xy=(19, 287), xytext=(16, 287), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=16', xy=(20, 320), xytext=(16, 320), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=34', xy=(20, 254), xytext=(16, 254), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('S', xy=(19, 104), xytext=(16, 104), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='green', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=7', xy=(20, 137), xytext=(16, 137), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=25', xy=(20, 71), xytext=(16, 71), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('T', xy=(41, 37), xytext=(44, 37), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='crimson', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=26', xy=(40, 70), xytext=(44, 70), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=2\n ★ U ★\n fibre_num=38', xy=(19, 220), xytext=(16, 210), \
+                                            xycoords='data', fontsize=fs * 0.6, ha='right', va='center', rotation=0, \
+                                            color='black', bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=0.7, lengthB=0.5', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, 867), xytext=(44, 867), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='red', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-', color='red', lw=0.7)))
+
+
+    # for i in [793, 727, 661, 595, 199, 133, 67, 1]:
+    #     plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, i), xytext=(45, 400), xycoords='data', \
+    #                                             fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='red', \
+    #                                             arrowprops=dict(arrowstyle='-', color='red', lw=0.7)))
+
+
     plt.xlim(-10, 70)
     plt.ylim(-10, 930)
+    plt.gcf().set_size_inches(4, 6)
     plt.show()
+
