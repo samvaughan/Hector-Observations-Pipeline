@@ -12,7 +12,7 @@ from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
 from hop.misc import plotting_tools as plotting_tools
 from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
+from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
 from hop.target_selection import HectorSim
 
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
