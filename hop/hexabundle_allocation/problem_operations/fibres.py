@@ -339,7 +339,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     # plt.show()
     figure = plt.gcf()
 
-    figure.set_size_inches(5,8)
+    figure.set_size_inches(6,8)
     plt.savefig(fibreFigure_AAOmega, dpi=500)
 
     ## Spector slitelets figure
@@ -562,7 +562,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
 
     plt.xlim(-10, 70)
     plt.ylim(-10, 930)
-    plt.gcf().set_size_inches(5, 8)
+    plt.gcf().set_size_inches(6, 8)
     plt.axis('off')
     # plt.show()
 
@@ -781,21 +781,21 @@ def create_skyFibreSlitlet_figure(skyFibre_AAOmegaFigure, skyFibre_SpectorFigure
 
     for slitlet_count in range(19):
 
-        if (slitlet_count+1) >= 16:
-            x_start = 95
-            j = slitlet_count - 15
-        elif (slitlet_count+1) >= 11:
-            x_start = 70
-            j = slitlet_count - 10
-        elif (slitlet_count+1) >= 6:
-            x_start = 45
-            j = slitlet_count - 5
-        else :
-            x_start = 20
-            j = slitlet_count
+        # if (slitlet_count+1) >= 16:
+        #     x_start = 95
+        #     j = slitlet_count - 15
+        # elif (slitlet_count+1) >= 11:
+        #     x_start = 70
+        #     j = slitlet_count - 10
+        # elif (slitlet_count+1) >= 6:
+        #     x_start = 45
+        #     j = slitlet_count - 5
+        # else :
+        #     x_start = 20
+        #     j = slitlet_count
 
-
-        y_start = 858 - (80 * (j + 1))
+        x_start = 20
+        y_start = 858 - (80 * (slitlet_count + 1))
         plt.gcf().gca().add_patch(
             patches.Rectangle((x_start, y_start), 15, 63, facecolor='grey', lw=2, zorder=2))
 
@@ -808,47 +808,56 @@ def create_skyFibreSlitlet_figure(skyFibre_AAOmegaFigure, skyFibre_SpectorFigure
 
         if (slitlet_count+1) == 1:
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
                                                     ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
                                                     ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='red',facecolor='black', lw=1, zorder=3))
 
         elif (slitlet_count+1) in range(2,19):
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
                                                     ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
                                                     ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='blue', facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 5), xytext=(x_start - 5, y_start + 5),
                              xycoords='data', fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
 
         elif (slitlet_count+1) == 19:
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+48), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
             plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 5), xytext=(x_start - 5, y_start + 5),
+            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='blue', facecolor='black', lw=1, zorder=3))
+            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 7.5), xytext=(x_start - 5, y_start + 5),
                              xycoords='data', fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
             index += 1
 
-    plt.xlim(10, 115)
-    plt.ylim(420, 870)
+    plt.xlim(0, 50)
+    # plt.ylim(420, 870)
+    plt.ylim(-680, 930)
     plt.axis('off')
     # plt.show()
+    plt.gcf().set_size_inches(6, 8)
     plt.savefig(skyFibre_SpectorFigure)
+
+    def createHexabundleFigure_withChangeShown(tile_1,tile_2):
+
+
+        return
+
+
