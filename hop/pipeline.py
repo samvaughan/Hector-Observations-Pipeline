@@ -482,19 +482,19 @@ class HectorPipe:
         fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         fibreFigure_Spector = f"{self.plot_location}/fibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # create figure of slitlets
-        fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
+        # fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
 
         skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # create figure of magnified sky fibre positioning in slitlets
-        fibres.create_skyFibreSlitlet_figure(skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
+        fibres.create_skyFibreSlitlet_figure(new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
 
-        # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
-        # tile_1 = tile_number
-        # tile_2 =tile_number+1
-        # fibres.createHexabundleFigure_withChangeShown(tile_1,tile_2)
-        # subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_1:03d}.pdf"
-        # subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_2:03d}.pdf"
+        ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+        tile_1 = skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
+        tile_2 = skyfibre_file_2 = f"{self.configuration_location}\example_output_file_with_sky_fibres_2.csv"
+        subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_previous.pdf"
+        subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_current.pdf"
+        fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
 
 
