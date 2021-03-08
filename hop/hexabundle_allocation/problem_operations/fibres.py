@@ -569,287 +569,370 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     plt.savefig(fibreFigure_Spector, dpi=500)
 
 
-def create_skyFibreSlitlet_figure(skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
+def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
 
     plt.figure(5)
-    fs = 7
+    fs = 5
 
-    j = 1
+    skyFibresArray_AAOmega = {}
+    for i in new_arrayAAOmega[1:]:
+        if str(i[1]) != 'P':
+            key = i[6]
+            value = str(i[5])
+            value_2 = i[9]
+            skyFibresArray_AAOmega.setdefault(key, []).append({value: value_2})
+
+    print(skyFibresArray_AAOmega)
 
     for slitlet_count in range(13):
-
-        if (slitlet_count+1) >= 11:
-            x_start = 70
-            j = slitlet_count - 10
-        elif (slitlet_count+1) >= 6:
-            x_start = 45
-            j = slitlet_count - 5
-        else :
-            x_start = 20
-            j = slitlet_count
-
-
-        y_start = 858 - (80 * (j + 1))
-        plt.gcf().gca().add_patch(
-            patches.Rectangle((x_start, y_start), 15, 63, facecolor='grey', lw=2, zorder=2))
-
-        y = y_start + 62
-
-        plt.gcf().gca().add_artist(plt.annotate(str(slitlet_count + 1), xy=(x_start + 8, y - 30), xytext=(x_start + 8, y - 30), \
-                         xycoords='data', fontsize=14, ha='right', va='center', rotation=0, color='white'))
-        j =+ 1
-
-
-        if (slitlet_count+1) == 1:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 2:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 3:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 4:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 5:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 43), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 48), xytext=(x_start - 5, y_start + 48), xycoords='data',
-                             fontsize=8, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start ), xytext=(x_start-5, y_start), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-        elif (slitlet_count+1) == 6:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-        elif (slitlet_count+1) == 7:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-        elif (slitlet_count+1) == 8:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-        elif (slitlet_count+1) == 9:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
-                             ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-        elif (slitlet_count+1) == 10:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
-                             fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
-                             fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 11:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
-                             fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
-                             fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 12:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
-                             fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
-                             fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
-
-        elif (slitlet_count+1) == 13:
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 43), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 48), xytext=(x_start - 5, y_start + 48), xycoords='data',
-                             fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
-            plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
-                             fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
-
-    plt.xlim(10, 90)
-    plt.ylim(420, 870)
-    plt.axis('off')
-    # plt.show()
-    plt.savefig(skyFibre_AAOmegaFigure)
-
-
-    plt.figure(6)
-    j = 1
-    index = 0
-    skyfibres_Spector = ['H7','H3','H5','H2','H4','H1','H6','H7','H3','H5','H2','H4','H1','H6','H7','H3','H5','H2','H4','H1',\
-                         'H6','H7','H3','H5','H2','H4','H1','H6','H7','H3','H5','H2','H4','H1','H6','H7','H3','H5','H2','H4',\
-                         'H1','H6','H7','H3','H5','H2','H4','H1','H6','H7','H3','H5','H2','H4','H1']
-
-    for slitlet_count in range(19):
-
-        # if (slitlet_count+1) >= 16:
-        #     x_start = 95
-        #     j = slitlet_count - 15
-        # elif (slitlet_count+1) >= 11:
-        #     x_start = 70
-        #     j = slitlet_count - 10
-        # elif (slitlet_count+1) >= 6:
-        #     x_start = 45
-        #     j = slitlet_count - 5
-        # else :
-        #     x_start = 20
-        #     j = slitlet_count
 
         x_start = 20
         y_start = 858 - (80 * (slitlet_count + 1))
         plt.gcf().gca().add_patch(
-            patches.Rectangle((x_start, y_start), 15, 63, facecolor='grey', lw=2, zorder=2))
+            patches.Rectangle((x_start, y_start), 10, 63, facecolor='grey', lw=2, zorder=2))
 
         y = y_start + 62
-
-        plt.gcf().gca().add_artist(plt.annotate(str(slitlet_count + 1), xy=(x_start + 8, y - 30), xytext=(x_start + 8, y - 30), \
-                         xycoords='data', fontsize=14, ha='right', va='center', rotation=0, color='white'))
-        j =+ 1
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start - 10, y - 70), 10, 2, facecolor='black', lw=2, zorder=2))
 
 
-        if (slitlet_count+1) == 1:
+        plt.gcf().gca().add_artist(
+            plt.annotate(str(slitlet_count + 1), xy=(x_start - 6, y - 30), xytext=(x_start - 8, y - 30), \
+                         xycoords='data', fontsize=10, ha='right', va='center', rotation=0, color='black'))
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
+        direction = 'left'
+        x_text = x_start - 5
+        for i in skyFibresArray_AAOmega:
+            if (slitlet_count + 1) == i:
+                k = 0
+                for j in skyFibresArray_AAOmega[i]:
+                    print(skyFibresArray_AAOmega[i][k])
+                    for l in j:
+                        print(l)
+                        if l == 'nan':
+                            color = 'red'
+                            text = '▮'
+                        else:
+                            color = 'blue'
+                            text = l
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='red',facecolor='black', lw=1, zorder=3))
+                        if skyFibresArray_AAOmega[i][k][l] == 1:
+                            Y_adjustment = 53
+                        elif skyFibresArray_AAOmega[i][k][l] == 2:
+                            Y_adjustment = 43
+                        elif skyFibresArray_AAOmega[i][k][l] == 3:
+                            Y_adjustment = 33
+                        elif skyFibresArray_AAOmega[i][k][l] == 61:
+                            Y_adjustment = 20
+                        elif skyFibresArray_AAOmega[i][k][l] == 62:
+                            Y_adjustment = 10
+                        elif skyFibresArray_AAOmega[i][k][l] == 63:
+                            Y_adjustment = 0
+                        plt.gcf().gca().add_patch(
+                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color,
+                                              facecolor='black',
+                                              lw=1, zorder=3))
 
-        elif (slitlet_count+1) in range(2,19):
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(text, xy=(x_start, y_start + Y_adjustment + 5),
+                                         xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha=direction, va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+                        # if direction == 'left':
+                        #     direction = 'right'
+                        # elif direction == 'right':
+                        #     direction = 'left'
+                        if x_text == x_start - 5:
+                            x_text = x_start - 4
+                        elif x_text == x_start - 4:
+                            x_text = x_start - 5
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
+                        print(skyFibresArray_AAOmega[i][k][l])
+                    k += 1
+    #
+    # j = 1
+    #
+    # for slitlet_count in range(13):
+    #
+    #     if (slitlet_count+1) >= 11:
+    #         x_start = 70
+    #         j = slitlet_count - 10
+    #     elif (slitlet_count+1) >= 6:
+    #         x_start = 45
+    #         j = slitlet_count - 5
+    #     else :
+    #         x_start = 20
+    #         j = slitlet_count
+    #
+    #
+    #     y_start = 858 - (80 * (j + 1))
+    #     plt.gcf().gca().add_patch(
+    #         patches.Rectangle((x_start, y_start), 15, 63, facecolor='grey', lw=2, zorder=2))
+    #
+    #     y = y_start + 62
+    #
+    #     plt.gcf().gca().add_artist(plt.annotate(str(slitlet_count + 1), xy=(x_start + 8, y - 30), xytext=(x_start + 8, y - 30), \
+    #                      xycoords='data', fontsize=14, ha='right', va='center', rotation=0, color='white'))
+    #     j =+ 1
+    #
+    #
+    #     if (slitlet_count+1) == 1:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0,color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 2:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 3:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 4:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 20), xytext=(x_start-5, y_start + 20), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 5:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 43), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 48), xytext=(x_start - 5, y_start + 48), xycoords='data',
+    #                          fontsize=8, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 10), xytext=(x_start-5, y_start + 10), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start ), xytext=(x_start-5, y_start), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #     elif (slitlet_count+1) == 6:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #     elif (slitlet_count+1) == 7:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #     elif (slitlet_count+1) == 8:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #     elif (slitlet_count+1) == 9:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start+5), xytext=(x_start-5, y_start+5), xycoords='data', fontsize=fs, \
+    #                          ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #     elif (slitlet_count+1) == 10:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
+    #                          fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
+    #                          fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 11:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
+    #                          fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
+    #                          fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 12:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 20), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A3', xy=(x_start, y_start + 25), xytext=(x_start - 5, y_start + 25), xycoords='data',
+    #                          fontsize=fs, ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A5', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
+    #                          fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
+    #
+    #     elif (slitlet_count+1) == 13:
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+53), 15, 10, edgecolor='black',facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A1', xy=(x_start, y_start + 58), xytext=(x_start-5, y_start + 58), xycoords='data', fontsize=fs, \
+    #                                                 ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 43), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A4', xy=(x_start, y_start + 48), xytext=(x_start - 5, y_start + 48), xycoords='data',
+    #                          fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start + 10), 15, 10, edgecolor='black', facecolor='blue', lw=1, zorder=3,hatch='/'))
+    #         plt.gcf().gca().add_artist(plt.annotate('A2', xy=(x_start, y_start + 15), xytext=(x_start - 5, y_start + 15), xycoords='data',
+    #                          fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
+    #         plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='black', facecolor='red', lw=1, zorder=3,hatch='+'))
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+10), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 15), xytext=(x_start-5, y_start + 15), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='blue', facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 5), xytext=(x_start - 5, y_start + 5),
-                             xycoords='data', fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
+    plt.xlim(0, 40)
+    plt.ylim(-200, 900)
+    plt.axis('off')
+    # plt.show()
+    plt.gcf().set_size_inches(6, 8)
+    plt.savefig(skyFibre_AAOmegaFigure)
 
-        elif (slitlet_count+1) == 19:
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start+48), 15, 10, edgecolor='blue',facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start+58), xytext=(x_start-5, y_start+58), xycoords='data', fontsize=fs, \
-                                                    ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
+    plt.figure(6)
+    fs = 5
 
-            plt.gcf().gca().add_patch(patches.Rectangle((x_start, y_start), 15, 10, edgecolor='blue', facecolor='black', lw=1, zorder=3))
-            plt.gcf().gca().add_artist(plt.annotate(skyfibres_Spector[index], xy=(x_start, y_start + 7.5), xytext=(x_start - 5, y_start + 5),
-                             xycoords='data', fontsize=fs,ha='left', va='center', rotation=0, color='navy', arrowprops=dict(arrowstyle='-', lw=1.0)))
-            index += 1
+    skyFibresArray_Spector = {}
+    for i in new_arraySpector[1:]:
+        if str(i[1]) != 'P':
+            key = i[6]
+            value = str(i[5])
+            value_2 = i[9]
+            skyFibresArray_Spector.setdefault(key,[]).append({value:value_2})
 
-    plt.xlim(0, 50)
+
+    print(skyFibresArray_Spector)
+
+    for slitlet_count in range(19):
+
+        x_start = 20
+        y_start = 858 - (80 * (slitlet_count +1))
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start, y_start), 10, 63, facecolor='grey', lw=2, zorder=2))
+
+        y = y_start + 62
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start - 10, y - 70), 10, 2, facecolor='black', lw=2, zorder=2))
+
+
+
+        plt.gcf().gca().add_artist(
+            plt.annotate(str(slitlet_count + 1), xy=(x_start - 6, y - 30), xytext=(x_start - 8, y - 30), \
+                         xycoords='data', fontsize=10, ha='right', va='center', rotation=0, color='black'))
+
+        direction = 'left'
+        x_text = x_start - 5
+        for i in skyFibresArray_Spector:
+            if (slitlet_count+1) == i:
+                k = 0
+                for j in skyFibresArray_Spector[i]:
+                    print(skyFibresArray_Spector[i][k])
+                    for l in j:
+                        print(l)
+                        if l == 'nan':
+                            color = 'red'
+                            text = '▮'
+                        else:
+                            color = 'blue'
+                            text = l
+
+                        if skyFibresArray_Spector[i][k][l] == 1:
+                            Y_adjustment = 53
+                        elif skyFibresArray_Spector[i][k][l] == 2:
+                            Y_adjustment = 43
+                        elif skyFibresArray_Spector[i][k][l] == 3:
+                            Y_adjustment = 33
+                        elif skyFibresArray_Spector[i][k][l] == 43:
+                            Y_adjustment = 20
+                        elif skyFibresArray_Spector[i][k][l] == 44:
+                            Y_adjustment = 10
+                        elif skyFibresArray_Spector[i][k][l] == 45:
+                            Y_adjustment = 0
+                        plt.gcf().gca().add_patch(
+                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color, facecolor='black',
+                                              lw=1, zorder=3))
+
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(text, xy=(x_start, y_start + Y_adjustment + 5),
+                                         xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha=direction, va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+                        # if direction == 'left':
+                        #     direction = 'right'
+                        # elif direction == 'right':
+                        #     direction = 'left'
+                        if x_text == x_start - 5:
+                            x_text = x_start - 4
+                        elif x_text == x_start - 4:
+                            x_text = x_start - 5
+
+                        print(skyFibresArray_Spector[i][k][l])
+                    k += 1
+
+
+    plt.xlim(0, 40)
     # plt.ylim(420, 870)
-    plt.ylim(-680, 930)
+    plt.ylim(-680, 900)
     plt.axis('off')
     # plt.show()
     plt.gcf().set_size_inches(6, 8)
