@@ -2,6 +2,7 @@ import numpy as np
 import scipy.spatial.distance as dist
 import itertools
 import matplotlib.pyplot as plt
+import pandas as pd
 import os
 from operator import itemgetter
 import warnings
@@ -11,12 +12,13 @@ from ..hexabundle_allocation.hector import constants as hector_constants
 import logging
 logger = logging.getLogger(__name__)
 
-def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, n_xx_yy=100):
+def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, priorities, n_xx_yy=100):
     """
     Given a set of x, y coordinates, find the position which would cover the most targets if we placed a field of view there.
     Inputs:
         targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns 'RA' and 'DEC'
         n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don't make this too large...
+        Priorities: A priority value for each galaxy. If none is given, assume equal priorties for all targets
     """
 
     RA = targets_df.loc[:, 'RA']
@@ -29,7 +31,7 @@ def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, 
     galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
     galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
 
-    n_targets_in_FOV = galaxies_in_outer_FoV.sum(axis=1) - galaxies_in_inner_FoV.sum(axis=1)
+    n_targets_in_FOV = (galaxies_in_outer_FoV * np.array(priorities)[None, :]).sum(axis=1) - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)
 
     # Find the positions where the number of targets in the FoV is at its max
     possible_tile_centres = np.where(n_targets_in_FOV == np.max(n_targets_in_FOV))[0]
@@ -237,22 +239,19 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
     return non_clashing_stars.iloc[:Nsel]
 
 
-def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashing', fill_spares_with_repeats=False):
+def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Given a dataframe of targets, select Nsel galaxies to observe. These can't be nearer to each other than 'proximity'. Return a dataframe of just the new tile we've made.
     Inputs:
-        df (dataframe): A dataframe of targets. Must have columns "RA", "DEC", "PRI_SAMI" (i.e. priority), "ALREADY_TILED" (i.e. tiled before this current iteration).
+        df (dataframe): A dataframe of targets. Must have columns "RA", "DEC", "PRIORITY" (i.e. priority), "COMPLETED" (i.e. tiled before this current iteration).
         proximity (float): Smallest distance between two targets (in arcseconds)
         Nsel (int): Number of targets to select in each tile
     """
 
     # Select things which haven't been already tiled or selected as a target in this iteration
-    target_mask = (all_targets_df['ALREADY_TILED'] == False)
+    target_mask = (all_targets_df['COMPLETED'] == False)
     df = all_targets_df.loc[target_mask]
     already_tiled_in_FOV = all_targets_df.loc[~target_mask]
-
-    # Get the priority of each target
-    priorities = df['PRI_SAMI'].values
 
     # Find which of these targets clash with each other
     clashes = find_clashes(df, df, proximity)
@@ -302,7 +301,6 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
         else:
             # Just add everything left
             N_to_append = min(Nsel - len(targets), len(untiled_galaxies))
-            # random_choice = np.random.choice(np.arange(len(untiled_galaxies)), replace=False, size=N_to_append)
 
             unclashing_targets = [galaxies_in_order[r][0] for r in range(N_to_append)]
 
@@ -316,7 +314,6 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
 
     if fill_spares_with_repeats:
         if len(tile_df) < Nsel:
-            # print("!!")
             # We now see if any things which have already been tiled can be repeated
             # We check to see whether everything in the Field of View clashes with anything which has already been tiled.
             # NOTE that this a quick-fix way of doing things- for example, if two things are in a close pair, using this method they will never be added to the tile as a repeat, since they will always clash with each other. The correct thing to do would be to add in things to repeat one by one, as in the method above
@@ -328,7 +325,7 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
                 N_to_append = min(Nsel - len(tile_df), len(unclashing_repeats))
                 repeats_to_fill_hexabundles = np.random.choice(unclashing_repeats, N_to_append, replace=False)
                 tile_df = tile_df.append(already_tiled_in_FOV.iloc[repeats_to_fill_hexabundles])
-                tile_df.loc[tile_df.ALREADY_TILED == True, 'isel'] = 1.0
+                tile_df.loc[tile_df.COMPLETED == True, 'isel'] = 1.0
                 isel_values.extend([1.0] * len(repeats_to_fill_hexabundles))
 
                 if len(tile_df) < Nsel:
@@ -387,11 +384,11 @@ def select_targets(all_targets_df, proximity, Nsel, selection_type='most_clashin
     return tile_df, isel_values
 
 
-def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, selection_type='most_clashing', fill_spares_with_repeats=False):
+def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, use_galaxy_priorities=True, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
-        df_targets (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC', "PRI_SAMI" and "TILED"
+        df_targets (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC', "PRIORITY" and "TILED"
         df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC' and "R_MAG_AUTO"
         df_standard_stars (dataframe): A dataframe of standard stars. Must include columns 'RA', 'DEC' and 'priority'
         tiling_parameters (dict): A dictionary containing the various parameters to do with the tiling. So far, necessary keys are 'Hector_FOV_radius', 'proximity', 'Nsel', 'Nsel_guides' and 'Nsel_standards'
@@ -419,14 +416,19 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     if Hector_FOV_outer_radius < Hector_FOV_inner_radius:
         raise ValueError(f"Outer radius must be greater than inner radius! Currently O.R. is {Hector_FOV_outer_radius} and I.R. is {Hector_FOV_inner_radius}")
 
-    untiled = df_targets['ALREADY_TILED'] == False # & (df_targets['PRI_SAMI'] == 8)
+    untiled = df_targets['COMPLETED'] == False # & (df_targets['PRIORITY'] == 8)
+
+    if use_galaxy_priorities:
+        priorities = df_targets['PRIORITY']
+    else:
+        priorities = pd.Series(np.ones_like(df_targets['PRIORITY']), name='PRIORITY')
 
     # FIXME
     # This will cause an issue if the separation of two grid points is larger than the FOV size
     n_xx_yy = max(min(500, int(untiled.sum() / 10)), 50)
 
     if tiling_type == 'greedy':
-        tile_RA, tile_Dec = get_best_tile_centre_greedy(df_targets.loc[untiled], outer_FOV_radius=Hector_FOV_outer_radius, inner_FoV_radius=Hector_FOV_inner_radius, n_xx_yy=n_xx_yy)
+        tile_RA, tile_Dec = get_best_tile_centre_greedy(df_targets.loc[untiled], outer_FOV_radius=Hector_FOV_outer_radius, inner_FoV_radius=Hector_FOV_inner_radius, n_xx_yy=n_xx_yy, priorities=priorities.loc[untiled])
     elif tiling_type == 'dengreedy':
         tile_RA, tile_Dec = get_best_tile_centre_dengreedy(df_targets, df_targets.loc[untiled], outer_FOV_radius=Hector_FOV_outer_radius, inner_FoV_radius=Hector_FOV_inner_radius, n_xx_yy=n_xx_yy)
     else:
@@ -438,8 +440,11 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     inner_guides = df_guide_stars.loc[check_if_in_fov(df_guide_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
     inner_standards = df_standard_stars.loc[check_if_in_fov(df_standard_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
 
+    if (len(inner_guides) == 0) or len(inner_standards == 0):
+        raise ValueError("No stars in the Field of View!")
+
     # Select which targets to keep
-    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats)
+    tile_members, isel_values = select_targets(inner_targets, proximity, Nsel, priorities=priorities, selection_type=selection_type, fill_spares_with_repeats=fill_spares_with_repeats)
 
     # Add the 'isel' values to the main dataframe
     df_targets.loc[tile_members.index, 'isel'] = isel_values
@@ -528,8 +533,9 @@ def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tili
     completeness, completion_fraction_to_calculate, used_tiles_to_get_to_x, minimum_number_of_tiles_for_x, efficiency_xpc, efficiency = calculate_completeness_stats(df_targets, tiling_parameters['N_targets_per_Hector_field'], completion_fraction_to_calculate=completion_fraction_to_calculate, verbose=verbose)
 
     # Plot the completeness as a function of tile number
+    N_galaxy_observations = df_targets['N_observations_to_complete'].sum()
     xx = np.arange(1, len(completeness) + 1)
-    axs[1].plot(xx, tiling_parameters['N_targets_per_Hector_field'] / len(df_targets) * xx, c='k', linestyle='dashed')
+    axs[1].plot(xx, tiling_parameters['N_targets_per_Hector_field'] / N_galaxy_observations * xx, c='k', linestyle='dashed')
     axs[1].plot(xx, completeness, c='r', zorder=10)
     axs[1].axhline(completion_fraction_to_calculate, c='0.8', linestyle='dashed')
     axs[1].axhline(1, c='0.5')
@@ -538,6 +544,7 @@ def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tili
     axs[1].axvline(minimum_number_of_tiles_for_x, c='0.8', linestyle='dashed')
     axs[1].set_xlabel(r'$N_{\rm{tiles}}$')
     axs[1].set_ylabel('Completeness')
+    fig.tight_layout()
 
     return fig, axs
 
@@ -548,8 +555,7 @@ def _calc_completeness(df_targets):
     Inputs:
         df_targets (dataframe): a dataframe with a row for each target. Must have a column 'Tile_number'
     """
-
-    completeness = np.cumsum([np.sum(df_targets['Tile_number'] == i) / len(df_targets) for i in np.unique(df_targets['Tile_number'])])
+    completeness = np.cumsum([np.sum((df_targets['Tile_number'] == i) & df_targets['COMPLETED'] == True) / len(df_targets) for i in np.unique(df_targets['Tile_number'])])
 
     return completeness
 
@@ -567,15 +573,17 @@ def calculate_completeness_stats(df_targets, N_targets_per_Hector_field, complet
     if (completion_fraction_to_calculate > 1) or (completion_fraction_to_calculate < 0):
         raise ValueError(f"completion_fraction_to_calculate must be between 0 and 1: currently {completion_fraction_to_calculate}")
 
+    N_galaxy_observations = df_targets['N_observations_to_complete'].sum()
+
     # Work out the completeness after each tile
     completeness = _calc_completeness(df_targets)
 
     used_tiles = df_targets['Tile_number'].max() + 1  # Since we start indexing from 0
-    minimum_number_of_tiles = np.ceil(len(df_targets) / N_targets_per_Hector_field)
+    minimum_number_of_tiles = np.ceil(N_galaxy_observations / N_targets_per_Hector_field)
     efficiency = minimum_number_of_tiles / used_tiles
 
     used_tiles_to_get_to_x = np.where(completeness > completion_fraction_to_calculate)[0][0] + 1
-    minimum_number_of_tiles_for_x = np.ceil(completion_fraction_to_calculate * len(df_targets) / N_targets_per_Hector_field)
+    minimum_number_of_tiles_for_x = np.ceil(completion_fraction_to_calculate * N_galaxy_observations / N_targets_per_Hector_field)
     efficiency_xpc = minimum_number_of_tiles_for_x / used_tiles_to_get_to_x
 
     if verbose:
@@ -669,9 +677,9 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
     combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U',
        'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U',
        'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r',
-       'IFU_diam_2Re', 'MassHIpred',  'PRI_SAMI',
+       'IFU_diam_2Re', 'MassHIpred',  'PRIORITY',
        'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag',
-       'priority', 'remaining_observations', 'Tile_number', 'ALREADY_TILED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']]
+       'priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']]
 
     # Write a CSV file with the header we want
     with open(f"{outfolder}/Tiles/{out_name}", 'w') as f:

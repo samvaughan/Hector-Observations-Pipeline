@@ -83,6 +83,10 @@ class HectorPipe:
         if not self.ConfigurationCode_location.exists():
             raise FileNotFoundError("The Configuration Code seems to not exist")
 
+        self.have_targets_catalogue = False
+        self.have_standard_star_catalogue = False
+        self.have_guide_star_catalogue = False
+
 
     def load_input_catalogue(self):
         """
@@ -100,10 +104,13 @@ class HectorPipe:
     def _add_columns_to_catalogues(self):
 
         # Add the empty columns which we'll update
-        self.df_targets['ALREADY_TILED'] = False
+        self.df_targets['COMPLETED'] = False
         self.df_targets['Tile_number'] = -999
 
-        self.df_targets['remaining_observations'] = 1
+        # Add the columns about how many observations we need to complete for each galaxy
+        # The remaining obsverations column will count down to 0
+        self.df_targets['N_observations_to_complete'] = 1
+        self.df_targets['remaining_observations'] = self.df_targets['N_observations_to_complete'].copy()
         self.df_targets = self.df_targets.loc[self.df_targets['remaining_observations'] > 0]
 
         self.logger.info("Adding extra columns to the target dataframe")
@@ -155,7 +162,7 @@ class HectorPipe:
         Get the number of targets remaining in the field to tile
         """
 
-        remaining_targets = len(df_targets) - df_targets['ALREADY_TILED'].sum()
+        remaining_targets = len(df_targets) - df_targets['COMPLETED'].sum()
 
         if remaining_targets > 0:
             return remaining_targets
@@ -165,10 +172,10 @@ class HectorPipe:
             return 0
 
 
-    def _run_tiling_code(self, proximity, current_tile):
+    def _run_tiling_code(self, proximity, current_tile, use_galaxy_priorities):
 
             # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
-        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'])
+        df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'], use_galaxy_priorities=use_galaxy_priorities)
 
         tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
 
@@ -176,13 +183,16 @@ class HectorPipe:
 
 
 
-    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, robot_temperature=19, obs_temperature=8, label="", plateID="", date="", check_sky_fibres=True):
+    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, use_galaxy_priorities=True, robot_temperature=19, obs_temperature=8, label="", plateID="", date="", check_sky_fibres=True):
 
         """
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
         """
 
         self.logger.info(f"Robot Temperature: {robot_temperature} C, Obs Temperature: {obs_temperature} C. Label={label}, plateID={plateID}, date={date}\n\n")
+
+        # Make an empty data frame to store the properties of each tile
+        self.tile_database = pd.DataFrame()
 
         # Check that we have our three input catalogues
         if not self.have_targets_catalogue & self.have_standard_star_catalogue & self.have_guide_star_catalogue:
@@ -227,7 +237,7 @@ class HectorPipe:
                     tile_file_for_configuration = tile_out_fname
 
             # Run the tiling
-            self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=self.config['proximity'], current_tile=current_tile)
+            self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=self.config['proximity'], current_tile=current_tile, use_galaxy_priorities=use_galaxy_priorities)
 
             self.best_tile_RAs.append(tile_RA)
             self.best_tile_Decs.append(tile_Dec)
@@ -275,7 +285,7 @@ class HectorPipe:
                         
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
-                    self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile)
+                    self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile, use_galaxy_priorities=use_galaxy_priorities)
 
                     if apply_distortion_correction == True:
                         DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date="", robot_temp=19, obs_temp=8, label="", plateID="", distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
@@ -286,12 +296,27 @@ class HectorPipe:
 
             # Now find which targets have been selected in this tile
             selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])
-            # Find which targets are being tiled for the first time
-            new_targets = (selected_targets_mask) & (self.df_targets['ALREADY_TILED'] == False)
-            # Change the TILED flag for targets we've added to a tile
-            self.df_targets.loc[new_targets, 'ALREADY_TILED'] = True
+            # Find which targets are being tiled and haven't been completed
+            new_targets = (selected_targets_mask) & (self.df_targets['COMPLETED'] == False)
+            # Find the targets which have been completed and are just filling out the numbers
+            repeated_targets = (selected_targets_mask) & (self.df_targets['COMPLETED'] == True)
+
+            # Subtract one from the remaining observations for everything
+            self.df_targets.loc[new_targets, 'remaining_observations'] -= 1
+
+            # Change the TILED flag for targets we've finished
+            self.df_targets.loc[new_targets & (self.df_targets.loc[new_targets, 'remaining_observations'] == 0), 'COMPLETED'] = True
             # And include the tile number for each target
             self.df_targets.loc[new_targets, 'Tile_number'] = current_tile
+
+            # Now update the tile database
+
+            tile_df['tile_number'] = current_tile
+            tile_df['tile_centre_RA'] = tile_RA
+            tile_df['tile_centre_DEC'] = tile_Dec
+            tile_df['Filler_Galaxy'] = False
+            tile_df.loc[repeated_targets, 'Filler_Galaxy'] = True
+            self.tile_database = self.tile_database.append(tile_df.reset_index(drop=True))
 
             self.logger.info(f"FINISHED TILE {current_tile}\n\n")
 
@@ -303,9 +328,14 @@ class HectorPipe:
         if plot:
             fig, ax = tiling.plot_survey_completeness_and_tile_positions(self.tile_positions, self.df_targets, self.config, fig=None, ax=None, completion_fraction_to_calculate=0.95, verbose=True)
             fig.savefig(f"{self.config['output_folder']}/Plots/{self.config['output_filename_stem']}_field_plot.pdf", bbox_inches='tight')
+            plt.close('all')
         
-        #Save the overall dataframe
+        #Save the overall dataframes
         self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/completed_targets_dataframe.csv")
+
+        # Save the tile database
+        self.tile_database.set_index("tile_number", inplace=True)
+        self.tile_database.to_csv(f"{self.config['output_folder']}/Tiles/all_tiles_dataframe.csv")
 
         self.N_tiles = current_tile
 
@@ -490,3 +520,32 @@ class HectorPipe:
 
         for tile_number in tile_numbers:
             self.allocate_hexabundles_for_single_tile(tile_number)
+
+
+    def run_target_selection(self, plot=False, save=False):
+
+
+        full_catalogue_table = HectorSim.load_table(self.config)
+        HectorSim_input_parameters = ['BoundaryType','zlimit','MstarMin','MstarMax','SparseFunction','MSparseCut1','minRe', 'total_area', 'SourceCat']
+        HectorSim_args = {k:self.config[k] for k in HectorSim_input_parameters}
+        HectorSim_args['entire_table'] = full_catalogue_table
+
+        self.target_selection = HectorSim.HectorSim(**HectorSim_args)
+
+        if save:
+
+            final_catalogue_path = Path(self.config['final_catalogue_name'])
+            P.save_dataframe_as_FITS_table(self.target_selection.selection_function_sparsely_sampled, final_catalogue_path.expanduser().as_posix())
+
+        if plot:
+            return self._make_target_selection_plot()
+
+    def _make_target_selection_plot(self):
+        
+        plt.style.use((Path(__file__).parent / "target_selection/HectorSim.mplstyle").as_posix())
+        fig, axs = plt.subplots(nrows=3, ncols=6, figsize=(18.87, 5.94))
+        self.target_selection.make_Julias_plot(fig, axs)
+        fig.tight_layout()
+        fig.subplots_adjust(hspace=0.4, wspace=0.28)
+
+        return fig, axs
