@@ -227,20 +227,25 @@ def sky_fibre_annotations(skyfibre_file):
         plt.gcf().gca().add_artist(draw_wedge)
         angle = angle + 20
 
+def draw_circularSegments():
+
+    draw_circle = plt.Circle((0, 0), 220, fill=True, color='#E78BE7', alpha=0.4)
+    draw_circle1 = plt.Circle((0, 0), (0.823*220), fill=True, color='#f6f93b')
+    draw_circle2 = plt.Circle((0, 0), (0.627*220), fill=True, color='#60fb3d')
+    draw_circle3 = plt.Circle((0, 0), (0.396*220), fill=True, color='#add8e6')
+
+    plt.gcf().gca().add_artist(draw_circle)
+    plt.gcf().gca().add_artist(draw_circle1)
+    plt.gcf().gca().add_artist(draw_circle2)
+    plt.gcf().gca().add_artist(draw_circle3)
 
 def draw_all_magnets(magnets, clusterNum, tileNum, skyfibre_file, robot_figureFile, hexabundle_figureFile):
     # plt.figure(2)
     # draw_magnet_pickup_areas(magnets, '--c')
 
     plt.figure(1)
-    draw_circle = plt.Circle((0, 0), 220, fill=True, color='#E78BE7', alpha=0.4)
-    draw_circle1 = plt.Circle((0, 0), (0.823*220), fill=True, color='#f6f93b')
-    draw_circle2 = plt.Circle((0, 0), (0.627*220), fill=True, color='#60fb3d')
-    draw_circle3 = plt.Circle((0, 0), (0.396*220), fill=True, color='#add8e6')
-    plt.gcf().gca().add_artist(draw_circle)
-    plt.gcf().gca().add_artist(draw_circle1)
-    plt.gcf().gca().add_artist(draw_circle2)
-    plt.gcf().gca().add_artist(draw_circle3)
+
+    draw_circularSegments()
 
     sky_fibre_annotations(skyfibre_file)
 

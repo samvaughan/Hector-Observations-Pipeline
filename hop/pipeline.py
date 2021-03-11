@@ -12,7 +12,7 @@ from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
 from hop.misc import plotting_tools as plotting_tools
 from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts
+from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
 from hop.target_selection import HectorSim
 
 from hop.hexabundle_allocation.hector.plate import HECTOR_plate
@@ -458,7 +458,9 @@ class HectorPipe:
 
         mu_1re_cutoff = 22.5
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
-        positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, self.galaxyIDrecord, mu_1re_cutoff, self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
+        positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
+                                                                         conflicted_magnets, self.galaxyIDrecord, mu_1re_cutoff, \
+                                                                         self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
 
         if plot:
             skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
@@ -490,26 +492,43 @@ class HectorPipe:
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
-        # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
-        # # fibre input file to be read
-        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
-        #
-        # # fibre output file to be written to
-        # output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
-        # output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
-        #
-        # output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
-        # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        #
-        # # create the fibre spectrograph files for each of AAOmega and Spector
-        # new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
-        #
-        # # create the hexabundle fibre coordinate data files
-        # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
-        #
-        # fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitlet_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-        # # create figure of slitlets
-        # fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega)
+        ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
+        # fibre input file to be read
+        fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
+
+        # fibre output file to be written to
+        output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
+        output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
+
+        output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
+        #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+
+        # create the fibre spectrograph files for each of AAOmega and Spector
+        new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
+
+        # create the hexabundle fibre coordinate data files
+        fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
+
+        fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        fibreFigure_Spector = f"{self.plot_location}/fibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # create figure of slitlets
+        # fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
+
+        skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # create figure of magnified sky fibre positioning in slitlets
+        fibres.create_skyFibreSlitlet_figure(new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
+
+        ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+        tile_1 = skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
+        tile_2 = skyfibre_file_2 = f"{self.configuration_location}\example_output_file_with_sky_fibres_2.csv"
+        subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_previous.pdf"
+        subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_current.pdf"
+        fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+
+
+
+
 
 
     def allocate_hexabundles_for_all_tiles(self):

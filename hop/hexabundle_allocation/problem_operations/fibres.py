@@ -8,6 +8,7 @@ import string
 import csv
 import re
 from pathlib import Path
+from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
 
 
 def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
@@ -201,7 +202,7 @@ def convert_rectangularMagnetOrientation(magnet):
 
     return probe_orientation
 
-def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
+def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, fibreFigure_Spector):
 
     print((new_arrayAAOmega))
     print('figure being created')
@@ -251,9 +252,6 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
 
     # Adjust the fontsizes on tick labels for this plot
     fs = 9.0
-    # [t.set_fontsize(fs) for t in plt.xaxis.get_majorticklabels()]
-    # [t.set_fontsize(fs) for t in plt.yaxis.get_majorticklabels()]
-    # plt.yaxis.get_offset_text().set_fontsize(fs)
 
     # Here is the label and arrow code of interest
     plt.gcf().gca().add_artist(plt.annotate('A', xy=(19, 763), xytext=(16, 763), xycoords='data',\
@@ -329,7 +327,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
                 arrowprops=dict(arrowstyle='-', lw=1.0)))
 
     for i in [793,727,661,595,199,133,67,1]:
-        plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, i), xytext=(45, 400), xycoords='data', \
+        plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, i), xytext=(50, 400), xycoords='data', \
                                                 fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='red', \
                                                 arrowprops=dict(arrowstyle='-', color='red',lw=0.7)))
     # plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, 1), xytext=(48, 400), xycoords='data', \
@@ -338,11 +336,11 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
 
     plt.xlim(-10, 70)
     plt.ylim(-10, 870)
-    # plt.axis('off')
+    plt.axis('off')
     # plt.show()
     figure = plt.gcf()
 
-    figure.set_size_inches(8,12)
+    figure.set_size_inches(6,8)
     plt.savefig(fibreFigure_AAOmega, dpi=500)
 
     ## Spector slitelets figure
@@ -399,6 +397,494 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega):
             plt.annotate(str(slitlet_count + 1), xy=(30, y + 22), xytext=(30, y + 22), xycoords='data', \
                          fontsize=10, ha='right', va='center', rotation=0, color='white'))
 
+    # Adjust the fontsizes on tick labels for this plot
+    fs = 9.0
+
+    # Here is the label and arrow code of interest
+    plt.gcf().gca().add_artist(plt.annotate('I', xy=(19, 859.5), xytext=(16, 859.5), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='navy', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=2.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=8', xy=(20, 808), xytext=(16, 808), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('J', xy=(41, 774), xytext=(44, 774), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='brown', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=9', xy=(40, 807), xytext=(44, 807), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='brown', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=27', xy=(40, 741), xytext=(44, 741), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='brown', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('K', xy=(19, 704), xytext=(16, 704), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='peru', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=28', xy=(20, 740), xytext=(16, 740), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='peru', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=4', xy=(20, 668), xytext=(16, 668), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='peru', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('L', xy=(41, 634), xytext=(44, 634), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='green', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=5', xy=(40, 667), xytext=(44, 667), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=23', xy=(40, 601), xytext=(44, 601), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('M', xy=(19, 567), xytext=(16, 567), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='crimson', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=24', xy=(20, 600), xytext=(16, 600), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=42', xy=(20,534), xytext=(16,534), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('N', xy=(41, 497), xytext=(44, 497), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='purple', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=43', xy=(40, 533), xytext=(44, 533), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='purple', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=19', xy=(40, 461), xytext=(44, 461), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='purple', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('O', xy=(19, 427), xytext=(16, 427), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=20', xy=(20, 460), xytext=(16, 460), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=38', xy=(20,394), xytext=(16,394), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('P', xy=(41, 357), xytext=(44, 357), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='navy', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=39', xy=(40, 393), xytext=(44, 393), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=15', xy=(40, 321), xytext=(44, 321), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='navy', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('Q', xy=(19, 287), xytext=(16, 287), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=16', xy=(20, 320), xytext=(16, 320), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=34', xy=(20,254), xytext=(16,254), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('R', xy=(41, 249), xytext=(44, 249), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=0.3, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=35', xy=(40, 254), xytext=(44, 284), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('R', xy=(41, 170), xytext=(44, 170), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=39', xy=(40, 201), xytext=(44, 210), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=6', xy=(40, 138), xytext=(44, 130), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('Q', xy=(19, 287), xytext=(16, 287), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='chocolate', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=16', xy=(20, 320), xytext=(16, 320), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=34', xy=(20, 254), xytext=(16, 254), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='chocolate', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('S', xy=(19, 104), xytext=(16, 104), xycoords='data', \
+                                            fontsize=fs, ha='right', va='center', rotation=0, color='green', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=7', xy=(20, 137), xytext=(16, 137), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=25', xy=(20, 71), xytext=(16, 71), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='green', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('T', xy=(41, 37), xytext=(44, 37), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='crimson', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=1.0, lengthB=0.5', lw=1.0)))
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=26', xy=(40, 70), xytext=(44, 70), xycoords='data', \
+                                            fontsize=fs * 0.7, ha='left', va='center', rotation=0, color='crimson', \
+                                            arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('fibre_num=2\n ★ U ★\n fibre_num=38', xy=(19, 220), xytext=(16, 210), \
+                                            xycoords='data', fontsize=fs * 0.6, ha='right', va='center', rotation=0, \
+                                            color='black', bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-[, widthB=0.7, lengthB=0.5', lw=1.0)))
+
+    plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, 867), xytext=(44, 867), xycoords='data', \
+                                            fontsize=fs, ha='left', va='center', rotation=0, color='red', \
+                                            bbox=dict(boxstyle='square', fc='white'), \
+                                            arrowprops=dict(arrowstyle='-', color='red', lw=0.7)))
+
+    # for i in [793, 727, 661, 595, 199, 133, 67, 1]:
+    #     plt.gcf().gca().add_artist(plt.annotate('▮ BLOCK', xy=(40, i), xytext=(45, 400), xycoords='data', \
+    #                                             fontsize=fs * 0.7, ha='right', va='center', rotation=0, color='red', \
+    #                                             arrowprops=dict(arrowstyle='-', color='red', lw=0.7)))
+
+
     plt.xlim(-10, 70)
     plt.ylim(-10, 930)
-    plt.show()
+    plt.gcf().set_size_inches(6, 8)
+    plt.axis('off')
+    # plt.show()
+
+    plt.savefig(fibreFigure_Spector, dpi=500)
+
+
+def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
+
+    plt.figure(5)
+    fs = 5
+
+    skyFibresArray_AAOmega = {}
+    for i in new_arrayAAOmega[1:]:
+        if str(i[1]) != 'P':
+            key = i[6]
+            value = str(i[5])
+            value_2 = i[9]
+            skyFibresArray_AAOmega.setdefault(key, []).append({value: value_2})
+
+    print(skyFibresArray_AAOmega)
+
+    for slitlet_count in range(13):
+
+        x_start = 20
+        y_start = 858 - (80 * (slitlet_count + 1))
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start, y_start), 10, 63, facecolor='grey', lw=2, zorder=2))
+
+        y = y_start + 62
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start - 10, y - 70), 10, 2, facecolor='black', lw=2, zorder=2))
+
+
+        plt.gcf().gca().add_artist(
+            plt.annotate(str(slitlet_count + 1), xy=(x_start - 6, y - 30), xytext=(x_start - 8, y - 30), \
+                         xycoords='data', fontsize=10, ha='right', va='center', rotation=0, color='black'))
+
+        direction = 'left'
+        x_text = x_start - 5
+        for i in skyFibresArray_AAOmega:
+            if (slitlet_count + 1) == i:
+                k = 0
+                for j in skyFibresArray_AAOmega[i]:
+                    print(skyFibresArray_AAOmega[i][k])
+                    for l in j:
+                        print(l)
+                        if l == 'nan':
+                            color = 'red'
+                            text = '▮'
+                        else:
+                            color = 'blue'
+                            text = l
+
+                        if skyFibresArray_AAOmega[i][k][l] == 1:
+                            Y_adjustment = 53
+                        elif skyFibresArray_AAOmega[i][k][l] == 2:
+                            Y_adjustment = 43
+                        elif skyFibresArray_AAOmega[i][k][l] == 3:
+                            Y_adjustment = 33
+                        elif skyFibresArray_AAOmega[i][k][l] == 61:
+                            Y_adjustment = 20
+                        elif skyFibresArray_AAOmega[i][k][l] == 62:
+                            Y_adjustment = 10
+                        elif skyFibresArray_AAOmega[i][k][l] == 63:
+                            Y_adjustment = 0
+                        plt.gcf().gca().add_patch(
+                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color,
+                                              facecolor='black',
+                                              lw=1, zorder=3))
+
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(text, xy=(x_start, y_start + Y_adjustment + 5),
+                                         xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha=direction, va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+                        # if direction == 'left':
+                        #     direction = 'right'
+                        # elif direction == 'right':
+                        #     direction = 'left'
+                        if x_text == x_start - 5:
+                            x_text = x_start - 4
+                        elif x_text == x_start - 4:
+                            x_text = x_start - 5
+
+                        print(skyFibresArray_AAOmega[i][k][l])
+                    k += 1
+
+    plt.xlim(0, 40)
+    plt.ylim(-200, 900)
+    plt.axis('off')
+    # plt.show()
+    plt.gcf().set_size_inches(6, 8)
+    plt.savefig(skyFibre_AAOmegaFigure)
+
+
+    plt.figure(6)
+    fs = 5
+
+    skyFibresArray_Spector = {}
+    for i in new_arraySpector[1:]:
+        if str(i[1]) != 'P':
+            key = i[6]
+            value = str(i[5])
+            value_2 = i[9]
+            skyFibresArray_Spector.setdefault(key,[]).append({value:value_2})
+
+
+    print(skyFibresArray_Spector)
+
+    for slitlet_count in range(19):
+
+        x_start = 20
+        y_start = 858 - (80 * (slitlet_count +1))
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start, y_start), 10, 63, facecolor='grey', lw=2, zorder=2))
+
+        y = y_start + 62
+        plt.gcf().gca().add_patch(
+            patches.Rectangle((x_start - 10, y - 70), 10, 2, facecolor='black', lw=2, zorder=2))
+
+
+
+        plt.gcf().gca().add_artist(
+            plt.annotate(str(slitlet_count + 1), xy=(x_start - 6, y - 30), xytext=(x_start - 8, y - 30), \
+                         xycoords='data', fontsize=10, ha='right', va='center', rotation=0, color='black'))
+
+        direction = 'left'
+        x_text = x_start - 5
+        for i in skyFibresArray_Spector:
+            if (slitlet_count+1) == i:
+                k = 0
+                for j in skyFibresArray_Spector[i]:
+                    print(skyFibresArray_Spector[i][k])
+                    for l in j:
+                        print(l)
+                        if l == 'nan':
+                            color = 'red'
+                            text = '▮'
+                        else:
+                            color = 'blue'
+                            text = l
+
+                        if skyFibresArray_Spector[i][k][l] == 1:
+                            Y_adjustment = 53
+                        elif skyFibresArray_Spector[i][k][l] == 2:
+                            Y_adjustment = 43
+                        elif skyFibresArray_Spector[i][k][l] == 3:
+                            Y_adjustment = 33
+                        elif skyFibresArray_Spector[i][k][l] == 43:
+                            Y_adjustment = 20
+                        elif skyFibresArray_Spector[i][k][l] == 44:
+                            Y_adjustment = 10
+                        elif skyFibresArray_Spector[i][k][l] == 45:
+                            Y_adjustment = 0
+                        plt.gcf().gca().add_patch(
+                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color, facecolor='black',
+                                              lw=1, zorder=3))
+
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(text, xy=(x_start, y_start + Y_adjustment + 5),
+                                         xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha=direction, va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+                        # if direction == 'left':
+                        #     direction = 'right'
+                        # elif direction == 'right':
+                        #     direction = 'left'
+                        if x_text == x_start - 5:
+                            x_text = x_start - 4
+                        elif x_text == x_start - 4:
+                            x_text = x_start - 5
+
+                        print(skyFibresArray_Spector[i][k][l])
+                    k += 1
+
+
+    plt.xlim(0, 40)
+    # plt.ylim(420, 870)
+    plt.ylim(-680, 900)
+    plt.axis('off')
+    # plt.show()
+    plt.gcf().set_size_inches(6, 8)
+    plt.savefig(skyFibre_SpectorFigure)
+
+
+def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figureFile_tile1,subplateSkyfibre_figureFile_tile2):
+
+
+    plt.figure(7)
+
+    skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
+    skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
+
+    draw_circularSegments()
+
+    sky_fibre_annotations(tile_1)
+
+    print(skyfibreDict_tile1)
+    print(skyfibreDict_tile2)
+
+    plt.axis('off')
+    axes = plt.gca()
+    axes.set_xlim([-350, 350])
+    axes.set_ylim([-350, 350])
+    # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.gcf().set_size_inches(6, 6)
+    plt.savefig(subplateSkyfibre_figureFile_tile1)
+
+    plt.figure(8)
+
+    # skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
+    # skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
+
+    draw_circularSegments()
+
+    skyfibreDict = skyfibreDict_tile2
+    angle_subplate = [7, 5, 3, 1, -1, -3, -5, -7]
+    radii = 270
+
+    # filename = 'Sky_fibre_position_example.csv'
+    # skyfibreDict = read_sky_fibre_file(skyfibre_file)
+    # print(skyfibreDict)
+    string = str(skyfibreDict['H3'][5].keys())
+    print(re.sub('[^0-9]', '', string))
+
+    # sky fibres top batch
+    angle = 30
+    skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
+            if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1]:
+                colour = 'black'
+            else:
+                colour = 'yellow'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_top[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_top[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_top[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres left batch
+    angle = 150
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_left[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_left[i]])):
+            if skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1]:
+                colour = 'black'
+            else:
+                colour = 'yellow'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_left[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_left[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_left[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres right batch
+    angle = -160
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_right[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_right[i]])):
+            if skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1]:
+                colour = 'black'
+            else:
+                colour = 'yellow'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_right[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_right[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_right[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle + 20
+
+
+    plt.axis('off')
+    axes = plt.gca()
+    axes.set_xlim([-350, 350])
+    axes.set_ylim([-350, 350])
+    # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.gcf().set_size_inches(6, 6)
+    plt.savefig(subplateSkyfibre_figureFile_tile2)
+

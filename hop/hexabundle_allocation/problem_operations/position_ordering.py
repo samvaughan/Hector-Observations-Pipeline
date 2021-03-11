@@ -102,7 +102,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
 
         # storing all the parameters in positioning array
         f = np.append([magnet.__class__.__name__, str(magnet.magnet_label), str(robot_center_x+magnet.view_x), \
-                       str(robot_center_y+magnet.view_y), str(magnet.rotation_pickup), str(round(magnet.rotation_putdown,2)), \
+                       str(robot_center_y+magnet.view_y), str(magnet.rotation_pickup), str(magnet.rotation_putdown), \
                        str(order), available_pickup, str(float(magnet.IDs)), str(int(magnet.index)), str(probe_orientation)], str(magnet.hexabundle))
 
         # appending each magnet with its established parameters to the position ordering array
