@@ -135,6 +135,11 @@
 //                     these fibres. Revised the programming notes, which had
 //                     got rather out of date. Removed extraneous spaces in
 //                     column headings for MagnetX,MagnetY,Position. KS.
+//     12th Mar 2021.  X,Y positions are now output in floating point format
+//                     to .01 micron precision, instead of as integer micron
+//                     values. This is to prevent loss of precision when they
+//                     are used in subsequent calculations (not just for
+//                     actual positions for the robot positioner). KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -1606,8 +1611,8 @@ void WriteOutputFile (
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {
-         int X = TargetList[ITarget].X + 0.5;
-         int Y = TargetList[ITarget].Y + 0.5;
+         double X = TargetList[ITarget].X;
+         double Y = TargetList[ITarget].Y;
          
          if (TargetList[ITarget].Type == GALAXY) {
 
@@ -1615,7 +1620,7 @@ void WriteOutputFile (
             //  input line, and append the values we've calculated - ie X and Y,
             //  which are the magnet X and Y positions.
          
-            fprintf(OutputFile,"%s,%d,%d\n",
+            fprintf(OutputFile,"%s,%.2f,%.2f\n",
                        TargetList[ITarget].OriginalLine.c_str(),X,Y);
          } else {
          
@@ -1658,7 +1663,7 @@ void WriteOutputFile (
             //  Note we don't need a comma at the end of OutputLine as it already
             //  ends in one.
             
-            fprintf(OutputFile,"%s%d,%d\n",OutputLine.c_str(),X,Y);
+            fprintf(OutputFile,"%s%.2f,%.2f\n",OutputLine.c_str(),X,Y);
          }
       }
       
@@ -1685,8 +1690,8 @@ void WriteOutputFile (
          if (Posn < 0 || Posn > 3) UsePosn = 0;
          double Ra = SkyFibreList[ISky].MeanRa[UsePosn];
          double Dec = SkyFibreList[ISky].MeanDec[UsePosn];
-         int X = int(SkyFibreList[ISky].X[UsePosn] + 0.5);
-         int Y = int(SkyFibreList[ISky].Y[UsePosn] + 0.5);
+         double X = SkyFibreList[ISky].X[UsePosn];
+         double Y = SkyFibreList[ISky].Y[UsePosn];
          string OutputLine = Name;
          int NFields = ProgDetails->FieldNames.size();
          char Number[64];
@@ -1701,7 +1706,7 @@ void WriteOutputFile (
                OutputLine = OutputLine + ",";
             }
          }
-         fprintf(OutputFile,"%s,%d,%d,%d\n",OutputLine.c_str(),X,Y,Posn);
+         fprintf(OutputFile,"%s,%.2f,%.2f,%d\n",OutputLine.c_str(),X,Y,Posn);
       }
 
       fclose(OutputFile);
