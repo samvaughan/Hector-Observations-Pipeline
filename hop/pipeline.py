@@ -28,9 +28,11 @@ class HectorPipe:
         * Configure each tile
         * Run the HexabundleAllocation code
     """
-    def __init__(self, config_filename):
+    def __init__(self, config_filename, Profit_files_location=None):
         """
         Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.
+
+        Optional Arguments: Location of the Profit files. If None, default location is $hop_package_location/distortion_correction/HectorTranslationSoftware/DataFiles
         """
 
         # Firstly, set the directory of the 'hop' folder as a bash environment variable, so that we can access it in R
@@ -73,7 +75,10 @@ class HectorPipe:
         # Locations of all the Hector Config code
         self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds")  
         self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
-        self.Profit_files_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles")
+        if Profit_files_location is None:
+            self.Profit_files_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles")
+        else:
+            self.Profit_files_location = Path(Profit_files_location)
 
         if not self.TdF_distortion_file_location.exists():
             raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
