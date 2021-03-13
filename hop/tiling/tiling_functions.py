@@ -440,7 +440,7 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     inner_guides = df_guide_stars.loc[check_if_in_fov(df_guide_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
     inner_standards = df_standard_stars.loc[check_if_in_fov(df_standard_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
 
-    if (len(inner_guides) == 0) or len(inner_standards == 0):
+    if (len(inner_guides) == 0) or (len(inner_standards) == 0):
         raise ValueError("No stars in the Field of View!")
 
     # Select which targets to keep
