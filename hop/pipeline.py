@@ -522,7 +522,7 @@ class HectorPipe:
         skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # create figure of magnified sky fibre positioning in slitlets
-        fibres.create_skyFibreSlitlet_figure(new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
+        fibres.create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
 
         ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
         tile_1 = skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
