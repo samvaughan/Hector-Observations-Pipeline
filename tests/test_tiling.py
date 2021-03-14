@@ -84,8 +84,9 @@ class Test_get_best_tile_centre_greedy():
 
         RA, DEC = np.genfromtxt(f'{file_location}/test_save_files/input_test_data/input_gaussian_cluster.txt', unpack=True)
         targets_df = pd.DataFrame(dict(RA=RA, DEC=DEC))
+        priorities = np.ones(len(targets_df))
 
-        centre = np.round(T.get_best_tile_centre_greedy(targets_df, inner_FoV_radius=0.0, outer_FOV_radius=0.2, n_xx_yy=100), 1)
+        centre = np.round(T.get_best_tile_centre_greedy(targets_df, inner_FoV_radius=0.0, outer_FOV_radius=0.2, n_xx_yy=100, priorities=priorities), 1)
         assert np.array_equal([10, 10], centre)
 
 
@@ -225,8 +226,9 @@ def inputs_for_select_targets():
 
     file_location = os.path.dirname(os.path.abspath(__file__))
     test_data = pd.read_csv(f'{file_location}/test_save_files/input_test_data/test_data_for_select_targets.csv')
+    priorities = np.ones(len(test_data))
 
-    yield test_data
+    yield dict(all_targets_df=test_data, priorities=priorities)
 
 
 class Test_select_targets():
@@ -239,7 +241,7 @@ class Test_select_targets():
         """
 
         proximity = 200
-        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+        tile_members, isels = T.select_targets(**inputs_for_select_targets, proximity=proximity, Nsel=Nsel, selection_type='random', fill_spares_with_repeats=False)
 
         assert (len(tile_members) == Nsel)
 
@@ -252,7 +254,7 @@ class Test_select_targets():
         Nsel = 19
 
         try:
-            tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+            tile_members, isels = T.select_targets(**inputs_for_select_targets, proximity=proximity, Nsel=Nsel, selection_type='random', fill_spares_with_repeats=False)
         except ValueError:
             pytest.fail("Value error raised implies our tile clashes with itself!")
 
@@ -264,11 +266,12 @@ class Test_select_targets():
         proximity = 200
         Nsel = 19
         # Make it so that everything in this field has been observed except one galaxy
-        inputs_for_select_targets['ALREADY_TILED'] = True
-        inputs_for_select_targets.loc[inputs_for_select_targets.CATAID==8706, 'ALREADY_TILED'] = False 
+        targets_df = inputs_for_select_targets['all_targets_df']
+        targets_df['COMPLETED'] = True
+        targets_df.loc[targets_df.CATAID==8706, 'COMPLETED'] = False
+        priorities = inputs_for_select_targets['priorities']
 
-
-        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=True)
+        tile_members, isels = T.select_targets(all_targets_df=targets_df, priorities=priorities, proximity=proximity, Nsel=Nsel, selection_type='random', fill_spares_with_repeats=True)
 
         assert len(tile_members) == Nsel
 
@@ -280,12 +283,14 @@ class Test_select_targets():
         """
         proximity = 200
         Nsel = 19
-        
         # Make it so that everything in this field has been observed except one galaxy
-        inputs_for_select_targets['ALREADY_TILED'] = True
-        inputs_for_select_targets.loc[inputs_for_select_targets.CATAID==8706, 'ALREADY_TILED'] = False 
+        targets_df = inputs_for_select_targets['all_targets_df']
+        targets_df['COMPLETED'] = True
+        targets_df.loc[targets_df.CATAID==8706, 'COMPLETED'] = False
+        priorities = inputs_for_select_targets['priorities']
 
-        tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='random', fill_spares_with_repeats=False)
+
+        tile_members, isels = T.select_targets(all_targets_df=targets_df, priorities=priorities, proximity=proximity, Nsel=Nsel, selection_type='random', fill_spares_with_repeats=False)
 
         assert len(tile_members) == 1
 
@@ -300,7 +305,7 @@ class Test_select_targets():
         Nsel = 19
 
         with pytest.raises(NameError):
-            tile_members, isels = T.select_targets(inputs_for_select_targets, proximity, Nsel, selection_type='wrong_value', fill_spares_with_repeats=False)
+            tile_members, isels = T.select_targets(**inputs_for_select_targets, proximity=proximity, Nsel=Nsel, selection_type='wrong_value', fill_spares_with_repeats=False)
 
 
 @pytest.fixture(scope='function')
@@ -308,6 +313,8 @@ def inputs_for_calc_completeness():
 
     file_location = os.path.dirname(os.path.abspath(__file__))
     df = pd.read_csv(f"{file_location}/test_save_files/input_test_data/example_tile_distribution_for_completeness_calcs.csv")
+    df['COMPLETED'] = True
+    df['N_observations_to_complete'] = 1
 
     yield df
 

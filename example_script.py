@@ -11,7 +11,7 @@ HP = pipeline.HectorPipe(config_filename="ConfigFiles/GAMA_G09.yaml")
 
 
 HP.load_input_catalogue()
-HP.df_targets['PRI_SAMI'] = 8
+HP.df_targets['PRIORITY'] = 1
 
 HP.tile_field(configure_tiles=False, apply_distortion_correction=True, check_sky_fibres=False)
 

@@ -1,7 +1,7 @@
 # Target and Standard Star file from Sam's tiling code
 # 0.0 0.0
 # Proximity Value: 200
-ID,RA,DEC,Re,Mstar,z,GAL_MAG_G,GAL_MAG_I,GAL_MU_0_G,GAL_MU_0_I,GAL_MU_0_R,GAL_MU_0_U,GAL_MU_0_Z,GAL_MU_E_G,GAL_MU_E_I,GAL_MU_E_R,GAL_MU_E_U,GAL_MU_E_Z,GAL_MU_R_at_2Re,GAL_MU_R_at_3Re,Dingoflag,Ellipticity_r,IFU_diam_2Re,MassHIpred,PRI_SAMI,SersicIndex_r,WALLABYflag,g_m_i,isel,mag,priority,remaining_observations,Tile_number,ALREADY_TILED,type,MagnetX_noDC,MagnetY_noDC
+ID,RA,DEC,Re,Mstar,z,GAL_MAG_G,GAL_MAG_I,GAL_MU_0_G,GAL_MU_0_I,GAL_MU_0_R,GAL_MU_0_U,GAL_MU_0_Z,GAL_MU_E_G,GAL_MU_E_I,GAL_MU_E_R,GAL_MU_E_U,GAL_MU_E_Z,GAL_MU_R_at_2Re,GAL_MU_R_at_3Re,Dingoflag,Ellipticity_r,IFU_diam_2Re,MassHIpred,PRIORITY,SersicIndex_r,WALLABYflag,g_m_i,isel,mag,priority,remaining_observations,Tile_number,COMPLETED,type,MagnetX_noDC,MagnetY_noDC
 1,0.0,-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,8.0,0.0,0.0,0.0,9,0.0,0.0,0.0,0.0,0.0,1,0.0,0.0
 2,0.1,-2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,8.0,0.0,0.0,0.0,9,0.0,0.0,0.0,0.0,0.0,1,0.0,0.0
 100,2.0,-0.5,,,,,,,,,,,,,,,,,,,,,,,,,,27,9.0,,,,,0,,

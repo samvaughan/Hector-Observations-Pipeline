@@ -27,11 +27,12 @@ def input_dataframes():
     df_standard_stars = df_standard_stars.rename(columns=dict(ROWID='CoADD_ID'))
 
     # Add the empty columns which we'll update
-    df_targets['ALREADY_TILED'] = False
+    df_targets['COMPLETED'] = False
     df_targets['Tile_number'] = -999
     df_targets['isel'] = -999
-    df_targets['PRI_SAMI'] = 8.0
+    df_targets['PRIORITY'] = 8.0
     df_targets['remaining_observations'] = 1.0
+    df_targets['N_observations_to_complete'] = 1.0
 
     input_dataframes = [df_targets, df_standard_stars, df_guide_stars]
     yield input_dataframes
@@ -65,7 +66,7 @@ def output_folder(input_dataframes):
 
     for current_tile in tqdm(range(0, N_tiles), total=58):
 
-        if df_targets['ALREADY_TILED'].sum() == len(df_targets):
+        if df_targets['COMPLETED'].sum() == len(df_targets):
             break
 
         tile_out_fname = os.path.expanduser(f"{output_folder}/Tiles/tile_{current_tile:03}.fld")
@@ -79,14 +80,12 @@ def output_folder(input_dataframes):
         selected_targets_mask = df_targets['CATAID'].isin(tile_df['CATAID'])
 
         # Find which ones are being tiled for the first time
-        new_targets = (selected_targets_mask) & (df_targets['ALREADY_TILED'] == False)
+        new_targets = (selected_targets_mask) & (df_targets['COMPLETED'] == False)
 
         # Change the TILED flag for targets we've added to a tile
-        df_targets.loc[new_targets, 'ALREADY_TILED'] = True
+        df_targets.loc[new_targets, 'COMPLETED'] = True
         # And include the tile number for each target
         df_targets.loc[new_targets, 'Tile_number'] = current_tile
-
-        #print(f"\tTile {current_tile}: Tiled targets: {df_targets['ALREADY_TILED'].sum()}. Selected for this tile: {selected_targets_mask.sum()}. Remaining targets in field: {len(df_targets[df_targets['ALREADY_TILED']==False])}. ")
     df_targets.to_csv(f'{output_folder}/Tiles/overall_targets_dataframe.csv')
     tile_positions = [best_tile_RAs, best_tile_Decs]
     fig, ax = T.plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tiling_parameters, verbose=False)

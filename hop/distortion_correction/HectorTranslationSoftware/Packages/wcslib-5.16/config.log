@@ -30,14 +30,14 @@ Kernel configured for up to 8 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3 4 5 6 7
 Primary memory available: 8.00 gigabytes
-Default processor set: 377 tasks, 2033 threads, 8 processors
-Load average: 2.74, Mach factor: 5.25
+Default processor set: 349 tasks, 1966 threads, 8 processors
+Load average: 3.14, Mach factor: 4.85
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
 PATH: /Users/samvaughan/.cargo/bin
-PATH: /opt/anaconda3/bin
+PATH: /opt/anaconda3/envs/Hector/bin
 PATH: /opt/anaconda3/condabin
 PATH: /Users/samvaughan/anaconda3/bin
 PATH: /usr/local/bin
@@ -848,7 +848,7 @@ configure:5436: checking for _doprnt
 configure:5436: gcc -o conftest -g -O2   conftest.c -lm  >&5
 Undefined symbols for architecture x86_64:
   "__doprnt", referenced from:
-      _main in conftest-20b355.o
+      _main in conftest-5a84c9.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5436: $? = 1
@@ -1057,7 +1057,7 @@ configure:5506: checking for sincos
 configure:5506: gcc -o conftest -g -O2   conftest.c -lm  >&5
 Undefined symbols for architecture x86_64:
   "_sincos", referenced from:
-      _main in conftest-f604b8.o
+      _main in conftest-d23d14.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5506: $? = 1
@@ -1221,7 +1221,7 @@ Using built-in specs.
 Target: x86_64-apple-darwin18
 Thread model: posix
 gcc version 9.1.0 (Homebrew GCC 9.1.0) 
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccyaQ09y.s
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cchZDuzW.s
 GNU Fortran (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
@@ -1230,17 +1230,17 @@ GNU Fortran2008 (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
- as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccfCWAJr.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccyaQ09y.s
+ as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccpNIU2P.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cchZDuzW.s
 Apple LLVM version 10.0.1 (clang-1001.0.46.4)
 Target: x86_64-apple-darwin18.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
- "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name ccyaQ09y.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccfCWAJr.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccyaQ09y.s
+ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name cchZDuzW.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccpNIU2P.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cchZDuzW.s
 Reading specs from /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../../libgfortran.spec
 rename spec lib to liborig
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccfCWAJr.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccpNIU2P.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
 collect2 version 9.1.0
-/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccfCWAJr.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
+/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccpNIU2P.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
 @(#)PROGRAM:ld  PROJECT:ld64-450.3
 BUILD 18:16:53 Apr  5 2019
 configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
@@ -1258,7 +1258,7 @@ Using built-in specs.
 Target: x86_64-apple-darwin18
 Thread model: posix
 gcc version 9.1.0 (Homebrew GCC 9.1.0) 
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccWxene6.s
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccwPHXFz.s
 GNU Fortran (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
@@ -1267,17 +1267,17 @@ GNU Fortran2008 (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
- as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccAeUjq5.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccWxene6.s
+ as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccMZxklx.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccwPHXFz.s
 Apple LLVM version 10.0.1 (clang-1001.0.46.4)
 Target: x86_64-apple-darwin18.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
- "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name ccWxene6.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccAeUjq5.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccWxene6.s
+ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name ccwPHXFz.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccMZxklx.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccwPHXFz.s
 Reading specs from /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../../libgfortran.spec
 rename spec lib to liborig
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccAeUjq5.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccMZxklx.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
 collect2 version 9.1.0
-/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccAeUjq5.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
+/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccMZxklx.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
 @(#)PROGRAM:ld  PROJECT:ld64-450.3
 BUILD 18:16:53 Apr  5 2019
 configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
@@ -1299,7 +1299,7 @@ configure:6502: $? = 0
 configure:6543: gcc -o conftest -g -O2   conftest.c cfortran_test.o -lm   -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
 Undefined symbols for architecture x86_64:
   "_foobar", referenced from:
-      _main in conftest-9a7a83.o
+      _main in conftest-95515c.o
      (maybe you meant: _foobar_)
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)

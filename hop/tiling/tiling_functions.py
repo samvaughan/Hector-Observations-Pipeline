@@ -712,7 +712,8 @@ def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, til
         f.write(f"# {tile_RA} {tile_Dec}\n")
         f.write(f"# Proximity Value: {tiling_parameters['proximity']}\n")
 
-    guide_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'MagnetX_noDC', 'MagnetY_noDC']].to_csv(f"{outfolder}/Tiles/{out_name}", sep=',', mode='a', index=False)
+    # Add in ['MagnetX_noDC', 'MagnetY_noDC']
+    guide_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'MagnetX_noDC', 'MagnetY_noDC']].to_csv(f"{outfolder}/Tiles/{out_name}", sep=' ', mode='a', index=False)
 
     return 0
 
