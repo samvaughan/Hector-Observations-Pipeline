@@ -7,6 +7,7 @@ import datetime
 import string
 import csv
 import re
+import random
 from pathlib import Path
 from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
 
@@ -570,7 +571,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     plt.savefig(fibreFigure_Spector, dpi=500)
 
 
-def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
+def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
 
     plt.figure(5)
     fs = 5
@@ -587,16 +588,18 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
 
     for slitlet_count in range(13):
 
+        # plotting the slitlet as a rectangle
         x_start = 20
         y_start = 858 - (80 * (slitlet_count + 1))
         plt.gcf().gca().add_patch(
             patches.Rectangle((x_start, y_start), 10, 63, facecolor='grey', lw=2, zorder=2))
 
+        # plotting the enfing borderline for each slitelet after the slitlet number label
         y = y_start + 62
         plt.gcf().gca().add_patch(
             patches.Rectangle((x_start - 10, y - 70), 10, 2, facecolor='black', lw=2, zorder=2))
 
-
+        # plotting the slitlet number as a label beside the slitlet
         plt.gcf().gca().add_artist(
             plt.annotate(str(slitlet_count + 1), xy=(x_start - 6, y - 30), xytext=(x_start - 8, y - 30), \
                          xycoords='data', fontsize=10, ha='right', va='center', rotation=0, color='black'))
@@ -607,12 +610,20 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
             if (slitlet_count + 1) == i:
                 k = 0
                 for j in skyFibresArray_AAOmega[i]:
-                    print(skyFibresArray_AAOmega[i][k])
+
                     for l in j:
-                        print(l)
+
+                        position = random.randint(0, 3) # MUST CHANGE TO READING ACTUAL POSITION OF SKYFIBRE SUBPLATES
+                        if position == 0:
+                            fill_color = 'black'
+                        elif position != 0:
+                            fill_color = 'grey'
+
+
                         if l == 'nan':
                             color = 'red'
                             text = '▮'
+
                         else:
                             color = 'blue'
                             text = l
@@ -631,7 +642,7 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
                             Y_adjustment = 0
                         plt.gcf().gca().add_patch(
                             patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color,
-                                              facecolor='black',
+                                              facecolor=fill_color,
                                               lw=1, zorder=3))
 
                         plt.gcf().gca().add_artist(
@@ -639,16 +650,18 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
                                          xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
                                          ha=direction, va='center', rotation=0, color=color,
                                          arrowprops=dict(arrowstyle='-', lw=1.0)))
-                        # if direction == 'left':
-                        #     direction = 'right'
-                        # elif direction == 'right':
-                        #     direction = 'left'
+
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(str(position), xy=(x_start+10, y_start + Y_adjustment + 5),
+                                         xytext=(x_text+18, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha='right', va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+
                         if x_text == x_start - 5:
                             x_text = x_start - 4
                         elif x_text == x_start - 4:
                             x_text = x_start - 5
 
-                        print(skyFibresArray_AAOmega[i][k][l])
                     k += 1
 
     plt.xlim(0, 40)
@@ -696,7 +709,7 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
             if (slitlet_count+1) == i:
                 k = 0
                 for j in skyFibresArray_Spector[i]:
-                    print(skyFibresArray_Spector[i][k])
+
                     for l in j:
                         print(l)
                         if l == 'nan':
@@ -727,16 +740,12 @@ def create_skyFibreSlitlet_figure(new_arrayAAOmega,new_arraySpector, skyFibre_AA
                                          xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
                                          ha=direction, va='center', rotation=0, color=color,
                                          arrowprops=dict(arrowstyle='-', lw=1.0)))
-                        # if direction == 'left':
-                        #     direction = 'right'
-                        # elif direction == 'right':
-                        #     direction = 'left'
+
                         if x_text == x_start - 5:
                             x_text = x_start - 4
                         elif x_text == x_start - 4:
                             x_text = x_start - 5
 
-                        print(skyFibresArray_Spector[i][k][l])
                     k += 1
 
 
