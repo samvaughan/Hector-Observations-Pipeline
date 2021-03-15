@@ -23,8 +23,8 @@ library(yaml)
 #plate_scale"/mm scaling
 #plate_scale <<- 15.008
 #! Added by Sam to use the same constants file as Ayoan's code uses
-#hector_constants <<- read_yaml(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'),"constants/HECTOR_CONSTANTS.yaml", sep='/'))
-hector_constants <<- read_yaml("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/constants/HECTOR_CONSTANTS.yaml")
+hector_constants <<- read_yaml(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'),"constants/HECTOR_CONSTANTS.yaml", sep='/'))
+#hector_constants <<- read_yaml("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/constants/HECTOR_CONSTANTS.yaml")
 
 
 #Field dimensions and parameters:
