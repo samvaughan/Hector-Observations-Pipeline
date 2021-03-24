@@ -97,9 +97,9 @@ class HectorPipe:
         """
         Load an input target catalogue, guide star catalogue and standard star catalogue
         """
-        self.df_targets = P.load_FITS_table_in_pandas(os.path.expanduser(self.config['final_catalogue_name']))
-        self.df_guide_stars = P.load_FITS_table_in_pandas(os.path.expanduser(self.config['guide_star_filename']))
-        self.df_standard_stars = P.load_FITS_table_in_pandas(os.path.expanduser(self.config['standard_star_filename']))
+        self.df_targets = misc_tools._read_table(os.path.expanduser(self.config['final_catalogue_name']))
+        self.df_guide_stars = misc_tools._read_table(os.path.expanduser(self.config['guide_star_filename']))
+        self.df_standard_stars = misc_tools._read_table(os.path.expanduser(self.config['standard_star_filename']))
 
         # Add some attributes to check that we have the correct catalogues
         self.have_targets_catalogue = True
@@ -128,9 +128,9 @@ class HectorPipe:
 
         # # Rename columns to match the ones the code expects
         # # This will be removed in future
-        self.df_targets = self.df_targets.rename(columns=dict(GAL_MAG_R='r_mag', CATID='CATAID'))
-        self.df_guide_stars = self.df_guide_stars.rename(columns=dict(ROWID='CoADD_ID'))
-        self.df_standard_stars = self.df_standard_stars.rename(columns=dict(ROWID='CoADD_ID'))
+        self.df_targets = self.df_targets.rename(columns=dict(GAL_MAG_R='r_mag', CATID='ID'))
+        self.df_guide_stars = self.df_guide_stars.rename(columns=dict(ROWID='ID', R_MAG_AUTO='r_mag'))
+        self.df_standard_stars = self.df_standard_stars.rename(columns=dict(ROWID='ID', R_MAG_AUTO='r_mag'))
 
     def find_premade_tiles(self):
         """
@@ -182,7 +182,7 @@ class HectorPipe:
             # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
         df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'], use_galaxy_priorities=use_galaxy_priorities)
 
-        tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True)
+        tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True, columns_in_order=self.config['columns_for_target_tile_saving'], guide_columns_in_order=self.config['columns_for_guide_tile_saving'])
 
         return df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec
 
@@ -300,7 +300,7 @@ class HectorPipe:
                     raise ValueError(f"Couldn't configure this tile after {self.config['MAX_TRIES']} attempts.")
 
             # Now find which targets have been selected in this tile
-            selected_targets_mask = self.df_targets['CATAID'].isin(tile_df['CATAID'])
+            selected_targets_mask = self.df_targets['ID'].isin(tile_df['ID'])
             # Find which targets are being tiled and haven't been completed
             new_targets = (selected_targets_mask) & (self.df_targets['COMPLETED'] == False)
             # Find the targets which have been completed and are just filling out the numbers
@@ -327,6 +327,8 @@ class HectorPipe:
 
             # Save the overall database in its current form
             self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/in_progress_targets_dataframe.csv")
+            self.tile_database.set_index("tile_number", inplace=True)
+            self.tile_database.to_csv(f"{self.config['output_folder']}/Tiles/tiles_dataframe.csv")
 
         self.tile_positions = np.array([self.best_tile_RAs, self.best_tile_Decs])
 
@@ -337,10 +339,6 @@ class HectorPipe:
         
         #Save the overall dataframes
         self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/completed_targets_dataframe.csv")
-
-        # Save the tile database
-        self.tile_database.set_index("tile_number", inplace=True)
-        self.tile_database.to_csv(f"{self.config['output_folder']}/Tiles/all_tiles_dataframe.csv")
 
         self.N_tiles = current_tile
 
@@ -382,7 +380,7 @@ class HectorPipe:
         header.insert(1, f"# {tile_RA} {tile_Dec}\n")
 
         DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, skiprows=6)
-        guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.CoADD_ID.astype(str))
+        guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.ID.astype(str))
         with open(guide_tile_out_fname_after_DC, 'w') as f:
             for ln in header:
                 f.write(ln)

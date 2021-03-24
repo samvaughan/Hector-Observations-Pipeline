@@ -215,16 +215,16 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
     Given a tile of targets, select Nsel worth of stars by selecting stars which don't clash with any of our targets. The returned stars are sorted by either their priority (for standard stars) or their R-band magnitude (for guide stars)
 
     Inputs:
-        star_df (dataframe): a dataframe of stars (guide or standard). Must have columns "RA", "DEC" and either "priority" or "R_MAG_AUTO" (see below)
+        star_df (dataframe): a dataframe of stars (guide or standard). Must have columns "RA", "DEC" and either "priority" or "r_mag" (see below)
         tile_df (dataframe): a dataframe containing Nsel targets, created from using 'unpick'. Must have columns "RA" amd "DEC"
         proximity (float): distance between two adjacent bundles, in arcseconds.
         Nsel (int): Return this many stars for each tile.
-        star_type (string): One of either "standards" or "guides". Selects whether we sort the star dataframe by "priority" (for standards) or "R_MAG_AUTO" (for guides)
+        star_type (string): One of either "standards" or "guides". Selects whether we sort the star dataframe by "priority" (for standards) or "r_mag" (for guides)
     """
     if star_type == 'standards':
         star_df = star_df.sort_values(by='priority', ascending=False)
     elif star_type == 'guides':
-        star_df = star_df.sort_values(by='R_MAG_AUTO', ascending=True)
+        star_df = star_df.sort_values(by='r_mag', ascending=True)
     else:
         raise NameError(f"star_type must be either 'standards' or 'guides'; currently {star_type}")
 
@@ -389,7 +389,7 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
         df_targets (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC', "PRIORITY" and "TILED"
-        df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC' and "R_MAG_AUTO"
+        df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC' and "r_mag"
         df_standard_stars (dataframe): A dataframe of standard stars. Must include columns 'RA', 'DEC' and 'priority'
         tiling_parameters (dict): A dictionary containing the various parameters to do with the tiling. So far, necessary keys are 'Hector_FOV_radius', 'proximity', 'Nsel', 'Nsel_guides' and 'Nsel_standards'
     Returns:
@@ -460,10 +460,10 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     return df_targets, tile_members, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec
 
 
-def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number, plot=True):
+def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number, columns_in_order, guide_columns_in_order, plot=True):
     """
     Save the outputs from a single tile. These are:
-        * A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns CATID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!
+        * A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns ID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!
         * A text file called guide_tile_{i}.fld, which contains guide stars (observed with the Hector guide bundles). This has columns RA, DEC, mag
         * A plot of the field with the Nsel best targets selected by this code. Note that this may not resemble the final tile selected by the configuration code!
     Note that we also make two new columns called "MagnetX_noDC" and "MagnetY_noDC" which correspond to the xy positions of the galaxies on the Hector plate in microns from the centre. These have *NOT* been corrected for the optical distortions- that's done by the "DistortionCorrection" code, which happens after each time has been saved.
@@ -494,15 +494,15 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
     guide_stars_for_tile['MagnetX_noDC'] = (guide_stars_for_tile['RA'] - tile_RA) * hector_constants.HECTOR_plate_radius * 1e3
     guide_stars_for_tile['MagnetY_noDC'] = (guide_stars_for_tile['DEC'] - tile_Dec) * hector_constants.HECTOR_plate_radius * 1e3
 
-    save_tile_text_file(outfolder, tile_out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
-    save_guide_text_file(outfolder, guide_out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
+    save_tile_text_file(outfolder, tile_out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, columns_in_order)
+    save_guide_text_file(outfolder, guide_out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, guide_columns_in_order)
 
     if plot:
         if not os.path.exists(f'{outfolder}/Plots'):
             os.makedirs(f'{outfolder}/Plots')
 
         fig, ax = plot_tile(tile_df, guide_stars_for_tile, standard_stars_for_tile, df_targets, tile_RA, tile_Dec, tiling_parameters['Hector_FOV_outer_radius'], tiling_parameters['Hector_FOV_inner_radius'], tile_number, tiling_parameters['proximity'])
-        fig.savefig(f'{outfolder}/Plots/tile_{tile_number:03}.png')
+        fig.savefig(f'{outfolder}/Plots/tile_{tile_number:03}.png', bbox_inches='tight')
         plt.close('all')
 
     return 0
@@ -609,7 +609,7 @@ def plot_tile(tile_df, guide_df, standards_df, catalogue_df, tile_RA, tile_Dec, 
         proximity (float): Radius of the tile
         fig, ax (optional): An exisiting Figure/Axis object to plot on
     """
-    top_target_mask = catalogue_df['CATAID'].isin(tile_df['CATAID']) 
+    top_target_mask = catalogue_df['ID'].isin(tile_df['ID']) 
 
     if fig is None or ax is None:
         fig, ax = plt.subplots(figsize=(14, 10))
@@ -643,7 +643,7 @@ def plot_tile(tile_df, guide_df, standards_df, catalogue_df, tile_RA, tile_Dec, 
     ax.add_artist(circle)
 
 
-    ax.legend(bbox_to_anchor=(1, 0.5))
+    legend = ax.legend(bbox_to_anchor=(1, 0.5))
 
     ax.set_xlabel('Right Ascension')
     ax.set_ylabel('Declination')
@@ -653,7 +653,7 @@ def plot_tile(tile_df, guide_df, standards_df, catalogue_df, tile_RA, tile_Dec, 
     return fig, ax
 
 
-def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters):
+def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, columns_in_order):
     """
     Save a text file of things to be observed with Hector science bundles (i.e. targets and standards). The second line of this text file __must__ be the tile RA and DEC seperated by a space.
     """
@@ -662,24 +662,27 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
         os.makedirs(f"{outfolder}/Tiles")
 
     # Make sure the tile_df is sorted by priority
-    tile_df = tile_df.sort_values(by='isel', ascending=False)
+    tile_df = tile_df.sort_values(by='priority', ascending=False)
 
     # Rename the column headings so things match
-    targets_renamer = dict(CATAID="ID", r_mag='mag')
-    tile_df = tile_df.rename(columns=targets_renamer)
+    #targets_renamer = dict(CATAID="ID")
+    #tile_df = tile_df.rename(columns=targets_renamer)
     tile_df['type'] = 1
 
-    standards_renamer = dict(CoADD_ID='ID', R_MAG_AUTO='mag')
-    standard_stars_for_tile = standard_stars_for_tile.rename(columns=standards_renamer)
+    #standards_renamer = dict(CoADD_ID='ID')
+    #standard_stars_for_tile = standard_stars_for_tile.rename(columns=standards_renamer)
     standard_stars_for_tile['type'] = 0
 
     # combined_stars_targets_df = tile_df[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']].append(standard_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']])
-    combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U',
-       'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U',
-       'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r',
-       'IFU_diam_2Re', 'MassHIpred',  'PRIORITY',
-       'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag',
-       'priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']]
+    if not 'MagnetX_noDC' in columns_in_order:
+        columns_in_order.extend(['priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'MagnetX_noDC', 'MagnetY_noDC', 'type'])
+    combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[columns_in_order]
+    # combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U',
+    #    'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U',
+    #    'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r',
+    #    'IFU_diam_2Re', 'MassHIpred',  'PRIORITY',
+    #    'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag',
+    #    'priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']]
 
     # Write a CSV file with the header we want
     with open(f"{outfolder}/Tiles/{out_name}", 'w') as f:
@@ -691,7 +694,7 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
     return 0
 
 
-def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters):
+def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, guide_columns_in_order):
     """
     Save a text file of things to be observed with Hector guide bundles (i.e. guides). The second line of this text file __must__ be the tile RA and DEC seperated by a space.
     """
@@ -700,10 +703,10 @@ def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, til
         os.makedirs(f"{outfolder}/Tiles")
 
     # Make sure the tile_df is sorted by R band magnitude
-    guide_stars_for_tile = guide_stars_for_tile.sort_values(by='R_MAG_AUTO')
+    guide_stars_for_tile = guide_stars_for_tile.sort_values(by='r_mag')
 
-    guides_renamer = dict(CoADD_ID='ID', R_MAG_AUTO='mag')
-    guide_stars_for_tile = guide_stars_for_tile.rename(columns=guides_renamer)
+    #
+    #guide_stars_for_tile = guide_stars_for_tile.rename(columns=guides_renamer)
     guide_stars_for_tile['type'] = 2
 
     # Write a CSV file with the header we want
@@ -713,7 +716,9 @@ def save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, til
         f.write(f"# Proximity Value: {tiling_parameters['proximity']}\n")
 
     # Add in ['MagnetX_noDC', 'MagnetY_noDC']
-    guide_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'MagnetX_noDC', 'MagnetY_noDC']].to_csv(f"{outfolder}/Tiles/{out_name}", sep=' ', mode='a', index=False)
+    if not 'MagnetX_noDC' in guide_columns_in_order:
+        guide_columns_in_order.extend(['MagnetX_noDC', 'MagnetY_noDC'])
+    guide_stars_for_tile[guide_columns_in_order].to_csv(f"{outfolder}/Tiles/{out_name}", sep=' ', mode='a', index=False)
 
     return 0
 

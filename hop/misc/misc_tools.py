@@ -32,7 +32,6 @@ def _read_table(fname):
         table = pd.read_csv(fname, sep='\t')
     elif extension == '.fits':
         table = P.load_FITS_table_in_pandas(fname)
-        #raise TypeError("Not yet written the code for fits... Exiting!")
     else:
         raise TypeError(f"Catalogue {fname} data type \
             not understood")
