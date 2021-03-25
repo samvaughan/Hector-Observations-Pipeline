@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import subprocess
 import sys
 import itertools
+import datetime
+import shlex
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -188,7 +190,7 @@ class HectorPipe:
 
 
 
-    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, use_galaxy_priorities=True, robot_temperature=19, obs_temperature=8, label="", plateID="", date="", check_sky_fibres=True):
+    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, use_galaxy_priorities=True, robot_temperature=19, obs_temperature=8, label="a test_label", plateID="a test_plateID", date=datetime.date.today().strftime("%Y %m %d"), check_sky_fibres=True):
 
         """
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
@@ -293,7 +295,7 @@ class HectorPipe:
                     self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile, use_galaxy_priorities=use_galaxy_priorities)
 
                     if apply_distortion_correction == True:
-                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date="", robot_temp=19, obs_temp=8, label="", plateID="", distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
+                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=label, plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
 
 
                 if not configured:
@@ -343,7 +345,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="", plateID="", distortion_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -354,15 +356,17 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", date, label, plateID, f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f"{sky_fibre_file}", f"{profit_file_dir}"]
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if not check_sky_fibres:
             DC_bash_code += ["nosky"]
 
+        
         process = subprocess.Popen(DC_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output, error = process.communicate()
         if verbose:
+            self.logger.info(f"Bash command: {shlex.join(DC_bash_code)}")
             self.logger.info(output.decode("utf-8"))
         if process.returncode != 0:
             raise ValueError(output.decode("utf-8"))

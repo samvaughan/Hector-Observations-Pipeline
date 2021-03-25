@@ -119,7 +119,7 @@ for (f in SAMIFields_Targets){
   sky_fibre_data = tile_data[sky_fibre_rows,]
   #Combining guides and targets:
   #* I've changed these column headings to match the outputs of my tiling code
-  fdata=rbind(tile_data[not_sky_fibre_rows,c('ID','MagnetX','MagnetY','mag','type')],gdata[,c('ID','MagnetX','MagnetY','mag','type')])
+  fdata=rbind(tile_data[not_sky_fibre_rows,c('ID','MagnetX','MagnetY','r_mag','type')],gdata[,c('ID','MagnetX','MagnetY','r_mag','type')])
   
   # Converting coordinates into mm
   
