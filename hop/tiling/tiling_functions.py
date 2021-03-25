@@ -419,9 +419,9 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     untiled = df_targets['COMPLETED'] == False # & (df_targets['PRIORITY'] == 8)
 
     if use_galaxy_priorities:
-        priorities = df_targets['PRIORITY']
+        priorities = df_targets['priority']
     else:
-        priorities = pd.Series(np.ones_like(df_targets['PRIORITY']), name='PRIORITY')
+        priorities = pd.Series(np.ones_like(df_targets['priority']), name='priority')
 
     # FIXME
     # This will cause an issue if the separation of two grid points is larger than the FOV size

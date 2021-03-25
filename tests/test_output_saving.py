@@ -45,7 +45,7 @@ def tile_for_testing(tile_RA, tile_Dec):
 
     tiling_parameters = dict(proximity=200)
 
-    columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred',  'PRIORITY',   'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
+    columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred',  'PRIORITY',   'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'r_mag','priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
 
     tile_df = pd.DataFrame(np.zeros((2, len(columns))), columns=columns)
     tile_df['type'] = 1.0
@@ -55,9 +55,9 @@ def tile_for_testing(tile_RA, tile_Dec):
     tile_df['PRIORITY'] = [8, 8]
     tile_df['isel'] = [9, 9]
 
-    standard_stars_for_tile = pd.DataFrame(dict(CoADD_ID=[100, 200], R_MAG_AUTO=[9, 10], RA=[2, 1.9], DEC=[-0.5, -1], isel=[27, 27]))
+    standard_stars_for_tile = pd.DataFrame(dict(CoADD_ID=[100, 200], r_mag=[9, 10], RA=[2, 1.9], DEC=[-0.5, -1], isel=[27, 27]))
 
-    T.save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
+    T.save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, columns_in_order=columns)
 
     tile_for_testing = f"{outfolder}/Tiles/{out_name}"
 
@@ -72,9 +72,10 @@ def guidetile_for_testing(tile_RA, tile_Dec):
 
     tiling_parameters = dict(proximity=200)
 
-    guide_stars_for_tile = pd.DataFrame(dict(CoADD_ID=[100, 200], R_MAG_AUTO=[9, 10], RA=[2, 1.9], DEC=[-0.5, -1], MagnetY_noDC=[0, 0], MagnetX_noDC=[0, 0]))
+    guide_stars_for_tile = pd.DataFrame(dict(ID=[100, 200],  RA=[2, 1.9], DEC=[-0.5, -1], r_mag=[9, 10], type=[2, 2], MagnetX_noDC=[0, 0], MagnetY_noDC=[0, 0]))
+    guide_columns = list(guide_stars_for_tile.columns)
 
-    T.save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters)
+    T.save_guide_text_file(outfolder, out_name, guide_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, guide_columns_in_order=guide_columns)
 
     guidetile_for_testing = f"{outfolder}/Tiles/{out_name}"
 
@@ -107,7 +108,7 @@ class Test_save_target_outfile():
 
     def test_correct_column_names_for_targets(self, tile_for_testing):
 
-        columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred', 'PRIORITY', 'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'mag','priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
+        columns = ['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U', 'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U', 'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r', 'IFU_diam_2Re', 'MassHIpred', 'PRIORITY', 'SersicIndex_r', 'WALLABYflag', 'g_m_i', 'isel', 'r_mag','priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'type', 'MagnetX_noDC', 'MagnetY_noDC']
 
         test_df = pd.read_csv(tile_for_testing, comment='#')
 
@@ -147,7 +148,7 @@ class Test_save_guide_outfile():
         test_df = pd.read_csv(guidetile_for_testing, comment='#', delim_whitespace=True)
 
         # Check that this has column names 'ID', 'RA', 'DEC' and 'mag' and type
-        assert np.array_equal(test_df.columns.tolist(), np.array(['ID', 'RA', 'DEC', 'mag', 'type', 'MagnetX_noDC', 'MagnetY_noDC']))
+        assert np.array_equal(test_df.columns.tolist(), np.array(['ID', 'RA', 'DEC', 'r_mag', 'type', 'MagnetX_noDC', 'MagnetY_noDC']))
 
     def test_index_not_included(self, guidetile_for_testing):
 

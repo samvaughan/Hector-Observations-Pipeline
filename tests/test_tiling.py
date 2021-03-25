@@ -195,7 +195,7 @@ class Test_select_stars_for_tile():
 
     def test_stars_sorted_properly_standards(self):
 
-        star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], R_MAG_AUTO=[10, 11, 10.5, 9]))
+        star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], r_mag=[10, 11, 10.5, 9]))
         tile_df = pd.DataFrame(dict(RA=[-1], DEC=[-1]))
 
         non_clashing_stars = T.select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='standards')
@@ -209,15 +209,15 @@ class Test_select_stars_for_tile():
 
     def test_stars_sorted_properly_guides(self):
 
-        star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], R_MAG_AUTO=[10, 11, 10.5, 9]))
+        star_df = pd.DataFrame(dict(RA=[0, 1, 2, 3], DEC=[0, 1, 2, 3], priority=[1, 2, 10, 3], r_mag=[10, 11, 10.5, 9]))
         tile_df = pd.DataFrame(dict(RA=[-1], DEC=[-1]))
 
         non_clashing_stars = T.select_stars_for_tile(star_df, tile_df, proximity=100, Nsel=10, star_type='guides')
 
         # This array should be sorted by priority in a _descending_ order. Check this is true...
-        vals = non_clashing_stars['R_MAG_AUTO'].values
+        vals = non_clashing_stars['r_mag'].values
         # This is the array sorted descening by numpy
-        sorted_ascending = np.sort(star_df['R_MAG_AUTO'])
+        sorted_ascending = np.sort(star_df['r_mag'])
 
         assert np.array_equal(vals, sorted_ascending)
 

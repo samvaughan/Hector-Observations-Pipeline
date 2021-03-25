@@ -22,15 +22,17 @@ def input_dataframes():
     df_guide_stars = P.load_FITS_table_in_pandas(os.path.expanduser(f'{file_location}/test_save_files/input_test_data/guides.fits'))
     df_standard_stars = P.load_FITS_table_in_pandas(os.path.expanduser(f'{file_location}/test_save_files/input_test_data/standards.fits'))
 
-    df_targets = df_targets.rename(columns=dict(r_Petro='r_mag', CATID='CATAID'))
-    df_guide_stars = df_guide_stars.rename(columns=dict(ROWID='CoADD_ID'))
-    df_standard_stars = df_standard_stars.rename(columns=dict(ROWID='CoADD_ID'))
+    df_targets = df_targets.rename(columns=dict(r_Petro='r_mag', CATID='ID'))
+    df_guide_stars = df_guide_stars.rename(columns=dict(ROWID='ID', R_MAG_AUTO=
+        'r_mag'))
+    df_standard_stars = df_standard_stars.rename(columns=dict(ROWID='ID', R_MAG_AUTO=
+        'r_mag'))
 
     # Add the empty columns which we'll update
     df_targets['COMPLETED'] = False
     df_targets['Tile_number'] = -999
     df_targets['isel'] = -999
-    df_targets['PRIORITY'] = 8.0
+    df_targets['priority'] = 1
     df_targets['remaining_observations'] = 1.0
     df_targets['N_observations_to_complete'] = 1.0
 
@@ -72,12 +74,12 @@ def output_folder(input_dataframes):
         tile_out_fname = os.path.expanduser(f"{output_folder}/Tiles/tile_{current_tile:03}.fld")
 
         df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = T.make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity=proximity, tiling_parameters=tiling_parameters, tiling_type=tiling_type, selection_type='random', fill_spares_with_repeats=fill_spares_with_repeats)
-        T.save_tile_outputs(f'{output_folder}', df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number=current_tile, plot=True)
+        T.save_tile_outputs(f'{output_folder}', df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number=current_tile, plot=True, columns_in_order=df_targets.columns.tolist(), guide_columns_in_order=df_guide_stars.columns.tolist())
 
         best_tile_RAs.append(tile_RA)
         best_tile_Decs.append(tile_Dec)
 
-        selected_targets_mask = df_targets['CATAID'].isin(tile_df['CATAID'])
+        selected_targets_mask = df_targets['ID'].isin(tile_df['ID'])
 
         # Find which ones are being tiled for the first time
         new_targets = (selected_targets_mask) & (df_targets['COMPLETED'] == False)
