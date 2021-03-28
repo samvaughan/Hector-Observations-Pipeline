@@ -229,10 +229,10 @@ def sky_fibre_annotations(skyfibre_file):
 
 def draw_circularSegments():
 
-    draw_circle = plt.Circle((0, 0), 220, fill=True, color='#E78BE7', alpha=0.4)
-    draw_circle1 = plt.Circle((0, 0), (0.823*220), fill=True, color='#f6f93b')
-    draw_circle2 = plt.Circle((0, 0), (0.627*220), fill=True, color='#60fb3d')
-    draw_circle3 = plt.Circle((0, 0), (0.396*220), fill=True, color='#add8e6')
+    draw_circle = plt.Circle((0, 0), 226, fill=True, color='#E78BE7', alpha=0.4)
+    draw_circle1 = plt.Circle((0, 0), (196.05124), fill=True, color='#f6f93b')
+    draw_circle2 = plt.Circle((0, 0), (147.91658), fill=True, color='#60fb3d')
+    draw_circle3 = plt.Circle((0, 0), (92.71721), fill=True, color='#add8e6')
 
     plt.gcf().gca().add_artist(draw_circle)
     plt.gcf().gca().add_artist(draw_circle1)
@@ -292,7 +292,7 @@ def draw_all_magnets(magnets, clusterNum, tileNum, skyfibre_file, robot_figureFi
     axes = plt.gca()
     axes.set_xlim([-350, 350])
     axes.set_ylim([-350, 350])
-    # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.show()                ## for showing the figure of magnets with pickup area
     plt.savefig(hexabundle_figureFile)
     # plt.savefig("image.png", bbox_inches='tight', dpi=100)
 

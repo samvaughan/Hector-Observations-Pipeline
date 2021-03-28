@@ -15,13 +15,13 @@ def assign_magnet_labels(magnet, index1):
 
     # adding labels for circular magnet
     elif magnet.__class__.__name__ == 'circular_magnet':
-        if magnet.rads < 0.396:
+        if magnet.rads < 92.71721:
             magnet.magnet_label = 'Blu'
-        elif 0.396 <= magnet.rads < 0.627:
+        elif 0.396 <= magnet.rads < 147.91658:
             magnet.magnet_label = 'Gre'
-        elif 0.627 <= magnet.rads < 0.823:
+        elif 0.627 <= magnet.rads < 196.05124:
             magnet.magnet_label = 'Yel'
-        elif magnet.rads >= 0.823:
+        elif magnet.rads >= 196.05124:
             magnet.magnet_label = 'Mag'
 
     return magnet, index1
