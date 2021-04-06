@@ -8,50 +8,104 @@ import time
 # arranging the guides files in consistent format with hexas files
 def arrange_guidesFile(fileNameGuides,proxyGuideFile):
 
-    # index to keep count
-    ExtraCols = 1
+    df = pd.read_csv(fileNameGuides,sep=' ')
+    df.columns = ['probe', 'x', 'y', 'rads', 'angs', 'azAngs', 'angs_azAng']
 
-    # reading the guides cdv file
-    df = pd.read_csv(fileNameGuides)
+    for i in range(len(df['probe'])):
+        df['probe'][i] = int(22 + i)
+    print(df)
 
-    # The columns being filled up with NaN to keep the guides file same format as the hexas file
-    for i in range(35):
-        df['ColFillUp%d' % ExtraCols] = 'NaN'
-        ExtraCols += 1
+    probe_number = list(df['probe'])
+    circular_magnet_center_x = list(df['x'])
+    circular_magnet_center_y = list(df['y'])
+    rads = list(df['rads'])
+    angs = list(df['angs'])
+    azAngs = list(df['azAngs'])
+    rectangle_magnet_input_orientation = list(df['angs_azAng'])
 
-    # writing to the proxy guides file
-    df.to_csv(proxyGuideFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
+    # for i in range(len(probe_number)):
+    #     IDs[i] = float('NaN')
+    #     galaxyORstar[i] = float('NaN')
+    #     Re[i] = float('NaN')
+    #     mu_1re[i] = float('NaN')
+    #     Mstar[i] = float('NaN')
 
-    # adding in two more columns at the start of the proxy file for the IDs and the magnet indexes
-    rows = [line.split(' ') for line in open(proxyGuideFile)]
-    cols = list(zip(*rows))
-    cols.insert(1, ['"1stCol"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
-    cols.insert(1, ['21', '22', '23', '24', '25', '26', '27'])
-    cols.insert(1, ['"IDs"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
-    cols = cols[1:]
-    rows = list(zip(*cols))
+    guideFileList = [probe_number, \
+    IDs, \
+    circular_magnet_center_x, \
+    circular_magnet_center_y, \
+    rads, \
+    angs, \
+    azAngs, \
+    rectangle_magnet_input_orientation, \
+    galaxyORstar, \
+    Re, \
+    mu_1re, \
+    Mstar ]
 
-    # writing those two columns created above to the file
-    with open(proxyGuideFile, 'w') as f:
-        f.writelines([' '.join(row) for row in rows[1:]])
+    print(guideFileList)
+
+    return df, guideFileList
+    # # index to keep count
+    # ExtraCols = 1
+    #
+    # # reading the guides cdv file
+    # df = pd.read_csv(fileNameGuides)
+    #
+    # # The columns being filled up with NaN to keep the guides file same format as the hexas file
+    # for i in range(32):
+    #     df['ColFillUp%d' % ExtraCols] = 'NaN'
+    #     ExtraCols += 1
+    #
+    # # writing to the proxy guides file
+    # df.to_csv(proxyGuideFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    #
+    # # adding in two more columns at the start of the proxy file for the IDs and the magnet indexes
+    # rows = [line.split(' ') for line in open(proxyGuideFile)]
+    # cols = list(zip(*rows))
+    # # cols.insert(1, ['"1stCol"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
+    # cols.insert(1, ['21', '22', '23', '24', '25', '26', '27'])
+    # # cols.insert(1, ['"IDs"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
+    # cols = cols[1:]
+    # rows = list(zip(*cols))
+    #
+    # # writing those two columns created above to the file
+    # with open(proxyGuideFile, 'w') as f:
+    #     f.writelines([' '.join(row) for row in rows[1:]])
 
 # merging the hexas and guides file to create one plate file with all the magnets
-def merge_hexaAndGuides(fileNameHexa, proxyGuideFile, plate_file):
+def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
-    # adding the proxy guides file to the hexas file
-    with open(fileNameHexa) as fp:
-        file1 = fp.read()
-    with open(proxyGuideFile) as fp:
-        file2 = fp.read()
-    file1 += file2
+    df1 = pd.read_csv(fileNameHexa,sep=' ')
 
-    # creating a plate file to write the added hexas and guides
-    with open(plate_file, 'w+') as fp:
-        fp.write(file1)
+    # print(df1)
+    mask = df1['probe'] < 22
+    df_1 = df1[mask]
+    print(df_1)
+    print(df_guideFile)
 
-    # print statement to check from terminal the plate file of the tile which is being checked
-    print("Filename being checked for conflicts:")
-    print(fileNameHexa)
+    df_plateFile = pd.concat([df_1, df_guideFile], sort=False)
+
+    df_plateFile.fillna('NA', inplace=True)
+
+    df_plateFile.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+
+
+    # # adding the proxy guides file to the hexas file
+    # with open(fileNameHexa) as fp:
+    #     file1 = fp.read()
+    # with open(proxyGuideFile) as fp:
+    #     file2 = fp.read()
+    # file1 += file2
+    #
+    # # creating a plate file to write the added hexas and guides
+    # with open(plate_file, 'w+') as fp:
+    #     fp.write(file1)
+    #
+    # # print statement to check from terminal the plate file of the tile which is being checked
+    # print("Filename being checked for conflicts:")
+    # print(fileNameHexa)
 
 # creating the robotFile array for
 def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
@@ -112,7 +166,6 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     w, h = len(positioning_array[:, 9]) + 1, 1
     rePosition_col = [['[0]' for x in range(w)] for y in range(h)]
 
-
     # filling out the created list with the blocked magnets dictionary in order with the robot file array
     for each_magnet in fully_blocked_magnets_dictionary:
         for i in range(len(robotFilearray)):
@@ -159,7 +212,7 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 
     # adding the title row and getting rid of some columns not required
     positioning_array_circular = np.insert(positioning_array_circular, 0, np.array(newrow_circular), 0)
-    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10, 11], 1)
+    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10], 1)
 
     # splitting positioning array to keep only rectangular ones
     positioning_array = np.vsplit(positioning_array, 2)[1]
@@ -180,6 +233,8 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 
         # Create a csv.writer object from the output file object
         csv_writer = csv.writer(write_obj)
+
+        print(positioning_array_circular)
 
         # Read each row of the input csv file as list
         for row in csv_reader:

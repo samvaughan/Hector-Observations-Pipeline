@@ -382,7 +382,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
         if str(i.IDs) != 'nan' and i.__class__.__name__ == 'rectangular_magnet' and (i.IDs not in galaxyIDrecord):
-                galaxyIDrecord[round(i.IDs)] = ''
+                galaxyIDrecord[i.IDs] = ''
 
         # Getting an array count of mu_1re graeter and less than 22
         if i.__class__.__name__ == 'rectangular_magnet' and i.galaxyORstar == 1 and i.Re < 12:

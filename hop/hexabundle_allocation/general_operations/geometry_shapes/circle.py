@@ -29,8 +29,8 @@ class circle:
         circle.calculate_circle_all_coordinates(self)
 
         plt.figure(1)
-        plt.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha = 0.5)
-        plt.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha = 0.5)
+        plt.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha=0.5)
+        plt.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha=0.5)
         plt.axis('scaled')
 
 ################################################################
