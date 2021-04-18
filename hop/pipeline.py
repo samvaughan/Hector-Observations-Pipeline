@@ -406,21 +406,17 @@ class HectorPipe:
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
         ### FIXME- add documentation here
-        
-        # fileNameGuides = ('GAMA_'+batch+'/Configuration/HECTORConfig_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
+
+        # Input config files to be read from
         fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-
-        # proxy file to arrange guides in required format to merge with hexa probes
-        proxyGuideFile = f'{self.allocation_files_location_base}/newfile.txt'
-
-        # Adding ID column and getting rid of the header line of Guides cluster to add to the hexa cluster
-        df_guideFile, guideFileList = file_arranging.arrange_guidesFile(fileNameGuides, proxyGuideFile)
-
-        # fileNameHexa = ('GAMA_'+batch+'/Configuration/HECTORConfig_Hexa_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
         fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
+        # files to be output to after arranging the guide and hexa probe data
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        # plate_file = get_file('GAMA_'+batch+'/Output/Hexa_and_Guides_GAMA_'+batch+'_tile_%03d.txt' % (tileNum))
+        guide_outputFile = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+
+        # Adding ID column and getting rid of the header line of Guides cluster to add to the hexa cluster
+        df_guideFile, guideFileList = file_arranging.arrange_guidesFile(fileNameHexa, fileNameGuides, guide_outputFile)
 
         # Adding guides cluster txt file to hexa cluster txt file
         file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
@@ -480,8 +476,8 @@ class HectorPipe:
         print(positioning_array)
 
         # insert column heading and print only rectangular magnet rows in the csv file
-        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle']
-        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle']
+        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle', 'rectMag_inputOrientation']
+        newrow_circular = ['Magnet', 'Label', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order', 'Pickup_option', 'ID', 'Index', 'Hexabundle', 'rectMag_inputOrientation']
 
         # final two output files
         outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
@@ -494,7 +490,7 @@ class HectorPipe:
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
 
         # produce final files with consistent layout and no extra commas
-        file_arranging.finalFiles(outputFile, robotFile)
+        file_arranging.finalFiles(outputFile, fileNameHexa)
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
@@ -526,15 +522,12 @@ class HectorPipe:
         # # create figure of magnified sky fibre positioning in slitlets
         # fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
         #
-        # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
-        # tile_1 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        # tile_2 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{(tile_number+1):03d}.txt"
-        # subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_previous.pdf"
-        # subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_current.pdf"
-        # fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2,fileNameHexa)
-
-
-
+        ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+        tile_1 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        tile_2 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{(tile_number+1):03d}.txt"
+        subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_previous.pdf"
+        subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_current.pdf"
+        fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2,fileNameHexa)
 
 
 

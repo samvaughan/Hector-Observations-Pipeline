@@ -28,10 +28,7 @@ def remove_apostrophes(s):
 # extracting the list of probes with all the respective parameters required from the file
 def create_list_of_probes_from_file(file,guideFileList):
 
-    df = pd.read_csv(file,sep=' ')#,usecols=['probe','IDs','x','y','rads','angs','azAngs','angs_azAng','type','Re','Mstar','GAL_MU_E_R'])
-                     # converters={1: parse_col_string, 5: parse_col_string, 6: parse_col_string, 7: parse_col_string,
-                     #              8: parse_col_string, 9: remove_apostrophes, 43: parse_col_string, 12: parse_col,
-                     #              13: parse_col, 24: parse_col})
+    df = pd.read_csv(file,sep=' ')
 
     print(df.keys())
     print(df['Re'])
@@ -43,11 +40,10 @@ def create_list_of_probes_from_file(file,guideFileList):
             print(i)
             count_split += 1
 
-    mask = df['probe'] < 22
+    mask = df['IDs'] > 0
     df_1 = df[mask]
 
-    # df_1 = df.iloc[:count_split, :]
-    # print(df_1)
+    print(df_1['IDs'])
     df_2 = df[~mask]
 
     print("Shape of new dataframes - {} , {}".format(df_1.shape, df_2.shape))

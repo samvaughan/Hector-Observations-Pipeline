@@ -86,7 +86,7 @@ def magnetPair_radialPositionOffset(plate_file):
     # L = L_initial x ( 1 + α ⋅ ΔT)
 
     # store magnet pair index and offset distance accordingly, to be derived
-    magnetPair_offset = []
+    magnetPair_offset = [(1,2)]
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
     csv_input = pd.read_csv(plate_file,skipinitialspace=True)
@@ -136,6 +136,7 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
                                                          each_probe.circular_magnet_center[1] - (sin(theta) * item[1]))
 
                 ### TEST PRINT
+                print('RADIAL OFFSET CHANGEEE')
                 print(each_probe.circular_magnet_center)
 
     return list_of_probes

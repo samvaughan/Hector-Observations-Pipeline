@@ -6,14 +6,22 @@ import re
 import time
 
 # arranging the guides files in consistent format with hexas files
-def arrange_guidesFile(fileNameGuides,proxyGuideFile):
+def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
 
     df = pd.read_csv(fileNameGuides,sep=' ')
     df.columns = ['probe', 'x', 'y', 'rads', 'angs', 'azAngs', 'angs_azAng']
 
+    df1 = pd.read_csv(fileNameHexa,sep=' ')
+
+    mask = df1['probe'] < 22
+    df_new = df1[mask]
+
+    # reading the index value of last hex probe to get count of hexa probes
+    hexaCount = int(df_new['probe'][df_new.index[-1]]) + 1
+
+    # probe numbering for the guid probes, counting onward from hexa count
     for i in range(len(df['probe'])):
-        df['probe'][i] = int(22 + i)
-    print(df)
+        df['probe'][i] = int(hexaCount + i)
 
     probe_number = list(df['probe'])
     circular_magnet_center_x = list(df['x'])
@@ -24,12 +32,6 @@ def arrange_guidesFile(fileNameGuides,proxyGuideFile):
     rectangle_magnet_input_orientation = list(df['angs_azAng'])
 
     IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
-    # for i in range(len(probe_number)):
-    #     IDs[i] = float('NaN')
-    #     galaxyORstar[i] = float('NaN')
-    #     Re[i] = float('NaN')
-    #     mu_1re[i] = float('NaN')
-    #     Mstar[i] = float('NaN')
 
     guideFileList = [probe_number, \
     IDs, \
@@ -44,7 +46,7 @@ def arrange_guidesFile(fileNameGuides,proxyGuideFile):
     mu_1re, \
     Mstar ]
 
-    print(guideFileList)
+    df.to_csv(guide_outputFile, index=False, sep=' ')
 
     return df, guideFileList
     # # index to keep count
@@ -79,13 +81,12 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
     df1 = pd.read_csv(fileNameHexa,sep=' ')
 
-    # print(df1)
     mask = df1['probe'] < 22
-    df_1 = df1[mask]
-    print(df_1)
+    df_new = df1[mask]
+
     print(df_guideFile)
 
-    df_plateFile = pd.concat([df_1, df_guideFile], sort=False)
+    df_plateFile = pd.concat([df_new, df_guideFile], sort=False)
 
     df_plateFile.fillna('NA', inplace=True)
 
@@ -212,14 +213,14 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 
     # adding the title row and getting rid of some columns not required
     positioning_array_circular = np.insert(positioning_array_circular, 0, np.array(newrow_circular), 0)
-    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10], 1)
+    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10,11], 1)
 
     # splitting positioning array to keep only rectangular ones
     positioning_array = np.vsplit(positioning_array, 2)[1]
 
     # adding the title row and getting rid of some columns not required
     positioning_array = np.insert(positioning_array, 0, np.array(newrow), 0)
-    positioning_array = np.delete(positioning_array, [2, 3, 4, 5, 8], 1)
+    positioning_array = np.delete(positioning_array, [2, 3, 4, 5, 8, 11], 1)
 
     # index for keeping count
     index = 0
@@ -254,10 +255,21 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
     return positioning_array,positioning_array_circular
 
 # final files being formatted to maintain consistency
-def finalFiles(outputFile, robotFile):
+def finalFiles(outputFile, fileNameHexa):
 
     df3 = pd.read_csv(outputFile, header=0)
-    df3.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+
+    df1 = pd.read_csv(fileNameHexa,sep=' ')
+
+    mask = df1['probe'] < 22
+    df_new = df1[~mask]
+
+
+    df_tileOutput = pd.concat([df3, df_new], sort=False)
+
+    df_tileOutput.fillna('NA', inplace=True)
+
+    df_tileOutput.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
     # df4 = pd.read_csv(robotFile, header=0, error_bad_lines=False)
     # df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')

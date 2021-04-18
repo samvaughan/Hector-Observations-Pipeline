@@ -210,6 +210,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     # fibre_data = pd.read_excel(fibre_file)
 
     plt.figure(3)
+    plt.clf()
     j = 1
     for slitlet_count in range(13):
 
@@ -347,7 +348,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     ## Spector slitelets figure
 
     plt.figure(4)
-
+    plt.clf()
     j = 1
     for slitlet_count in range(19):
 
@@ -574,6 +575,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
 def create_skyFibreSlitlet_figure( new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
 
     plt.figure(5)
+    plt.clf()
     fs = 5
 
     skyFibresArray_AAOmega = {}
@@ -673,6 +675,7 @@ def create_skyFibreSlitlet_figure( new_arrayAAOmega,new_arraySpector, skyFibre_A
 
 
     plt.figure(6)
+    plt.clf()
     fs = 5
 
     skyFibresArray_Spector = {}
@@ -802,6 +805,7 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
 
 
     plt.figure(7)
+    plt.clf()
 
     skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
     skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
@@ -822,6 +826,7 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
     plt.savefig(subplateSkyfibre_figureFile_tile1)
 
     plt.figure(8)
+    plt.clf()
 
     # skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
     # skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
