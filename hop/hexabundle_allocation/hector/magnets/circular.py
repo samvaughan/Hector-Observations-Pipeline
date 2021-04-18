@@ -22,6 +22,7 @@ class circular_magnet(circle):
         self.rotation_pickup = rotation_pickup
         self.rotation_putdown = rotation_putdown
         self.azAngs = azAngs
+        self.rectangular_magnet_input_orientation = rectangular_magnet_input_orientation
         self.IDs = IDs
 
     # calculating the distance between magnet center to pickup area center
