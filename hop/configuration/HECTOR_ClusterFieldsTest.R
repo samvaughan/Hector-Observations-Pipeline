@@ -165,7 +165,7 @@ gazAngs=final_config$gazAngs
 probes=defineprobe(x=pos[,'x'],y=pos[,'y'],angs=angs)
 conflicts=find_probe_conflicts(probes=probes, pos=pos, angs=angs)
 nconflicts=dim(conflicts)[1]
-print(paste('There were ', as.character(nconflicts), ' unresolvable conflicts in field ', as.character(i)))
+print(paste('There were ', as.character(nconflicts), ' unresolvable conflicts in the field'))
 itnconflicts=c(itnconflicts,nconflicts)
 swapsneeded=c(swapsneeded,final_config$swaps)
 
