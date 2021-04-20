@@ -270,8 +270,10 @@ class HectorPipe:
             if configure_tiles:
                 if apply_distortion_correction:
                     tile_file_for_configuration = tile_out_fname_after_DC
+                    guide_tile_for_configuration = guide_tile_out_fname_after_DC
                 else:
                     tile_file_for_configuration = tile_out_fname
+                    guide_tile_for_configuration = guide_tile_out_fname
 
             # Run the tiling
             self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=self.config['proximity'], current_tile=current_tile, use_galaxy_priorities=use_galaxy_priorities)
@@ -298,7 +300,7 @@ class HectorPipe:
 
                     # Now call Caro's code
                     self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
-                    Configuration_bash_code = ["Rscript", self.ConfigurationCode_location, tile_file_for_configuration, configuration_output_filename, configuration_guide_filename, '--plot_filename',configuration_plot_filename]
+                    Configuration_bash_code = ["Rscript", self.ConfigurationCode_location, tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, '--plot_filename', configuration_plot_filename]
                     try:
                         process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
                         self.logger_R_code.info(process.stdout)
