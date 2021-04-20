@@ -93,7 +93,7 @@ swapsneeded=c()
 
 
 print(paste('********************************************'))
-print(paste('Configuring field ',f, sep=''))
+print(paste('Configuring field ', tile_filename, sep=''))
 print(paste('********************************************'))
 
 #Reading in the field data (fd):
@@ -101,7 +101,7 @@ print(paste('********************************************'))
 #* And f, which the name of the file
 #* Also added a slash here, in the sep argument (was originally sep=' ')
 #* And changed the substr call below, as the name of the files is different to the original format
-fieldsfolder = dirname(SAMIFields_Targets)
+
 
 tile_data=read.table(file=tile_filename, header=TRUE, sep=',', comment.char="#", check.names = TRUE, stringsAsFactors = FALSE)
 
