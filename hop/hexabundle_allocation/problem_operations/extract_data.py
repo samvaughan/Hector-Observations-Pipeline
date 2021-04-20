@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+from io import StringIO
+import string
 from ..hector.probe import probe
 from ..problem_operations. offsets import radialPositionOffset
 
@@ -9,22 +12,84 @@ def parse_col(s):
     except ValueError:
         return 0
 
+def parse_col_string(s):
+    try:
+        return float(s)
+    except ValueError:
+        return s
+
+def remove_apostrophes(s):
+    try:
+        return float(s)
+    except ValueError:
+        s.decode('utf-8')
+        return s.replace("\"", "")
+
 # extracting the list of probes with all the respective parameters required from the file
-def create_list_of_probes_from_file(file):
+def create_list_of_probes_from_file(file,guideFileList):
+
+    df = pd.read_csv(file,sep=' ')
+
+    print(df.keys())
+    print(df['Re'])
+    # headers = pd.read_csv(file, nrows=0,delimiter='\t').columns.tolist()
+    count_split = 0
+    print(df['probe'])
+    for i in df['probe']:
+        if 0<i<28 :
+            print(i)
+            count_split += 1
+
+    mask = df['IDs'] > 0
+    df_1 = df[mask]
+
+    print(df_1['IDs'])
+    df_2 = df[~mask]
+
+    print("Shape of new dataframes - {} , {}".format(df_1.shape, df_2.shape))
+
+    probe_number = list(df_1['probe'])
+    probe_number = [round(num) for num in probe_number]
+    probe_number += guideFileList[0]
+
+    IDs = list(df_1['IDs']) + guideFileList[1]
+    circular_magnet_center_x = list(df_1['x']) + guideFileList[2]
+    circular_magnet_center_y = list(df_1['y']) + guideFileList[3]
+    rads = list(df_1['rads']) + guideFileList[4]
+    angs = list(df_1['angs']) + guideFileList[5]
+    azAngs = list(df_1['azAngs']) + guideFileList[6]
+    rectangle_magnet_input_orientation = list(df_1['angs_azAng']) + guideFileList[7]
+
+    galaxyORstar = list(df_1['type'])
+    galaxyORstar = [round(num) for num in galaxyORstar]
+    galaxyORstar += guideFileList[8]
+
+    Re = list(df_1['Re']) + guideFileList[9]
+    mu_1re = list(df_1['GAL_MU_E_R']) + guideFileList[10]
+    Mstar = list(df_1['Mstar']) + guideFileList[11]
+
+    print(rectangle_magnet_input_orientation)
+
+    print(galaxyORstar)
+
+    # for type, df_type in df.groupby('type'):
+    #     df_new
+    #
+    # print(df_new)
 
     # Parameters required being extracted as lists
-    probe_number, \
-    IDs, \
-    circular_magnet_center_x, \
-    circular_magnet_center_y, \
-    rads, \
-    angs, \
-    azAngs, \
-    rectangle_magnet_input_orientation, \
-    galaxyORstar, \
-    Re, \
-    mu_1re, \
-    Mstar = np.loadtxt(file, skiprows=1, unpack=True, converters={12:parse_col,13:parse_col,24:parse_col}, usecols =[1,9,3,4,5,6,7,8,43,12,24,13])
+    # probe_number, \
+    # IDs, \
+    # circular_magnet_center_x, \
+    # circular_magnet_center_y, \
+    # rads, \
+    # angs, \
+    # azAngs, \
+    # rectangle_magnet_input_orientation, \
+    # galaxyORstar, \
+    # Re, \
+    # mu_1re, \
+    # Mstar = np.loadtxt(file, skiprows=1, unpack=True, converters={1:parse_col_string,5:parse_col_string,6:parse_col_string,7:parse_col_string,8:parse_col_string,9:remove_apostrophes,43:parse_col_string,12:parse_col,13:parse_col,24:parse_col}, usecols =[1,9,3,4,5,6,7,8,43,12,24,13])
 
     # PROBES list created
     list_of_probes = []
@@ -62,10 +127,10 @@ def create_list_of_probes_from_file(file):
     return list_of_probes
 
 # creating a list of circular and rectangular magnets separately from the probes list
-def create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_offset):
+def create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList,magnetPair_offset):
 
     # creating probes list from file
-    list_of_probes = create_list_of_probes_from_file(file)
+    list_of_probes = create_list_of_probes_from_file(file,guideFileList)
 
     # adjusting the radial position offsets to the magnet pair due to thermal expansion
     list_of_probes = radialPositionOffset(list_of_probes, magnetPair_offset)
@@ -86,10 +151,10 @@ def create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_of
 
     return list_of_circular_magnet,list_of_rectangular_magnet
 
-def create_list_of_all_magnets_from_file(file,magnetPair_offset):
+def create_list_of_all_magnets_from_file(file,guideFileList,magnetPair_offset):
 
     # extracting circular and rectangular magnets list from the list of probes which is first extracted from file
-    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,magnetPair_offset)
+    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList,magnetPair_offset)
 
     return np.concatenate([circular_magnets, rectangular_magnets])
 

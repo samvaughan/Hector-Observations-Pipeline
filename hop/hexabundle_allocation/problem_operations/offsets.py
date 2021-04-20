@@ -9,13 +9,13 @@ import sys
 import re
 
 # Adjusting offset to move circular magnet closer to OR far from rectangular magnet
-def hexaPositionOffset(all_magnets):
+def hexaPositionOffset(all_magnets,offsetFile):
 
     offset_distance = 0.0  # to be derived from excel file
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 24:
+        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 5:
 
             # getting the orientation of rectangular magnet with respect to North(up)
             ang = i.orientation
@@ -36,7 +36,7 @@ def hexaPositionOffset(all_magnets):
 
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'circular_magnet' and i.index == 24:
+        if i.__class__.__name__ == 'circular_magnet' and i.index == 5:
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
             angle_adjusted = 450+ang
@@ -47,7 +47,13 @@ def hexaPositionOffset(all_magnets):
 
             rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
 
+            # subtracting offset distance moves circular magnet upwards toward plate edge
+            # (P-perpendicular movement to rectangular magnet)
+            i.center = (i.center[0] - rotation_matrix_circle[1][0] * offset_distance, \
+                                      i.center[1] - rotation_matrix_circle[1][1] * offset_distance)
+
             # subtracting offset distance moves circular magnet closer to rectangular
+            # (Q-parallel movement to rectangular magnet)
             i.center = (i.center[0] - rotation_matrix_circle[0][0] * offset_distance, \
                                       i.center[1] - rotation_matrix_circle[0][1] * offset_distance)
             i.offset = offset_distance
@@ -75,13 +81,16 @@ def magnetPair_radialPositionOffset(plate_file):
 
     # T_observed > T_configured then radial inward movement by magnet
     # T_observed < T_configured then radial outward movement by magnet
-    # coeff. of thermal expansion =  1.2 × 10−6 K^(−1)
+    # ΔT = T_configured - T_observed
+    # coeff. of thermal expansion, α=  1.2 × 10−6 K^(−1),[Common grades of Invar, measured between 20 °C and 100 °C]
+    # L = L_initial x ( 1 + α ⋅ ΔT)
 
     # store magnet pair index and offset distance accordingly, to be derived
-    magnetPair_offset = []
+    magnetPair_offset = [(1,2)]
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
-    csv_input = pd.read_csv(plate_file)
+    csv_input = pd.read_csv(plate_file,skipinitialspace=True)
+    # print(pd.read_csv(plate_file, index_col=0, nrows=0).columns.tolist())
     csv_input['magnetPair_offset'] = '0.000'
     csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE,escapechar=' ')
     # csv_input = pd.read_csv(plate_file, header=0)
@@ -127,6 +136,7 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
                                                          each_probe.circular_magnet_center[1] - (sin(theta) * item[1]))
 
                 ### TEST PRINT
+                print('RADIAL OFFSET CHANGEEE')
                 print(each_probe.circular_magnet_center)
 
     return list_of_probes
@@ -134,7 +144,6 @@ def radialPositionOffset(list_of_probes,magnetPair_offset):
 def magnetOffsets_asColumns_toFile():
 
     #
-
 
 
     return

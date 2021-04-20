@@ -114,37 +114,62 @@ def coordinates_and_angle_of_skyFibres(angle,radii):
 
 def read_sky_fibre_file(filename):
 
-    dataframe = pd.read_csv(filename,skiprows=lambda x: x in [0,1,2,3,4,5])
-    print(dataframe)
-
-    subplate_name = dataframe['ID']
-    position = dataframe['Position']
-
-    skyfibreDict = {}
-    j = 0
-    for i in subplate_name:
-        if i[0] == 'S':
-
-            if i[4] == 'A':
-                fib_num = 7
-            elif i[4] == 'H':
-                fib_num = 8
-
-            num = [int(s) for s in i.split('-') if s.isdigit()]
-            num = int(num[0])
-
-            k = 1
-            while num > fib_num:
-                num = num - fib_num
-                k += 1
-
-            if (i[4]+str(k)) not in skyfibreDict:
-                skyfibreDict[i[4]+str(k)] = []
-            skyfibreDict[i[4] + str(k)].append({int(num): int(position[j])})
-
-        j += 1
+    # dataframe = pd.read_csv(filename,skiprows=lambda x: x in [0,1,2,3,4,5])
+    # # print(dataframe)
+    #
+    # subplate_name = dataframe['ID']
+    # position = dataframe['Position']
+    #
+    # skyfibreDict = {}
+    # j = 0
+    # for i in subplate_name:
+    #     if i[0] == 'S':
+    #
+    #         if i[4] == 'A':
+    #             fib_num = 7
+    #         elif i[4] == 'H':
+    #             fib_num = 8
+    #
+    #         num = [int(s) for s in i.split('-') if s.isdigit()]
+    #         num = int(num[0])
+    #
+    #         k = 1
+    #         while num > fib_num:
+    #             num = num - fib_num
+    #             k += 1
+    #
+    #         if (i[4]+str(k)) not in skyfibreDict:
+    #             skyfibreDict[i[4]+str(k)] = []
+    #         skyfibreDict[i[4] + str(k)].append({int(num): int(position[j])})
+    #
+    #     j += 1
 
     # print(skyfibreDict)
+
+    df_skyfibre = pd.read_csv(filename, sep=' ')
+
+    mask = df_skyfibre['probe'] < 22
+    df_skyfibre = df_skyfibre[~mask]
+    print("\nFibre file reading array here")
+    print(df_skyfibre)
+
+    skyfibreDict = {}
+    subplate_info = df_skyfibre['IDs']
+    position = df_skyfibre['Position']
+    position.reset_index(drop=True, inplace=True)
+    print(position)
+    j = 0
+    for i in subplate_info:
+        # print(i[4:6])
+        # print(i[7])
+        # print(int(position[0]))
+
+        # skyfibreDict[i[4:5]] = {int(i[7]): int(position[j])}
+        if (str(i[4:6])) not in skyfibreDict:
+            skyfibreDict[str(i[4:6])] = []
+        skyfibreDict[str(i[4:6])].append({int(i[7]): int(position[j])})
+
+        j += 1
 
     return skyfibreDict
 
@@ -229,17 +254,18 @@ def sky_fibre_annotations(skyfibre_file):
 
 def draw_circularSegments():
 
-    draw_circle = plt.Circle((0, 0), 220, fill=True, color='#E78BE7', alpha=0.4)
-    draw_circle1 = plt.Circle((0, 0), (0.823*220), fill=True, color='#f6f93b')
-    draw_circle2 = plt.Circle((0, 0), (0.627*220), fill=True, color='#60fb3d')
-    draw_circle3 = plt.Circle((0, 0), (0.396*220), fill=True, color='#add8e6')
+    draw_circle = plt.Circle((0, 0), 226, fill=True, color='#E78BE7', alpha=0.4)
+    draw_circle1 = plt.Circle((0, 0), (196.05124), fill=True, color='#f6f93b')
+    draw_circle2 = plt.Circle((0, 0), (147.91658), fill=True, color='#60fb3d')
+    draw_circle3 = plt.Circle((0, 0), (92.71721), fill=True, color='#add8e6')
 
     plt.gcf().gca().add_artist(draw_circle)
     plt.gcf().gca().add_artist(draw_circle1)
     plt.gcf().gca().add_artist(draw_circle2)
     plt.gcf().gca().add_artist(draw_circle3)
 
-def draw_all_magnets(magnets, clusterNum, tileNum, skyfibre_file, robot_figureFile, hexabundle_figureFile):
+
+def draw_all_magnets(magnets, clusterNum, tileNum, fileNameHexa, robot_figureFile, hexabundle_figureFile):
     # plt.figure(2)
     # draw_magnet_pickup_areas(magnets, '--c')
 
@@ -247,7 +273,7 @@ def draw_all_magnets(magnets, clusterNum, tileNum, skyfibre_file, robot_figureFi
 
     draw_circularSegments()
 
-    sky_fibre_annotations(skyfibre_file)
+    sky_fibre_annotations(fileNameHexa)
 
     # plt.figure(2)
     # draw_magnet_pickup_areas(magnets, '--c')

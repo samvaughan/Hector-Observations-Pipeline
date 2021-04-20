@@ -210,6 +210,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     # fibre_data = pd.read_excel(fibre_file)
 
     plt.figure(3)
+    plt.clf()
     j = 1
     for slitlet_count in range(13):
 
@@ -347,7 +348,7 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     ## Spector slitelets figure
 
     plt.figure(4)
-
+    plt.clf()
     j = 1
     for slitlet_count in range(19):
 
@@ -571,9 +572,10 @@ def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, 
     plt.savefig(fibreFigure_Spector, dpi=500)
 
 
-def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
+def create_skyFibreSlitlet_figure( new_arrayAAOmega,new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure):
 
     plt.figure(5)
+    plt.clf()
     fs = 5
 
     skyFibresArray_AAOmega = {}
@@ -673,6 +675,7 @@ def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpect
 
 
     plt.figure(6)
+    plt.clf()
     fs = 5
 
     skyFibresArray_Spector = {}
@@ -711,7 +714,13 @@ def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpect
                 for j in skyFibresArray_Spector[i]:
 
                     for l in j:
-                        print(l)
+
+                        position = random.randint(0, 3) # MUST CHANGE TO READING ACTUAL POSITION OF SKYFIBRE SUBPLATES
+                        if position == 0:
+                            fill_color = 'black'
+                        elif position != 0:
+                            fill_color = 'grey'
+
                         if l == 'nan':
                             color = 'red'
                             text = '▮'
@@ -732,13 +741,19 @@ def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpect
                         elif skyFibresArray_Spector[i][k][l] == 45:
                             Y_adjustment = 0
                         plt.gcf().gca().add_patch(
-                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color, facecolor='black',
+                            patches.Rectangle((x_start, y_start + Y_adjustment), 10, 10, edgecolor=color, facecolor=fill_color,
                                               lw=1, zorder=3))
 
                         plt.gcf().gca().add_artist(
                             plt.annotate(text, xy=(x_start, y_start + Y_adjustment + 5),
                                          xytext=(x_text, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
                                          ha=direction, va='center', rotation=0, color=color,
+                                         arrowprops=dict(arrowstyle='-', lw=1.0)))
+
+                        plt.gcf().gca().add_artist(
+                            plt.annotate(str(position), xy=(x_start + 10, y_start + Y_adjustment + 5),
+                                         xytext=(x_text + 18, y_start + Y_adjustment + 5), xycoords='data', fontsize=fs, \
+                                         ha='right', va='center', rotation=0, color=color,
                                          arrowprops=dict(arrowstyle='-', lw=1.0)))
 
                         if x_text == x_start - 5:
@@ -758,10 +773,39 @@ def create_skyFibreSlitlet_figure(skyfibre_file, new_arrayAAOmega,new_arraySpect
     plt.savefig(skyFibre_SpectorFigure)
 
 
-def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figureFile_tile1,subplateSkyfibre_figureFile_tile2):
+def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figureFile_tile1,subplateSkyfibre_figureFile_tile2,fileNameHexa):
+
+    # df_skyfibre = pd.read_csv(fileNameHexa, sep=' ')
+    #
+    # mask = df_skyfibre['probe'] < 22
+    # df_skyfibre = df_skyfibre[~mask]
+    # print("\nFibre file reading array here")
+    # print(df_skyfibre)
+    #
+    # skyfibreDict = {}
+    # subplate_info = df_skyfibre['IDs']
+    # position = df_skyfibre['Position']
+    # print(position)
+    # j= 35
+    # for i in subplate_info:
+    #     # print(i[4:6])
+    #     # print(i[7])
+    #     print(int(position[35]))
+    #
+    #     # skyfibreDict[i[4:5]] = {int(i[7]): int(position[j])}
+    #     if (str(i[4:6])) not in skyfibreDict:
+    #         skyfibreDict[str(i[4:6])] = []
+    #     skyfibreDict[str(i[4:6])].append({int(i[7]):int(position[j])})
+    #
+    #     j += 1
+    #
+    # print(skyfibreDict)
+
+
 
 
     plt.figure(7)
+    plt.clf()
 
     skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
     skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
@@ -782,6 +826,7 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
     plt.savefig(subplateSkyfibre_figureFile_tile1)
 
     plt.figure(8)
+    plt.clf()
 
     # skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
     # skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
@@ -807,17 +852,18 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
                      va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
             if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1]:
-                colour = 'black'
+                colour1 = colour2 = 'black'
             else:
-                colour = 'yellow'
+                colour1 = 'orange'
+                colour2 = 'yellow'
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_top[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
-            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
                          fontsize=6, weight='bold', ha='center', va='center')
         if skyfibreTitles_top[i][0] == 'H':
             alpha = 0.4
@@ -837,17 +883,18 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
                      va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_left[i]])):
             if skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1]:
-                colour = 'black'
+                colour1 = colour2 = 'black'
             else:
-                colour = 'yellow'
+                colour1 = 'orange'
+                colour2 = 'yellow'
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_left[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
-            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
                          fontsize=6, weight='bold', ha='center', va='center')
         if skyfibreTitles_left[i][0] == 'H':
             alpha = 0.4
@@ -867,17 +914,18 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
                      va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_right[i]])):
             if skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1]:
-                colour = 'black'
+                colour1 = colour2 = 'black'
             else:
-                colour = 'yellow'
+                colour1 = 'orange'
+                colour2 = 'yellow'
             angle_pos = angle + angle_subplate[j]
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
             fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_right[i]][j].keys()))
-            plt.annotate(fibre_num, (x, y), color=colour, rotation=rotation, fontsize=5, ha='center', va='center')
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
-            plt.annotate('▮', (x, y), color=colour, rotation=rotation, fontsize=7, ha='center', va='center')
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
             x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
-            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color=colour, rotation=rotation,
+            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
                          fontsize=6, weight='bold', ha='center', va='center')
         if skyfibreTitles_right[i][0] == 'H':
             alpha = 0.4
