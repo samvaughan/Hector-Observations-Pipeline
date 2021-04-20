@@ -98,3 +98,23 @@ def set_up_loggers(config):
         logger_R_code.addHandler(file_handler_R_code)
 
     return logger, logger_R_code
+
+
+def update_header(filename, header_dictionary):
+
+    """
+    Take a dictionary of header key/value pairs and write it to the top of a tile/configuration file
+    """
+
+    # Update the header of the configuration code file and the guide file
+    with open(filename, 'r+') as f:
+        lines = f.readlines()
+        # Add in each header key/value pair to the file
+        # Reverse the list and add each one to the start of the file- this keeps the original order
+        # without having to increment the index
+        for key, value in reversed(d.items()):
+            lines.insert(0, f"{key},{value}") 
+        f.seek(0)                 # file pointer locates at the beginning to write the whole file again
+        f.writelines(lines)       # write whole lists again to the same file
+
+    return header_dictionary

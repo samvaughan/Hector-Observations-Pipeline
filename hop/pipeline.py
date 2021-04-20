@@ -12,7 +12,7 @@ import shlex
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
-from hop.misc import plotting_tools as plotting_tools
+from hop.misc import plotting_tools 
 from hop.tiling import tiling_functions as tiling
 from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
 from hop.target_selection import HectorSim
@@ -46,6 +46,9 @@ class HectorPipe:
         # Lists for the tile RAs and DECs
         self.best_tile_RAs = []
         self.best_tile_Decs = []
+
+        # Set up the header for this tile we'll append to
+        self.header_dictionary = self.make_header_dictionary()
 
         # Set up the output folders
         subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres"]
@@ -94,6 +97,13 @@ class HectorPipe:
         self.have_standard_star_catalogue = False
         self.have_guide_star_catalogue = False
 
+
+    def make_header_dictionary(self):
+
+        header_dictionary = {"#PROXIMITY":f"{self.config['proximity']} # tiling proximity value in arcseconds",
+                                "#TILING_DATE":f"{datetime.date.today().strftime('%Y %m %d')} # Date the tile was created/configured"}
+
+        return header_dictionary
 
     def load_input_catalogue(self):
         """
@@ -196,7 +206,7 @@ class HectorPipe:
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
         """
 
-        self.logger.info(f"Robot Temperature: {robot_temperature} C, Obs Temperature: {obs_temperature} C. Label={label}, plateID={plateID}, date={date}\n\n")
+        self.logger.info(f"Robot Temperature: {robot_temperature} C, Obs Temperature: {obs_temperature} C. date={date}\n\n")
 
         # Make an empty data frame to store the properties of each tile
         self.tile_database = pd.DataFrame()
@@ -232,6 +242,9 @@ class HectorPipe:
             guide_tile_out_fname = Path(f"{self.tile_location}/guide_tile_{current_tile:03}.fld")
             tile_out_fname_after_DC = Path(f"{self.distortion_corrected_tile_location}/DC_tile_{current_tile:03}.fld")
             guide_tile_out_fname_after_DC = Path(f"{self.distortion_corrected_tile_location}/guide_DC_tile_{current_tile:03}.fld")
+            configuration_output_filename = Path(f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{current_tile:03}.txt")
+            configuration_guide_filename = Path(f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{current_tile:03}.txt")
+            configuration_plot_filename = Path(f"{self.configuration_location}/HECTORConfig_Plot_{self.config['output_filename_stem']}_{current_tile:03}.pdf")
 
             # filename for a plot which compares the tile before/after distortion correction
             DC_correction_comparison_plot_filename = Path(f"{self.distortion_corrected_plot_location}/Tile_{current_tile:03}_comparison.pdf")
@@ -251,7 +264,7 @@ class HectorPipe:
 
             if apply_distortion_correction == True:
                 # Run the distortion correction
-                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=label, plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
+                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=f"{self.config['SourceCat']} Tile {count:03}", plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
                 self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
 
 
@@ -264,9 +277,11 @@ class HectorPipe:
                     if self.config['Rescale_proximity'] is True:
                         proximity = self.config['proximity'] * (1 + (j // 5) * 0.1)
 
+                    # Set up the filenames of the configureation
+
                     # Now call Caro's code
                     self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
-                    Configuration_bash_code = ["Rscript", f"{self.ConfigurationCode_location}", f"{tile_file_for_configuration}", f'{self.config["output_filename_stem"]}_', '--out-dir', f'{self.config["output_folder"]}/Configuration/']
+                    Configuration_bash_code = ["Rscript", self.ConfigurationCode_location, tile_file_for_configuration, configuration_output_filename, configuration_guide_filename, '--plot_filename',configuration_plot_filename]
                     try:
                         process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
                         self.logger_R_code.info(process.stdout)
@@ -301,6 +316,11 @@ class HectorPipe:
                 if not configured:
                     raise ValueError(f"Couldn't configure this tile after {self.config['MAX_TRIES']} attempts.")
 
+            # Update the header of the files from the config code
+            if configure_tiles:
+                self.header_dictionary = misc_tools.update_header(configuration_output_filename, self.header_dictionary)
+                self.header_dictionary = misc_tools.update_header(configuration_guide_filename, self.header_dictionary)
+
             # Now find which targets have been selected in this tile
             selected_targets_mask = self.df_targets['ID'].isin(tile_df['ID'])
             # Find which targets are being tiled and haven't been completed
@@ -323,16 +343,19 @@ class HectorPipe:
             tile_df['tile_centre_DEC'] = tile_Dec
             tile_df['Filler_Galaxy'] = False
             tile_df.loc[repeated_targets, 'Filler_Galaxy'] = True
-            self.tile_database = self.tile_database.append(tile_df.reset_index(drop=True))
+            self.tile_database = self.tile_database.append(tile_df, ignore_index=True)
+            #self.tile_database.set_index("tile_number", inplace=True)
 
             self.logger.info(f"FINISHED TILE {current_tile}\n\n")
 
             # Save the overall database in its current form
             self.df_targets.to_csv(f"{self.config['output_folder']}/Tiles/in_progress_targets_dataframe.csv")
-            self.tile_database.set_index("tile_number", inplace=True)
+            
             self.tile_database.to_csv(f"{self.config['output_folder']}/Tiles/tiles_dataframe.csv")
 
+
         self.tile_positions = np.array([self.best_tile_RAs, self.best_tile_Decs])
+        
 
         if plot:
             fig, ax = tiling.plot_survey_completeness_and_tile_positions(self.tile_positions, self.df_targets, self.config, fig=None, ax=None, completion_fraction_to_calculate=0.95, verbose=True)
@@ -380,10 +403,15 @@ class HectorPipe:
                 if ln.startswith("#"):
                     header.append(ln)
 
-        header.insert(0, f"# Tile file after distortion correction applied\n")
-        header.insert(1, f"# {tile_RA} {tile_Dec}\n")
+        # Convert the header list to a header dictionary
+        # The extra argument to split is "maxsplits", i.e. we only want to split on the first occurence
+        header_keys = [h.strip().split(',', 1)[0] for h in header]
+        header_values = [h.strip().split(',', 1)[1] for h in header]
 
-        DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, skiprows=6)
+        new_header_values = dict(zip(header_keys, header_values))
+        self.header_dictionary.update(new_header_values)
+
+        DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, comment='#')
         guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.ID.astype(str))
         with open(guide_tile_out_fname_after_DC, 'w') as f:
             for ln in header:

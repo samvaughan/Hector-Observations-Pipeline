@@ -32,12 +32,14 @@ library("argparse")
 parser = ArgumentParser(description='Configure a Hector tile such that all targets are observable')
 parser$add_argument('tile_files', type="character",
                     help='one or more (use wildcards) tile files for us to configure. Should end in .fld')
-parser$add_argument('addition_to_fname', type="character",
-                    help='a string to add to the filename')
+parser$add_argument('galaxy_out_name', type="character",
+                    help='Name of the output file')
+parser$add_argument('guide_out_name', type="character",
+                    help='Name of the output guide file')
 parser$add_argument('--plot', default=FALSE, action="store_true",
                     help='Show plots to the screen? Default is FALSE')
-parser$add_argument('--out-dir', default='./',
-                    help='Directory to save the output files')
+parser$add_argument('--plot_filename',
+                    help='Show plots to the screen? Default is FALSE')
 parser$add_argument('--run_local', default=FALSE, action="store_true",
                     help='Are we running locally on my laptop? If so, set the location')
 #parser$add_argument('--FoV', default=152.2, help='Size of the FoV. This decides which Config file to load! Bit of a hack...')
@@ -49,9 +51,9 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #* To compare to ipython: %run myscript a, b would become tmp_args=c('a', 'b')
 #* DON'T FORGET TO COMMENT OUT LINE 51 TO RUN AS A SCRIPT!!!
 tmp_args=c('/Users/samvaughan/Science/Hector/HectorObservationPipeline/Outputs/GAMA/G09/DistortionCorrected/DC_tile_000.fld',
-             'GAMA_G12_',
-             '--out-dir',
-             '/Users/samvaughan/Desktop/',
+             '/Users/samvaughan/Desktop/GAMA_G12_hexa.txt',
+             '/Users/samvaughan/Desktop/GAMA_G12_guides.txt',
+             '--plot_filename', '/Users/samvaughan/Desktop/GAMA_G12_plot.pdf',
              '--plot', '--run_local')
 
 #args <- parser$parse_args(tmp_args)
@@ -63,6 +65,9 @@ SAMIFields_Targets = Sys.glob(args$tile_files)
 addition_to_fname = args$addition_to_fname
 plot = args$plot
 out_dir = args$out_dir
+galaxy_out_name = args$galaxy_out_name
+guide_out_name = args$guide_out_name
+plot_filename = args$plot_filename
 #FoV_size = args$FoV
 
 
@@ -102,9 +107,9 @@ for (f in SAMIFields_Targets){
   
   gdata[,'type']=2
   
-  #Reading in the field centre (ra, dec) from the fld file header (currently second line, i.e n=2):
-  fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
-  fcentre=data.frame(ra=fcentre[1],dec=fcentre[2])
+  # #Reading in the field centre (ra, dec) from the fld file header (currently second line, i.e n=2):
+  # fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
+  # fcentre=data.frame(ra=fcentre[1],dec=fcentre[2])
 
   # Add in the fraction of the plate radius for debugging
   tile_data[, 'fraction_plate_radius_X'] = tile_data['MagnetX']/1000/(fov/2)
@@ -132,7 +137,7 @@ for (f in SAMIFields_Targets){
   fdata=fdata[fdata[,'r']<fov/2-excl_radius,]
   
   #Converting into input file for the configuration code.
-  IDs=as.data.frame(fdata[,c('ID')])
+  IDs=as.data.frame(fdata$ID)
   pos=as.data.frame(fdata[fdata[,'type']==1,c('x','y')])
   stdpos=as.data.frame(fdata[fdata[,'type']==0,c('x','y')])
   guidepos=as.data.frame(fdata[fdata[,'type']==2,c('x','y')])
@@ -187,26 +192,34 @@ for (f in SAMIFields_Targets){
                           sky_fibre_data)
   
   final_table = rbind(target_table, sky_fibre_table)
+  
+  #* Get the IDs of guide stars which have been chosen:
+  guide_IDs = fdata[rownames(gpos), 'ID']
+  #* And get the columns from the input file
+  all_guide_data = gdata[gdata$ID %in% guide_IDs, ]
+  #* And now add on the other rows that we need 
+  final_guide_table = cbind(all_guide_data,gpos,grads,gangs,gazAngs,gangs_gazAng)
+  
   #Writing output files:
   #* I've added the ability to save things to a specified output directory
   #* This is passed via argparse as 'out_dir'
   #write.table(cbind(probe=c(1:length(angs)),IDs,pos,rads,angs,azAngs,angs_azAng),file=paste(out_dir,'HECTORConfig_Hexa_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep=''), row.names=FALSE)
   #write.table(cbind(probe=c(1:length(gangs)),gpos,gangs),file=paste(out_dir,'HECTORConfig_Guides_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep=''), row.names=FALSE)
   
-  galaxy_out_name = paste(out_dir,'HECTORConfig_Hexa_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep='')
-  guide_out_name = paste(out_dir,'HECTORConfig_Guides_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep='')
+  # galaxy_out_name = paste(out_dir,'HECTORConfig_Hexa_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep='')
+  # guide_out_name = paste(out_dir,'HECTORConfig_Guides_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.txt', sep='')
   print(paste('********************************************'))
   print(paste('Writing outputs to ', galaxy_out_name, sep=''))
   print(paste('********************************************'))
   
   #* Write the final table for the hexabundles and the guides
-  write.table(final_table,file=galaxy_out_name, row.names=TRUE)
-  write.table(cbind(probe=c(1:length(gangs)),gpos,grads,gangs,gazAngs,gangs_gazAng),file=guide_out_name, row.names=FALSE)
+  write.table(final_table,file=galaxy_out_name, row.names=FALSE)
+  write.table(final_guide_table, file=guide_out_name, row.names=FALSE)
   
   if (visualise) {
     plot_configured_field(pos=pos,angs=angs,gpos=gpos,gangs=gangs, fieldflags=final_config$flags, aspdf=FALSE)
   }
-  plot_filename = filename=paste(out_dir,'/HECTORConfig_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.pdf', sep='')
+  #* plot_filename = filename=paste(out_dir,'/HECTORConfig_',addition_to_fname, substr(f, start=1,stop=nchar(f)-4), '.pdf', sep='')
   plot_configured_field(filename=plot_filename,pos=pos,angs=angs,gpos=gpos,gangs=gangs, fieldflags=final_config$flags, aspdf=TRUE)
   i=i+1
 }

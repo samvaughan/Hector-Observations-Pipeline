@@ -94,3 +94,7 @@ fraction_to_reobserve : 0.0
 Rescale_proximity: True
 
 fill_spares_with_repeats: True
+
+columns_for_target_tile_saving : ['ID', 'RA', 'DEC', 'Re', 'z', 'Mstar','GAL_MAG_G', "r_mag", 'GAL_MAG_I']
+
+columns_for_guide_tile_saving : ['ID', 'RA', 'DEC', 'r_mag']
