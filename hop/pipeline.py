@@ -101,7 +101,8 @@ class HectorPipe:
     def make_header_dictionary(self):
 
         header_dictionary = {"#PROXIMITY":f"{self.config['proximity']} # tiling proximity value in arcseconds",
-                                "#TILING_DATE":f"{datetime.date.today().strftime('%Y %m %d')} # Date the tile was created/configured"}
+                             "#TILING_DATE":f"{datetime.date.today().strftime('%Y %m %d')} # Date the tile was created/configured"
+                            }
 
         return header_dictionary
 
@@ -187,6 +188,22 @@ class HectorPipe:
             self.logger.info("\n\n")
             self.logger.info("Done!")
             return 0
+
+
+    def add_fibre_type_column(self, tile_filename):
+
+        # Get the dataframe, skipping the header
+        tile = pd.read_csv(tile_filename, comment='#')
+
+        tile['fibre_type'] = 'NA'
+        # Galaixes and standard stars have type = 1
+        tile.loc[tile.type==1, 'fibre_type'] = 'P'
+        # Guides have type "G"
+        tile.loc[tile.type == 0, 'fibre_type'] = 'G'
+        # Sky fibres have type "S"
+        tile.loc[~np.isfinite(tile.type), 'fibre_type'] = 'S'
+
+        return tile
 
 
     def _run_tiling_code(self, proximity, current_tile, use_galaxy_priorities):
@@ -397,6 +414,9 @@ class HectorPipe:
 
         # Now take Keith's code and separate the one output file which contains galaxies, standard stars and guides into two: one which has galaxies and standard stars and one which just has the guides. This is a bit messy, but reflects the way that Caro's code reads things in. It's easier to do it in Python, where I know exactly which rows are guides/galaxies/standards, rather than guessing in R using the naming convention 
 
+        # First, add the fibre_type column
+        DC_corrected_output_file = self.add_fibre_type_column(tile_out_fname_after_DC)
+
         with open(tile_out_fname_after_DC,"r") as fi:
             header = []
             for ln in fi:
@@ -411,7 +431,6 @@ class HectorPipe:
         new_header_values = dict(zip(header_keys, header_values))
         self.header_dictionary.update(new_header_values)
 
-        DC_corrected_output_file = pd.read_csv(tile_out_fname_after_DC, comment='#')
         guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.ID.astype(str))
         with open(guide_tile_out_fname_after_DC, 'w') as f:
             for ln in header:
