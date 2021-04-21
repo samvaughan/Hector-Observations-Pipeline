@@ -198,8 +198,10 @@ class HectorPipe:
         tile['fibre_type'] = 'NA'
         # Galaixes and standard stars have type = 1
         tile.loc[tile.type==1, 'fibre_type'] = 'P'
+        # Standards also have type "G"
+        tile.loc[tile.type == 0, 'fibre_type'] = 'P'
         # Guides have type "G"
-        tile.loc[tile.type == 0, 'fibre_type'] = 'G'
+        tile.loc[tile.type == 2, 'fibre_type'] = 'G'
         # Sky fibres have type "S"
         tile.loc[~np.isfinite(tile.type), 'fibre_type'] = 'S'
 

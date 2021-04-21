@@ -52,10 +52,11 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #* arguments you'd give on the command line.
 #* To compare to ipython: %run myscript a, b would become tmp_args=c('a', 'b')
 #* DON'T FORGET TO COMMENT OUT LINE 51 TO RUN AS A SCRIPT!!!
-tmp_args=c('/Users/samvaughan/Science/Hector/HectorObservationPipeline/Outputs/GAMA/G09/DistortionCorrected/DC_tile_000.fld',
-             '/Users/samvaughan/Desktop/GAMA_G12_hexa.txt',
-             '/Users/samvaughan/Desktop/GAMA_G12_guides.txt',
-             '--plot_filename', '/Users/samvaughan/Desktop/GAMA_G12_plot.pdf',
+tmp_args=c('/Users/samvaughan/Science/Hector/HectorPipelineRuns/UpdatedHeaders/G15/DistortionCorrected/DC_tile_034.fld',
+           '/Users/samvaughan/Science/Hector/HectorPipelineRuns/UpdatedHeaders/G15/DistortionCorrected/guide_DC_tile_034.fld',
+             '/Users/samvaughan/Desktop/hexa_output.txt',
+             '/Users/samvaughan/Desktop/guide_output.txt',
+             '--plot_filename', '/Users/samvaughan/Desktop/plot_output.pdf',
              '--plot', '--run_local')
 
 #args <- parser$parse_args(tmp_args)
@@ -107,7 +108,7 @@ tile_data=read.table(file=tile_filename, header=TRUE, sep=',', comment.char="#",
 
 gdata=read.table(file=guide_filename, header=TRUE, comment.char="#", sep=',', check.names = TRUE, colClasses = c("ID"="character"))
 
-gdata[,'type']=2
+#gdata[,'type']=2
 
 # #Reading in the field centre (ra, dec) from the fld file header (currently second line, i.e n=2):
 # fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
