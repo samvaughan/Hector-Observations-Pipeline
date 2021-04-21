@@ -158,6 +158,7 @@ angs=final_config$angs
 gpos=final_config$gpos
 gangs=final_config$gangs
 rads=final_config$rads
+chosen_guides = final_config$guidenum
 grads=final_config$grads
 angs_azAng=final_config$angs_azAng
 gangs_gazAng=final_config$gangs_gazAng
@@ -197,7 +198,7 @@ sky_fibre_table = cbind(probe=sky_fibre_filler_list,
 final_table = rbind(target_table, sky_fibre_table)
 
 #* Get the IDs of guide stars which have been chosen:
-guide_IDs = fdata[rownames(gpos), 'ID']
+guide_IDs = gdata[chosen_guides, 'ID']
 #* And get the columns from the input file
 all_guide_data = gdata[gdata$ID %in% guide_IDs, ]
 #* And now add on the other rows that we need 
