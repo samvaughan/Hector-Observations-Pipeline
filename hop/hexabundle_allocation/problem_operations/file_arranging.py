@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
 import numpy as np
 import csv
 import re
@@ -8,10 +9,29 @@ import time
 # arranging the guides files in consistent format with hexas files
 def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
 
-    df = pd.read_csv(fileNameGuides,sep=' ')
-    df.columns = ['probe', 'x', 'y', 'rads', 'angs', 'azAngs', 'angs_azAng']
+    # getting count of lines to skip at top of file, which contain other information
+    with open(fileNameGuides) as f:
+        line = f.readline()
+        skipline_count = 0
+        while line.startswith('#'):
+            line = f.readline()
+            skipline_count += 1
 
-    df1 = pd.read_csv(fileNameHexa,sep=' ')
+    df = pd.read_csv(fileNameGuides, sep = ' ', skiprows=skipline_count)
+    df['probe'] = 0
+    print(df)
+
+    # df = pd.read_csv(fileNameGuides,sep=' ')
+    # df.columns = ['probe', 'x', 'y', 'rads', 'angs', 'azAngs', 'angs_azAng']
+    with open(fileNameHexa) as f:
+        line = f.readline()
+        skipline_count = 0
+        while line.startswith('#'):
+            line = f.readline()
+            skipline_count += 1
+
+    df1 = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
+    print(df1)
 
     mask = df1['probe'] < 22
     df_new = df1[mask]
@@ -26,10 +46,10 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     probe_number = list(df['probe'])
     circular_magnet_center_x = list(df['x'])
     circular_magnet_center_y = list(df['y'])
-    rads = list(df['rads'])
-    angs = list(df['angs'])
-    azAngs = list(df['azAngs'])
-    rectangle_magnet_input_orientation = list(df['angs_azAng'])
+    rads = list(df['grads'])
+    angs = list(df['gangs'])
+    azAngs = list(df['gazAngs'])
+    rectangle_magnet_input_orientation = list(df['gangs_gazAng'])
 
     IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
 
@@ -49,42 +69,22 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     df.to_csv(guide_outputFile, index=False, sep=' ')
 
     return df, guideFileList
-    # # index to keep count
-    # ExtraCols = 1
-    #
-    # # reading the guides cdv file
-    # df = pd.read_csv(fileNameGuides)
-    #
-    # # The columns being filled up with NaN to keep the guides file same format as the hexas file
-    # for i in range(32):
-    #     df['ColFillUp%d' % ExtraCols] = 'NaN'
-    #     ExtraCols += 1
-    #
-    # # writing to the proxy guides file
-    # df.to_csv(proxyGuideFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
-    #
-    # # adding in two more columns at the start of the proxy file for the IDs and the magnet indexes
-    # rows = [line.split(' ') for line in open(proxyGuideFile)]
-    # cols = list(zip(*rows))
-    # # cols.insert(1, ['"1stCol"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
-    # cols.insert(1, ['21', '22', '23', '24', '25', '26', '27'])
-    # # cols.insert(1, ['"IDs"', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
-    # cols = cols[1:]
-    # rows = list(zip(*cols))
-    #
-    # # writing those two columns created above to the file
-    # with open(proxyGuideFile, 'w') as f:
-    #     f.writelines([' '.join(row) for row in rows[1:]])
+
 
 # merging the hexas and guides file to create one plate file with all the magnets
 def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
-    df1 = pd.read_csv(fileNameHexa,sep=' ')
+    with open(fileNameHexa) as f:
+        line = f.readline()
+        skipline_count = 0
+        while line.startswith('#'):
+            line = f.readline()
+            skipline_count += 1
+
+    df1 = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
 
     mask = df1['probe'] < 22
     df_new = df1[mask]
-
-    print(df_guideFile)
 
     df_plateFile = pd.concat([df_new, df_guideFile], sort=False)
 
@@ -92,21 +92,6 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
     df_plateFile.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
-
-    # # adding the proxy guides file to the hexas file
-    # with open(fileNameHexa) as fp:
-    #     file1 = fp.read()
-    # with open(proxyGuideFile) as fp:
-    #     file2 = fp.read()
-    # file1 += file2
-    #
-    # # creating a plate file to write the added hexas and guides
-    # with open(plate_file, 'w+') as fp:
-    #     fp.write(file1)
-    #
-    # # print statement to check from terminal the plate file of the tile which is being checked
-    # print("Filename being checked for conflicts:")
-    # print(fileNameHexa)
 
 # creating the robotFile array for
 def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
@@ -194,9 +179,9 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
     rePosition_col = np.transpose(rePosition_col)
 
     ## TEST PRINTs
-    print(rePosition_col)
-    print(rePosition_col.shape)
-    print(robotFilearray.shape)
+    # print(rePosition_col)
+    # print(rePosition_col.shape)
+    # print(robotFilearray.shape)
 
     # add the 'list' column to the robot file array in desired position
     robotFilearray = np.hstack((robotFilearray[:, :9], rePosition_col, robotFilearray[:, 9:]))
@@ -263,7 +248,6 @@ def finalFiles(outputFile, fileNameHexa):
 
     mask = df1['probe'] < 22
     df_new = df1[~mask]
-
 
     df_tileOutput = pd.concat([df3, df_new], sort=False)
 

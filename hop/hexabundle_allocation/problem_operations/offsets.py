@@ -11,6 +11,10 @@ import re
 # Adjusting offset to move circular magnet closer to OR far from rectangular magnet
 def hexaPositionOffset(all_magnets,offsetFile):
 
+    df = pd.read_excel(offsetFile,usecols=['Name','P','Q'])
+    df.dropna(subset = ['Q'], inplace=True)
+    print(df)
+
     offset_distance = 0.0  # to be derived from excel file
 
     for i in all_magnets:
@@ -70,7 +74,7 @@ def hexaPositionOffset(all_magnets,offsetFile):
 
     return all_magnets
 
-
+## Created as a standalone function for the robot, so should not be required to implement in this pipeline
 # thermal expansion related offset which will move the magnet pair as a whole based on certain coefficients
 def magnetPair_radialPositionOffset(plate_file):
 
@@ -110,6 +114,7 @@ def magnetPair_radialPositionOffset(plate_file):
 
     return plate_file, magnetPair_offset
 
+## Created as a standalone function for the robot, so should not be required to implement in this pipeline
 # radial Position offset being adjusted in the extract_data.py file before all_magnets are being produced
 def radialPositionOffset(list_of_probes,magnetPair_offset):
 

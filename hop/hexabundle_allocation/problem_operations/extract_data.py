@@ -65,7 +65,7 @@ def create_list_of_probes_from_file(file,guideFileList):
     galaxyORstar += guideFileList[8]
 
     Re = list(df_1['Re']) + guideFileList[9]
-    mu_1re = list(df_1['GAL_MU_E_R']) + guideFileList[10]
+    mu_1re = list(df_1['GAL_MAG_G']) + guideFileList[10] #### NEEDS TO BE UPDATED TO READ CORRECT COLUMN AFTER CONFIRMATION FROM SAM
     Mstar = list(df_1['Mstar']) + guideFileList[11]
 
     print(rectangle_magnet_input_orientation)
@@ -127,13 +127,14 @@ def create_list_of_probes_from_file(file,guideFileList):
     return list_of_probes
 
 # creating a list of circular and rectangular magnets separately from the probes list
-def create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList,magnetPair_offset):
+def create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList):  #,magnetPair_offset):
 
     # creating probes list from file
     list_of_probes = create_list_of_probes_from_file(file,guideFileList)
 
+    ## Created as a standalone function for the robot, so should not be required to implement in this pipeline
     # adjusting the radial position offsets to the magnet pair due to thermal expansion
-    list_of_probes = radialPositionOffset(list_of_probes, magnetPair_offset)
+    # list_of_probes = radialPositionOffset(list_of_probes, magnetPair_offset)
 
     # circular magnet list created
     list_of_circular_magnet = []
@@ -151,10 +152,10 @@ def create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList
 
     return list_of_circular_magnet,list_of_rectangular_magnet
 
-def create_list_of_all_magnets_from_file(file,guideFileList,magnetPair_offset):
+def create_list_of_all_magnets_from_file(file,guideFileList):   #,magnetPair_offset):
 
     # extracting circular and rectangular magnets list from the list of probes which is first extracted from file
-    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList,magnetPair_offset)
+    [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList)  #,magnetPair_offset)
 
     return np.concatenate([circular_magnets, rectangular_magnets])
 

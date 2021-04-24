@@ -146,7 +146,15 @@ def read_sky_fibre_file(filename):
 
     # print(skyfibreDict)
 
-    df_skyfibre = pd.read_csv(filename, sep=' ')
+    # getting count of lines to skip at top of file, which contain other information
+    with open(filename) as f:
+        line = f.readline()
+        skipline_count = 0
+        while line.startswith('#'):
+            line = f.readline()
+            skipline_count += 1
+
+    df_skyfibre = pd.read_csv(filename, sep = ' ', skiprows=skipline_count)
 
     mask = df_skyfibre['probe'] < 22
     df_skyfibre = df_skyfibre[~mask]

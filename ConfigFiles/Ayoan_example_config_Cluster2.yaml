@@ -9,7 +9,7 @@
 output_folder: D:/Hector/Hector_project_files/Hector/magnet_position/G15
 
 # Stem to attach to all the tile files we'll make. Will have an underscore after it
-output_filename_stem: GAMA_G15_DC
+output_filename_stem: GAMA_G15
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

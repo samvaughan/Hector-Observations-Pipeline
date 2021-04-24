@@ -459,8 +459,8 @@ class HectorPipe:
         ### FIXME- add documentation here
 
         # Input config files to be read from
-        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
+        fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
 
         # files to be output to after arranging the guide and hexa probe data
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
@@ -472,14 +472,25 @@ class HectorPipe:
         # Adding guides cluster txt file to hexa cluster txt file
         file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
 
-        #### Offset function: thermal coefficient based movement of magnet pair as a whole
-        plate_file, magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
+        ## Created as a standalone function for the robot, so should not be required to implement in this pipeline
+        # Offset function: thermal coefficient based movement of magnet pair as a whole
+        # plate_file, magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
-        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList, magnetPair_offset)
+        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList) #, magnetPair_offset)
+
+        # file to report flags regarding special cases of hexabundle allocation
+        flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
+
+        # variable for the hexabundle allocation using version 3
+        mu_1re_cutoff = 22.5
+
+        # carrying out the whole hexabundle allocation algorithm from hexabundles.py script
+        self.galaxyIDrecord, MagnetDict = hexabundle.overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, \
+                                     self.galaxyIDrecord, mu_1re_cutoff, self.config['output_filename_stem'], tile_number, flagsFile)
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
-        offsetFile = f"{self.configuration_location}/Offsets_P&Q.csv"
+        offsetFile = f"{self.configuration_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
         all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
 
         # create magnet pickup areas for all the magnets
@@ -508,16 +519,13 @@ class HectorPipe:
         conflicts.blocked_magnet.print_fully_blocked_magnets(fully_blocked_magnets,conflictsRecord, fileNameHexa)
 
         conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
-        flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
 
-        mu_1re_cutoff = 22.5
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
         positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
-                                                                         conflicted_magnets, self.galaxyIDrecord, mu_1re_cutoff, \
-                                                                         self.config['output_filename_stem'], tile_number, conflictFile, flagsFile)
+                                                                         conflicted_magnets, MagnetDict, self.galaxyIDrecord, \
+                                                                         self.config['output_filename_stem'], tile_number, conflictFile)
 
         if plot:
-            # skyfibre_file = f"{self.configuration_location}\example_output_file_with_sky_fibres.csv"
             # draw all the magnets in the plots created earlier
             robot_figureFile = f"{self.plot_location}/robotPlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
             hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
@@ -542,9 +550,6 @@ class HectorPipe:
 
         # produce final files with consistent layout and no extra commas
         file_arranging.finalFiles(outputFile, fileNameHexa)
-
-        # just to check each tile's whole operation time
-        # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
         # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
         # # fibre input file to be read
@@ -580,7 +585,8 @@ class HectorPipe:
         subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_current.pdf"
         fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2,fileNameHexa)
 
-
+        # just to check each tile's whole operation time
+        # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
 
     def allocate_hexabundles_for_all_tiles(self):
 
