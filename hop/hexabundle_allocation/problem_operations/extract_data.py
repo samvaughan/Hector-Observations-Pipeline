@@ -30,20 +30,17 @@ def create_list_of_probes_from_file(file,guideFileList):
 
     df = pd.read_csv(file,sep=' ')
 
+    # print list of headers for the file
     print(df.keys())
-    print(df['Re'])
-    # headers = pd.read_csv(file, nrows=0,delimiter='\t').columns.tolist()
+
     count_split = 0
-    print(df['probe'])
     for i in df['probe']:
         if 0<i<28 :
-            print(i)
             count_split += 1
 
     mask = df['IDs'] > 0
     df_1 = df[mask]
 
-    print(df_1['IDs'])
     df_2 = df[~mask]
 
     print("Shape of new dataframes - {} , {}".format(df_1.shape, df_2.shape))
@@ -65,31 +62,8 @@ def create_list_of_probes_from_file(file,guideFileList):
     galaxyORstar += guideFileList[8]
 
     Re = list(df_1['Re']) + guideFileList[9]
-    mu_1re = list(df_1['GAL_MAG_G']) + guideFileList[10] #### NEEDS TO BE UPDATED TO READ CORRECT COLUMN AFTER CONFIRMATION FROM SAM
+    mu_1re = list(df_1['GAL_MU_E_R']) + guideFileList[10]
     Mstar = list(df_1['Mstar']) + guideFileList[11]
-
-    print(rectangle_magnet_input_orientation)
-
-    print(galaxyORstar)
-
-    # for type, df_type in df.groupby('type'):
-    #     df_new
-    #
-    # print(df_new)
-
-    # Parameters required being extracted as lists
-    # probe_number, \
-    # IDs, \
-    # circular_magnet_center_x, \
-    # circular_magnet_center_y, \
-    # rads, \
-    # angs, \
-    # azAngs, \
-    # rectangle_magnet_input_orientation, \
-    # galaxyORstar, \
-    # Re, \
-    # mu_1re, \
-    # Mstar = np.loadtxt(file, skiprows=1, unpack=True, converters={1:parse_col_string,5:parse_col_string,6:parse_col_string,7:parse_col_string,8:parse_col_string,9:remove_apostrophes,43:parse_col_string,12:parse_col,13:parse_col,24:parse_col}, usecols =[1,9,3,4,5,6,7,8,43,12,24,13])
 
     # PROBES list created
     list_of_probes = []

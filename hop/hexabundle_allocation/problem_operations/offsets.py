@@ -1,5 +1,6 @@
 from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
-from ..hector.constants import robot_center_x,robot_center_y
+from ..hector.constants import robot_center_x,robot_center_y,circular_rectangle_magnet_center_distance
+from ..hector.probe import probe
 from math import atan,sin,cos
 import numpy as np
 import pandas as pd
@@ -11,75 +12,133 @@ import re
 # Adjusting offset to move circular magnet closer to OR far from rectangular magnet
 def hexaPositionOffset(all_magnets,offsetFile):
 
+    # read offset excel file as a dataframe
     df = pd.read_excel(offsetFile,usecols=['Name','P','Q'])
-    df.dropna(subset = ['Q'], inplace=True)
-    print(df)
 
-    offset_distance = 0.0  # to be derived from excel file
+    # drop the rows with NA values in Q column
+    df.dropna(subset=['Q'], inplace=True)
 
+    # omit the information row via string length check
+    df_adjusted = df[df['Name'].str.len() <= 5]
+
+    # reset the index of the adjusted dataframe with changes
+    df_adjusted = df_adjusted.reset_index(drop=True)
+    df_final = df_adjusted
+
+    print(df_final)
+
+    # create dictionaries to store the offset values of P and Q, and ang to store rectangular magnet orientation
+    ang = {}
+    offset_distance_P = {}
+    offset_distance_Q = {}
+
+    # loop through all_magnets list and offset dataframe to store offset values and rectangular magnet
+    # orientation values in dictionary with key as index
     for i in all_magnets:
 
-        if i.__class__.__name__ == 'rectangular_magnet' and i.index == 5:
+        for j in range(len(df_final)):
 
-            # getting the orientation of rectangular magnet with respect to North(up)
-            ang = i.orientation
+            if i.__class__.__name__ == 'rectangular_magnet' and i.hexabundle == df_final['Name'][j]:
 
-            # check to adjust angle within 0 to -360 range
-            # if ang < 360:
-            #     ang = ang + 360
+                # getting the orientation of rectangular magnet with respect to North(up)
+                ang[i.index] = i.orientation
 
-            print('orientation_rectangular = '+str(ang))
-            azAngs = convert_radians_to_degrees(i.azAngs)
-            print('azAngs_rectangular = '+str(azAngs))
-            ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
-            print('ang_azAngs_rectangular = ' + str(ang_azAngs))
+                # storing the offset values in dictionary from the offset dataframe
+                offset_distance_P[i.index] = df_final['P'][j] / 1000
+                offset_distance_Q[i.index] = df_final['Q'][j] / 1000
 
-            rectangular_centre = i.center
-            print(rectangular_centre)
+                # print('orientation_rectangular = '+str(ang))
+                # azAngs = convert_radians_to_degrees(i.azAngs)
+                # print('azAngs_rectangular = '+str(azAngs))
+                # ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
+                # print('ang_azAngs_rectangular = ' + str(ang_azAngs))
+                #
+                # rectangular_centre = i.center
+                # print(rectangular_centre)
 
+    print(ang)
+    print(offset_distance_P)
+    print(offset_distance_Q)
 
-    for i in all_magnets:
+    print('HEREEEEEEE')
+    print(range(len(all_magnets)))
 
-        if i.__class__.__name__ == 'circular_magnet' and i.index == 5:
+    # calculate and make the changes to x and y positions of circular magnets as per offset values
+    for i in range(len(all_magnets)):
+
+        if all_magnets[i].__class__.__name__ == 'circular_magnet':
+
+            print(all_magnets[i].index)
+            print('Circular Before'+str(all_magnets[i].center))
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
-            angle_adjusted = 450+ang
+            angle_adjusted = 450 + ang[all_magnets[i].index]
 
             # check to adjust angle within 0 to 360 range
             if angle_adjusted > 360:
                 angle_adjusted = angle_adjusted - 360
 
+            # rotation matrix required for the offset adjustments of the circular magnets
             rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
 
             # subtracting offset distance moves circular magnet upwards toward plate edge
             # (P-perpendicular movement to rectangular magnet)
-            i.center = (i.center[0] - rotation_matrix_circle[1][0] * offset_distance, \
-                                      i.center[1] - rotation_matrix_circle[1][1] * offset_distance)
+            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[1][0] * offset_distance_P[all_magnets[i].index], \
+                                     all_magnets[i].center[1] - rotation_matrix_circle[1][1] * offset_distance_P[all_magnets[i].index])
 
             # subtracting offset distance moves circular magnet closer to rectangular
             # (Q-parallel movement to rectangular magnet)
-            i.center = (i.center[0] - rotation_matrix_circle[0][0] * offset_distance, \
-                                      i.center[1] - rotation_matrix_circle[0][1] * offset_distance)
-            i.offset = offset_distance
+            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[0][0] * offset_distance_Q[all_magnets[i].index], \
+                                     all_magnets[i].center[1] - rotation_matrix_circle[0][1] * offset_distance_Q[all_magnets[i].index])
 
-            print('orientation_circular = ' + str(i.orientation))
-            azAngs = convert_radians_to_degrees(i.azAngs)
-            # print('azAngs_circular=' + str(azAngs))
+            # storing offset values in all_magnets list for final output file
+            all_magnets[i].offset_P = offset_distance_P[all_magnets[i].index]
+            all_magnets[i].offset_Q = offset_distance_Q[all_magnets[i].index]
 
-            circular_centre = i.center
-            print(circular_centre)
+            print('orientation_circular = ' + str(all_magnets[i].orientation))
 
-    angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
-    print(angle)
+            # recalculating the circular magnet orientation with offset adjusted centre coordinates
+            all_magnets[i].circular_magnet_center = all_magnets[i].center
+            all_magnets[i].orientation = probe.calculate_circular_magnet_orientation(all_magnets[i])
+
+            print('Updated orientation_circular = ' + str(all_magnets[i].orientation))
+            print('Circular After:'+str(all_magnets[i].center))
+
+            # updating plotting view for Robot file centre coordinates
+            all_magnets[i].view_y = all_magnets[i].center[0]
+            all_magnets[i].view_x = - all_magnets[i].center[1]
+
+    print('\n\n\n')
+
+    # recalculate positions of x and y for rectangular magnets as per adjusted circular magnet coordinates
+    for i in range(len(all_magnets)):
+
+        if all_magnets[i].__class__.__name__ == 'rectangular_magnet':
+
+            for j in range(len(all_magnets)):
+
+                if all_magnets[j].__class__.__name__ == 'circular_magnet' and all_magnets[i].index == all_magnets[j].index:
+
+                    print(all_magnets[i].index)
+                    print('BEFORE:'+str(all_magnets[i].center))
+
+                    # circular magnet centre is stored for rectangular magnets as well for calculation of center coordinates
+                    all_magnets[i].circular_magnet_center = all_magnets[j].center
+                    all_magnets[i].circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
+
+                    # recalculate rectangular magnet center coordinates as per updated circular magnet center
+                    all_magnets[i].center = probe.calculate_rectangular_magnet_center_coordinates(all_magnets[i])
+                    print('AFTER:'+str(all_magnets[i].center))
+
+    print("DONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    # angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
+    # print(angle)
 
     return all_magnets
 
 ## Created as a standalone function for the robot, so should not be required to implement in this pipeline
 # thermal expansion related offset which will move the magnet pair as a whole based on certain coefficients
 def magnetPair_radialPositionOffset(plate_file):
-
-    ## read off a certain table from csv file or derived off some equations and calculations to identify the magnet pair
-    ## to be adjusted with the determined offset values, VARIABLE 'offset_distance' used for testing function's usability
 
     offset_radialDistance = 20  # to be derived
 
@@ -90,27 +149,12 @@ def magnetPair_radialPositionOffset(plate_file):
     # L = L_initial x ( 1 + α ⋅ ΔT)
 
     # store magnet pair index and offset distance accordingly, to be derived
-    magnetPair_offset = [(1,2)]
     # magnetPair_offset = [(14,-30),(4,-30),(12,-30),(9,-30)] # +ve value makes radial outward movement, and -ve value for radial inward movement
 
     csv_input = pd.read_csv(plate_file,skipinitialspace=True)
     # print(pd.read_csv(plate_file, index_col=0, nrows=0).columns.tolist())
     csv_input['magnetPair_offset'] = '0.000'
     csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE,escapechar=' ')
-    # csv_input = pd.read_csv(plate_file, header=0)
-    # csv_input['Berries'] = '0.000'
-    # csv_input.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
-
-    csv_read = pd.read_csv(plate_file)
-    # print(csv_read)
-
-    # r = csv.reader(open(plate_file))
-    # row0 = next(r)
-    # row0.append('berry')
-    #
-    # for item in r:
-    #     item.append(item[0])
-    #     print(item)
 
     return plate_file, magnetPair_offset
 

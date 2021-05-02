@@ -6,23 +6,26 @@ import csv
 import re
 import time
 
-# arranging the guides files in consistent format with hexas files
+# arranging the guides files in consistent format with hexas files and outputting them separately as well
 def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
 
     # getting count of lines to skip at top of file, which contain other information
     with open(fileNameGuides) as f:
         line = f.readline()
         skipline_count = 0
+        description = line
         while line.startswith('#'):
             line = f.readline()
+            if line[0] == '#':
+                description += line
             skipline_count += 1
 
-    df = pd.read_csv(fileNameGuides, sep = ' ', skiprows=skipline_count)
-    df['probe'] = 0
-    print(df)
+    # creating dataframe for guide probes from guides config file
+    df_guides = pd.read_csv(fileNameGuides, sep = ' ', skiprows=skipline_count)
 
-    # df = pd.read_csv(fileNameGuides,sep=' ')
-    # df.columns = ['probe', 'x', 'y', 'rads', 'angs', 'azAngs', 'angs_azAng']
+    # crate a probe column to keep count to the guides dataframe
+    df_guides.insert(loc=0, column='probe', value=0)
+
     with open(fileNameHexa) as f:
         line = f.readline()
         skipline_count = 0
@@ -30,50 +33,61 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
             line = f.readline()
             skipline_count += 1
 
-    df1 = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
-    print(df1)
-
-    mask = df1['probe'] < 22
-    df_new = df1[mask]
+    # creating data
+    # frame for just galaxy probes from hexa config file
+    df = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
+    mask = df['probe'] < 22
+    df_hexas = df[mask]
 
     # reading the index value of last hex probe to get count of hexa probes
-    hexaCount = int(df_new['probe'][df_new.index[-1]]) + 1
+    hexaCount = int(df_hexas['probe'][df_hexas.index[-1]]) + 1
 
-    # probe numbering for the guid probes, counting onward from hexa count
-    for i in range(len(df['probe'])):
-        df['probe'][i] = int(hexaCount + i)
+    # probe numbering for the guide probes, counting onward from hexa count
+    for i in range(len(df_guides['probe'])):
+        df_guides['probe'][i] = int(hexaCount + i)
 
-    probe_number = list(df['probe'])
-    circular_magnet_center_x = list(df['x'])
-    circular_magnet_center_y = list(df['y'])
-    rads = list(df['grads'])
-    angs = list(df['gangs'])
-    azAngs = list(df['gazAngs'])
-    rectangle_magnet_input_orientation = list(df['gangs_gazAng'])
+    # creating columns for guide file list
+    probe_number = list(df_guides['probe'])
+    circular_magnet_center_x = list(df_guides['x'])
+    circular_magnet_center_y = list(df_guides['y'])
+    rads = list(df_guides['grads'])
+    angs = list(df_guides['gangs'])
+    azAngs = list(df_guides['gazAngs'])
+    rectangle_magnet_input_orientation = list(df_guides['gangs_gazAng'])
 
+    # assigning 'NA' to parameters which guide probes do not have a value for
     IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
 
+    # setting guide file extracted list ready for output
     guideFileList = [probe_number, \
-    IDs, \
-    circular_magnet_center_x, \
-    circular_magnet_center_y, \
-    rads, \
-    angs, \
-    azAngs, \
-    rectangle_magnet_input_orientation, \
-    galaxyORstar, \
-    Re, \
-    mu_1re, \
-    Mstar ]
+                     IDs, \
+                     circular_magnet_center_x, \
+                     circular_magnet_center_y, \
+                     rads, \
+                     angs, \
+                     azAngs, \
+                     rectangle_magnet_input_orientation, \
+                     galaxyORstar, \
+                     Re, \
+                     mu_1re, \
+                     Mstar ]
 
-    df.to_csv(guide_outputFile, index=False, sep=' ')
+    # fill out all the empty slots of parameters with NA and save output guide file
+    df_guides.fillna('NA', inplace=True)
 
-    return df, guideFileList
+    # write the description from config guide file at top of output guide file
+    with open(guide_outputFile, 'w') as f:
+        f.write(description)
+
+    df_guides.to_csv(guide_outputFile, index=False, sep=' ', mode='a')
+
+    return df_guides, guideFileList
 
 
 # merging the hexas and guides file to create one plate file with all the magnets
 def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
+    # getting count of lines to skip at top of file, which contain other information
     with open(fileNameHexa) as f:
         line = f.readline()
         skipline_count = 0
@@ -81,15 +95,18 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
             line = f.readline()
             skipline_count += 1
 
+    # creating dataframe for just galaxy probes from hexa config file
     df1 = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
-
     mask = df1['probe'] < 22
     df_new = df1[mask]
 
+    # joining dataframes of hexa and guide probes
     df_plateFile = pd.concat([df_new, df_guideFile], sort=False)
 
+    # fill out all the empty slots of parameters with NA
     df_plateFile.fillna('NA', inplace=True)
 
+    # write the joined dataframe of hexa and guide probes on plate file
     df_plateFile.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
 
 
@@ -111,6 +128,7 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
     robotFilearray = add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocked_magnets_dictionary)
 
     # TEST PRINT
+    print('\n')
     print(robotFilearray)
 
     # write the robot file array into the CSV file for the robot
@@ -137,9 +155,6 @@ def add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocke
         else:
             x = np.int16(robotFilearray[i][9])
             nameColumn[0][i] = robotFilearray[i][1] + str('%02d' % x)
-
-    # TEST PRINT
-    print(nameColumn)
 
     # transposing the list to a column with a title assigned
     nameColumn[0][0] = 'Magnet_title'
@@ -220,8 +235,6 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
         # Create a csv.writer object from the output file object
         csv_writer = csv.writer(write_obj)
 
-        print(positioning_array_circular)
-
         # Read each row of the input csv file as list
         for row in csv_reader:
             roww_circular = np.array2string(positioning_array_circular[index], separator=' ',formatter={'str_kind': lambda x: x})
@@ -240,20 +253,57 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
     return positioning_array,positioning_array_circular
 
 # final files being formatted to maintain consistency
-def finalFiles(outputFile, fileNameHexa):
+def finalFiles(all_magnets, outputFile, fileNameHexa):
 
-    df3 = pd.read_csv(outputFile, header=0)
+    # read output file to create probes dataframe
+    df_probes = pd.read_csv(outputFile, sep=' ',header=0)
 
-    df1 = pd.read_csv(fileNameHexa,sep=' ')
+    df_probes['offset_P'] = 0.0
+    df_probes['offset_Q'] = 0.0
 
-    mask = df1['probe'] < 22
-    df_new = df1[~mask]
+    # update all the center coordinates of circular magnets in probes df with 'all_magnets' list
+    # and add the offsets P and Q to be printed out in final tile output file
+    for i in all_magnets:
 
-    df_tileOutput = pd.concat([df3, df_new], sort=False)
+        for j in df_probes['probe']:
 
+            if i.__class__.__name__ == 'circular_magnet' and i.index == int(j):
+                df_probes['x'][j-1] = i.center[0]
+                df_probes['y'][j-1] = i.center[1]
+                df_probes['offset_P'][j-1] = i.offset_P
+                df_probes['offset_Q'][j-1] = i.offset_Q
+
+    # getting count of lines to read at top of file, and storing descriptive comments
+    with open(fileNameHexa) as f:
+        line = f.readline()
+        skipline_count = 0
+        description = line
+
+        # count and store only lines starting with #
+        while line.startswith('#'):
+            line = f.readline()
+            if line[0] == '#':
+                description += line
+            skipline_count += 1
+
+    # creating dataframe for just the sky fibres from config hexa files
+    df = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
+    mask = df['probe'] < 22
+    df_skyfibre = df[~mask]
+
+    # joining the dataframes of hexa nd guide probes and skyfibres
+    df_tileOutput = pd.concat([df_probes, df_skyfibre], sort=False)
+
+    # fill out all the empty slots of parameters with NA
     df_tileOutput.fillna('NA', inplace=True)
 
-    df_tileOutput.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    # remove commas due to joining of positioning arrays pf circular and rectangular magnets
+    # df_tileOutput = df_tileOutput.replace(',', '', regex=True)
 
-    # df4 = pd.read_csv(robotFile, header=0, error_bad_lines=False)
-    # df4.to_csv(robotFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    # write the description from config file at top of final tile output file
+    with open(outputFile, 'w') as f:
+        f.write(description)
+
+    # write the joined dataframe of probes and skyfibres on final tile output file after the description
+    df_tileOutput.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ', mode='a')
+

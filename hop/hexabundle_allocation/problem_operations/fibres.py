@@ -16,13 +16,11 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
     fibre_data = pd.read_excel(fibre_file)
 
-    print(fibre_data)
-
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h1, h2 = 10, 820, 856
     new_arrayAAOmega = [['0' for x in range(w)] for y in range(h1)]
     new_arraySpector = [['0' for x in range(w)] for y in range(h2)]
-    # print(len(new_array))
+
 
     # headers for the spectrograph fibres file
     new_arrayAAOmega[0] = new_arraySpector[0] = ['slit_pos', 'type(S/P)', 'probe_num', 'probe_fibre', \
@@ -814,8 +812,7 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
 
     sky_fibre_annotations(tile_1)
 
-    print(skyfibreDict_tile1)
-    print(skyfibreDict_tile2)
+
 
     plt.axis('off')
     axes = plt.gca()

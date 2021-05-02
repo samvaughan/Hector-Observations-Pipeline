@@ -16,6 +16,9 @@ class circle:
         self.view_x = - self.center[1]
         # self.view_orientation = self.orientation# - 90
 
+        self.offset_P = 0.0
+        self.offset_Q = 0.0
+
     # calculating all coordinates of the circle
     def calculate_circle_all_coordinates(self):
 

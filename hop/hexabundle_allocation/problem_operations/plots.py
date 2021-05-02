@@ -158,14 +158,12 @@ def read_sky_fibre_file(filename):
 
     mask = df_skyfibre['probe'] < 22
     df_skyfibre = df_skyfibre[~mask]
-    print("\nFibre file reading array here")
-    print(df_skyfibre)
 
     skyfibreDict = {}
     subplate_info = df_skyfibre['IDs']
     position = df_skyfibre['Position']
     position.reset_index(drop=True, inplace=True)
-    print(position)
+
     j = 0
     for i in subplate_info:
         # print(i[4:6])
