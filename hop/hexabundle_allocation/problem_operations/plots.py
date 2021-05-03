@@ -324,7 +324,9 @@ def draw_all_magnets(magnets, clusterNum, tileNum, fileNameHexa, robot_figureFil
     axes = plt.gca()
     axes.set_xlim([-350, 350])
     axes.set_ylim([-350, 350])
+
     # plt.show()                ## for showing the figure of magnets with pickup area
+
     plt.savefig(hexabundle_figureFile)
     # plt.savefig("image.png", bbox_inches='tight', dpi=100)
 

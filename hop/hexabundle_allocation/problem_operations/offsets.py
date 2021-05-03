@@ -23,6 +23,7 @@ def hexaPositionOffset(all_magnets,offsetFile):
 
     # reset the index of the adjusted dataframe with changes
     df_adjusted = df_adjusted.reset_index(drop=True)
+    df_adjusted.index = df_adjusted.index + 1
     df_final = df_adjusted
 
     print(df_final)
@@ -36,7 +37,7 @@ def hexaPositionOffset(all_magnets,offsetFile):
     # orientation values in dictionary with key as index
     for i in all_magnets:
 
-        for j in range(len(df_final)):
+        for j in range(1,len(df_final)+1):
 
             if i.__class__.__name__ == 'rectangular_magnet' and i.hexabundle == df_final['Name'][j]:
 
@@ -46,6 +47,8 @@ def hexaPositionOffset(all_magnets,offsetFile):
                 # storing the offset values in dictionary from the offset dataframe
                 offset_distance_P[i.index] = df_final['P'][j] / 1000
                 offset_distance_Q[i.index] = df_final['Q'][j] / 1000
+
+                print('Index: '+str(i.index)+' , Hexabundle: '+str(i.hexabundle)+' , offset_P: '+str(df_final['P'][j]/1000))
 
                 # print('orientation_rectangular = '+str(ang))
                 # azAngs = convert_radians_to_degrees(i.azAngs)
@@ -70,6 +73,8 @@ def hexaPositionOffset(all_magnets,offsetFile):
 
             print(all_magnets[i].index)
             print('Circular Before'+str(all_magnets[i].center))
+            print('Offset P = '+str(offset_distance_P[all_magnets[i].index]))
+            print('Offset Q = '+str(offset_distance_Q[all_magnets[i].index]))
 
             # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
             angle_adjusted = 450 + ang[all_magnets[i].index]
@@ -81,15 +86,17 @@ def hexaPositionOffset(all_magnets,offsetFile):
             # rotation matrix required for the offset adjustments of the circular magnets
             rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
 
-            # subtracting offset distance moves circular magnet upwards toward plate edge
-            # (P-perpendicular movement to rectangular magnet)
-            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[1][0] * offset_distance_P[all_magnets[i].index], \
-                                     all_magnets[i].center[1] - rotation_matrix_circle[1][1] * offset_distance_P[all_magnets[i].index])
+            # subtracting offset distance moves circular magnet in opposite direction to rectangular magnet
+            # (P-parallel movement to rectangular magnet)
+            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[0][0] * offset_distance_P[all_magnets[i].index], \
+                                     all_magnets[i].center[1] - rotation_matrix_circle[0][1] * offset_distance_P[all_magnets[i].index])
 
-            # subtracting offset distance moves circular magnet closer to rectangular
-            # (Q-parallel movement to rectangular magnet)
-            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[0][0] * offset_distance_Q[all_magnets[i].index], \
-                                     all_magnets[i].center[1] - rotation_matrix_circle[0][1] * offset_distance_Q[all_magnets[i].index])
+            # subtracting offset distance moves circular magnet downwards with respect to the rectangular magnet on its right side
+            # (Q-perpendicular movement to rectangular magnet)
+            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[1][0] * offset_distance_Q[all_magnets[i].index], \
+                                     all_magnets[i].center[1] - rotation_matrix_circle[1][1] * offset_distance_Q[all_magnets[i].index])
+
+
 
             # storing offset values in all_magnets list for final output file
             all_magnets[i].offset_P = offset_distance_P[all_magnets[i].index]

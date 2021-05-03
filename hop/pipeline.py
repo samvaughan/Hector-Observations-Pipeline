@@ -459,12 +459,16 @@ class HectorPipe:
         ### FIXME- add documentation here
 
         # Input config files to be read from
+        # Input file 1
         fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
+        # Input file 2
         fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
         print('\n\n'+str(fileNameHexa))
 
         # files to be output to after arranging the guide and hexa probe data
+        # proxy output file
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        # Output file 1
         guide_outputFile = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # Adding ID column and getting rid of the header line of Guides cluster to add to the hexa cluster
@@ -491,6 +495,7 @@ class HectorPipe:
                                      self.galaxyIDrecord, mu_1re_cutoff, self.config['output_filename_stem'], tile_number, flagsFile)
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
+        # Input file 3 - offsets
         offsetFile = f"{self.configuration_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
         all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
 
@@ -518,6 +523,7 @@ class HectorPipe:
         conflictsRecord = f'{self.allocation_files_location_base}/Conflicts_Index.txt'
         conflicts.blocked_magnet.print_fully_blocked_magnets(fully_blocked_magnets,conflictsRecord, fileNameHexa)
 
+        # record the magnet and tile list in unresolvable conflicts file
         conflictFile = f'{self.allocation_files_location_base}/unresolvable_conflicts.txt'
 
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
@@ -527,7 +533,9 @@ class HectorPipe:
 
         if plot:
             # draw all the magnets in the plots created earlier
+            # Output file- figure 1
             robot_figureFile = f"{self.plot_location}/robotPlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+            # Output file- figure 2
             hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
             plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], tile_number, fileNameHexa, robot_figureFile, hexabundle_figureFile)  #***********
 
@@ -539,7 +547,9 @@ class HectorPipe:
         newrow_circular = ['Magnet_C', 'Label_C', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order_C', 'Pickup_option_C', 'ID', 'Index', 'Hexabundle', 'rectMag_inputOrientation']
 
         # final two output files
+        # Output file 2
         outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        # Output file 3
         robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
@@ -551,35 +561,42 @@ class HectorPipe:
         # produce final files with consistent layout and no extra commas
         file_arranging.finalFiles(all_magnets, outputFile, fileNameHexa)
 
-        # ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
-        # # fibre input file to be read
-        # fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
-        #
-        # # fibre output file to be written to
-        # output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
-        # output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
-        #
-        # output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
-        # #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
-        #
-        # # create the fibre spectrograph files for each of AAOmega and Spector
-        # new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
-        #
-        # # create the hexabundle fibre coordinate data files
-        # fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
-        #
-        # fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-        # fibreFigure_Spector = f"{self.plot_location}/fibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-        # # create figure of slitlets
-        # # fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
-        #
-        # skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-        # skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
-        # # create figure of magnified sky fibre positioning in slitlets
-        # fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
+
+        ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
+        # fibre input file to be read
+        # Input file 4 - fibres
+        fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
+
+        # fibre output file to be written to
+        # Output files printed only once, not for each tile
+        output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
+        output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
+
+        output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
+        #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+
+        # create the fibre spectrograph files for each of AAOmega and Spector
+        new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
+
+        # create the hexabundle fibre coordinate data files
+        fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)
+
+        # Output file- figure 3 fibres
+        fibreFigure_AAOmega = f"{self.plot_location}/fibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # Output file- figure 4 fibres
+        fibreFigure_Spector = f"{self.plot_location}/fibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # create figure of slitlets
+        fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
+
+        # Output file- figure 5 fibres
+        skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # Output file- figure 6 fibres
+        skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        # create figure of magnified sky fibre positioning in slitlets
+        fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
 
 
-        ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+        # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
         # tile_1 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
         # tile_2 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number+1):03d}.txt"
         # subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number:03d}_previous.pdf"

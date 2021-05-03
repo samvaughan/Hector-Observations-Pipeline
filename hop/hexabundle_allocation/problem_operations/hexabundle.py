@@ -533,9 +533,13 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
     # resolving hexabundles not allocated initially
     MagnetDict = resolve_unallocated_hexabundle(unallocatedOnes,result,MagnetDict,indexx)
 
-
     # recording hexabundle as per galaxy records; IDs in current tile have been recorded above
     galaxyIDrecord, MagnetDict = update_galaxyIDrecord_withHexabundle(galaxyIDrecord,MagnetDict)
+
+    # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
+    guideIndex = 1
+    for magnet in all_magnets:
+        magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict, magnet, guideIndex)
 
     return galaxyIDrecord, MagnetDict
 

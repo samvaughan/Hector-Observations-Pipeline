@@ -86,8 +86,8 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         # selecting only 1 pickup direction based on preference for circular: TR,TL,RO,RI and rectangular: I,O
         available_pickup = assign_preferable_pickupDirection(available_pickup)
 
-        # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
-        magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict,magnet,guideIndex)
+        # # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
+        # magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict,magnet,guideIndex)
 
         # calculating rotation angles for pickup and putdown based on available pickup direction
         magnet = calculate_pickup_putdown_angles(magnet,available_pickup)
