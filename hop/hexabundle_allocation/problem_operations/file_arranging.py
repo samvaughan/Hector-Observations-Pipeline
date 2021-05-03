@@ -298,7 +298,8 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
     df_tileOutput.fillna('NA', inplace=True)
 
     # remove commas due to joining of positioning arrays pf circular and rectangular magnets
-    # df_tileOutput = df_tileOutput.replace(',', '', regex=True)
+    df_tileOutput = df_tileOutput.replace(',', '', regex=True)
+    df_tileOutput.columns = df_tileOutput.columns.str.replace(',', '')
 
     # write the description from config file at top of final tile output file
     with open(outputFile, 'w') as f:
