@@ -3,7 +3,7 @@ pd.options.mode.chained_assignment = None  # disabled warning about writes makin
 from math import atan,sin,cos,sqrt,degrees,radians,pi
 
 
-def radialOffset_standaloneFunction(filename, offset=None, T_observed=None, T_configured=None, robot_centre=None, plate_radius=None, alpha=None):
+def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, T_configured=-10000, robot_centre=None, plate_radius=None, alpha=None):
     
     ''' FUNCTION TO ADJUST THE RADIAL OFFSET FOR ALL MAGNETS IN CASE OF THERMAL EXPANSION OF THE PLATE
     INPUTS: 1. 'filename'- Mandatory Input required is the filename with location
@@ -34,14 +34,28 @@ def radialOffset_standaloneFunction(filename, offset=None, T_observed=None, T_co
     if alpha == None:
         alpha = 1.2 * (10**(-6))
 
-    if T_observed != None and T_configured != None:
+    if T_observed != -10000 and T_configured != -10000:
         delta_T = T_configured - T_observed
         offset = plate_radius * ( delta_T * alpha )  
+        print('Offset calculated based on temperature change = '+str(offset)+' mm')
 
-    
-    df = pd.read_csv(filename,sep=' ')
+    # getting count of lines to skip at top of file, which contain other information
+    with open(filename) as file:
+        line = file.readline()
+        skipline_count = 0
+        description = line
 
-    magnet_count =len(df)
+        # count and store only lines starting with #
+        while line.startswith('#'):
+            line = file.readline()
+            if line[0] == '#':
+                description += line
+            skipline_count += 1
+
+
+    df = pd.read_csv(filename, sep=' ', skiprows=skipline_count+1)
+
+    magnet_count = len(df)
 
     for i in range(magnet_count):
         
@@ -68,7 +82,16 @@ def radialOffset_standaloneFunction(filename, offset=None, T_observed=None, T_co
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.txt'
 
-    df.to_csv(outputFile, index=False, sep=' ', escapechar=' ',line_terminator='\n\n',na_rep='NA')
+    # write the description from input robot file at top of final output robot file
+    with open(outputFile, 'w+') as f:
+        f.write(description[:-6])
+        if offset >= 0:
+            f.write(str(offset)+' mm of radial outward movement shift of magnets have been actioned')
+        elif offset < 0:
+            f.write(str(offset)+' mm of radial inward movement shift of magnets have been actioned')
+        f.write('\n\n')
+
+    df.to_csv(outputFile, index=False, sep=' ', escapechar=' ', line_terminator='\n\n', na_rep='NA', mode='a')
 
     print('Output file produced by adjusting offset values to the input file')
 
@@ -149,11 +172,13 @@ def convert_modulus_angle(angle):
 
 ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_DC_tile_000.txt'
+filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
 
 radialOffset_standaloneFunction(filename,2.0) # direct value of offset as input
 
-# radialOffset_standaloneFunction(filename,None, T_observed, T_configured) # Observed and configured temperatures as input
+# T_observed = 30
+# T_configured = 23.0
+# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
 
 
