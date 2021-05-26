@@ -3,6 +3,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
 import numpy as np
 import csv
+import datetime
 import re
 import time
 
@@ -111,7 +112,7 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
 
 # creating the robotFile array for
-def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
+def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
 
     # guide probes do not have ID, so they are allocated a large negative integer
     positioning_array[:, 8] = [i if i != 'nan' else -999999 for i in positioning_array[:, 8]]
@@ -133,6 +134,13 @@ def create_robotFileArray(positioning_array,robotFile,newrow,fully_blocked_magne
 
     # write the robot file array into the CSV file for the robot
     with open(robotFile, 'w+') as robotFile:
+
+        robotFile.write('# Robot File \n')
+        robotFile.write('# Label, ' + str(tile_batch) + ' Tile ' + str(tile_number) + '\n')
+        robotFile.write('# Date and Time file was created/configured: ')
+        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n')
+        robotFile.write('# Radial Offset Adjustment: None \n \n')
+
         writer = csv.writer(robotFile, delimiter=' ')
         writer.writerows(robotFilearray)
 
