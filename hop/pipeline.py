@@ -93,6 +93,8 @@ class HectorPipe:
         if not self.ConfigurationCode_location.exists():
             raise FileNotFoundError("The Configuration Code seems to not exist")
 
+        self.excel_files_for_allocation_location = Path(__file__).parent / Path("hexabundle_allocation")
+
         self.have_targets_catalogue = False
         self.have_standard_star_catalogue = False
         self.have_guide_star_catalogue = False
@@ -496,7 +498,7 @@ class HectorPipe:
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
-        offsetFile = f"{self.configuration_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
+        offsetFile = f"{self.excel_files_for_allocation_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
         all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
 
         # create magnet pickup areas for all the magnets
@@ -565,7 +567,7 @@ class HectorPipe:
         ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
         # fibre input file to be read
         # Input file 4 - fibres
-        fibre_file = f"{self.configuration_location}\Fibre_slitInfo.xlsx"
+        fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo.xlsx"
 
         # fibre output file to be written to
         # Output files printed only once, not for each tile

@@ -14,7 +14,7 @@ from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotatio
 
 def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
-    fibre_data = pd.read_excel(fibre_file)
+    fibre_data = pd.read_excel(fibre_file, engine = 'openpyxl')
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h1, h2 = 10, 820, 856

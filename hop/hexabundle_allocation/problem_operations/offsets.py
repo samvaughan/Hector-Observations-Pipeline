@@ -13,7 +13,7 @@ import re
 def hexaPositionOffset(all_magnets,offsetFile):
 
     # read offset excel file as a dataframe
-    df = pd.read_excel(offsetFile,usecols=['Name','P','Q'])
+    df = pd.read_excel(offsetFile,usecols=['Name','P','Q'], engine = 'openpyxl')
 
     # drop the rows with NA values in Q column
     df.dropna(subset=['Q'], inplace=True)
