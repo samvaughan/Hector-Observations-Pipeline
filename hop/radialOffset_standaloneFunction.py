@@ -84,11 +84,22 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
 
     # write the description from input robot file at top of final output robot file
     with open(outputFile, 'w+') as f:
-        f.write(description[:-6])
-        if offset >= 0:
-            f.write(str(offset)+' mm of radial outward movement shift of magnets have been actioned')
-        elif offset < 0:
-            f.write(str(offset)+' mm of radial inward movement shift of magnets have been actioned')
+        f.write(description)
+
+        f.write('# Radial Offset Adjustment, ' + str(offset) + '\n')
+        f.write('# Radial offset is in millimetre(mm) with +ve values actioning radial outward movement \n')
+        f.write('# and -ve values actioning radial inward movement of the magnets. \n')
+        
+        if T_observed != -10000 and T_configured != -10000:
+            f.write('# Temp1, ' + str(T_observed) + '\n')
+            f.write('# Temp2, ' + str(T_configured) + '\n')
+            f.write('# Temp1 is the temperature the distortion code assumed the field would be observed at, \n')
+            f.write('# and Temp2 is the actual temperature it is going to be observed at in degrees C. \n')
+        
+            f.write('# Radial Scale factor, ' + str((( delta_T * alpha )+1)) +'\n')
+            f.write('# Radial scale factor is thermal coefficient of invar times temperature difference \n')
+            f.write('# applied radially relative to the plate centre.')
+
         f.write('\n\n')
 
     df.to_csv(outputFile, index=False, sep=' ', escapechar=' ', line_terminator='\n\n', na_rep='NA', mode='a')
@@ -174,11 +185,11 @@ def convert_modulus_angle(angle):
 
 filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
 
-radialOffset_standaloneFunction(filename,2.0) # direct value of offset as input
+# radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
 
-# T_observed = 30
-# T_configured = 23.0
-# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+T_observed = 30
+T_configured = 23.0
+radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
 
 
