@@ -138,8 +138,8 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
         robotFile.write('# Robot File \n')
         robotFile.write('# Label, ' + str(tile_batch) + ' Tile ' + str(tile_number) + '\n')
         robotFile.write('# Date and Time file was created/configured: ')
-        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n')
-        robotFile.write('# Radial Offset Adjustment: None \n \n')
+        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n\n')
+        # robotFile.write('# Radial Offset Adjustment \n \n')
 
         writer = csv.writer(robotFile, delimiter=' ')
         writer.writerows(robotFilearray)
