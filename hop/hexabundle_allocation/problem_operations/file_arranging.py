@@ -138,7 +138,23 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
         robotFile.write('# Robot File \n')
         robotFile.write('# Label, ' + str(tile_batch) + ' Tile ' + str(tile_number) + '\n')
         robotFile.write('# Date and Time file was created/configured: ')
-        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n\n')
+        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n')
+
+        robotFile.write('# Radial Offset Adjustment, -9999\n')
+        robotFile.write('# Radial offset is in millimetre(mm) with +ve values actioning radial outward movement \n')
+        robotFile.write('# and -ve values actioning radial inward movement of the magnets. \n')
+
+        robotFile.write('# Temp1, -9999\n')
+        robotFile.write('# Temp2, -9999\n')
+        robotFile.write('# Temp1 is the temperature the distortion code assumed the field would be observed at, \n')
+        robotFile.write('# and Temp2 is the actual temperature it is going to be observed at in degrees C. \n')
+
+        robotFile.write('# Radial Scale factor, 1.0\n')
+        robotFile.write('# Radial scale factor is thermal coefficient of invar times temperature difference \n')
+        robotFile.write('# applied radially relative to the plate centre.')
+
+        robotFile.write('\n\n')
+
         # robotFile.write('# Radial Offset Adjustment \n \n')
 
         writer = csv.writer(robotFile, delimiter=' ')
