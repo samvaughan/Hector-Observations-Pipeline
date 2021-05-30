@@ -82,9 +82,16 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.txt'
 
+    hash_count = 0
     # write the description from input robot file at top of final output robot file
     with open(outputFile, 'w+') as f:
-        f.write(description)
+        
+        for i in description:
+            if i == '#':
+                hash_count += 1
+                if hash_count == 4:
+                    break    
+            f.write(i)
 
         f.write('# Radial Offset Adjustment, ' + str(offset) + '\n')
         f.write('# Radial offset is in millimetre(mm) with +ve values actioning radial outward movement \n')
