@@ -176,7 +176,8 @@ swapsneeded=c(swapsneeded,final_config$swaps)
 IDs=IDs[match(rownames(pos),rownames(fdata)),]
 # This gets the rest of the columns from the tile too for us to save
 subset_of_IDs_for_saving = (tile_data$ID %in% IDs)
-selected_objects = tile_data[subset_of_IDs_for_saving,]
+# Don't keep the ID column as otherwise this gets duplicated
+selected_objects = tile_data[subset_of_IDs_for_saving, -which(names(tile_data) == "ID")]
 
 # Now make the skyfibre rows
 sky_fibre_data = tile_data[(tile_data$ID %in% sky_fibre_IDs),]
@@ -186,7 +187,7 @@ sky_fibre_filler_list = rep(NA, nrow(sky_fibre_data))
 # I've added NA values for the sky fibre columns which don't make sense (rads, angs, etc)
 target_table = cbind(probe=c(1:length(angs)),IDs,pos,rads,angs,azAngs,angs_azAng,selected_objects)
 sky_fibre_table = cbind(probe=sky_fibre_filler_list, 
-                        IDs=sky_fibre_data$ID, 
+                        ID=sky_fibre_data$ID, 
                         x=sky_fibre_data$MagnetX / 1000.0, 
                         y=sky_fibre_data$MagnetY / 1000.0,
                         rads=sky_fibre_filler_list,
@@ -217,8 +218,8 @@ print(paste('Writing outputs to ', galaxy_out_name, sep=''))
 print(paste('********************************************'))
 
 #* Write the final table for the hexabundles and the guides
-write.table(final_table,file=galaxy_out_name, row.names=FALSE)
-write.table(final_guide_table, file=guide_out_name, row.names=FALSE)
+write.table(final_table,file=galaxy_out_name, row.names=FALSE, sep=',')
+write.table(final_guide_table, file=guide_out_name, row.names=FALSE, sep=',')
 
 if (visualise) {
   plot_configured_field(pos=pos,angs=angs,gpos=gpos,gangs=gangs, fieldflags=final_config$flags, aspdf=FALSE)

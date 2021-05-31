@@ -1607,7 +1607,7 @@ void WriteOutputFile (
       //  and the position used by the sky fibres.
       
       std::string FieldList = ProgDetails->ListOfFields +
-                                          ",MagnetX,MagnetY,Position\n";
+                                          ",MagnetX,MagnetY,SkyFibrePosition\n";
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {
