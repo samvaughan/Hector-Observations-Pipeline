@@ -550,7 +550,7 @@ class HectorPipe:
 
         # final two output files
         # Output file 2
-        outputFile = f"{self.allocation_files_location_tiles}/Hexa_and_Guides_with_PositioningArray_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        outputFile = f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
         # Output file 3
         robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
@@ -591,9 +591,9 @@ class HectorPipe:
         fibres.create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega,fibreFigure_Spector)
 
         # Output file- figure 5 fibres
-        skyFibre_AAOmegaFigure = f"{self.plot_location}/skyFibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        skyFibre_AAOmegaFigure = f"{self.plot_location}/skyfibre_slitletAAOmega_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # Output file- figure 6 fibres
-        skyFibre_SpectorFigure = f"{self.plot_location}/skyFfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
+        skyFibre_SpectorFigure = f"{self.plot_location}/skyfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # create figure of magnified sky fibre positioning in slitlets
         fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
 
