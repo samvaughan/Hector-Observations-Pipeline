@@ -188,15 +188,17 @@ def convert_modulus_angle(angle):
 
 
 
-### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
+if __name__ == "__main__":
 
-filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
+    ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-# radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
+    filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
 
-T_observed = 30
-T_configured = 23.0
-radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+    # radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
+
+    T_observed = 30
+    T_configured = 23.0
+    radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
 
 
