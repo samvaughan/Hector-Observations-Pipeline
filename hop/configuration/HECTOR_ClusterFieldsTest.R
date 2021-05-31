@@ -52,8 +52,8 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #* arguments you'd give on the command line.
 #* To compare to ipython: %run myscript a, b would become tmp_args=c('a', 'b')
 #* DON'T FORGET TO COMMENT OUT LINE 51 TO RUN AS A SCRIPT!!!
-tmp_args=c('/Users/samvaughan/Science/Hector/HectorPipelineRuns/UpdatedHeaders/G15/DistortionCorrected/DC_tile_034.fld',
-           '/Users/samvaughan/Science/Hector/HectorPipelineRuns/UpdatedHeaders/G15/DistortionCorrected/guide_DC_tile_034.fld',
+tmp_args=c('/Users/samvaughan/Science/Hector/HectorPipelineRuns/Outputs/GAMA/G15/DistortionCorrected/DC_tile_000.fld',
+           '/Users/samvaughan/Science/Hector/HectorPipelineRuns/Outputs/GAMA/G15/DistortionCorrected/guide_DC_tile_000.fld',
              '/Users/samvaughan/Desktop/hexa_output.txt',
              '/Users/samvaughan/Desktop/guide_output.txt',
              '--plot_filename', '/Users/samvaughan/Desktop/plot_output.pdf',
@@ -173,28 +173,30 @@ swapsneeded=c(swapsneeded,final_config$swaps)
 
 #* Get the IDs of things which have been tiled, and save these
 #* IDs=IDs[rownames(pos),] <<- This is wrong!
-IDs=IDs[match(rownames(pos),rownames(fdata)),]
+ID=IDs[match(rownames(pos),rownames(fdata)),]
 # This gets the rest of the columns from the tile too for us to save
-subset_of_IDs_for_saving = (tile_data$ID %in% IDs)
+subset_of_IDs_for_saving = (tile_data$ID %in% ID)
 # Don't keep the ID column as otherwise this gets duplicated
 selected_objects = tile_data[subset_of_IDs_for_saving, -which(names(tile_data) == "ID")]
 
 # Now make the skyfibre rows
 sky_fibre_data = tile_data[(tile_data$ID %in% sky_fibre_IDs),]
+sky_fibre_IDs = sky_fibre_data$ID
+sky_fibre_data_minus_IDs =  sky_fibre_data[, -which(names(sky_fibre_data) == "ID")]
 sky_fibre_filler_list = rep(NA, nrow(sky_fibre_data))
 
 # Now make the tables- one for the hexabundles ("target_table") and one for the sky fibres
 # I've added NA values for the sky fibre columns which don't make sense (rads, angs, etc)
-target_table = cbind(probe=c(1:length(angs)),IDs,pos,rads,angs,azAngs,angs_azAng,selected_objects)
+target_table = cbind(probe=c(1:length(angs)),ID,pos,rads,angs,azAngs,angs_azAng,selected_objects)
 sky_fibre_table = cbind(probe=sky_fibre_filler_list, 
-                        ID=sky_fibre_data$ID, 
+                        ID=sky_fibre_IDs, 
                         x=sky_fibre_data$MagnetX / 1000.0, 
                         y=sky_fibre_data$MagnetY / 1000.0,
                         rads=sky_fibre_filler_list,
                         angs=sky_fibre_filler_list,
                         azAngs=sky_fibre_filler_list,
                         angs_azAng=sky_fibre_filler_list,
-                        sky_fibre_data)
+                        sky_fibre_data_minus_IDs)
 
 final_table = rbind(target_table, sky_fibre_table)
 

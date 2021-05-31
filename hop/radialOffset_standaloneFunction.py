@@ -53,7 +53,7 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
             skipline_count += 1
 
 
-    df = pd.read_csv(filename, sep=' ', skiprows=skipline_count+1)
+    df = pd.read_csv(filename, sep=',', comment='#')
 
     magnet_count = len(df)
 
@@ -109,7 +109,7 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
 
         f.write('\n\n')
 
-    df.to_csv(outputFile, index=False, sep=' ', escapechar=' ', line_terminator='\n\n', na_rep='NA', mode='a')
+    df.to_csv(outputFile, index=False, sep=',', mode='a')
 
     print('Output file produced by adjusting offset values to the input file')
 
