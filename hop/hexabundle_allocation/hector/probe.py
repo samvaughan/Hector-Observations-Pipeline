@@ -103,6 +103,8 @@ class probe:
              + self.circular_rectangle_magnet_center_distance * cos(2 * pi - self.rectangular_magnet_orientation_modulo_radians),
              self.circular_magnet_center[1] \
              - self.circular_rectangle_magnet_center_distance * sin(2 * pi - self.rectangular_magnet_orientation_modulo_radians)]
+        else:
+            raise ValueError(f"This rectangular magnet has an orientation of {self.rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
 
         return np.array(self.rectangular_magnet_center)
 

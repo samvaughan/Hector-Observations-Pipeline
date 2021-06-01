@@ -436,6 +436,8 @@ class HectorPipe:
 
         new_header_values = dict(zip(header_keys, header_values))
         self.header_dictionary.update(new_header_values)
+        self.header_dictionary.update(zip(["#CONFIGTEMP", "#OBSTEMP"], [robot_temp, obs_temp]))
+
 
         guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.ID.astype(str))
         with open(guide_tile_out_fname_after_DC, 'w') as f:
@@ -452,7 +454,7 @@ class HectorPipe:
             fig, ax = plotting_tools.plot_distortion_correction_before_after(tile_out_fname_after_DC, title_text=f"{tile_out_fname_after_DC}")
             fig.savefig(f"{plot_save_filename}", bbox_inches='tight')
             plt.close(fig)
-        
+
         return DC_corrected_output_file
 
 

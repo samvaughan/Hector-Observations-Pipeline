@@ -28,7 +28,7 @@ def remove_apostrophes(s):
 # extracting the list of probes with all the respective parameters required from the file
 def create_list_of_probes_from_file(file,guideFileList):
 
-    df = pd.read_csv(file,sep=' ')
+    df = pd.read_csv(file,sep=',')
 
     # print list of headers for the file
     print(df.keys())
@@ -38,7 +38,7 @@ def create_list_of_probes_from_file(file,guideFileList):
         if 0<i<28 :
             count_split += 1
 
-    mask = df['IDs'] > 0
+    mask = (df['ID'] > 0) & (np.isfinite(df['rads'])) & (np.isfinite(df['angs']))
     df_1 = df[mask]
 
     df_2 = df[~mask]
@@ -49,7 +49,7 @@ def create_list_of_probes_from_file(file,guideFileList):
     probe_number = [round(num) for num in probe_number]
     probe_number += guideFileList[0]
 
-    IDs = list(df_1['IDs']) + guideFileList[1]
+    IDs = list(df_1['ID']) + guideFileList[1]
     circular_magnet_center_x = list(df_1['x']) + guideFileList[2]
     circular_magnet_center_y = list(df_1['y']) + guideFileList[3]
     rads = list(df_1['rads']) + guideFileList[4]

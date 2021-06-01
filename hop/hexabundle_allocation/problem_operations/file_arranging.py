@@ -22,7 +22,7 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
             skipline_count += 1
 
     # creating dataframe for guide probes from guides config file
-    df_guides = pd.read_csv(fileNameGuides, sep = ' ', skiprows=skipline_count)
+    df_guides = pd.read_csv(fileNameGuides, sep=',', skiprows=skipline_count)
 
     # crate a probe column to keep count to the guides dataframe
     df_guides.insert(loc=0, column='probe', value=0)
@@ -36,7 +36,7 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
 
     # creating data
     # frame for just galaxy probes from hexa config file
-    df = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
+    df = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
     mask = df['probe'] < 22
     df_hexas = df[mask]
 
@@ -80,7 +80,7 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     with open(guide_outputFile, 'w') as f:
         f.write(description)
 
-    df_guides.to_csv(guide_outputFile, index=False, sep=' ', mode='a')
+    df_guides.to_csv(guide_outputFile, index=False, sep=',', mode='a')
 
     return df_guides, guideFileList
 
@@ -97,8 +97,8 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
             skipline_count += 1
 
     # creating dataframe for just galaxy probes from hexa config file
-    df1 = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
-    mask = df1['probe'] < 22
+    df1 = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
+    mask = df1['probe'] < 22 # Getting Hexa Probes- shoudl change this to use the "type" column
     df_new = df1[mask]
 
     # joining dataframes of hexa and guide probes
@@ -108,7 +108,7 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
     df_plateFile.fillna('NA', inplace=True)
 
     # write the joined dataframe of hexa and guide probes on plate file
-    df_plateFile.to_csv(plate_file, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ')
+    df_plateFile.to_csv(plate_file, index=False, sep=',', quoting=csv.QUOTE_NONE, escapechar=' ')
 
 
 # creating the robotFile array for
@@ -157,7 +157,7 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
 
         # robotFile.write('# Radial Offset Adjustment \n \n')
 
-        writer = csv.writer(robotFile, delimiter=' ')
+        writer = csv.writer(robotFile, delimiter=',')
         writer.writerows(robotFilearray)
 
     return positioning_array,robotFilearray
@@ -261,12 +261,15 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 
         # Read each row of the input csv file as list
         for row in csv_reader:
-            roww_circular = np.array2string(positioning_array_circular[index], separator=' ',formatter={'str_kind': lambda x: x})
-            roww = np.array2string(positioning_array[index], separator=' ', formatter={'str_kind': lambda x: x})
+            
+            # roww_circular = np.array2string(positioning_array_circular[index], separator=',',formatter={'str_kind': lambda x: x})
+            # roww = np.array2string(positioning_array[index], separator=',', formatter={'str_kind': lambda x: x})
 
-            # Append the default text in the row / list
-            row.append(str(roww).replace('[', ' ').rstrip(']'))
-            row.append(str(roww_circular).replace('[', ' ').rstrip(']'))
+            # # Append the default text in the row / list
+            # row.append(str(roww).replace('[', '').rstrip(']'))
+            # row.append(str(roww_circular).replace('[', '').rstrip(']'))
+            row.extend(positioning_array[index])
+            row.extend(positioning_array_circular[index])
 
             # Add the updated row / list to the output file
             csv_writer.writerow(row)
@@ -280,7 +283,7 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 def finalFiles(all_magnets, outputFile, fileNameHexa):
 
     # read output file to create probes dataframe
-    df_probes = pd.read_csv(outputFile, sep=' ',header=0)
+    df_probes = pd.read_csv(outputFile, sep=',',header=0)
 
     df_probes['offset_P'] = 0.0
     df_probes['offset_Q'] = 0.0
@@ -311,7 +314,7 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
             skipline_count += 1
 
     # creating dataframe for just the sky fibres from config hexa files
-    df = pd.read_csv(fileNameHexa,sep=' ', skiprows=skipline_count)
+    df = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
     mask = df['probe'] < 22
     df_skyfibre = df[~mask]
 
@@ -322,13 +325,13 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
     df_tileOutput.fillna('NA', inplace=True)
 
     # remove commas due to joining of positioning arrays pf circular and rectangular magnets
-    df_tileOutput = df_tileOutput.replace(',', '', regex=True)
-    df_tileOutput.columns = df_tileOutput.columns.str.replace(',', '')
+    #df_tileOutput = df_tileOutput.replace(',', '', regex=True)
+    #df_tileOutput.columns = df_tileOutput.columns.str.replace(',', '')
 
     # write the description from config file at top of final tile output file
     with open(outputFile, 'w') as f:
         f.write(description)
 
     # write the joined dataframe of probes and skyfibres on final tile output file after the description
-    df_tileOutput.to_csv(outputFile, index=False, sep=' ', quoting=csv.QUOTE_NONE, escapechar=' ', mode='a')
+    df_tileOutput.to_csv(outputFile, index=False, sep=',', quoting=csv.QUOTE_NONE, escapechar=' ', mode='a')
 
