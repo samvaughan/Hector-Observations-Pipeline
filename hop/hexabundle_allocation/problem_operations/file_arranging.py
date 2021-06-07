@@ -237,14 +237,14 @@ def positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outpu
 
     # adding the title row and getting rid of some columns not required
     positioning_array_circular = np.insert(positioning_array_circular, 0, np.array(newrow_circular), 0)
-    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 9, 10,11], 1)
+    positioning_array_circular = np.delete(positioning_array_circular, [2, 3, 4, 5, 8, 9, 10, 11, 12], 1)
 
     # splitting positioning array to keep only rectangular ones
     positioning_array = np.vsplit(positioning_array, 2)[1]
 
     # adding the title row and getting rid of some columns not required
     positioning_array = np.insert(positioning_array, 0, np.array(newrow), 0)
-    positioning_array = np.delete(positioning_array, [2, 3, 4, 5, 8, 11], 1)
+    positioning_array = np.delete(positioning_array, [2, 3, 4, 5, 8], 1)
 
     # index for keeping count
     index = 0

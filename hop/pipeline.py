@@ -547,8 +547,8 @@ class HectorPipe:
         # print(positioning_array)
 
         # insert column heading and print only rectangular magnet rows in the csv file
-        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle', 'rectMag_inputOrientation']
-        newrow_circular = ['Magnet_C', 'Label_C', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order_C', 'Pickup_option_C', 'ID', 'Index', 'Hexabundle', 'rectMag_inputOrientation']
+        newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle', 'probe_orientation', 'rectMag_inputOrientation']
+        newrow_circular = ['Magnet_C', 'Label_C', 'Center_x', 'Center_y', 'holding_position_ang', 'plate_placement_ang', 'order_C', 'Pickup_option_C', 'ID', 'Index', 'Hexabundle', 'probe_orientation', 'rectMag_inputOrientation']
 
         # final two output files
         # Output file 2
