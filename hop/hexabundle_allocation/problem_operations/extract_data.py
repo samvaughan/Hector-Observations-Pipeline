@@ -38,7 +38,8 @@ def create_list_of_probes_from_file(file,guideFileList):
         if 0<i<28 :
             count_split += 1
 
-    mask = (df['ID'] > 0) & (np.isfinite(df['rads'])) & (np.isfinite(df['angs']))
+    # Only get the galaxy and standard star hexas
+    mask = (df.type == 1) | (df.type == 0)
     df_1 = df[mask]
 
     df_2 = df[~mask]

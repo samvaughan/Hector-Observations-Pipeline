@@ -22,30 +22,24 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
             skipline_count += 1
 
     # creating dataframe for guide probes from guides config file
-    df_guides = pd.read_csv(fileNameGuides, sep=',', skiprows=skipline_count)
+    df_guides = pd.read_csv(fileNameGuides, sep=',', comment='#')
 
     # crate a probe column to keep count to the guides dataframe
     df_guides.insert(loc=0, column='probe', value=0)
 
-    with open(fileNameHexa) as f:
-        line = f.readline()
-        skipline_count = 0
-        while line.startswith('#'):
-            line = f.readline()
-            skipline_count += 1
 
     # creating data
     # frame for just galaxy probes from hexa config file
-    df = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
-    mask = df['probe'] < 22
+    df = pd.read_csv(fileNameHexa,sep=',', comment='#')
+    mask = (df.type == 1) | (df.type == 0)
     df_hexas = df[mask]
 
     # reading the index value of last hex probe to get count of hexa probes
-    hexaCount = int(df_hexas['probe'][df_hexas.index[-1]]) + 1
+    hexaCount = int(df_hexas.loc[df_hexas.index[-1], 'probe']) + 1
 
     # probe numbering for the guide probes, counting onward from hexa count
     for i in range(len(df_guides['probe'])):
-        df_guides['probe'][i] = int(hexaCount + i)
+        df_guides.loc[df_guides.index[i], 'probe'] = int(hexaCount + i)
 
     # creating columns for guide file list
     probe_number = list(df_guides['probe'])
@@ -88,17 +82,17 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
 # merging the hexas and guides file to create one plate file with all the magnets
 def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
-    # getting count of lines to skip at top of file, which contain other information
-    with open(fileNameHexa) as f:
-        line = f.readline()
-        skipline_count = 0
-        while line.startswith('#'):
-            line = f.readline()
-            skipline_count += 1
+    # # getting count of lines to skip at top of file, which contain other information
+    # with open(fileNameHexa) as f:
+    #     line = f.readline()
+    #     skipline_count = 0
+    #     while line.startswith('#'):
+    #         line = f.readline()
+    #         skipline_count += 1
 
     # creating dataframe for just galaxy probes from hexa config file
-    df1 = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
-    mask = df1['probe'] < 22 # Getting Hexa Probes- shoudl change this to use the "type" column
+    df1 = pd.read_csv(fileNameHexa,sep=',', comment='#')
+    mask = (df1.type == 1) | (df1.type == 0)
     df_new = df1[mask]
 
     # joining dataframes of hexa and guide probes
