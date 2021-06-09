@@ -128,6 +128,9 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
     # add the reposition column to robot file by using the fully blocked magnets dictionary
     robotFilearray = add_repositionCol_to_robotFile(positioning_array,robotFilearray,fully_blocked_magnets_dictionary)
 
+    # delete the column which are not to be included in robot file array
+    robotFilearray = np.delete(robotFilearray, [13], 1)
+
     # TEST PRINT
     print('\n')
     print(robotFilearray)
