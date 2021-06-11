@@ -301,16 +301,7 @@ class HectorPipe:
                         proximity = self.config['proximity'] * (1 + (j // 5) * 0.1)
 
                     # Set up the filenames of the configureation
-
-                    # Now call Caro's code
-                    self.logger.info(f"Tile {current_tile}: \n\tRunning Configuration code on file {tile_out_fname_after_DC}...")
-                    Configuration_bash_code = ["Rscript", self.ConfigurationCode_location, tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, '--plot_filename', configuration_plot_filename]
-                    try:
-                        process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
-                        self.logger_R_code.info(process.stdout)
-                        return_code = process.returncode
-                    except subprocess.TimeoutExpired:
-                        return_code = 10
+                    return_code = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
                         
                         
                     # If we've done the tile, break out of the inner 'Max tries' loop
@@ -456,6 +447,39 @@ class HectorPipe:
             plt.close(fig)
 
         return DC_corrected_output_file
+
+    def apply_config_code_to_tile(self, tile_number, config_timeout=None):
+
+        tile_file_for_configuration = Path(f"{self.distortion_corrected_tile_location}/DC_tile_{tile_number:03}.fld")
+        guide_tile_for_configuration = Path(f"{self.distortion_corrected_tile_location}/guide_DC_tile_{tile_number:03}.fld")
+        configuration_output_filename = Path(f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number:03}.txt")
+        configuration_guide_filename = Path(f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number:03}.txt")
+        configuration_plot_filename = Path(f"{self.configuration_location}/HECTORConfig_Plot_{self.config['output_filename_stem']}_{tile_number:03}.pdf")
+
+        print(f"\tRunning Configuration code on Tile {tile_number}")
+        print(f"\tSaving to {configuration_output_filename}")
+        if config_timeout is not None:
+            print(f"\tTimeout is {config_timeout} seconds")
+
+        return_code = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout, log=False, print_output=True)
+
+        return return_code
+
+    def run_configuration_code(self, tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout, log=True, print_output=False):
+        # Now call Caro's code
+        if log:
+            self.logger.info(f"\n\tRunning Configuration code on file {tile_file_for_configuration}...")
+        Configuration_bash_code = ["Rscript", self.ConfigurationCode_location, tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, '--plot_filename', configuration_plot_filename]
+        try:
+            process = subprocess.run(Configuration_bash_code, text=True, capture_output=True, timeout=config_timeout)
+            if log:
+                self.logger_R_code.info(process.stdout)
+            if print_output:
+                print(process.stdout)
+            return_code = process.returncode
+        except subprocess.TimeoutExpired:
+            return_code = 10
+        return return_code
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):

@@ -41,7 +41,6 @@ def create_list_of_probes_from_file(file,guideFileList):
     # Only get the galaxy and standard star hexas
     mask = (df.type == 1) | (df.type == 0)
     df_1 = df[mask]
-
     df_2 = df[~mask]
 
     print("Shape of new dataframes - {} , {}".format(df_1.shape, df_2.shape))
