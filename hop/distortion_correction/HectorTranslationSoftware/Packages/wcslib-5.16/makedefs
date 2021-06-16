@@ -81,7 +81,7 @@
   WCSLIBPKG := wcslib-5.16
 
 # System architecture.
-  ARCH     := x86_64-darwin13.4.0
+  ARCH     := x86_64-darwin18.7.0
 
 # Flex and options.
   FLEX     := flex
@@ -89,20 +89,20 @@
 
 # C preprocessor and options.
   CPP      := x86_64-apple-darwin13.4.0-clang -E
-  CPPFLAGS := -D_FORTIFY_SOURCE=2 -isystem /opt/anaconda3/envs/Hector/include -DHAVE_CONFIG_H
+  CPPFLAGS := -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -DHAVE_CONFIG_H
   WCSTRIG  := WRAPPER
 
 # C compiler and options.
   CC       := x86_64-apple-darwin13.4.0-clang
-  CFLAGS   := -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/Hector/include
+  CFLAGS   := -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include
 
 # Fortran compiler and options.
-  FC       := /opt/anaconda3/envs/Hector/bin/x86_64-apple-darwin13.4.0-gfortran
-  FFLAGS   := -march=core2 -mtune=haswell -ftree-vectorize -fPIC -fstack-protector -O2 -pipe -isystem /opt/anaconda3/envs/Hector/include -I.
+  FC       := gfortran
+  FFLAGS   := -g -O2 -I.
 
 # Static object library.
   WCSLIB   := libwcs-$(LIBVER).a
-  RANLIB   := x86_64-apple-darwin13.4.0-ranlib
+  RANLIB   := /opt/anaconda3/envs/snakemake/bin/x86_64-apple-darwin13.4.0-ranlib
 
 # Shared (dynamic) library (see note 3 above).
   SHRLIB   := libwcs.5.16.dylib
@@ -147,7 +147,7 @@
 # -------------------------------------------------------------------
 # Linker options (use CC for linking).
   LD       = $(CC)
-  LDFLAGS := -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/Hector/lib -L/opt/anaconda3/envs/Hector/lib
+  LDFLAGS := -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib
 
 # PGPLOT (see note 4 above).
   PGPLOTINC := 
@@ -159,7 +159,7 @@
   GETWCSTAB  := 
 
 # Libraries required by the above Fortran compiler.
-  FLIBS :=  -L/opt/anaconda3/envs/Hector/lib -L/opt/anaconda3/envs/Hector/lib/gcc/x86_64-apple-darwin13.4.0/9.3.0 -L/opt/anaconda3/envs/Hector/lib/gcc/x86_64-apple-darwin13.4.0/9.3.0/../../.. -lgfortran -lquadmath -lm
+  FLIBS :=  -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm
 
 # Libraries required by WCSLIB itself.
   LIBS := -lm 

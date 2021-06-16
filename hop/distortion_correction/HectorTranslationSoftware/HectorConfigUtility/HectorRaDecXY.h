@@ -63,8 +63,8 @@
 //     safest to call it for each fibre - if the wavelength hasn't changed, it
 //     does nothing.
 //
-//     For diagnostic purposes it is possible to disable the telecentricity
-//     and offset corrections, but these are enabled by default.
+//     For diagnostic purposes it is possible to disable the telecentricity,
+//     linearity, and offset corrections, but these are enabled by default.
 //
 //  Packages used:
 //     Most 2dF code works through the rather abstract FPIL interface, which
@@ -76,10 +76,6 @@
 //     directly from this code, which is really just a very thin layer on top of
 //     the 2dFutil coordinate conversion routines.
 //
-//  Remaining issues:
-//     o There are issues connected with the thermal expansion of the field
-//       plate that will need to be dealt with.
-//
 //  Author(s): Keith Shortridge, K&V  (Keith@KnaveAndVarlet.com.au)
 //
 //  History:
@@ -90,6 +86,14 @@
 //     12th Sep 2020.  Added DisableTelecentricity() and DisableMechOffset().KS.
 //     15th Jan 2021.  Added ThermalOffset() and associated variables. KS.
 //     16th Jan 2021.  Added use of a DebugHandler to control debugging. KS.
+//      9th Jun 2021.  Added the linearity data in I_Lin. Added I_LinFilePath to
+//                     record the file name used. Initialise() now takes an
+//                     argument giving the linearity file path. I_EnableLin
+//                     and the routine DisableLin() added. KS.
+//     11th Jun 2021.  Added Pos2RaDec() and RaDec2Pos(). KS.
+//     13th Jun 2021.  Replaced TeleCorrToRaDec(), TeleCorrToXY() with,
+//                     respectively TeleCorrFromXY(0), TeleCorrFromRaDec().
+//                     Added GetModel(). KS.
 //
 // ----------------------------------------------------------------------------------
 
@@ -115,7 +119,9 @@ public:
    bool Initialise (double CenRa, double CenDec, double Mjd, double Dut,
          double AtmosTemp, double Press, double Humid, double CenWave,
          double ObsWave, double RobotTemp, double ObsTemp,
-         const std::string& DistFilePath);
+         const std::string& DistFilePath, const std::string& LinFilePath);
+   //  Get model details - required for the output file header
+   bool GetModel (double Pars[], int MaxPars, int* NumPars);
    //  Modify the observing wavelength being used - eg when changing fibre types.
    bool SetObsWavelength (double ObsWave);
    //  Convert Ra,Dec to X,Y
@@ -130,19 +136,26 @@ public:
    bool DisableTelecentricity (bool Disable);
    //  Disable/re-enable the mech offset correction - old setting returned.
    bool DisableMechOffset (bool Disable);
+   //  Disable/re-enable the linearity correction - old setting returned.
+   bool DisableLin (bool Disable);
 
 private:
    //  Utility routine to convert status codes to text.
    const std::string StatusToText (StatusType Status);
-   //  Calculates the telecentricity correction to an X,Y value.
-   void TeleCorrToXY (double Ra, double Dec, double* X, double* Y);
-   //  Calculates the telecentricity correction to an Ra,Dec value.
-   void TeleCorrToRaDec (double X, double Y, double* Ra, double* Dec);
+   //  Calculates the telecentricity correction based on an Ra,Dec value.
+   void TeleCorrFromRaDec (double Ra, double Dec, double X, double Y,
+                                             double* CorrX, double* CorrY);
+   //  Calculates the telecentricity correction based on an X,Y value.
+   bool TeleCorrFromXY (double X, double Y, double* CorrX, double* CorrY);
    //  Calculate telecentricity offset in microns from angle from plate centre.
    double TelecentricityOffset (double AngleRad, int* Zone = NULL);
    //  Calculate change in position due to temperature difference
-   void ThermalOffset (double X, double Y, double RobotTemp,
-         double ObsTemp, double CTE, double* DeltaX, double* DeltaY);
+   void ThermalOffset (double X, double Y, double Temp,
+         double TargetTemp, double CTE, double* CorrX, double* CorrY);
+   //  Applies both 2dF linearity and XY->RaDec corrections.
+   bool Pos2RaDec (double X, double Y, double *Ra, double*Dec);
+   //  Applies both 2dF RaDec -> XY and linearity corrections.
+   bool RaDec2Pos (double Ra, double Dec, double *X, double *Y);
    //  Flag set once Initialise() has been called successfully.
    bool I_Initialised;
    //  Field plate apparent central RA.
@@ -173,10 +186,16 @@ private:
    bool I_EnableTelecentricity;
    //  Flag enabling mechanical offset correction - defaults to on.
    bool I_EnableMechOffset;
+   //  Flag enabling the linearity correction - defaults to on.
+   bool I_EnableLin;
    //  File path for distortion SDS file.
    std::string I_DistFilePath;
+   //  File path for linearityn SDS file.
+   std::string I_LinFilePath;
    //  Structure holding 2dF distortion values read from SDS file.
    TdfDistType I_Dist;
+   //  Structure holding 2dF linearity correction values read from SDS file.
+   TdfLinType I_Lin;
    //  Structure holding combined XY transformation parameters.
    TdfXyType I_XYPars;
    //  Description of last error, if any.

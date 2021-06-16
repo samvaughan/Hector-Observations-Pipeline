@@ -42,6 +42,10 @@
 //      5th Jan 2021.  Various modifications to support the full sky fibre
 //                     processing, including writing to the output file. KS.
 //     16th Feb 2021.  Added CheckSky flag to the program details structure. KS.
+//      9th Jun 2021.  Added LinFileName and LinCorrection to the program
+//                     details structure. Added LinFilePath to the observation
+//                     details structure. KS.
+//     15th Jun 2021.  Added ModelPars and NumberPars to the program details. KS.
 //
 // ----------------------------------------------------------------------------------
 
@@ -58,6 +62,10 @@
 //  Possible target types - galaxy, guide star, unknown
 
 enum HectorTargetType {GALAXY,GUIDE,UNKNOWN};
+
+//  Number of model parameters used by the coordinate conversion code.
+
+const static int C_MODEL_PARMS = 20;
 
 //  A HectorTarget structure describes one of the targets - galaxy or guide star.
 //  We read most of this from the input file, but have to calculate the X,Y
@@ -127,6 +135,7 @@ struct HectorObsDetails {
    double CenWave = 0.0;
    double ObsWave = 0.0;
    std::string DistFilePath = "";
+   std::string LinFilePath = "";
 };
 
 //  A HectorFileHeader structure contains any details read from the input file that
@@ -157,6 +166,7 @@ struct HectorUtilProgDetails {
    std::string DateAndTime = "";         // Obs date/time, eg 2020 01 28 15 30 00.00"
    bool MechCorrection = true;           // Apply mechanical offset corrections
    bool TeleCorrection = true;           // Apply telecentricity corrections
+   bool LinCorrection = true;            // Apply linearity corrections
    bool CheckSky = true;                 // Check sky fibre contamination
    int ExpectedAFibres = 0;              // # of expected AAOmega sky fibres
    int ExpectedHFibres = 0;              // # of expected Hector sky fibres
@@ -169,6 +179,8 @@ struct HectorUtilProgDetails {
    double Mjd = 0.0;                     // Obs date and time as Mjd.
    float RobotTemp = 0.0;                // Robot configuration temp, deg K.
    float ObsTemp = 0.0;                  // Estimated observation temp, deg K.
+   double ModelPars[C_MODEL_PARMS];      // Coordinate model parameters
+   int NumberPars = 0;                   // Number of items used in Pars.
    HectorRaDecXY CoordConverter;         // Instance of coordinate converter
    bool ConverterInitialised = false;    // True once converter initialised
    double CentreRa = 0.0;                // Central Ra in radians
@@ -176,6 +188,7 @@ struct HectorUtilProgDetails {
    double FieldRadius = 0.0;             // Field radius in radians
    double SkyRadiusAsec = 0.0;           // Sky fibre clear radius in arcsec
    std::string DistFileName = "";        // Name of 2dF distortion file
+   std::string LinFileName = "";         // Name of 2dF linearity file
    std::string ProfitDirectory = "";     // Directory holding Profit maskfiles
    std::string DebugLevels = "";         // Used to control debugging
    std::string Error = "";               // Describes last error
@@ -192,5 +205,7 @@ struct HectorUtilProgDetails {
       the fields are initialised. With C++11 I can use in-class initialisers for
       this, as hers, but it means this code does need -std=c++11 when compiled.
  
+   o  It seems an unnecessary duplication to have the 2dF distortion and linearity
+      file names in both the program details and observation details structures.
  
 */

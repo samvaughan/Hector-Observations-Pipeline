@@ -19,7 +19,7 @@
 //  Invocation:
 //     HectorConfigUtil <galaxy_file_path> <guide_file_path> <output_file_path>
 //                      <label> <plateId> <date_and_time> <robot_temp> <obs_temp>
-//                      <distortion_file> <sky_fibre_file>
+//                      <distortion_file> <linearity_file> <sky_fibre_file>
 //                      <profit_file_dir> <clearance>
 //
 //     Where:
@@ -47,6 +47,9 @@
 //     <distortion_file>  is a string giving the path name of the 2dF distortion
 //                        file. If omitted, the value of the environment
 //                        variable TDF_DISTORTION will be used.
+//     <linearity_file>   is a string giving the path name of the 2dF linearity
+//                        file. If omitted, the value of the environment
+//                        variable TDF_LINEARITY will be used.
 //     <sky_fibre_file>   is a string giving the path name of the file containing
 //                        the locations of the Hector sky fibres. If omitted,
 //                        the value of the environment variable SKY_FIBRES will
@@ -69,6 +72,7 @@
 //     using command line flags. At the moment, the following are supported:
 //     -notele          Disables the telecentricity correction
 //     -nomech          Disables the magnet offset correction
+//     -nolin           Disables the linearity correction.
 //     -nosky           Disables the sky fibre contamination checks
 //     -debug "levels"  Switches on various diagnostic levels. Here, "levels"
 //                      is a comma-separated list of strings of the form
@@ -134,12 +138,19 @@
 //                     for the Sky fibres, as these should not be applied for
 //                     these fibres. Revised the programming notes, which had
 //                     got rather out of date. Removed extraneous spaces in
-//                     column headings for MagnetX,MagnetY,SkyFibrePosition. KS.
+//                     column headings for MagnetX,MagnetY,Position. KS.
 //     12th Mar 2021.  X,Y positions are now output in floating point format
 //                     to .01 micron precision, instead of as integer micron
 //                     values. This is to prevent loss of precision when they
 //                     are used in subsequent calculations (not just for
 //                     actual positions for the robot positioner). KS.
+//      9th Jun 2021.  In WriteOutputFile() the Position column of the output
+//                     file is now called SkyPosition, as requested by USyd.
+//                     Added a new parameter to the command line for the name
+//                     of the linearity file, and added the -nolin option. KS.
+//     15th Jun 2015.  Now gets the model parameters from the coordinate
+//                     converter and writes them and the robot and observing
+//                     temp values to the output file, as Tony requested. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -375,18 +386,23 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
    RealArg ObsTempArg(TheHandler,"ObsTemp",8,"",15.0,-10.0,60.0,
       "Temperature in deg C when the observation will be performed");
    FileArg DistortionFileArg(TheHandler,"2dFDistortion",9,"MustExist",
-      "$TDF_DISTORTION,tdf_distortion0.sds",
+      "$TDF_DISTORTION,tdFdistortion0.sds",
       "Name of file giving 2dF distortion parameters");
-   FileArg SkyFibreFileArg(TheHandler,"SkyFibres",10,"MustExist",
+   FileArg LinearityFileArg(TheHandler,"2dFLinearity",10,"MustExist",
+      "$TDF_LINEARITY,tdFlinear0.sds",
+      "Name of file giving 2dF linearity parameters");
+   FileArg SkyFibreFileArg(TheHandler,"SkyFibres",11,"MustExist",
        "$SKY_FIBRES,SkyFibres.csv", "Name of file giving sky fibre positions");
-   FileArg ProfitDirArg(TheHandler,"ProfitDir",11,"MustExist","$PROFIT_DIR",
+   FileArg ProfitDirArg(TheHandler,"ProfitDir",12,"MustExist","$PROFIT_DIR",
       "Name of directory containing ProFit mask files");
-   RealArg ClearanceArg(TheHandler,"Clearance",12,"",3.0,0.0,10.0,
+   RealArg ClearanceArg(TheHandler,"Clearance",13,"",3.0,0.0,10.0,
       "Clearance required around sky fibres in arcsec");
    BoolArg TeleArg(TheHandler,"Tele",0,"NoSave",true,
       "Apply telecentricity corrections");
    BoolArg OffsetArg(TheHandler,"Mech",0,"NoSave",true,
       "Apply mechanical offset corrections");
+   BoolArg LinArg(TheHandler,"Lin",0,"NoSave",true,
+      "Apply linearity corrections");
    BoolArg SkyArg(TheHandler,"Sky",0,"NoSave",true,
       "Check positions of sky fibres for contamination");
    StringArg DebugArg(TheHandler,"Debug",0,"NoSave","","Debug levels");
@@ -418,11 +434,13 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
    ProgDetails->RobotTemp = RobotTempArg.GetValue(&Ok,&Error) + ZeroDegCinDegK;
    ProgDetails->ObsTemp = ObsTempArg.GetValue(&Ok,&Error) + ZeroDegCinDegK;
    ProgDetails->DistFileName = DistortionFileArg.GetValue(&Ok,&Error);
+   ProgDetails->LinFileName = LinearityFileArg.GetValue(&Ok,&Error);
    ProgDetails->SkyFibreFileName = SkyFibreFileArg.GetValue(&Ok,&Error);
    ProgDetails->ProfitDirectory = ProfitDirArg.GetValue(&Ok,&Error);
    ProgDetails->SkyRadiusAsec = ClearanceArg.GetValue(&Ok,&Error);
    ProgDetails->TeleCorrection = TeleArg.GetValue(&Ok,&Error);
    ProgDetails->MechCorrection = OffsetArg.GetValue(&Ok,&Error);
+   ProgDetails->LinCorrection = LinArg.GetValue(&Ok,&Error);
    ProgDetails->CheckSky = SkyArg.GetValue(&Ok,&Error);
    ProgDetails->DebugLevels = DebugArg.GetValue(&Ok,&Error);
    if (!Ok) ProgDetails->Error = Error;
@@ -1037,10 +1055,11 @@ void GetObsDetails (
    if (!ProgDetails->Ok) return;
    
    //  We don't ask how, but we assume the name of the 2dF distortion file is
-   //  in ProgDetails.
+   //  in ProgDetails. Ditto the linearity file.
    
    ObsDetails->DistFilePath = ProgDetails->DistFileName;
-   
+   ObsDetails->LinFilePath = ProgDetails->LinFileName;
+
    //  We need to add the actual initialisation of the observation details. Normally,
    //  we expect anything that isn't going to be allowed to default to have been
    //  supplied on the command line, so it will now be in ProgDetails.
@@ -1083,13 +1102,21 @@ void GetObsDetails (
       ObsDetails->Mjd,ObsDetails->Dut,ObsDetails->Temp,ObsDetails->Press,
          ObsDetails->Humid,ObsDetails->CenWave,ObsDetails->ObsWave,
             ProgDetails->RobotTemp,ProgDetails->ObsTemp,
-                                  ObsDetails->DistFilePath)) {
+               ObsDetails->DistFilePath,ObsDetails->LinFilePath)) {
       string Error = "Error initialising coordinate converter: " +
                                      ProgDetails->CoordConverter.GetError();
       ProgDetails->Ok = false;
       ProgDetails->Error = Error;
    } else {
-      ProgDetails->ConverterInitialised = true;
+      if (!ProgDetails->CoordConverter.GetModel(ProgDetails->ModelPars,
+                               C_MODEL_PARMS,&(ProgDetails->NumberPars))) {
+         string Error = "Error coordinate converter parameters: " +
+                                    ProgDetails->CoordConverter.GetError();
+         ProgDetails->Ok = false;
+         ProgDetails->Error = Error;
+      } else {
+         ProgDetails->ConverterInitialised = true;
+      }
    }
    
    //  If we are supposed to disable the telecentricity or mechanical offset
@@ -1102,6 +1129,11 @@ void GetObsDetails (
       ProgDetails->CoordConverter.DisableTelecentricity(true);
    }
 
+   //  Ditto the linearity correction
+   
+   if (!(ProgDetails->LinCorrection)) {
+      ProgDetails->CoordConverter.DisableLin(true);
+   }
    
 }
 
@@ -1601,13 +1633,24 @@ void WriteOutputFile (
          Sign[0],Idmsf[0],Idmsf[1],Idmsf[2],Idmsf[3]);
       fputs("#EQUINOX,J2000.0\n",OutputFile);
       
+      //  These additional details were requested by Tony Farrell. They provide
+      //  diagnostic information about the coordinate conversion parameters.
+      
+      fputs("#MDLPARS",OutputFile);
+      for (int I = 0; I < ProgDetails->NumberPars; I++) {
+         fprintf(OutputFile,",%.10g",ProgDetails->ModelPars[I]);
+      }
+      fputs("\n",OutputFile);
+      fprintf(OutputFile,"#ROBOT_TEMP,%f\n",ProgDetails->RobotTemp);
+      fprintf(OutputFile,"#OBS_TEMP,%f\n",ProgDetails->ObsTemp);
+
       //  Now the target details. The field labels come from the ListOfFields
       //  item, which is the list exactly as read from the galaxy input file,
       //  plus the two values calculated by the program, MagnetX and MagnetY
       //  and the position used by the sky fibres.
       
       std::string FieldList = ProgDetails->ListOfFields +
-                                          ",MagnetX,MagnetY,SkyFibrePosition\n";
+                                          ",MagnetX,MagnetY,SkyPosition\n";
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {
@@ -1904,5 +1947,5 @@ int main (int Argc, char* Argv[]) {
      for the hexabundles and/or guide fibres (ie for the target objects) and so
      may turn out to depend on choices made by the configuration program,
      particularly near the boundaries of the various angle bands.
-
+ 
 */

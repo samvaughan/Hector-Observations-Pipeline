@@ -79,6 +79,7 @@ class HectorPipe:
 
         # Locations of all the Hector Config code
         self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds")  
+        self.TdF_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFlinear0.sds")  
         self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
         if Profit_files_location is None:
             self.Profit_files_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles")
@@ -88,6 +89,9 @@ class HectorPipe:
         if not self.TdF_distortion_file_location.exists():
             raise FileNotFoundError("The 2dF distortion file tdFdistortion0.sds seems to not exist")
         os.environ['TDF_DISTORTION'] = self.TdF_distortion_file_location.as_posix()
+        if not self.TdF_linearity_file_location.exists():
+            raise FileNotFoundError("The 2dF linearity file tdFlinear0.sds seems to not exist")
+        os.environ['TDF_LINEARITY'] = self.TdF_linearity_file_location.as_posix()
 
         self.ConfigurationCode_location = Path(__file__).parent / Path("configuration/HECTOR_ClusterFieldsTest.R")
         if not self.ConfigurationCode_location.exists():
@@ -287,7 +291,7 @@ class HectorPipe:
 
             if apply_distortion_correction == True:
                 # Run the distortion correction
-                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=f"{self.config['SourceCat']} Tile {count:03}", plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
+                DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=f"{self.config['SourceCat']} Tile {count:03}", plateID=plateID, distortion_file=self.TdF_distortion_file_location, linearity_file=self.TdF_linearity_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
                 self.logger.info(f"\tDistortion-corrected tile saved at {tile_out_fname_after_DC}...")
 
 
@@ -324,7 +328,7 @@ class HectorPipe:
                     self.df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec = self._run_tiling_code(proximity=proximity, current_tile=current_tile, use_galaxy_priorities=use_galaxy_priorities)
 
                     if apply_distortion_correction == True:
-                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=label, plateID=plateID, distortion_file=self.TdF_distortion_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
+                        DC_corrected_output_file = self.apply_distortion_correction(tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, plot_save_filename=DC_correction_comparison_plot_filename, date=date, robot_temp=robot_temperature, obs_temp=obs_temperature, label=label, plateID=plateID, distortion_file=self.TdF_distortion_file_location, linearity_file=self.TdF_linearity_file_location, sky_fibre_file=self.Hector_sky_fibre_location, profit_file_dir=self.Profit_files_location, check_sky_fibres=check_sky_fibres)
 
 
                 if not configured:
@@ -382,7 +386,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -393,7 +397,7 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if not check_sky_fibres:
@@ -427,7 +431,7 @@ class HectorPipe:
 
         new_header_values = dict(zip(header_keys, header_values))
         self.header_dictionary.update(new_header_values)
-        self.header_dictionary.update(zip(["#CONFIGTEMP", "#OBSTEMP"], [robot_temp, obs_temp]))
+        #self.header_dictionary.update(zip(["#CONFIGTEMP", "#OBSTEMP"], [robot_temp, obs_temp]))
 
 
         guide_rows = DC_corrected_output_file.ID.isin(guide_stars_for_tile.ID.astype(str))
