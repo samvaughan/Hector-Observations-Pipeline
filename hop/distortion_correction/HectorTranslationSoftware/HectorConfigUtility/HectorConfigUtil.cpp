@@ -134,7 +134,7 @@
 //                     for the Sky fibres, as these should not be applied for
 //                     these fibres. Revised the programming notes, which had
 //                     got rather out of date. Removed extraneous spaces in
-//                     column headings for MagnetX,MagnetY,Position. KS.
+//                     column headings for MagnetX,MagnetY,SkyFibrePosition. KS.
 //     12th Mar 2021.  X,Y positions are now output in floating point format
 //                     to .01 micron precision, instead of as integer micron
 //                     values. This is to prevent loss of precision when they

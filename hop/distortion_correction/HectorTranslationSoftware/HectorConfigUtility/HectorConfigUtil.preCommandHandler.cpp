@@ -1578,7 +1578,7 @@ void WriteOutputFile (
       //  plus the two values calculated by the program, MagnetX and MagnetY.
       
       std::string FieldList = ProgDetails->ListOfFields +
-           ",MagnetX,MagnetY,Position\n";
+           ",MagnetX,MagnetY,SkyFibrePosition\n";
       fputs(FieldList.c_str(),OutputFile);
       int TargetCount = TargetList.size();
       for (int ITarget = 0; ITarget < TargetCount; ITarget++) {

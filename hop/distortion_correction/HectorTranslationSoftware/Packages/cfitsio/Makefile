@@ -35,21 +35,21 @@ INSTALL_DIRS	= ${prefix} ${CFITSIO_INCLUDE} ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgcon
 
 
 SHELL =		/bin/sh
-ARCHIVE =	ar rv
-RANLIB =	ranlib
-CC =		gcc
-CFLAGS =	-g -O2 -arch i386 -arch x86_64 -Dg77Fortran -fPIC -fno-common
-CPPFLAGS =	
+ARCHIVE =	x86_64-apple-darwin13.4.0-ar rv
+RANLIB =	x86_64-apple-darwin13.4.0-ranlib
+CC =		x86_64-apple-darwin13.4.0-clang
+CFLAGS =	-march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/Hector/include -arch i386 -arch x86_64 -Dg77Fortran -fPIC -fno-common
+CPPFLAGS =	-D_FORTIFY_SOURCE=2 -isystem /opt/anaconda3/envs/Hector/include
 SSE_FLAGS =	
-FC =		gfortran
-LDFLAGS =	-g -O2
-LDFLAGS_BIN =	-g -O2 -rpath ${CFITSIO_LIB}
+FC =		/opt/anaconda3/envs/Hector/bin/x86_64-apple-darwin13.4.0-gfortran
+LDFLAGS =	-march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/Hector/include
+LDFLAGS_BIN =	-march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/Hector/include -rpath ${CFITSIO_LIB}
 DEFS =		-DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MATH_H=1 -DHAVE_LIMITS_H=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DHAVE_LONGLONG=1 -DHAVE_UNION_SEMUN=1
 LIBS =		
 FLEX =		flex
 BISON =		bison
 
-SHLIB_LD =	gcc -dynamiclib -arch i386 -arch x86_64 -headerpad_max_install_names -install_name @rpath/lib${PACKAGE}.${CFITSIO_SONAME}${SHLIB_SUFFIX} -compatibility_version ${CFITSIO_SONAME} -current_version ${CFITSIO_SONAME}.${CFITSIO_MAJOR}.${CFITSIO_MINOR}
+SHLIB_LD =	x86_64-apple-darwin13.4.0-clang -dynamiclib -arch i386 -arch x86_64 -headerpad_max_install_names -install_name @rpath/lib${PACKAGE}.${CFITSIO_SONAME}${SHLIB_SUFFIX} -compatibility_version ${CFITSIO_SONAME} -current_version ${CFITSIO_SONAME}.${CFITSIO_MAJOR}.${CFITSIO_MINOR}
 SHLIB_SUFFIX =	.dylib
 CFITSIO_SHLIB =	lib${PACKAGE}.${CFITSIO_SONAME}.${CFITSIO_MAJOR}.${CFITSIO_MINOR}${SHLIB_SUFFIX}
 CFITSIO_SHLIB_SONAME = lib${PACKAGE}.${CFITSIO_SONAME}${SHLIB_SUFFIX}
