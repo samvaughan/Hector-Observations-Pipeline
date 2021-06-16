@@ -675,7 +675,7 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
 
     # combined_stars_targets_df = tile_df[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']].append(standard_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']])
     if not 'MagnetX_noDC' in columns_in_order:
-        columns_in_order.extend(['priority', 'remaining_observations', 'Tile_number', 'COMPLETED', 'MagnetX_noDC', 'MagnetY_noDC', 'type'])
+        columns_in_order.extend(['priority', 'MagnetX_noDC', 'MagnetY_noDC', 'type'])
     combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[columns_in_order]
     # combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U',
     #    'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U',
