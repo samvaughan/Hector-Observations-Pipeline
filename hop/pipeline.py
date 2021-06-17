@@ -305,11 +305,9 @@ class HectorPipe:
                         proximity = self.config['proximity'] * (1 + (j // 5) * 0.1)
 
                     # Set up the filenames of the configureation
-                    process = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
-
-                    return_code = process.returncode
-                    if subprocess.TimeoutExpired:
-                        return_code = 10
+                    return_code = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
+                        
+                        
                     # If we've done the tile, break out of the inner 'Max tries' loop
                     if return_code == 0:
                         configured = True
@@ -318,12 +316,7 @@ class HectorPipe:
                         timeout_message = f"\t**Tiling code couldn't configure and timed out... Trying again with a new input tile.**\n\t**Proximity value is currently {proximity:.3f}, {remaining_targets} targets remaining**"
                         self.logger.info(timeout_message)
                         self.logger_R_code.info(timeout_message)
-                    else:
-                        tiling_error_message = "\t***Error in the tiling code! Exiting to debug***\n"
-                        self.logger_R_code.info(process.stderr)
-                        self.logger_R_code.error(tiling_error_message)
-                        self.logger.info(tiling_error_message)
-                        raise subprocess.CalledProcessError(return_code, Configuration_bash_code)
+
                         
 
                     # If we get here, it means the configuration code hasn't managed to configure. So we'll give it another tile. 
@@ -482,7 +475,18 @@ class HectorPipe:
                 self.logger_R_code.info(process.stdout)
             if print_output:
                 print(process.stdout)
-        return process
+            return_code = process.returncode
+        except subprocess.TimeoutExpired:
+            return_code = 10
+
+        if return_code == 1:
+            tiling_error_message = "\t***Error in the tiling code! Exiting to debug***\n"
+            self.logger_R_code.info(process.stderr)
+            self.logger_R_code.error(tiling_error_message)
+            self.logger.info(tiling_error_message)
+            raise subprocess.CalledProcessError(return_code, Configuration_bash_code)
+        
+        return return_code
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
