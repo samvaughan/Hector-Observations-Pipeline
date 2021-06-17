@@ -308,8 +308,8 @@ class HectorPipe:
                     process = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
 
                     return_code = process.returncode
-                        except subprocess.TimeoutExpired:
-                    return_code = 10
+                    if subprocess.TimeoutExpired:
+                        return_code = 10
                     # If we've done the tile, break out of the inner 'Max tries' loop
                     if return_code == 0:
                         configured = True
