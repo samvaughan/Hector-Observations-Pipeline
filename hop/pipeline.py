@@ -305,9 +305,11 @@ class HectorPipe:
                         proximity = self.config['proximity'] * (1 + (j // 5) * 0.1)
 
                     # Set up the filenames of the configureation
-                    return_code = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
-                        
-                        
+                    process = self.run_configuration_code(tile_file_for_configuration, guide_tile_for_configuration, configuration_output_filename, configuration_guide_filename, configuration_plot_filename, config_timeout)
+
+                    return_code = process.returncode
+                        except subprocess.TimeoutExpired:
+                    return_code = 10
                     # If we've done the tile, break out of the inner 'Max tries' loop
                     if return_code == 0:
                         configured = True
@@ -480,10 +482,7 @@ class HectorPipe:
                 self.logger_R_code.info(process.stdout)
             if print_output:
                 print(process.stdout)
-            return_code = process.returncode
-        except subprocess.TimeoutExpired:
-            return_code = 10
-        return return_code
+        return process
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
