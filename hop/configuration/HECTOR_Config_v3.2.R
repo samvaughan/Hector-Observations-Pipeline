@@ -7,7 +7,7 @@
 #############################################################################
 
 #Loading required libraries:
-library(astro)
+library(magicaxis)
 library(astroFns)
 library(plotrix)
 library(raster)
@@ -268,7 +268,7 @@ random_allocation <- function (nrandprobes=ngalprobes+6, nstdprobes=20, nguidepr
 #Draw buttons around each position to be allocated.
 draw_pos <- function(x,y, label_probe=TRUE, overwrite=TRUE){
   if (overwrite){ #set overwrite to true to start the plots from scratch.
-    aplot(0,0,pch='x',col="red",xlim=c(-fov/2.,fov/2.),ylim=c(-fov/2.,fov/2.), asp=1, xlab='X (mm)', ylab='Y (mm)')
+    magplot(0,0,pch='x',col="red",xlim=c(-fov/2.,fov/2.),ylim=c(-fov/2.,fov/2.), asp=1, xlab='X (mm)', ylab='Y (mm)')
     draw.circle(0,0,radius=fov/2.,border='red')
     draw.circle(0,0,radius=fov/2.+skybuffer,border='black')
     #Draw the cable exit gaps in cyan
