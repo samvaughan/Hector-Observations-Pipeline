@@ -512,12 +512,14 @@ class HectorPipe:
         # Adding guides cluster txt file to hexa cluster txt file
         file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
 
-        ## Created as a standalone function for the robot, so should not be required to implement in this pipeline
-        # Offset function: thermal coefficient based movement of magnet pair as a whole
-        # plate_file, magnetPair_offset = offsets.magnetPair_radialPositionOffset(plate_file)
-
         # extracting all the magnets and making a list of them from the plate_file
         all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList) #, magnetPair_offset)
+
+        ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
+        ## dependent on which annulus the circular magnet sits in
+        # Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole
+        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.558, 'Yel':0.558, 'Mag':0.558,}
+        all_magnets = offsets.magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_magnets)
 
         # file to report flags regarding special cases of hexabundle allocation
         flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
@@ -532,7 +534,7 @@ class HectorPipe:
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
         offsetFile = f"{self.excel_files_for_allocation_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
-        all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
+        # all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
 
         # create magnet pickup areas for all the magnets
         plots.create_magnet_pickup_areas(all_magnets)
