@@ -53,8 +53,8 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
             skipline_count += 1
 
 
-    df = pd.read_csv(filename, sep=',', comment='#')
-
+    df = pd.read_csv(filename, sep=',', skiprows=skipline_count+1)
+    
     magnet_count = len(df)
 
     for i in range(magnet_count):
@@ -63,7 +63,7 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
 
             x = df['Center_x'][i]-robot_centre[0]
             y = df['Center_y'][i]-robot_centre[1]
-            theta = atan(abs(y/x))
+            theta = atan(y/x)
 
             if x >= 0:
                 df['Center_x'][i] = df['Center_x'][i] + ( cos(theta) * offset )
@@ -75,14 +75,17 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
             for j in range(magnet_count):
         
                 if df['Magnet'][j] == 'rectangular_magnet' and df['Index'][j] == df['Index'][i]:
-                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(df['Center_x'][i],df['Center_y'][i],df['rectMag_inputOrient'][j])
+                    
+                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x + ( cos(theta) * offset ), y + ( sin(theta) * offset ), df['rectMag_inputOrientation'][i])
 
-                    df['Center_x'][j] = x_rect
-                    df['Center_y'][j] = y_rect
+                    df['Center_x'][j] = x_rect + robot_centre[0]
+                    df['Center_y'][j] = y_rect + robot_centre[1]
+
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.txt'
 
     hash_count = 0
+
     # write the description from input robot file at top of final output robot file
     with open(outputFile, 'w+') as f:
         
@@ -109,10 +112,9 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
 
         f.write('\n\n')
 
-    df.to_csv(outputFile, index=False, sep=',', mode='a')
+    df.to_csv(outputFile, index=False, sep=' ', escapechar=' ', line_terminator='\n\n', na_rep='NA', mode='a')
 
     print('Output file produced by adjusting offset values to the input file')
-
 
 
 # calculating circular magnet orientation based on magnet center, categorizing them in four quadrants
@@ -188,17 +190,13 @@ def convert_modulus_angle(angle):
 
 
 
-if __name__ == "__main__":
+### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-    ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
+filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
 
-    filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
+radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
 
-    # radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
-
-    T_observed = 30
-    T_configured = 23.0
-    radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
-
-
+# T_observed = 30
+# T_configured = 23.0
+# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
