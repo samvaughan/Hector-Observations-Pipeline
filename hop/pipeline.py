@@ -506,7 +506,7 @@ class HectorPipe:
         # Output file 1
         guide_outputFile = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
-        # Adding ID column and getting rid of the header line of Guides cluster to add to the hexa cluster
+        # Adding ID column and removing the header line of Guides cluster to add to the hexa cluster
         df_guideFile, guideFileList = file_arranging.arrange_guidesFile(fileNameHexa, fileNameGuides, guide_outputFile)
 
         # Adding guides cluster txt file to hexa cluster txt file
@@ -518,7 +518,7 @@ class HectorPipe:
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in
         # Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole
-        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.558, 'Yel':0.558, 'Mag':0.558,}
+        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.558, 'Yel':0.558, 'Mag':0.558}
         all_magnets = offsets.magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_magnets)
 
         # file to report flags regarding special cases of hexabundle allocation
@@ -674,11 +674,12 @@ class HectorPipe:
 
     def show_sky_fibre_changes(self, tile_number_1, tile_number_2):
         # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
-        tile_1 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-        tile_2 = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
         subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.pdf"
         subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{(tile_number_2):03d}_current.pdf"
-        fibres.createHexabundleFigure_withChangeShown(tile_1, tile_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2,fileNameHexa)
+        fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+
+
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
