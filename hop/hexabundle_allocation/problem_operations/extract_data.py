@@ -3,7 +3,7 @@ import pandas as pd
 from io import StringIO
 import string
 from ..hector.probe import probe
-from ..problem_operations. offsets import radialPositionOffset
+# from ..problem_operations. offsets import radialPositionOffset
 from ..problem_operations.robot_parameters import assign_magnet_labels
 
 # derive floats only and if the format is different then return 0 instead of a ValueError
