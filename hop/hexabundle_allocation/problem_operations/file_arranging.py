@@ -141,8 +141,8 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
         robotFile.write('Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. \n')
 
 
-        robotFile.write(f'RobotTemp, {robot_temp:.3f} #temperature (degrees C) the distortion code assumed the field would be observed at\n')
-        robotFile.write(f'ObsTemp, {obs_temp:.3f} #actual temperature (degrees C) it is going to be observed at\n')
+        robotFile.write(f'RobotTemp, {robot_temp:.4f} #temperature (degrees C) the distortion code assumed the field would be observed at\n')
+        robotFile.write(f'ObsTemp, {obs_temp:.4f} #actual temperature (degrees C) it is going to be observed at\n')
 
         robotFile.write('Radial_Scale_factor, 1.0 #Radial scale factor is thermal coefficient of invar times temperature difference applied radially relative to the plate centre.\n')
         robotFile.write('\n\n')
