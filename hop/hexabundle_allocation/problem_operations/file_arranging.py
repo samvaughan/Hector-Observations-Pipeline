@@ -136,7 +136,7 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
 
         robotFile.write('# Robot File \n')
         robotFile.write(f'Label, {str(tile_batch)}_Tile_{str(tile_number)}\n')
-        robotFile.write(f'Date_and_Time_file_created, {str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S'))}\n')
+        robotFile.write(f"Date_and_Time_file_created, {str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S'))}\n")
 
         robotFile.write('Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. \n')
 
