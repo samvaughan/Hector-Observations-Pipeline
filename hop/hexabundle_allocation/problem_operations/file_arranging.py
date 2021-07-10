@@ -108,7 +108,7 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
 
 # creating the robotFile array for
-def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary):
+def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=-9999, obs_temp=-9999):
 
     # guide probes do not have ID, so they are allocated a large negative integer
     positioning_array[:, 8] = [i if i != 'nan' else -999999 for i in positioning_array[:, 8]]
@@ -141,8 +141,8 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
         robotFile.write('Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. \n')
 
 
-        robotFile.write('Temp1, -9999 #Temp1 is the temperature (degrees C) the distortion code assumed the field would be observed at\n')
-        robotFile.write('Temp2, -9999 #Temp2 is the actual temperature (degrees C) it is going to be observed at\n')
+        robotFile.write(f'RobotTemp, {robot_temp:.3f} #temperature (degrees C) the distortion code assumed the field would be observed at\n')
+        robotFile.write(f'ObsTemp, {obs_temp:.3f} #actual temperature (degrees C) it is going to be observed at\n')
 
         robotFile.write('Radial_Scale_factor, 1.0 #Radial scale factor is thermal coefficient of invar times temperature difference applied radially relative to the plate centre.\n')
         robotFile.write('\n\n')

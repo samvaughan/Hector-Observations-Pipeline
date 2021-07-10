@@ -232,6 +232,8 @@ class HectorPipe:
         """
 
         self.logger.info(f"Robot Temperature: {robot_temperature} C, Obs Temperature: {obs_temperature} C. date={date}\n\n")
+        self.robot_temperature = robot_temperature
+        self.obs_temperature = obs_temperature
 
         # Make an empty data frame to store the properties of each tile
         self.tile_database = pd.DataFrame()
@@ -540,8 +542,8 @@ class HectorPipe:
             f.write('#')
             output_file_contents.to_csv(f, index=False)
 
-        # The Robot file
-        
+
+
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
@@ -645,7 +647,7 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(self.config['output_filename_stem'],tile_number,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(self.config['output_filename_stem'],tile_number,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
