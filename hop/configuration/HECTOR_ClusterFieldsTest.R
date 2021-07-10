@@ -114,9 +114,9 @@ gdata=read.table(file=guide_filename, header=TRUE, comment.char="#", sep=',', ch
 # fcentre=as.numeric(strsplit(readLines(paste(fieldsfolder,f, sep='/'), n=2)[2], split=' ')[[1]][c(2,3)])
 # fcentre=data.frame(ra=fcentre[1],dec=fcentre[2])
 
-# Add in the fraction of the plate radius for debugging
-tile_data[, 'fraction_plate_radius_X'] = tile_data['MagnetX']/1000/(fov/2)
-tile_data[, 'fraction_plate_radius_Y'] = tile_data['MagnetY']/1000/(fov/2)
+# # Add in the fraction of the plate radius for debugging
+# tile_data[, 'fraction_plate_radius_X'] = tile_data['MagnetX']/1000/(fov/2)
+# tile_data[, 'fraction_plate_radius_Y'] = tile_data['MagnetY']/1000/(fov/2)
 
 # Peel off the sky fibres
 row_numbers = as.numeric(rownames(tile_data))
@@ -205,7 +205,7 @@ guide_IDs = gdata[chosen_guides, 'ID']
 #* And get the columns from the input file
 all_guide_data = gdata[gdata$ID %in% guide_IDs, ]
 #* And now add on the other rows that we need 
-final_guide_table = cbind(all_guide_data,pos=gpos,rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
+final_guide_table = cbind(all_guide_data,x=gpos$x, y=gpos$y, rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
 
 #Writing output files:
 #* I've added the ability to save things to a specified output directory

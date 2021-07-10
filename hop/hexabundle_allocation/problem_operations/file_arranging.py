@@ -135,23 +135,16 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
     with open(robotFile, 'w+') as robotFile:
 
         robotFile.write('# Robot File \n')
-        robotFile.write('# Label, ' + str(tile_batch) + ' Tile ' + str(tile_number) + '\n')
-        robotFile.write('# Date and Time file was created/configured: ')
-        robotFile.write(str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S')) + '\n')
+        robotFile.write(f'Label, {str(tile_batch)}_Tile_{str(tile_number)}\n')
+        robotFile.write(f'Date_and_Time_file_created, {str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S'))}\n')
 
-        robotFile.write('# Radial Offset Adjustment, -9999\n')
-        robotFile.write('# Radial offset is in millimetre(mm) with +ve values actioning radial outward movement \n')
-        robotFile.write('# and -ve values actioning radial inward movement of the magnets. \n')
+        robotFile.write('Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. \n')
 
-        robotFile.write('# Temp1, -9999\n')
-        robotFile.write('# Temp2, -9999\n')
-        robotFile.write('# Temp1 is the temperature the distortion code assumed the field would be observed at, \n')
-        robotFile.write('# and Temp2 is the actual temperature it is going to be observed at in degrees C. \n')
 
-        robotFile.write('# Radial Scale factor, 1.0\n')
-        robotFile.write('# Radial scale factor is thermal coefficient of invar times temperature difference \n')
-        robotFile.write('# applied radially relative to the plate centre.')
+        robotFile.write('Temp1, -9999 #Temp1 is the temperature (degrees C) the distortion code assumed the field would be observed at\n')
+        robotFile.write('Temp2, -9999 #Temp2 is the actual temperature (degrees C) it is going to be observed at\n')
 
+        robotFile.write('Radial_Scale_factor, 1.0 #Radial scale factor is thermal coefficient of invar times temperature difference applied radially relative to the plate centre.\n')
         robotFile.write('\n\n')
 
         # robotFile.write('# Radial Offset Adjustment \n \n')
@@ -314,8 +307,10 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
 
     # creating dataframe for just the sky fibres from config hexa files
     df = pd.read_csv(fileNameHexa,sep=',', skiprows=skipline_count)
-    mask = df['probe'] < 22
-    df_skyfibre = df[~mask]
+    hexabundle_mask = df['fibre_type'] == 'P'
+    skyfibre_mask = df['fibre_type'] == 'S'
+    assert hexabundle_mask.sum() + skyfibre_mask.sum() == len(df)
+    df_skyfibre = df.loc[skyfibre_mask]
 
     # joining the dataframes of hexa nd guide probes and skyfibres
     df_tileOutput = pd.concat([df_probes, df_skyfibre], sort=False)

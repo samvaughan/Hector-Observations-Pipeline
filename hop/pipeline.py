@@ -51,7 +51,7 @@ class HectorPipe:
         self.header_dictionary = self.make_header_dictionary()
 
         # Set up the output folders
-        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres"]
+        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres", "FinalOuputs"]
         folders = misc_tools.create_output_directories(self.config['output_folder'], subfolders_to_be_made)
 
         # Add these as class attributes
@@ -64,7 +64,7 @@ class HectorPipe:
         self.allocation_files_location_base = folders['Allocation']
         self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
         self.allocation_files_location_robot = folders['Allocation/robot_outputs']
-
+        self.final_tiles_correct_format_location = folders['FinalOuputs']
 
         # Set up the log files
         self.logger, self.logger_R_code = misc_tools.set_up_loggers(self.config)
@@ -500,11 +500,48 @@ class HectorPipe:
             * things which are specified as an integer must be made an integer, not a floating point number
         """
 
-        outputFile = f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        tileFile = Path(f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
         # Output file 3
-        robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        robotFile = Path(f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
+
+        outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
+        outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
+
+        ### The Tile File
+
+        # Read in the output file and get the header
+        with open(tileFile, 'r') as f:
+            tile_header_lines = []
+            tile_header_linenumbers = []
+            for linenumber, line in enumerate(f):
+                if line.startswith('#'):
+                    tile_header_lines.append(line)
+                    tile_header_linenumbers.append(linenumber)
+
+        # Get the contents of the file:
+        output_file_contents = pd.read_csv(tileFile, comment='#')
+        # Convert things which are nan values in integer columns to -99
+        # The integer columns are: probe, priority, type, SkyPosition, order, order_c
+        integer_columns = ['probe', 'priority', 'type', 'SkyPosition', 'order', 'order_C']
+        # Replace NAs with -99
+        output_file_contents.loc[:, integer_columns] = output_file_contents.loc[:, integer_columns].fillna(-99).astype(int)
+        # Now change the types of these columns to be integers
+        output_file_contents = output_file_contents.astype(dict(zip(integer_columns, ['int64']*len(integer_columns))))
 
 
+        # Now write the correct output tile file
+        with open(outputTileFile, 'a') as f:
+
+            for line in tile_header_lines:
+                f.write(line.lstrip('#'))
+
+            # Now write a comment character before the column names get written
+            # Tony requires us to do this 
+            f.write('#')
+            output_file_contents.to_csv(f, index=False)
+
+        # The Robot file
+        
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
