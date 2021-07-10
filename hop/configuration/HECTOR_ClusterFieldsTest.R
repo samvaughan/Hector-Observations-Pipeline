@@ -205,7 +205,7 @@ guide_IDs = gdata[chosen_guides, 'ID']
 #* And get the columns from the input file
 all_guide_data = gdata[gdata$ID %in% guide_IDs, ]
 #* And now add on the other rows that we need 
-final_guide_table = cbind(all_guide_data,gpos,grads,gangs,gazAngs,gangs_gazAng)
+final_guide_table = cbind(all_guide_data,pos=gpos,rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
 
 #Writing output files:
 #* I've added the ability to save things to a specified output directory

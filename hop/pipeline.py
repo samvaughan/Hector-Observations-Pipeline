@@ -489,6 +489,25 @@ class HectorPipe:
         return return_code
 
 
+
+    def make_output_file_for_Tony(self, tile_number):
+
+        """
+        Take our output files and make them into a format which Tony can read in.
+        This means:
+            * '#' is reserved for a comment. Header key/value pairs should not start with a #, but the row names (which are only included for readability, Tony's code doesn't use them) should
+            * Missing values should be blank- i.e. na_rep=''
+            * things which are specified as an integer must be made an integer, not a floating point number
+            * Skyfibres should be given a value of -99 for their 'probe' value. 
+        """
+
+        outputFile = f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+        # Output file 3
+        robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+
+
+
+
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
 
         ### FIXME- add documentation here
