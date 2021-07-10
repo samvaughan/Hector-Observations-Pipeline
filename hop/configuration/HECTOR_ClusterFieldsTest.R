@@ -183,7 +183,7 @@ selected_objects = tile_data[subset_of_IDs_for_saving, -which(names(tile_data) =
 sky_fibre_data = tile_data[(tile_data$ID %in% sky_fibre_IDs),]
 sky_fibre_IDs = sky_fibre_data$ID
 sky_fibre_data_minus_IDs =  sky_fibre_data[, -which(names(sky_fibre_data) == "ID")]
-sky_fibre_filler_list = rep(NA, nrow(sky_fibre_data))
+sky_fibre_filler_list = rep(-99, nrow(sky_fibre_data))
 
 # Now make the tables- one for the hexabundles ("target_table") and one for the sky fibres
 # I've added NA values for the sky fibre columns which don't make sense (rads, angs, etc)

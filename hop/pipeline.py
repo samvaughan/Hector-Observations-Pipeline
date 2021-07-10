@@ -498,7 +498,6 @@ class HectorPipe:
             * '#' is reserved for a comment. Header key/value pairs should not start with a #, but the row names (which are only included for readability, Tony's code doesn't use them) should
             * Missing values should be blank- i.e. na_rep=''
             * things which are specified as an integer must be made an integer, not a floating point number
-            * Skyfibres should be given a value of -99 for their 'probe' value. 
         """
 
         outputFile = f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"

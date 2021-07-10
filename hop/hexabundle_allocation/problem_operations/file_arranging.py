@@ -45,10 +45,10 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     probe_number = list(df_guides['probe'])
     circular_magnet_center_x = list(df_guides['x'])
     circular_magnet_center_y = list(df_guides['y'])
-    rads = list(df_guides['grads'])
-    angs = list(df_guides['gangs'])
-    azAngs = list(df_guides['gazAngs'])
-    rectangle_magnet_input_orientation = list(df_guides['gangs_gazAng'])
+    rads = list(df_guides['rads'])
+    angs = list(df_guides['angs'])
+    azAngs = list(df_guides['azAngs'])
+    rectangle_magnet_input_orientation = list(df_guides['angs_azAng'])
 
     # assigning 'NA' to parameters which guide probes do not have a value for
     IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
