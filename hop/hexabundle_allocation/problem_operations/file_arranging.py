@@ -68,13 +68,15 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
                      Mstar ]
 
     # fill out all the empty slots of parameters with NA and save output guide file
-    df_guides.fillna('NA', inplace=True)
+    df_guides.fillna('', inplace=True)
 
     # write the description from config guide file at top of output guide file
     with open(guide_outputFile, 'w') as f:
         f.write(description)
 
-    df_guides.to_csv(guide_outputFile, index=False, sep=',', mode='a')
+    df_guidesOutput = df_guides.replace('NaN', '', regex=True)
+    df_guidesOutput.to_csv(guide_outputFile, index=False, sep=',', mode='a')
+
 
     return df_guides, guideFileList
 
@@ -99,7 +101,7 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
     df_plateFile = pd.concat([df_new, df_guideFile], sort=False)
 
     # fill out all the empty slots of parameters with NA
-    df_plateFile.fillna('NA', inplace=True)
+    df_plateFile.fillna('', inplace=True)
 
     # write the joined dataframe of hexa and guide probes on plate file
     df_plateFile.to_csv(plate_file, index=False, sep=',', quoting=csv.QUOTE_NONE, escapechar=' ')
@@ -319,9 +321,9 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
     df_tileOutput = pd.concat([df_probes, df_skyfibre], sort=False)
 
     # fill out all the empty slots of parameters with NA
-    df_tileOutput.fillna('NA', inplace=True)
+    df_tileOutput.fillna('', inplace=True)
 
-    # remove commas due to joining of positioning arrays pf circular and rectangular magnets
+    # remove commas due to joining of positioning arrays of circular and rectangular magnets
     #df_tileOutput = df_tileOutput.replace(',', '', regex=True)
     #df_tileOutput.columns = df_tileOutput.columns.str.replace(',', '')
 

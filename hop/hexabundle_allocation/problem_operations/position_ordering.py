@@ -62,8 +62,8 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
     position_ordering_array = []
 
     # magnet label and guide hexabundle index
-    index1 = 1
-    guideIndex = 1
+    # index1 = 1
+    # guideIndex = 1
 
     # # carrying out the whole hexabundle allocation algorithm from hexabundles.py script
     # galaxyIDrecord, MagnetDict = overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, \
@@ -78,7 +78,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         order = check_for_unresolvable_conflict(magnet,conflictFile,max_order,clusterNum,tileNum)
 
         # adding magnet labels of rectangular: R01.. ,and circular: Blu,Mag,Gre,Yel
-        magnet,index1 = assign_magnet_labels(magnet,index1)
+        # magnet,index1 = assign_magnet_labels(magnet,index1)
 
         # adding pickup direction to placement orders of 1 in the case of more than 1 placement orders
         magnet, available_pickup = add_pickupDirection(magnet, available_pickup)
@@ -108,7 +108,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         # appending each magnet with its established parameters to the position ordering array
         position_ordering_array.append(np.array(f))
 
-    # change numoy array data type from '<U19' to 'object' type
+    # change numpy array data type from '<U19' to 'object' type
     position_ordering_array = np.array(position_ordering_array, dtype=np.object)
 
 

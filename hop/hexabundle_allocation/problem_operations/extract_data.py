@@ -3,7 +3,8 @@ import pandas as pd
 from io import StringIO
 import string
 from ..hector.probe import probe
-from ..problem_operations. offsets import radialPositionOffset
+# from ..problem_operations. offsets import radialPositionOffset
+from ..problem_operations.robot_parameters import assign_magnet_labels
 
 # derive floats only and if the format is different then return 0 instead of a ValueError
 def parse_col(s):
@@ -131,7 +132,17 @@ def create_list_of_all_magnets_from_file(file,guideFileList):   #,magnetPair_off
     # extracting circular and rectangular magnets list from the list of probes which is first extracted from file
     [circular_magnets, rectangular_magnets] = create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList)  #,magnetPair_offset)
 
-    return np.concatenate([circular_magnets, rectangular_magnets])
+    all_magnets = np.concatenate([circular_magnets, rectangular_magnets])
+
+    # magnet label index
+    index = 1
+
+    for magnet in all_magnets:
+
+        # adding magnet labels of rectangular: R01.. ,and circular: Blu,Mag,Gre,Yel
+        magnet,index = assign_magnet_labels(magnet,index)
+
+    return all_magnets#np.concatenate([circular_magnets, rectangular_magnets])
 
 # quick function to read a filename
 def get_file(filename):

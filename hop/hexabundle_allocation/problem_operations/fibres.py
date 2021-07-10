@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from collections import Counter
 import matplotlib.cm as cm
 import pandas as pd
 import numpy as np
@@ -9,6 +10,7 @@ import csv
 import re
 import random
 from pathlib import Path
+from ..problem_operations import extract_data, file_arranging
 from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
 
 
@@ -770,48 +772,129 @@ def create_skyFibreSlitlet_figure( new_arrayAAOmega,new_arraySpector, skyFibre_A
     plt.gcf().set_size_inches(6, 8)
     plt.savefig(skyFibre_SpectorFigure)
 
+def plot_bar_from_dict(dict, ax=None):
+    """"
+    This function creates a bar plot from a dictionary.
 
-def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figureFile_tile1,subplateSkyfibre_figureFile_tile2,fileNameHexa):
+    :param dict: A dictionary with the item as the key
+     and the frequency as the value
+    :param ax: an axis of matplotlib
+    :return: the axis wit the object in it
+    """
 
-    # df_skyfibre = pd.read_csv(fileNameHexa, sep=' ')
-    #
-    # mask = df_skyfibre['probe'] < 22
-    # df_skyfibre = df_skyfibre[~mask]
-    # print("\nFibre file reading array here")
-    # print(df_skyfibre)
-    #
-    # skyfibreDict = {}
-    # subplate_info = df_skyfibre['IDs']
-    # position = df_skyfibre['Position']
-    # print(position)
-    # j= 35
-    # for i in subplate_info:
-    #     # print(i[4:6])
-    #     # print(i[7])
-    #     print(int(position[35]))
-    #
-    #     # skyfibreDict[i[4:5]] = {int(i[7]): int(position[j])}
-    #     if (str(i[4:6])) not in skyfibreDict:
-    #         skyfibreDict[str(i[4:6])] = []
-    #     skyfibreDict[str(i[4:6])].append({int(i[7]):int(position[j])})
-    #
-    #     j += 1
-    #
-    # print(skyfibreDict)
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    frequencies = dict.values()
+    names = dict.keys()
+
+    x_coordinates = np.arange(len(dict))
+    ax.bar(x_coordinates, frequencies, align='center')
+
+    ax.xaxis.set_major_locator(plt.FixedLocator(x_coordinates))
+    ax.xaxis.set_major_formatter(plt.FixedFormatter(names))
+
+    return ax
+
+def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
+
+    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    tile_1_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    tile_2_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    # proxy output files
+    plate_file_1 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
+    plate_file_2 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
+    # Output files 1
+    guide_outputFile_1 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
+    guide_outputFile_2 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
+
+    # Adding ID column and removing the header line of Guides cluster to add to the hexa cluster
+    df_guideFile_1, guideFileList_1 = file_arranging.arrange_guidesFile(tile_1_hexa, tile_1_guide, guide_outputFile_1)
+    df_guideFile_2, guideFileList_2 = file_arranging.arrange_guidesFile(tile_2_hexa, tile_2_guide, guide_outputFile_2)
+
+    # Adding guides cluster txt file to hexa cluster txt file
+    file_arranging.merge_hexaAndGuides(tile_1_hexa, df_guideFile_1, plate_file_1)
+    file_arranging.merge_hexaAndGuides(tile_2_hexa, df_guideFile_2, plate_file_2)
+
+    # extracting all the magnets and making a list of them from the plate_file
+    all_magnets_1 = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file_1),
+                                                                      guideFileList_1)
+    all_magnets_2 = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file_2),
+                                                                      guideFileList_2)
+
+    # annuli_count_Blu ,annuli_count_Gre, annuli_count_Yel, annuli_count_Mag = 0,0,0,0
+    annuli_count = {'Blu': 0, 'Gre': 0, 'Yel': 0, 'Mag': 0}
+
+    for magnet in np.concatenate((all_magnets_1, all_magnets_2)):
+        if magnet.__class__.__name__ == 'circular_magnet':
+            annuli_count[magnet.magnet_label] += 1
+
+    # max magnet casings to be allowed per annuli
+    annuli_count_magnetCasing = {'Blu': 18, 'Gre': 19, 'Yel': 22, 'Mag': 21}
+
+    # file to report flags regarding special cases of hexabundle allocation
+    flag_magnetCount = f'{self.allocation_files_location_base}/MagnetCount_warnings.txt'
+
+    magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}&{tile_number_2:03d}.pdf"
+
+    # plt.figure(9)
+    # plt.clf()
+
+    df = pd.DataFrame.from_dict(annuli_count, orient='index')
+    df.plot(kind='bar',legend=False, grid=True)
+
+    plt.gcf().set_size_inches(8, 12)
+    plt.yticks(df.values)
+    plt.savefig(magnetCount_barPlot, dpi=200)
+    plt.clf()
+
+    # plot_bar_from_dict(annuli_count)
+    # plt.show()
+
+    # your_bins = 4 #['Blu', 'Gre', 'Yel', 'Mag']
+    # data = []
+    # for i in annuli_count:
+    #     data += [annuli_count[i]]
+    # print(data)
+    # arr = plt.hist(data, bins=your_bins)
+    # for i in range(your_bins):
+    #     plt.text(arr[1][i], arr[0][i], str(arr[0][i]))
+    #     plt.show()
+
+    for i in annuli_count:
+        if annuli_count[i] > annuli_count_magnetCasing[i]:
+            # write warnings on file with tile numbers and particular annuli
+            with open(flag_magnetCount, 'a') as fp:
+                conflict = str(self.config['output_filename_stem']) + ', Tiles ' + str(tile_number_1) + ' and ' + str(
+                    tile_number_2) + ' have more magnets in annulus ' \
+                           + str(i) + ':' + str(annuli_count[i]) + ' than available number of casings, with extra '+\
+                           str(annuli_count[i] - annuli_count_magnetCasing[i])+ ' magnet/s. \n'
+                fp.write(conflict)
+
+    print(annuli_count)
 
 
+def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2):
 
+    # check for magnet count per annulus and record any warnings on text file
+    check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2)
+
+    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
     plt.figure(7)
     plt.clf()
 
-    skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
-    skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
+    skyfibreDict_tile1 = read_sky_fibre_file(tile_1_hexa)
+    skyfibreDict_tile2 = read_sky_fibre_file(tile_2_hexa)
 
     draw_circularSegments()
 
-    sky_fibre_annotations(tile_1)
-
+    sky_fibre_annotations(tile_1_hexa)
 
 
     plt.axis('off')
@@ -838,7 +921,6 @@ def createHexabundleFigure_withChangeShown(tile_1,tile_2,subplateSkyfibre_figure
     # skyfibreDict = read_sky_fibre_file(skyfibre_file)
     # print(skyfibreDict)
     string = str(skyfibreDict['H3'][5].keys())
-    print(re.sub('[^0-9]', '', string))
 
     # sky fibres top batch
     angle = 30
