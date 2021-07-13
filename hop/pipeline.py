@@ -575,7 +575,7 @@ class HectorPipe:
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in
         # Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole
-        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.558, 'Yel':0.558, 'Mag':0.558}
+        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.458, 'Yel':-0.358, 'Mag':-0.258}
         all_magnets = offsets.magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_magnets)
 
         # file to report flags regarding special cases of hexabundle allocation
@@ -729,13 +729,43 @@ class HectorPipe:
 
         return fig, axs
 
-    def show_sky_fibre_changes(self, tile_number_1, tile_number_2):
+    def show_sky_fibre_changes(self, tile_number_1=None, tile_number_2=None, tile_batch=None, tileNumber_batch=None):
         # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
 
-        subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.pdf"
-        subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{(tile_number_2):03d}_current.pdf"
-        fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+        if (tile_number_1 != None) and (tile_number_2 != None):
 
+            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.pdf"
+            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}_current.pdf"
+            annuliCount_batch = fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, annuliCount_batch, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+
+        elif (tile_batch != None) and (tileNumber_batch != None):
+
+            annuliCount_batch = {'Blu':[], 'Gre':[], 'Yel':[], 'Mag':[]}
+
+            for i in range(tileNumber_batch+1):
+                # HP.allocate_hexabundles_for_single_tile(tile_number=i,plot=True)
+
+                # For running the show sky fibre changes function, the guidefile and proxy hexa and guide file need to be created at first
+                for j in range(i, tileNumber_batch+1):
+
+                    if i != j:
+                        # subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.pdf"
+                        # subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.pdf"
+                        # annuliCount_batch = fibres.createHexabundleFigure_withChangeShown(self, i, j, annuliCount_batch, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+
+                        annuliCount_batch = fibres.check_magnetCount_perAnnulus(self, i, j, annuliCount_batch)
+                        print(annuliCount_batch)
+
+            # create histogram plot
+            fibres.plotHist_annuliCount_batch(self, annuliCount_batch)
+            print(len(annuliCount_batch['Mag']))
+            print(len(annuliCount_batch['Blu']))
+
+        else:
+            print('\nEither pass two tile numbers or a batch of tile in the format shown:\n'+\
+                  '      HP.show_sky_fibre_changes(tile number 1,tile number 2)\n'+
+                  '                        OR                                  \n'+
+                  '      HP.show_sky_fibre_changes( None, None, tile batch) \n')
 
 
         # just to check each tile's whole operation time

@@ -797,7 +797,7 @@ def plot_bar_from_dict(dict, ax=None):
 
     return ax
 
-def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
+def check_magnetCount_perAnnulus(self, tile_number_1=None, tile_number_2=None, annuliCount_batch=None ):
 
     tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -839,18 +839,18 @@ def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
     # file to report flags regarding special cases of hexabundle allocation
     flag_magnetCount = f'{self.allocation_files_location_base}/MagnetCount_warnings.txt'
 
-    magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}&{tile_number_2:03d}.pdf"
+    # magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}&{tile_number_2:03d}.pdf"
 
     # plt.figure(9)
     # plt.clf()
-
-    df = pd.DataFrame.from_dict(annuli_count, orient='index')
-    df.plot(kind='bar',legend=False, grid=True)
-
-    plt.gcf().set_size_inches(8, 12)
-    plt.yticks(df.values)
-    plt.savefig(magnetCount_barPlot, dpi=200)
-    plt.clf()
+    #
+    # df = pd.DataFrame.from_dict(annuli_count, orient='index')
+    # df.plot(kind='bar',legend=False, grid=True)
+    #
+    # plt.gcf().set_size_inches(8, 12)
+    # plt.yticks(df.values)
+    # plt.savefig(magnetCount_barPlot, dpi=200)
+    # plt.clf()
 
     # plot_bar_from_dict(annuli_count)
     # plt.show()
@@ -866,6 +866,7 @@ def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
     #     plt.show()
 
     for i in annuli_count:
+
         if annuli_count[i] > annuli_count_magnetCasing[i]:
             # write warnings on file with tile numbers and particular annuli
             with open(flag_magnetCount, 'a') as fp:
@@ -875,13 +876,45 @@ def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
                            str(annuli_count[i] - annuli_count_magnetCasing[i])+ ' magnet/s. \n'
                 fp.write(conflict)
 
-    print(annuli_count)
+        # if annuli_count[i] in annuliCount_batch[i]:
+        annuliCount_batch[i] += [annuli_count[i]]
+
+    return annuliCount_batch
+
+def plotHist_annuliCount_batch(self, annuliCount_batch):
 
 
-def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2):
+    hist_colour = {'Blu':"blue", 'Gre':"green", 'Yel':"yellow", 'Mag':"Magenta"}
+
+    for i in annuliCount_batch:
+
+        S = annuliCount_batch[i]
+
+        plt.figure(9)
+        plt.clf()
+
+        plt.style.use('ggplot')
+        # plt.hist(S, bins= range(1,30), weights=np.ones_like(S) / len(S), color= hist_colour[i],alpha=0.5, histtype='bar', ec='black')
+
+        fig, ax = plt.subplots(1, figsize=(16, 6))
+        n, bins, patches = plt.hist(S, bins= range(1,30), weights=np.ones_like(S) / len(S), color= hist_colour[i],alpha=0.5, histtype='bar', ec='black')
+        # x ticks
+        xticks = [(bins[idx + 1] + value) / 2 for idx, value in enumerate(bins[:-1])]
+        # plot values on top of bars
+        for idx, value in enumerate(n):
+            if value > 0:
+                plt.text(xticks[idx], value + 5, int(value), ha='center')
+
+        magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_{i}.pdf"
+        plt.gcf().set_size_inches(15,10)
+        plt.savefig(magnetCount_barPlot, dpi=200)
+        plt.clf()
+
+
+def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, annuliCount_batch, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2):
 
     # check for magnet count per annulus and record any warnings on text file
-    check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2)
+    annuliCount_batch = check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch)
 
     tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -1024,3 +1057,4 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
     plt.gcf().set_size_inches(6, 6)
     plt.savefig(subplateSkyfibre_figureFile_tile2)
 
+    return annuliCount_batch
