@@ -689,6 +689,9 @@ class HectorPipe:
         # create figure of magnified sky fibre positioning in slitlets
         fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
 
+        # just to check each tile's whole operation time
+        # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
+
 
 
     def allocate_hexabundles_for_all_tiles(self):
@@ -729,44 +732,65 @@ class HectorPipe:
 
         return fig, axs
 
-    def show_sky_fibre_changes(self, tile_number_1=None, tile_number_2=None, tile_batch=None, tileNumber_batch=None):
-        # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+    def show_skyfibreChanges_and_magnetCountPerAnnuli(self, tile_number_1=None, tile_number_2=None, tile_batch=None, tileBatch_count=None, tileBatch_skyFibreChange = 'OFF'):
+
+        ''' FUNCTION TO SHOW CHANGES IN SKYFIBRE SUB-PLATE NUMBERS AND MAGNET COUNT CHECK PERFORMED BETWEEN TWO TILES
+            TWO OPTIONS TO RUN THIS FUNCTION
+
+        INPUTS FOR OPTION 1: 'tile_number_1' and 'tile_number_2'
+                             Produces the plots for the first tile and the second tile with changes in skyfibre sub-plate
+                             number of second tile compared to first tile being highlighted, and conducts magnet count
+                             check per annulus to record any warnings of magnet count in any annulus exceeding the
+                             available number of casings on text file.
+
+        INPUTS FOR OPTION 2: 'tile_batch' and 'tileBatch_count'
+                             'tileBatch_skyFibreChange' - set as 'ON' to generate a full set of sky fibre change plots
+                             Carries out a magnet count check for each tile pair in a whole batch without any repeats
+                             and generates histogram plots for each annulus to show distribution of magnets count for
+                             each annulus in a batch. 'tileBatch_skyFibreChange' is OFF by default, and if set to ON
+                             will also produce a full set of sky fibre change plots for each tile pair in batch.
+
+        '''
+
+        # max magnet casings to be allowed per annuli
+        annuli_count_magnetCasing = {'Blu': 18, 'Gre': 19, 'Yel': 22, 'Mag': 21}
+
+        annuliCount_batch = {'Blu': [], 'Gre': [], 'Yel': [], 'Mag': []}
 
         if (tile_number_1 != None) and (tile_number_2 != None):
 
+            # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+
             subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.pdf"
             subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}_current.pdf"
-            annuliCount_batch = fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, annuliCount_batch, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+            fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
-        elif (tile_batch != None) and (tileNumber_batch != None):
+            # check for magnet count per annulus and record any warnings on text file
+            fibres.check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch, annuli_count_magnetCasing)
 
-            annuliCount_batch = {'Blu':[], 'Gre':[], 'Yel':[], 'Mag':[]}
+        elif (tile_batch != None) and (tileBatch_count != None):
 
-            for i in range(tileNumber_batch+1):
-                # HP.allocate_hexabundles_for_single_tile(tile_number=i,plot=True)
+            # nested for loops to test out each possible pair in a batch of tiles without any repeat
+            for i in range(tileBatch_count+1):
 
-                # For running the show sky fibre changes function, the guidefile and proxy hexa and guide file need to be created at first
-                for j in range(i, tileNumber_batch+1):
+                for j in range(i, tileBatch_count+1):
 
                     if i != j:
-                        # subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.pdf"
-                        # subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.pdf"
-                        # annuliCount_batch = fibres.createHexabundleFigure_withChangeShown(self, i, j, annuliCount_batch, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
-                        annuliCount_batch = fibres.check_magnetCount_perAnnulus(self, i, j, annuliCount_batch)
+                        annuliCount_batch = fibres.check_magnetCount_perAnnulus(self, i, j, annuliCount_batch, annuli_count_magnetCasing)
                         print(annuliCount_batch)
+
+                        # produce plots for sky fibre changes if input is provided as 'on'
+                        if tileBatch_skyFibreChange == 'ON':
+                            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.pdf"
+                            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.pdf"
+                            fibres.createHexabundleFigure_withChangeShown(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
             # create histogram plot
             fibres.plotHist_annuliCount_batch(self, annuliCount_batch)
-            print(len(annuliCount_batch['Mag']))
-            print(len(annuliCount_batch['Blu']))
 
         else:
             print('\nEither pass two tile numbers or a batch of tile in the format shown:\n'+\
                   '      HP.show_sky_fibre_changes(tile number 1,tile number 2)\n'+
                   '                        OR                                  \n'+
                   '      HP.show_sky_fibre_changes( None, None, tile batch) \n')
-
-
-        # just to check each tile's whole operation time
-        # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
