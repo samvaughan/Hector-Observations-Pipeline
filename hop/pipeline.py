@@ -591,7 +591,7 @@ class HectorPipe:
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
         offsetFile = f"{self.excel_files_for_allocation_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
-        # all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
+        all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
 
         # create magnet pickup areas for all the magnets
         plots.create_magnet_pickup_areas(all_magnets)
@@ -646,6 +646,9 @@ class HectorPipe:
         # Output file 3
         robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
+        # dummy values to be removed
+        self.robot_temperature = 9999
+        self.obs_temperature = 9999
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(self.config['output_filename_stem'],tile_number,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 
@@ -659,15 +662,20 @@ class HectorPipe:
         ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
         # fibre input file to be read
         # Input file 4 - fibres
-        fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo.xlsx"
+        fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo_test_templateforTony[11][32].csv"
 
-        # fibre output file to be written to
+        # fibre slit info output file
+        output_fibreSlitInfo = f"{self.allocation_files_location_tiles}/Fibre_slitInfo_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv"
+
         # Output files printed only once, not for each tile
         output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"
         output_fibreSpector = f"{self.allocation_files_location_tiles}/Hector_fibres_Spector.txt"
 
         output_hexabundle_coordData = f"{self.allocation_files_location_tiles}/Fibre_coordData_"
         #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
+
+        # create fibre slit info file for each tile updating the skyfibres with position 0
+        fibres.create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo)
 
         # create the fibre spectrograph files for each of AAOmega and Spector
         new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)

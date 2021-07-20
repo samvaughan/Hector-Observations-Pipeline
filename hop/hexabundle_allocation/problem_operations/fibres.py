@@ -10,13 +10,50 @@ import csv
 import re
 import random
 from pathlib import Path
-from ..problem_operations import extract_data, file_arranging
+from ..problem_operations import extract_data, file_arranging, plots
 from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
+
+
+def create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo):
+
+    skyfibreDict = plots.read_sky_fibre_file(fileNameHexa)
+
+    pd.set_option('display.max_columns', 12)
+
+    fibre_data = pd.read_csv(fibre_file)
+    print(skyfibreDict)
+    print(fibre_data)
+
+    nullPosition_skyFibre = {}
+    index_1 = 0
+    for i in skyfibreDict:
+        for j in skyfibreDict[i]:
+            for k in j:
+                if int(j[k]) == 0:
+                    # if (str(i)) not in nullPosition_skyFibre:
+                    #     nullPosition_skyFibre[str(i)] = []
+                    # nullPosition_skyFibre[str(i)].append(k)
+
+                    index2 = 0
+                    # read through fibre data to match null position skyfibres and update the 'hexabundle or skyfibre' column
+                    for l in fibre_data['Spectrograph']:
+
+                        if (fibre_data['Bundle/plate'][index2] == str(i)) and (int(fibre_data['Fibre_number'][index2]) == int(k)):
+                            fibre_data['Hexabundle or sky fibre'][index2] = 'BLOCK-sky'
+
+                        index2 += 1
+
+            index_1 += 1
+
+    fibre_data.to_csv(output_fibreSlitInfo, index=False, sep=',')
+
+    # print(nullPosition_skyFibre)
+
 
 
 def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
-    fibre_data = pd.read_excel(fibre_file, engine = 'openpyxl')
+    fibre_data = pd.read_csv(fibre_file)
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h1, h2 = 10, 820, 856
