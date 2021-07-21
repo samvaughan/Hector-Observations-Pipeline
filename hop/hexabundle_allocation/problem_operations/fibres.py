@@ -10,13 +10,50 @@ import csv
 import re
 import random
 from pathlib import Path
-from ..problem_operations import extract_data, file_arranging
+from ..problem_operations import extract_data, file_arranging, plots
 from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
+
+
+def create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo):
+
+    skyfibreDict = plots.read_sky_fibre_file(fileNameHexa)
+
+    pd.set_option('display.max_columns', 12)
+
+    fibre_data = pd.read_csv(fibre_file)
+    print(skyfibreDict)
+    print(fibre_data)
+
+    nullPosition_skyFibre = {}
+    index_1 = 0
+    for i in skyfibreDict:
+        for j in skyfibreDict[i]:
+            for k in j:
+                if int(j[k]) == 0:
+                    # if (str(i)) not in nullPosition_skyFibre:
+                    #     nullPosition_skyFibre[str(i)] = []
+                    # nullPosition_skyFibre[str(i)].append(k)
+
+                    index2 = 0
+                    # read through fibre data to match null position skyfibres and update the 'hexabundle or skyfibre' column
+                    for l in fibre_data['Spectrograph']:
+
+                        if (fibre_data['Bundle/plate'][index2] == str(i)) and (int(fibre_data['Fibre_number'][index2]) == int(k)):
+                            fibre_data['Hexabundle or sky fibre'][index2] = 'BLOCK-sky'
+
+                        index2 += 1
+
+            index_1 += 1
+
+    fibre_data.to_csv(output_fibreSlitInfo, index=False, sep=',')
+
+    # print(nullPosition_skyFibre)
+
 
 
 def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
-    fibre_data = pd.read_excel(fibre_file, engine = 'openpyxl')
+    fibre_data = pd.read_csv(fibre_file)
 
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h1, h2 = 10, 820, 856
@@ -797,7 +834,8 @@ def plot_bar_from_dict(dict, ax=None):
 
     return ax
 
-def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
+# check for magnet count per annulus and record any warnings on text file
+def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch , annuli_count_magnetCasing):
 
     tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -829,59 +867,57 @@ def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2):
     # annuli_count_Blu ,annuli_count_Gre, annuli_count_Yel, annuli_count_Mag = 0,0,0,0
     annuli_count = {'Blu': 0, 'Gre': 0, 'Yel': 0, 'Mag': 0}
 
+    # counting magnets in each annulus for tiles 1 and 2 and storing count in annuli_count dictionary
     for magnet in np.concatenate((all_magnets_1, all_magnets_2)):
         if magnet.__class__.__name__ == 'circular_magnet':
+            # print(magnet.__class__.__name__+' '+str(magnet.index)+' '+str(magnet.rads)+' '+magnet.magnet_label)
             annuli_count[magnet.magnet_label] += 1
-
-    # max magnet casings to be allowed per annuli
-    annuli_count_magnetCasing = {'Blu': 18, 'Gre': 19, 'Yel': 22, 'Mag': 21}
 
     # file to report flags regarding special cases of hexabundle allocation
     flag_magnetCount = f'{self.allocation_files_location_base}/MagnetCount_warnings.txt'
 
-    magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}&{tile_number_2:03d}.pdf"
-
-    # plt.figure(9)
-    # plt.clf()
-
-    df = pd.DataFrame.from_dict(annuli_count, orient='index')
-    df.plot(kind='bar',legend=False, grid=True)
-
-    plt.gcf().set_size_inches(8, 12)
-    plt.yticks(df.values)
-    plt.savefig(magnetCount_barPlot, dpi=200)
-    plt.clf()
-
-    # plot_bar_from_dict(annuli_count)
-    # plt.show()
-
-    # your_bins = 4 #['Blu', 'Gre', 'Yel', 'Mag']
-    # data = []
-    # for i in annuli_count:
-    #     data += [annuli_count[i]]
-    # print(data)
-    # arr = plt.hist(data, bins=your_bins)
-    # for i in range(your_bins):
-    #     plt.text(arr[1][i], arr[0][i], str(arr[0][i]))
-    #     plt.show()
-
     for i in annuli_count:
+
         if annuli_count[i] > annuli_count_magnetCasing[i]:
             # write warnings on file with tile numbers and particular annuli
             with open(flag_magnetCount, 'a') as fp:
-                conflict = str(self.config['output_filename_stem']) + ', Tiles ' + str(tile_number_1) + ' and ' + str(
-                    tile_number_2) + ' have more magnets in annulus ' \
-                           + str(i) + ':' + str(annuli_count[i]) + ' than available number of casings, with extra '+\
-                           str(annuli_count[i] - annuli_count_magnetCasing[i])+ ' magnet/s. \n'
+                conflict = str(self.config['output_filename_stem']) + ', Tiles ' + str(tile_number_1) + ' and ' + \
+                           str(tile_number_2) + ' have more magnets in annulus ' + str(i) + ':' + str(annuli_count[i]) \
+                           + ' than available number of casings, with extra '\
+                           + str(annuli_count[i] - annuli_count_magnetCasing[i]) + ' magnet/s. \n'
                 fp.write(conflict)
+                print(conflict)
 
-    print(annuli_count)
+        # add magnet count in each tile pair to the whole batch annuliCount dictionary
+        annuliCount_batch[i] += [annuli_count[i]]
 
+    return annuliCount_batch
 
+# plot histogram for whole batch magnet count per annulus of tile pairs
+def plotHist_annuliCount_batch(self, annuliCount_batch):
+
+    # histogram colour for each annulus based on its name
+    hist_colour = {'Blu':"blue", 'Gre':"green", 'Yel':"yellow", 'Mag':"Magenta"}
+
+    for i in annuliCount_batch:
+
+        # count of magnets in each pair of tiles for whole batch read as data from each of the annulus
+        S = annuliCount_batch[i]
+
+        # hitogram plot file name
+        magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_{i}.pdf"
+
+        plt.figure(9)
+        plt.clf()
+
+        # plotting histogram and saving the figure as pdf
+        plt.style.use('ggplot')
+        plt.hist(S, bins=range(1,30), weights=np.ones_like(S)/len(S), color=hist_colour[i], alpha=0.5, histtype='bar', ec='black')
+        plt.gcf().set_size_inches(15,10)
+        plt.savefig(magnetCount_barPlot, dpi=200)
+
+# PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
 def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2):
-
-    # check for magnet count per annulus and record any warnings on text file
-    check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2)
 
     tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -1023,4 +1059,3 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
     # plt.show()                ## for showing the figure of magnets with pickup area
     plt.gcf().set_size_inches(6, 6)
     plt.savefig(subplateSkyfibre_figureFile_tile2)
-
