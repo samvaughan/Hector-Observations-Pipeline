@@ -52,8 +52,8 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #* arguments you'd give on the command line.
 #* To compare to ipython: %run myscript a, b would become tmp_args=c('a', 'b')
 #* DON'T FORGET TO COMMENT OUT LINE 51 TO RUN AS A SCRIPT!!!
-tmp_args=c('/Users/samvaughan/Science/Hector/HectorPipelineRuns/Outputs/GAMA/G15/DistortionCorrected/DC_tile_000.fld',
-           '/Users/samvaughan/Science/Hector/HectorPipelineRuns/Outputs/GAMA/G15/DistortionCorrected/guide_DC_tile_000.fld',
+tmp_args=c('/Users/samvaughan/Science/Hector/Tiling/SAMI_Clusters/results/TilingOutputs/Cluster_4/DistortionCorrected/DC_tile_000.fld',
+           '/Users/samvaughan/Science/Hector/Tiling/SAMI_Clusters/results/TilingOutputs/Cluster_4/DistortionCorrected/guide_DC_tile_000.fld',
              '/Users/samvaughan/Desktop/hexa_output.txt',
              '/Users/samvaughan/Desktop/guide_output.txt',
              '--plot_filename', '/Users/samvaughan/Desktop/plot_output.pdf',

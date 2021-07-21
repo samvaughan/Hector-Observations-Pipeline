@@ -9,6 +9,7 @@ import sys
 import itertools
 import datetime
 import shlex
+import shutil
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -490,6 +491,33 @@ class HectorPipe:
         
         return return_code
 
+    @staticmethod
+    def _read_file_get_header(filename):
+
+        """ Read in the output file and get the header, as well as the line numbers for the header"""
+        with open(filename, 'r') as f:
+            header_lines = []
+            header_linenumbers = []
+            for linenumber, line in enumerate(f):
+                if line.startswith('#'):
+                    header_lines.append(line)
+                    header_linenumbers.append(linenumber)
+        
+        return header_lines, header_linenumbers
+
+    @staticmethod
+    def _write_file_with_header(outfilename, header, dataframe):
+        """ Take a header and a pandas dataframe. Write the header to a file and then append the dataframe. There will be a # before the start of the column names"""
+        # Now write the correct output tile file
+        with open(outfilename, 'a') as f:
+
+            for line in header:
+                f.write(line.lstrip('#'))
+
+            # Now write a comment character before the column names get written
+            # Tony requires us to do this 
+            f.write('#')
+            dataframe.to_csv(f, index=False)
 
 
     def make_output_file_for_Tony(self, tile_number):
@@ -509,41 +537,34 @@ class HectorPipe:
         outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
         outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
 
+        # Clear the output files if they already exist
+        if outputTileFile.exists():
+            os.remove(outputTileFile)
+        if outputRobotFile.exists():
+            os.remove(outputRobotFile)
+
+
         ### The Tile File
 
-        # Read in the output file and get the header
-        with open(tileFile, 'r') as f:
-            tile_header_lines = []
-            tile_header_linenumbers = []
-            for linenumber, line in enumerate(f):
-                if line.startswith('#'):
-                    tile_header_lines.append(line)
-                    tile_header_linenumbers.append(linenumber)
+        tile_header_lines, tile_header_linenumbers = self._read_file_get_header(tileFile)
 
         # Get the contents of the file:
-        output_file_contents = pd.read_csv(tileFile, comment='#')
+        output_tile_contents = pd.read_csv(tileFile, comment='#')
         # Convert things which are nan values in integer columns to -99
         # The integer columns are: probe, priority, type, SkyPosition, order, order_c
         integer_columns = ['probe', 'priority', 'type', 'SkyPosition', 'order', 'order_C']
         # Replace NAs with -99
-        output_file_contents.loc[:, integer_columns] = output_file_contents.loc[:, integer_columns].fillna(-99).astype(int)
+        output_tile_contents.loc[:, integer_columns] = output_tile_contents.loc[:, integer_columns].fillna(-99).astype(int)
         # Now change the types of these columns to be integers
-        output_file_contents = output_file_contents.astype(dict(zip(integer_columns, ['int64']*len(integer_columns))))
+        output_tile_contents = output_tile_contents.astype(dict(zip(integer_columns, ['int64']*len(integer_columns))))
+        self._write_file_with_header(outfilename=outputTileFile, header=tile_header_lines, dataframe=output_tile_contents)
+        
 
-
-        # Now write the correct output tile file
-        with open(outputTileFile, 'a') as f:
-
-            for line in tile_header_lines:
-                f.write(line.lstrip('#'))
-
-            # Now write a comment character before the column names get written
-            # Tony requires us to do this 
-            f.write('#')
-            output_file_contents.to_csv(f, index=False)
-
-
-
+        # Now do the robot file
+        robot_header_lines, robot_header_linenumbers = self._read_file_get_header(robotFile)
+        output_robot_contents = pd.read_csv(robotFile, comment='#')
+        self._write_file_with_header(outfilename=outputRobotFile, header=robot_header_lines, dataframe=output_robot_contents)
+        
 
 
     def allocate_hexabundles_for_single_tile(self, tile_number, plot=False):
