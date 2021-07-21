@@ -596,7 +596,7 @@ class HectorPipe:
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in
         # Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole
-        offset_circularAnnulus = {'Blu':0.558, 'Gre':0.458, 'Yel':-0.358, 'Mag':-0.258}
+        offset_circularAnnulus = {'Blu':0.0, 'Gre':0.0, 'Yel':0.0, 'Mag':0.0}
         all_magnets = offsets.magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_magnets)
 
         # file to report flags regarding special cases of hexabundle allocation
