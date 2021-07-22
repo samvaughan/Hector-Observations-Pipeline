@@ -816,7 +816,7 @@ class HectorPipe:
                             fibres.createHexabundleFigure_withChangeShown(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
             # create histogram plot
-            fibres.plotHist_annuliCount_batch(self, annuliCount_batch)
+            fibres.plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count)
 
         else:
             print('\nEither pass two tile numbers or a batch of tile in the format shown:\n'+\

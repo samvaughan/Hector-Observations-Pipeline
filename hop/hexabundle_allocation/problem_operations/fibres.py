@@ -894,7 +894,7 @@ def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount
     return annuliCount_batch
 
 # plot histogram for whole batch magnet count per annulus of tile pairs
-def plotHist_annuliCount_batch(self, annuliCount_batch):
+def plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count):
 
     # histogram colour for each annulus based on its name
     hist_colour = {'Blu':"blue", 'Gre':"green", 'Yel':"yellow", 'Mag':"Magenta"}
@@ -905,7 +905,7 @@ def plotHist_annuliCount_batch(self, annuliCount_batch):
         S = annuliCount_batch[i]
 
         # hitogram plot file name
-        magnetCount_barPlot = f"{self.plot_location}/MagnetCountPlots/magnetCount_barPlot_{self.config['output_filename_stem']}_{i}.pdf"
+        magnetCount_barPlot = f"{self.plot_location}/magnetCount_barPlot_{self.config['output_filename_stem']}_{i}.pdf"
 
         plt.figure(9)
         plt.clf()
@@ -914,6 +914,9 @@ def plotHist_annuliCount_batch(self, annuliCount_batch):
         plt.style.use('ggplot')
         plt.hist(S, bins=range(1,30), weights=np.ones_like(S)/len(S), color=hist_colour[i], alpha=0.5, histtype='bar', ec='black')
         plt.gcf().set_size_inches(15,10)
+        plt.suptitle('Batch '+str(tile_batch)+' : '+str(tileBatch_count+1)+' tiles, '+str(len(annuliCount_batch['Blu']))+' pairs -- '+str(hist_colour[i]))
+        plt.xlabel('Magnet Count for each tile pair', fontsize=20)
+        plt.ylabel('Distribution weights in batch (sums to total of 1.0)', fontsize=20)
         plt.savefig(magnetCount_barPlot, dpi=200)
 
 # PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
