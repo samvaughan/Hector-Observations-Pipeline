@@ -49,9 +49,10 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     angs = list(df_guides['angs'])
     azAngs = list(df_guides['azAngs'])
     rectangle_magnet_input_orientation = list(df_guides['angs_azAng'])
+    IDs = list(df_guides['ID'])
 
     # assigning 'NA' to parameters which guide probes do not have a value for
-    IDs = galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
+    galaxyORstar = Re = mu_1re = Mstar = [float('NaN')] * len(probe_number)
 
     # setting guide file extracted list ready for output
     guideFileList = [probe_number, \
@@ -314,7 +315,7 @@ def finalFiles(all_magnets, outputFile, fileNameHexa):
     # joining the dataframes of hexa nd guide probes and skyfibres
     df_tileOutput = pd.concat([df_probes, df_skyfibre], sort=False)
 
-    # fill out all the empty slots of parameters with NA
+    # fill out all the empty slots of parameters with ''
     df_tileOutput.fillna('', inplace=True)
 
     # remove commas due to joining of positioning arrays of circular and rectangular magnets
