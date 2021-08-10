@@ -904,7 +904,7 @@ def plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_co
         # count of magnets in each pair of tiles for whole batch read as data from each of the annulus
         S = annuliCount_batch[i]
 
-        # hitogram plot file name
+        # histogram plot file name
         magnetCount_barPlot = f"{self.plot_location}/magnetCount_barPlot_{self.config['output_filename_stem']}_{i}.pdf"
 
         plt.figure(9)
@@ -966,8 +966,7 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
     skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
     for i in range(0, 4):
         x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
-        plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
-                     va='center')
+        plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center', va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
             if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1]:
                 colour1 = colour2 = 'black'
