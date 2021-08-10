@@ -667,7 +667,7 @@ class HectorPipe:
         # Output file 3
         robotFile = f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
-        # dummy values to be removed
+        ## DUMMY VALUES TO BE REMOVED ##
         self.robot_temperature = 9999
         self.obs_temperature = 9999
         # creating robotFile array and storing it in robot file
@@ -679,8 +679,6 @@ class HectorPipe:
         # produce final files with consistent layout and no extra commas
         file_arranging.finalFiles(all_magnets, outputFile, fileNameHexa)
 
-
-        ### FIBRES INPUT AND OUTPUT FILES: just started off, there will be functions created in fibres.py
         # fibre input file to be read
         # Input file 4 - fibres
         fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo_test_templateforTony[11][32].csv"
