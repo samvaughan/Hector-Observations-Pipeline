@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import string
+import cv2
 import csv
 import re
 import random
@@ -1061,3 +1062,272 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
     # plt.show()                ## for showing the figure of magnets with pickup area
     plt.gcf().set_size_inches(6, 6)
     plt.savefig(subplateSkyfibre_figureFile_tile2)
+
+
+# PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
+def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile):
+
+    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    plt.figure(7)
+    plt.clf()
+
+    skyfibreDict_tile1 = read_sky_fibre_file(tile_1_hexa)
+    skyfibreDict_tile2 = read_sky_fibre_file(tile_2_hexa)
+    print(skyfibreDict_tile1)
+
+    draw_circularSegments()
+
+    ##  sky_fibre_annotations function slightly edited to makr positions 2 & 3 in yellow
+    skyfibreDict = skyfibreDict_tile1
+    angle_subplate = [7, 5, 3, 1, -1, -3, -5, -7]
+    radii = 270
+    print(skyfibreDict)
+
+    # sky fibres top batch
+    angle = 30
+    skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        print(range(len(skyfibreDict[skyfibreTitles_top[i]])))
+        for j in range(0, len(skyfibreDict[skyfibreTitles_top[i]])):
+            print(j)
+            print(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1])+'\n')
+            if int(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]) in [2,3]:
+                colour1 = 'orange'
+                colour2 = 'yellow'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_top[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_top[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_top[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres left batch
+    angle = 150
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_left[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',va='center')
+        for j in range(0, len(skyfibreDict[skyfibreTitles_left[i]])):
+            if int(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]) in [2,3]:
+                colour1 = 'orange'
+                colour2 = 'yellow'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_left[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_left[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_left[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres right batch
+    angle = -160
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_right[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(0, len(skyfibreDict[skyfibreTitles_right[i]])):
+            if int(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]) in [2,3]:
+                colour1 = 'orange'
+                colour2 = 'yellow'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_right[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_right[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_right[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle + 20
+
+    plt.axis('off')
+    plt.title("Original",fontsize=12)
+    axes = plt.gca()
+    axes.set_xlim([-350, 350])
+    axes.set_ylim([-350, 350])
+    # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.gcf().set_size_inches(6, 6)
+    plt.savefig(subplateSkyfibre_figureFile_tile1, dpi=1200)
+
+    plt.figure(8)
+    plt.clf()
+
+    # skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
+    # skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
+
+    draw_circularSegments()
+
+    skyfibreDict = skyfibreDict_tile2
+    angle_subplate = [7, 5, 3, 1, -1, -3, -5, -7]
+    radii = 270
+
+    # filename = 'Sky_fibre_position_example.csv'
+    # skyfibreDict = read_sky_fibre_file(skyfibre_file)
+    # print(skyfibreDict)
+    string = str(skyfibreDict['H3'][5].keys())
+
+    # sky fibres top batch
+    angle = 30
+    skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center', va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
+            if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] in [2,3]:
+                colour1 = colour2 = 'red'
+            elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] != 0:
+                colour1 = colour2 = 'blue'
+            elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] == 0:
+                colour1 = colour2 = 'lime'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_top[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_top[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_top[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres left batch
+    angle = 150
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_left[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_left[i]])):
+            if skyfibreDict[skyfibreTitles_left[i]][j][j + 1] in [2, 3]:
+                colour1 = colour2 = 'red'
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][
+                j + 1] != 0:
+                colour1 = colour2 = 'blue'
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][
+                j + 1] == 0:
+                colour1 = colour2 = 'lime'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_left[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_left[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_left[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle - 20
+
+    # sky fibres right batch
+    angle = -160
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+    for i in range(0, 4):
+        x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
+        plt.annotate(skyfibreTitles_right[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
+                     va='center')
+        for j in range(len(skyfibreDict[skyfibreTitles_right[i]])):
+            if skyfibreDict[skyfibreTitles_right[i]][j][j + 1] in [2, 3]:
+                colour1 = colour2 = 'red'
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][
+                j + 1] != 0:
+                colour1 = colour2 = 'blue'
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][
+                j + 1] == 0:
+                colour1 = colour2 = 'lime'
+            else:
+                colour1 = colour2 = 'black'
+            angle_pos = angle + angle_subplate[j]
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 342)
+            fibre_num = re.sub('[^0-9]', '', str(skyfibreDict[skyfibreTitles_right[i]][j].keys()))
+            plt.annotate(fibre_num, (x, y), color=colour1, rotation=rotation, fontsize=5, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 308)
+            plt.annotate('▮', (x, y), color=colour2, rotation=rotation, fontsize=7, ha='center', va='center')
+            x, y, rotation = coordinates_and_angle_of_skyFibres(angle_pos, 322)
+            plt.annotate(str(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]), (x, y), color=colour2, rotation=rotation,
+                         fontsize=6, weight='bold', ha='center', va='center')
+        if skyfibreTitles_right[i][0] == 'H':
+            alpha = 0.4
+        elif skyfibreTitles_right[i][0] == 'A':
+            alpha = 0.7
+        draw_wedge = patches.Wedge((0, 0), r=333, theta1=angle - 9 + 90, theta2=angle + 9 + 90, width=90,
+                                   facecolor='gray', edgecolor='black', alpha=alpha)
+        plt.gcf().gca().add_artist(draw_wedge)
+        angle = angle + 20
+
+    plt.axis('off')
+    plt.title("New",fontsize=12)
+    axes = plt.gca()
+    axes.set_xlim([-350, 350])
+    axes.set_ylim([-350, 350])
+    # plt.show()                ## for showing the figure of magnets with pickup area
+    plt.gcf().set_size_inches(6, 6)
+    plt.savefig(subplateSkyfibre_figureFile_tile2, dpi=1200)
+
+    # read the images
+    img1 = cv2.imread(subplateSkyfibre_figureFile_tile1)
+    img2 = cv2.imread(subplateSkyfibre_figureFile_tile2)
+
+    # horizontally concatenates images of same height
+    im_h = cv2.hconcat([img1, img2])
+
+    # show the output image
+    # cv2.imshow('man_image.jpeg', im_h)
+    cv2.imwrite(subplateSkyfibre_figureFile, im_h)
+

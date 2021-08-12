@@ -788,9 +788,10 @@ class HectorPipe:
 
             # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
 
-            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.pdf"
-            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}_current.pdf"
-            fibres.createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.jpg"
+            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}_current.jpg"
+            subplateSkyfibre_figureFile = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_orginal-{tile_number_1:03d}_new-{tile_number_2:03d}.jpg"
+            fibres.createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile)
 
             # check for magnet count per annulus and record any warnings on text file
             fibres.check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch, annuli_count_magnetCasing)
@@ -811,7 +812,7 @@ class HectorPipe:
                         if tileBatch_skyFibreChange == 'ON':
                             subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.pdf"
                             subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.pdf"
-                            fibres.createHexabundleFigure_withChangeShown(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+                            fibres.createskyfibreChanges_plot(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
 
             # create histogram plot
             fibres.plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count)
