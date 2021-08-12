@@ -156,8 +156,8 @@ def read_sky_fibre_file(filename):
 
     df_skyfibre = pd.read_csv(filename, sep = ' ', skiprows=skipline_count)
 
-    mask = df_skyfibre['probe'] < 22
-    df_skyfibre = df_skyfibre[~mask]
+    mask = df_skyfibre['fibre_type'] == 'S'
+    df_skyfibre = df_skyfibre[mask]
 
     skyfibreDict = {}
     subplate_info = df_skyfibre['IDs']
