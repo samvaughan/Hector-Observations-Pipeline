@@ -1080,6 +1080,8 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
     tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
+    pistonChange_count = 0
+
     plt.figure(7)
     plt.clf()
 
@@ -1104,9 +1106,8 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
                      va='center')
         print(range(len(skyfibreDict[skyfibreTitles_top[i]])))
         for j in range(0, len(skyfibreDict[skyfibreTitles_top[i]])):
-            print(j)
-            print(str(skyfibreDict[skyfibreTitles_top[i]][j][j + 1])+'\n')
             if int(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
                 colour1 = 'orange'
                 colour2 = 'yellow'
             else:
@@ -1137,6 +1138,7 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
         plt.annotate(skyfibreTitles_left[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',va='center')
         for j in range(0, len(skyfibreDict[skyfibreTitles_left[i]])):
             if int(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
                 colour1 = 'orange'
                 colour2 = 'yellow'
             else:
@@ -1168,6 +1170,7 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
                      va='center')
         for j in range(0, len(skyfibreDict[skyfibreTitles_right[i]])):
             if int(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
                 colour1 = 'orange'
                 colour2 = 'yellow'
             else:
@@ -1224,10 +1227,13 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
         plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center', va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
             if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] in [2,3]:
+                pistonChange_count += 1
                 colour1 = colour2 = 'red'
             elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] != 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'blue'
             elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] == 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'lime'
             else:
                 colour1 = colour2 = 'black'
@@ -1258,12 +1264,13 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
                      va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_left[i]])):
             if skyfibreDict[skyfibreTitles_left[i]][j][j + 1] in [2, 3]:
+                pistonChange_count += 1
                 colour1 = colour2 = 'red'
-            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][
-                j + 1] != 0:
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1] != 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'blue'
-            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][
-                j + 1] == 0:
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1] == 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'lime'
             else:
                 colour1 = colour2 = 'black'
@@ -1294,12 +1301,13 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
                      va='center')
         for j in range(len(skyfibreDict[skyfibreTitles_right[i]])):
             if skyfibreDict[skyfibreTitles_right[i]][j][j + 1] in [2, 3]:
+                pistonChange_count += 1
                 colour1 = colour2 = 'red'
-            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][
-                j + 1] != 0:
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1] != 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'blue'
-            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][
-                j + 1] == 0:
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1] == 0:
+                pistonChange_count += 1
                 colour1 = colour2 = 'lime'
             else:
                 colour1 = colour2 = 'black'
@@ -1340,4 +1348,107 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
     # show the output image
     # cv2.imshow('man_image.jpeg', im_h)
     cv2.imwrite(subplateSkyfibre_figureFile, im_h)
+
+    return pistonChange_count
+
+
+# PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
+def skyfibreChanges_pistonChange_count(self, tile_number_1, tile_number_2):
+
+    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    pistonChange_count = 0
+
+    plt.figure(7)
+    plt.clf()
+
+    skyfibreDict_tile1 = read_sky_fibre_file(tile_1_hexa)
+    skyfibreDict_tile2 = read_sky_fibre_file(tile_2_hexa)
+    print(skyfibreDict_tile1)
+
+    ##  sky_fibre_annotations function slightly edited to makr positions 2 & 3 in yellow
+    skyfibreDict = skyfibreDict_tile1
+
+    skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
+    for i in range(0, 4):
+        for j in range(0, len(skyfibreDict[skyfibreTitles_top[i]])):
+            if int(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
+
+    # sky fibres left batch
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    for i in range(0, 4):
+        for j in range(0, len(skyfibreDict[skyfibreTitles_left[i]])):
+            if int(skyfibreDict[skyfibreTitles_left[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
+
+    # sky fibres right batch
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+    for i in range(0, 4):
+        for j in range(0, len(skyfibreDict[skyfibreTitles_right[i]])):
+            if int(skyfibreDict[skyfibreTitles_right[i]][j][j + 1]) in [2,3]:
+                pistonChange_count += 1
+
+
+    skyfibreDict = skyfibreDict_tile2
+
+    # sky fibres top batch
+    skyfibreTitles_top = ['H3', 'A3', 'H4', 'A4']
+    for i in range(0, 4):
+        for j in range(len(skyfibreDict[skyfibreTitles_top[i]])):
+            if skyfibreDict[skyfibreTitles_top[i]][j][j + 1] in [2,3]:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] != 0:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_top[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_top[i]][j][j + 1] == 0:
+                pistonChange_count += 1
+
+    # sky fibres left batch
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    for i in range(0, 4):
+        for j in range(len(skyfibreDict[skyfibreTitles_left[i]])):
+            if skyfibreDict[skyfibreTitles_left[i]][j][j + 1] in [2, 3]:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1] != 0:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_left[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_left[i]][j][j + 1] == 0:
+                pistonChange_count += 1
+
+    # sky fibres right batch
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+    for i in range(0, 4):
+        for j in range(len(skyfibreDict[skyfibreTitles_right[i]])):
+            if skyfibreDict[skyfibreTitles_right[i]][j][j + 1] in [2, 3]:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 0 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1] != 0:
+                pistonChange_count += 1
+            elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1] == 0:
+                pistonChange_count += 1
+
+    print(pistonChange_count)
+    return pistonChange_count
+
+
+# plot histogram for whole batch piston change per tile pair
+def plotHist_pistonChange_count_batch(self, pistonChange_countBatch, tile_batch, tileBatch_count):
+
+    # count of piston change in each pair of tiles for whole batch
+    S = pistonChange_countBatch
+    print(S)
+
+    # histogram plot file name
+    magnetCount_barPlot = f"{self.plot_location}/pistonChangeCount_barPlot_{self.config['output_filename_stem']}.pdf"
+
+    plt.figure(10)
+    plt.clf()
+
+    # plotting histogram and saving the figure as pdf
+    plt.style.use('ggplot')
+    plt.hist(S, bins=range(5,50), weights=np.ones_like(S)/len(S), color='orange', alpha=0.5, histtype='bar', ec='black')
+    plt.gcf().set_size_inches(15,10)
+    plt.suptitle('Batch '+str(tile_batch)+' : '+str(tileBatch_count+1)+' tiles, pairs -- '+str(len(pistonChange_countBatch)))
+    plt.xlabel('piston change Count for each tile pair', fontsize=20)
+    plt.ylabel('Distribution weights in batch (sums to total of 1.0)', fontsize=20)
+    plt.savefig(magnetCount_barPlot, dpi=200)
 
