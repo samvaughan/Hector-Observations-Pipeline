@@ -154,14 +154,14 @@ def read_sky_fibre_file(filename):
             line = f.readline()
             skipline_count += 1
 
-    df_skyfibre = pd.read_csv(filename, sep = ' ', skiprows=skipline_count)
+    df_skyfibre = pd.read_csv(filename, sep=',', comment='#')
 
     mask = df_skyfibre['fibre_type'] == 'S'
     df_skyfibre = df_skyfibre[mask]
 
     skyfibreDict = {}
-    subplate_info = df_skyfibre['IDs']
-    position = df_skyfibre['Position']
+    subplate_info = df_skyfibre['ID']
+    position = df_skyfibre['SkyPosition']
     position.reset_index(drop=True, inplace=True)
 
     j = 0

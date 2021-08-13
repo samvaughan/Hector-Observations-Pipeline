@@ -714,7 +714,7 @@ class HectorPipe:
         # Output file- figure 6 fibres
         skyFibre_SpectorFigure = f"{self.plot_location}/skyfibre_slitletSpector_{self.config['output_filename_stem']}_tile_{tile_number:03d}.pdf"
         # create figure of magnified sky fibre positioning in slitlets
-        fibres.create_skyFibreSlitlet_figure( new_arrayAAOmega, new_arraySpector, skyFibre_AAOmegaFigure, skyFibre_SpectorFigure)
+        fibres.create_skyFibreSlitlet_figure(fileNameHexa=fileNameHexa, new_arrayAAOmega=new_arrayAAOmega, new_arraySpector=new_arraySpector, skyFibre_AAOmegaFigure=skyFibre_AAOmegaFigure, skyFibre_SpectorFigure=skyFibre_SpectorFigure)
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
