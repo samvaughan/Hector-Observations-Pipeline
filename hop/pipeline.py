@@ -31,7 +31,7 @@ class HectorPipe:
         * Configure each tile
         * Run the HexabundleAllocation code
     """
-    def __init__(self, config_filename, Profit_files_location=None):
+    def __init__(self, config_filename, Profit_files_location=None, config_dictionary=None):
         """
         Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.
 
@@ -41,8 +41,11 @@ class HectorPipe:
         # Firstly, set the directory of the 'hop' folder as a bash environment variable, so that we can access it in R
         os.environ['HECTOROBSPIPELINE_LOC'] = Path(__file__).parent.as_posix()
 
-        self.config_filename = config_filename
-        self.config = misc_tools._load_config(config_filename)
+        if config_dictionary is None:
+            self.config_filename = config_filename
+            self.config = misc_tools._load_config(config_filename)
+        else:
+            self.config = config_dictionary
 
         # Lists for the tile RAs and DECs
         self.best_tile_RAs = []
