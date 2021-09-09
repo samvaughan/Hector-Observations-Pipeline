@@ -787,6 +787,8 @@ class HectorPipe:
 
         annuliCount_batch = {'Blu': [], 'Gre': [], 'Yel': [], 'Mag': []}
 
+        pistonChange_countBatch = []
+
         if (tile_number_1 != None) and (tile_number_2 != None):
 
             # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
@@ -813,13 +815,21 @@ class HectorPipe:
 
                         # produce plots for sky fibre changes if input is provided as 'on'
                         if tileBatch_skyFibreChange == 'ON':
-                            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.pdf"
-                            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.pdf"
-                            fibres.createskyfibreChanges_plot(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2)
+                            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{i:03d}_previous.jpg"
+                            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{j:03d}_current.jpg"
+                            subplateSkyfibre_figureFile = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_orginal-{i:03d}_new-{j:03d}.jpg"
+                            # pistonChange_count = fibres.createskyfibreChanges_plot(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile)
+
+                            pistonChange_count = fibres.skyfibreChanges_pistonChange_count(self, i, j)
+                            pistonChange_countBatch += [pistonChange_count]
 
             # create histogram plot
             fibres.plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count)
 
+            if tileBatch_skyFibreChange == 'ON':
+                fibres.plotHist_pistonChange_count_batch(self, pistonChange_countBatch, tile_batch, tileBatch_count)
+
+            print(len(annuliCount_batch['Blu']))
         else:
             print('\nEither pass two tile numbers or a batch of tile in the format shown:\n'+\
                   '      HP.show_sky_fibre_changes(tile number 1,tile number 2)\n'+
