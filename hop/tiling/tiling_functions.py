@@ -389,7 +389,7 @@ def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='
     return tile_df, isel_values
 
 
-def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, use_galaxy_priorities=True, selection_type='most_clashing', fill_spares_with_repeats=False):
+def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, use_galaxy_priorities=True, selection_type='most_clashing', fill_spares_with_repeats=False, df_skies=None):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
     Inputs:
@@ -445,6 +445,9 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     inner_guides = df_guide_stars.loc[check_if_in_fov(df_guide_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
     inner_standards = df_standard_stars.loc[check_if_in_fov(df_standard_stars, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
 
+    if df_skies is not None:
+        inner_skies = df_skies.loc[check_if_in_fov(df_skies, tile_RA, tile_Dec, outer_radius=Hector_FOV_outer_radius, inner_radius=Hector_FOV_inner_radius), :]
+
     if (len(inner_guides) == 0) or (len(inner_standards) == 0):
         raise ValueError("No stars in the Field of View!")
 
@@ -461,6 +464,9 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     standard_stars_for_tile = select_stars_for_tile(inner_standards, tile_members, proximity=proximity, Nsel=Nsel_standards, star_type='standards')
 
     standard_stars_for_tile['isel'] = standard_stars_for_tile['priority'] + 10
+
+    if df_skies is not None:
+        skies_for_tile = select_sky_fibres_for_tile
 
     return df_targets, tile_members, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec
 
