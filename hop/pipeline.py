@@ -540,8 +540,8 @@ class HectorPipe:
         # Output file 3
         robotFile = Path(f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
 
-        outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
-        outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
+        outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv")
+        outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv")
 
         # Clear the output files if they already exist
         if outputTileFile.exists():

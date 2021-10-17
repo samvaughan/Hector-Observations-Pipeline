@@ -11,14 +11,14 @@ def plot_distortion_correction_before_after(DC_tile_filename, title_text=None):
 
     font_size = 12
 
-    # Get the RA and DEC of the tile
-    with open(DC_tile_filename, 'r') as f:
-        lines = f.readlines()
-    RA, DEC = lines[1].split()[1:]
-    RA = float(RA)
-    DEC = float(DEC)
+    # # Get the RA and DEC of the tile
+    # with open(DC_tile_filename, 'r') as f:
+    #     lines = f.readlines()
+    # RA, DEC = lines[1].split()[1:]
+    # RA = float(RA)
+    # DEC = float(DEC)
 
-    df = pd.read_csv(DC_tile_filename, skiprows=8)
+    df = pd.read_csv(DC_tile_filename, comment='#')
 
     # Select only galaxies in the tile
     mask = df.type == 1
@@ -49,7 +49,7 @@ def plot_distortion_correction_before_after(DC_tile_filename, title_text=None):
 
     ax.scatter(0, 0, marker='+', c='k')
     ax.legend(fontsize=font_size, loc='lower left')
-    ax.set_box_aspect(1)
+    #ax.set_box_aspect(1)
 
     ax.set_xlabel("X (mm)")
     ax.set_ylabel("Y (mm)")
@@ -57,7 +57,7 @@ def plot_distortion_correction_before_after(DC_tile_filename, title_text=None):
     ax.set_title(title_text, fontsize=font_size)
 
     box_props = dict(boxstyle='round', facecolor='0.9', alpha=0.5)
-    ax.text(0.5, 0.95, s=f"Tile Centre is ({RA:.3f}, {DEC:.3f})", transform=ax.transAxes, bbox=box_props, fontsize=font_size, ha='center', va='bottom')
+    #ax.text(0.5, 0.95, s=f"Tile Centre is ({RA:.3f}, {DEC:.3f})", transform=ax.transAxes, bbox=box_props, fontsize=font_size, ha='center', va='bottom')
 
     return fig, ax
 

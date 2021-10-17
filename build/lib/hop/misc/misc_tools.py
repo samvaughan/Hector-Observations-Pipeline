@@ -32,21 +32,20 @@ def _read_table(fname):
         table = pd.read_csv(fname, sep='\t')
     elif extension == '.fits':
         table = P.load_FITS_table_in_pandas(fname)
-        #raise TypeError("Not yet written the code for fits... Exiting!")
     else:
         raise TypeError(f"Catalogue {fname} data type \
             not understood")
     return table
 
 
-def create_output_directories(output_folder):
+def create_output_directories(output_folder, subfolders_to_be_made):
 
         # Make the folder if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     # Make the subdirectories if they don't exist
-    subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
+    # subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs"]
     folders = dict(zip(subfolders_to_be_made, [Path(f'{output_folder}/{subfolder}') for subfolder in subfolders_to_be_made]))
     for name, p in folders.items():
         p.mkdir(parents=True, exist_ok=True)
@@ -99,3 +98,23 @@ def set_up_loggers(config):
         logger_R_code.addHandler(file_handler_R_code)
 
     return logger, logger_R_code
+
+
+def update_header(filename, header_dictionary):
+
+    """
+    Take a dictionary of header key/value pairs and write it to the top of a tile/configuration file
+    """
+
+    # Update the header of the configuration code file and the guide file
+    with open(filename, 'r+') as f:
+        lines = f.readlines()
+        # Add in each header key/value pair to the file
+        # Reverse the list and add each one to the start of the file- this keeps the original order
+        # without having to increment the index
+        for key, value in header_dictionary.items():
+            lines.insert(0, f"{key},{value}\n") 
+        f.seek(0)                 # file pointer locates at the beginning to write the whole file again
+        f.writelines(lines)       # write whole lists again to the same file
+
+    return header_dictionary

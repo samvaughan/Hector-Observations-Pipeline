@@ -260,13 +260,24 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
     # resolving hexabundles not allocated initially
     MagnetDict = resolve_unallocated_hexabundle(unallocatedOnes,result,MagnetDict,indexx)
 
-
     # recording hexabundle as per galaxy records; IDs in current tile have been recorded above
     galaxyIDrecord, MagnetDict = update_galaxyIDrecord_withHexabundle(galaxyIDrecord,MagnetDict)
 
+    # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
+    guideIndex = 1
+    for magnet in all_magnets:
+        magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict, magnet, guideIndex)
+
+    # copying hexabundle titles from rectangular magnets to circular magnets
+    for magnet in all_magnets:
+        if (magnet.hexabundle == 'NA') and (magnet.__class__.__name__ == 'circular_magnet'):
+            for magnet2 in all_magnets:
+                if (magnet.index == magnet2.index) and (magnet2.__class__.__name__ == 'rectangular_magnet'):
+                    magnet.hexabundle = magnet2.hexabundle
+
     return galaxyIDrecord, MagnetDict
 
-def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, clusterNum, tileNum, flagsFile):
+def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, mu_1re_cutoff, clusterNum, tileNum, flagsFile):
 
     hexabundleIndexAAOmega = 0
     hexabundleIndexHector = 0
@@ -291,7 +302,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
         for recordID in galaxyIDrecord:
 
             # searching each magnet ID in the records
-            if i.IDs == recordID and i.__class__.__name__ == 'rectangular_magnet' \
+            if i.IDs == recordID and i.__class__.__name__ == 'rectangular_magnet' and (i.galaxyORstar in [0,1]) \
             and galaxyIDrecord[recordID] != 'U' and galaxyIDrecord[recordID] != 'H':
                 print('Galaxy ID match found with previous tiles !')
                 # print(recordID)
@@ -381,10 +392,10 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
 
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
-        if str(i.IDs) != 'nan' and i.__class__.__name__ == 'rectangular_magnet' and (i.IDs not in galaxyIDrecord):
-                galaxyIDrecord[round(i.IDs)] = ''
+        if (i.galaxyORstar in [0,1]) and i.__class__.__name__ == 'rectangular_magnet' and (i.IDs not in galaxyIDrecord):
+                galaxyIDrecord[i.IDs] = ''
 
-        # Getting an array count of mu_1re graeter and less than 22
+        # Getting an array count of mu_1re greater and less than 22
         if i.__class__.__name__ == 'rectangular_magnet' and i.galaxyORstar == 1 and i.Re < 12:
             answer = answer + [i.Re]
         elif i.__class__.__name__ == 'rectangular_magnet' and i.galaxyORstar == 1 and i.Re >= 12:
@@ -465,7 +476,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
 
     print('\nLarger hexabundles more than 61 have been allocated.\n')
 
-    X = 22.5
+    X = mu_1re_cutoff
     print('mu_1re cutoff, X = ' + str(X))
     # Allocating all 61 hexabundles based on mu_1Re < X
     for magnet in Mstar_Sort:  # Spector
@@ -533,9 +544,20 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
     # resolving hexabundles not allocated initially
     MagnetDict = resolve_unallocated_hexabundle(unallocatedOnes,result,MagnetDict,indexx)
 
-
     # recording hexabundle as per galaxy records; IDs in current tile have been recorded above
     galaxyIDrecord, MagnetDict = update_galaxyIDrecord_withHexabundle(galaxyIDrecord,MagnetDict)
+
+    # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
+    guideIndex = 1
+    for magnet in all_magnets:
+        magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict, magnet, guideIndex)
+
+    # copying hexabundle titles from rectangular magnets to circular magnets
+    for magnet in all_magnets:
+        if (magnet.hexabundle == 'NA') and (magnet.__class__.__name__ == 'circular_magnet'):
+            for magnet2 in all_magnets:
+                if (magnet.index == magnet2.index) and (magnet2.__class__.__name__ == 'rectangular_magnet'):
+                    magnet.hexabundle = magnet2.hexabundle
 
     return galaxyIDrecord, MagnetDict
 
@@ -565,7 +587,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
         for recordID in galaxyIDrecord:
 
             # searching each magnet ID in the records
-            if i.IDs == recordID and i.__class__.__name__ == 'rectangular_magnet' \
+            if i.IDs == recordID and i.__class__.__name__ == 'rectangular_magnet' and (i.galaxyORstar in [0,1]) \
             and galaxyIDrecord[recordID] != 'U' and galaxyIDrecord[recordID] != 'H':
                 print('Galaxy ID match found with previous tiles !')
                 # print(recordID)
@@ -655,7 +677,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
 
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
-        if str(i.IDs) != 'nan' and i.__class__.__name__ == 'rectangular_magnet' and (i.IDs not in galaxyIDrecord):
+        if (i.galaxyORstar in [0,1]) and i.__class__.__name__ == 'rectangular_magnet' and (i.IDs not in galaxyIDrecord):
                 galaxyIDrecord[round(i.IDs)] = ''
 
         # Getting an array count of mu_1re greater and less than 22
@@ -819,6 +841,18 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
 
     # recording hexabundle as per galaxy records; IDs in current tile have been recorded above
     galaxyIDrecord, MagnetDict = update_galaxyIDrecord_withHexabundle(galaxyIDrecord,MagnetDict)
+
+    # assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary
+    guideIndex = 1
+    for magnet in all_magnets:
+        magnet, guideIndex = hexabundle_allocation_fromMagnetDict(MagnetDict, magnet, guideIndex)
+
+    # copying hexabundle titles from rectangular magnets to circular magnets
+    for magnet in all_magnets:
+        if (magnet.hexabundle == 'NA') and (magnet.__class__.__name__ == 'circular_magnet'):
+            for magnet2 in all_magnets:
+                if (magnet.index == magnet2.index) and (magnet2.__class__.__name__ == 'rectangular_magnet'):
+                    magnet.hexabundle = magnet2.hexabundle
 
     return galaxyIDrecord, MagnetDict
 

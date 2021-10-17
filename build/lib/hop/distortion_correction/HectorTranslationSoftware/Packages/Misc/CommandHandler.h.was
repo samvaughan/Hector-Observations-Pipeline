@@ -1,0 +1,236 @@
+#ifndef __CmdHandler__
+#define __CmdHandler__
+
+#include <string>
+#include <list>
+#include <vector>
+
+class CmdHandler;
+
+class CmdArg {
+public:
+   CmdArg(CmdHandler& Handler,const std::string& Name,int Posn,long Flags,
+                      const std::string& Prompt,const std::string& Text);
+   virtual ~CmdArg();
+   //void SetText (const std::string& Text);
+   //void SetPrompt (const std::string& Prompt);
+   //void Cancel (void);
+   void SetPosn (int Posn);
+   std::string GetError(void);
+   bool Clear (void);
+   bool ValueOptional (void) { return I_Valopt; }
+   bool Required (void) { return I_Required; }
+   bool Active (void) { return I_IsActive; }
+   bool IsSet (void) { return I_IsSet; }
+   bool Hidden (void) { return I_Hidden; }
+   void Reset (void);
+   void SetListing (bool Listing = true);
+   std::string GetName (void) { return I_Name; }
+   std::string Description (void);
+   typedef enum
+     {CMD_ARG_UNKNOWN,CMD_ARG_FILE,CMD_ARG_BOOL,CMD_ARG_STRING,CMD_ARG_INT,
+                                 CMS_ARG_FLOAT,CMD_ARG_DATETIME
+     } CmdArgType;
+   virtual bool MatchName (const std::string& Name);
+   virtual bool SetValue (const std::string& Name, const std::string& Value);
+   virtual bool SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue);
+   virtual std::string GetCurrentSpec (void);
+   //  Flags values - need to review use of these.
+   static const long SILENT = 0x1;
+   static const long REQUIRED = 0x2;
+   static const long VALOPT = 0x4;
+   static const long VALREQ = 0x8;
+   static const long INTERNAL = 0x10;
+   static const long HIDDEN = 0x20;
+   static const long MUST_EXIST = 0x40;
+   static const long NOSAVE = 0x80;
+protected:
+   void CloseHandler (CmdHandler* Handler);
+   virtual bool SetPrevious (const std::string& Value);
+   bool TellUser (const std::string& ReportString);
+   std::string PromptUser (const std::string& Default);
+   void SetPrompting (const std::string& OnOffDefault);
+   bool CanPrompt (void);
+   bool DontSave (void);
+   CmdHandler* I_Handler;
+   std::string I_Name;
+   std::string I_Prompt;
+   std::string I_Text;
+   long I_Posn;
+   long I_Flags;
+   bool I_PreviousSet;
+   bool I_IsSet;
+   bool I_IsActive;
+   bool I_Required;
+   bool I_Valopt;
+   bool I_Internal;
+   bool I_Listing;
+   bool I_Hidden;
+   bool I_PromptOn;
+   bool I_PromptOff;
+   CmdArgType I_Type;
+   std::string I_ConstructError;
+   std::string I_ErrorText;
+   friend class CmdHandler;
+};
+
+class StringArg : public CmdArg {
+public:
+   StringArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
+      long Flags = 0,const std::string& Default = "",
+      const std::string& Prompt = "",const std::string& Text = "");
+   virtual ~StringArg();
+   virtual std::string GetValue (bool* OK,std::string* Error);
+   //void SetDefault (const std::string& Default);
+   virtual bool SetValue (const std::string& Name, const std::string& Value);
+   virtual bool SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue);
+   virtual std::string GetCurrentSpec (void);
+protected:
+   virtual bool SetPrevious (const std::string& Value);
+   std::string I_Previous;
+   std::string I_Value;
+   std::string I_Default;
+};
+
+class FileArg : public StringArg {
+public:
+   FileArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
+      long Flags = 0,const std::string& Default = "",
+      const std::string& Prompt = "",const std::string& Text = "");
+   ~FileArg();
+   std::string GetValue (bool* Ok,std::string* Error);
+   //virtual bool SetValue (const std::string& Name, const std::string& Value);
+   //virtual bool SetValue (const std::string& Name, bool Equals,
+   //    const std::string Value, bool GotValue, bool* UsedValue);
+protected:
+   bool MustExist (void);
+   bool FileExists (std::string& FileName);
+private:
+   std::string I_DefNote;
+   std::vector<std::string> I_Defaults;
+};
+
+class BoolArg : public CmdArg {
+public:
+   BoolArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
+      long Flags = 0,bool Default = true,
+      const std::string& Prompt = "",const std::string& Text = "");
+   ~BoolArg();
+   bool GetValue (bool* OK,std::string* Error);
+   //void SetDefault (bool Default);
+   virtual bool MatchName (const std::string& Name);
+   virtual bool SetValue (const std::string& Name, const std::string& Value);
+   virtual bool SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue);
+   virtual std::string GetCurrentSpec (void);
+protected:
+   virtual bool SetPrevious (const std::string& Value);
+   bool ValidBoolean (const std::string& String, bool* Value);
+   bool I_Previous;
+   bool I_Value;
+   bool I_Default;
+private:
+   bool NegName (const std::string& Name);
+   bool PosName (const std::string& Name);
+};
+
+class IntArg : public CmdArg {
+public:
+   IntArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
+      long Flags = 0,long Default = 0,long Min = 0, long Max = 0,
+      const std::string& Prompt = "",const std::string& Text = "");
+   ~IntArg();
+   long GetValue (bool* OK,std::string* Error);
+   virtual bool SetValue (const std::string& Name, const std::string& Value);
+   virtual bool SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue);
+   virtual std::string GetCurrentSpec (void);
+   //void SetDefault (long Default);
+   //void SetRange (long Min, long Max);
+protected:
+   virtual bool SetPrevious (const std::string& Value);
+   std::string FormatValue (long Value);
+   bool ValidValue (const std::string& String, long* Value);
+   bool AllowedValue (long Value);
+   std::string Requirement (void);
+   long I_Previous;
+   long I_Value;
+   long I_Default;
+   long I_Min;
+   long I_Max;
+};
+
+
+class RealArg : public CmdArg {
+public:
+   RealArg (CmdHandler& Handler,const std::string& Name,int Posn = 0,
+       long Flags = 0,double Default = 0.0,double Min = 0.0, double Max = 0.0,
+      const std::string& Prompt = "",const std::string& Text = "");
+   ~RealArg();
+   double GetValue (bool* OK,std::string* Error);
+   virtual bool SetValue (const std::string& Name, const std::string& Value);
+   virtual bool SetValue (const std::string& Name, bool Equals,
+       const std::string Value, bool GotValue, bool* UsedValue);
+   virtual std::string GetCurrentSpec (void);
+   //void SetDefault (double Default);
+   //void SetRange (double Min, double Max);
+protected:
+   virtual bool SetPrevious (const std::string& Value);
+   std::string FormatValue (double Value);
+   bool ValidValue (const std::string& String, double* Value);
+   bool AllowedValue (double Value);
+   std::string Requirement (void);
+   double I_Previous;
+   double I_Value;
+   double I_Default;
+   double I_Min;
+   double I_Max;
+};
+
+class CmdInteractor {
+public:
+   CmdInteractor (void);
+   ~CmdInteractor();
+   void SetInteractive (bool CanInteract = true);
+   bool IsInteractive (void);
+   virtual bool Write (const std::string& Text);
+   virtual bool WriteLn (const std::string& Text = "");
+   virtual bool ReadLn (std::string& Text);
+   std::string GetError (void);
+private:
+   bool I_IsInteractive;
+   std::string I_ErrorText;
+};
+
+class CmdHandler {
+public:
+   CmdHandler (const std::string& Program);
+   ~CmdHandler();
+   bool IsInteractive (void);
+   bool ParseArgs (int Argc, char* Argv[]);
+   bool ParseArgs (const std::vector<std::string>& Args);
+   bool RemoveNamedArg (const std::string& Name);
+   bool ReadPrevious (void);
+   bool SaveCurrent (void);
+   std::string GetError (void);
+protected:
+   void DelArg (CmdArg* Arg);
+   void AddArg (CmdArg* Arg);
+   CmdInteractor* GetInteractor (void);
+   friend class CmdArg;
+private:
+   bool CheckSetup (void);
+   bool I_ReadPrevious;
+   bool I_Setup;
+   std::string I_Program;
+   std::string I_ErrorText;
+   std::list<CmdArg*> I_CmdArgs;
+   BoolArg* I_ResetArg;
+   BoolArg* I_PromptArg;
+   BoolArg* I_ListArg;
+   CmdInteractor I_Interactor;
+};
+
+#endif

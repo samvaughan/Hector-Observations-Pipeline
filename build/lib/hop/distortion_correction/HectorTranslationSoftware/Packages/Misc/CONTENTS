@@ -1,0 +1,36 @@
+These files are a few bits of utility code taken from various other (mainly AAO)
+sub-systems that provide facilities useful for the Hector translation software.
+
+gen_qfmed.c is a Quicksort-based routine that calculates the median of an
+            array of floating point numbers. It originated with Figaro, many
+            years ago and is a C version of a VAX assembler routine based on
+            a Pascal routine - the original Pascal is there in the comments
+            at the end of the code!
+
+ArrayManager.cpp/.h originated with AAOGlimpse, and implements an ArrayManager
+            class that allows a C++ program to treat a multi-dimensional
+            array using an Array[Ix][Iy] style to refer to individual elements.
+            It's very simple and very fast.
+
+TcsUtil.cpp/.h is a set of utility routines originating with the AAT TCS
+            that do things like formatting Ra,Dec values into strings nicely.
+            (They do other things too, but that's what they're used for here.)
+
+tdfxy.c/.h and associated _err files are from the AAO 2dFutil package, and
+            do the conversion between 2dF field plate coordinates and sky
+            Ra,Dec coordinates. The full 2dFutil package is quite large, but
+            this is the only code from it needed by the Hector translation
+            software.
+
+CommandHandler.cpp/.h is an experimental command line parser being developed
+            for more general-purpose use, but which is being tested initially
+            with the Hector translation software. It is hoped it will simplify
+            working with the large number of command line parameters,
+            particularly for testing, when the command line is usually entered
+            by hand.
+
+DebugHandler.h is an small experimental C++ class that provides some control
+            over the levels of debugging enabled in a program.
+            
+Wildcard.cpp/.h is a wildcard string-matching routine originally developed
+            for the AAO Ghost project, and used here by the DebugHandler code.

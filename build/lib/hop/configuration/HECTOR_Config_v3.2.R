@@ -7,7 +7,7 @@
 #############################################################################
 
 #Loading required libraries:
-library(astro)
+library(magicaxis)
 library(astroFns)
 library(plotrix)
 library(raster)
@@ -24,6 +24,8 @@ library(yaml)
 #plate_scale <<- 15.008
 #! Added by Sam to use the same constants file as Ayoan's code uses
 hector_constants <<- read_yaml(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'),"constants/HECTOR_CONSTANTS.yaml", sep='/'))
+#hector_constants <<- read_yaml("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/constants/HECTOR_CONSTANTS.yaml")
+
 
 #Field dimensions and parameters:
 fov <<- hector_constants$HECTOR_plate_radius*2  #diameter of the field in mm
@@ -266,7 +268,7 @@ random_allocation <- function (nrandprobes=ngalprobes+6, nstdprobes=20, nguidepr
 #Draw buttons around each position to be allocated.
 draw_pos <- function(x,y, label_probe=TRUE, overwrite=TRUE){
   if (overwrite){ #set overwrite to true to start the plots from scratch.
-    aplot(0,0,pch='x',col="red",xlim=c(-fov/2.,fov/2.),ylim=c(-fov/2.,fov/2.), asp=1, xlab='X (mm)', ylab='Y (mm)')
+    magplot(0,0,pch='x',col="red",xlim=c(-fov/2.,fov/2.),ylim=c(-fov/2.,fov/2.), asp=1, xlab='X (mm)', ylab='Y (mm)')
     draw.circle(0,0,radius=fov/2.,border='red')
     draw.circle(0,0,radius=fov/2.+skybuffer,border='black')
     #Draw the cable exit gaps in cyan

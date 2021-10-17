@@ -14,7 +14,7 @@ class HECTOR_plate(circle):
 def plot_plate(HECTOR_plate):
 
     # # setting aspect ratio
-    # plt.figure()
+    plt.figure(1)
     # plt.plot(np.sin(np.linspace(0, 20, 100)))
     # plt.figure().canvas.layout.width = '800px'
     # plt.figure().canvas.draw()
@@ -35,7 +35,7 @@ def plot_plate(HECTOR_plate):
 
 ###############################################################
     #2nd figure
-    plt.figure()
+    plt.figure(2)
 
     plt.plot(HECTOR_plate[0], HECTOR_plate[1], 'r')
     plt.plot(HECTOR_plate[0], HECTOR_plate[2], 'r')

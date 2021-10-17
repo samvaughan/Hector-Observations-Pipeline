@@ -16,6 +16,9 @@ class circle:
         self.view_x = - self.center[1]
         # self.view_orientation = self.orientation# - 90
 
+        self.offset_P = 0.0
+        self.offset_Q = 0.0
+
     # calculating all coordinates of the circle
     def calculate_circle_all_coordinates(self):
 
@@ -29,8 +32,8 @@ class circle:
         circle.calculate_circle_all_coordinates(self)
 
         plt.figure(1)
-        plt.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha = 0.5)
-        plt.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha = 0.5)
+        plt.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha=0.5)
+        plt.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha=0.5)
         plt.axis('scaled')
 
 ################################################################

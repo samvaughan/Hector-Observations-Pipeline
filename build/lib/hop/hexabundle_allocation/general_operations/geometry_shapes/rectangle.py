@@ -38,24 +38,24 @@ class rectangle:
         return [self.corner1,self.corner2,self.corner3,self.corner4]
 
     # plotting the rectangle on respective figures
-    def draw_rectangle(self,colour):
+    def draw_rectangle(self,colour,figurenum):
 
         rectangle.calculate_4corners(self)
 
-        plt.figure(1)
-        plt.plot([self.corner1[0], self.corner2[0]], [self.corner1[1], self.corner2[1]], colour,alpha = 0.5,zorder=3)
-        plt.plot([self.corner2[0], self.corner3[0]], [self.corner2[1], self.corner3[1]], colour,alpha = 0.5,zorder=3)
-        plt.plot([self.corner3[0], self.corner4[0]], [self.corner3[1], self.corner4[1]], colour,alpha = 0.5,zorder=3)
-        plt.plot([self.corner4[0], self.corner1[0]], [self.corner4[1], self.corner1[1]], colour,alpha = 0.5,zorder=3)
-        plt.axis('scaled')
+        if figurenum == 1:
+            plt.plot([self.corner1[0], self.corner2[0]], [self.corner1[1], self.corner2[1]], colour,alpha = 0.5,zorder=3)
+            plt.plot([self.corner2[0], self.corner3[0]], [self.corner2[1], self.corner3[1]], colour,alpha = 0.5,zorder=3)
+            plt.plot([self.corner3[0], self.corner4[0]], [self.corner3[1], self.corner4[1]], colour,alpha = 0.5,zorder=3)
+            plt.plot([self.corner4[0], self.corner1[0]], [self.corner4[1], self.corner1[1]], colour,alpha = 0.5,zorder=3)
+            plt.axis('scaled')
 
 ################################################################
-        plt.figure(2)
-        plt.plot([self.corner1[0] + robot_center_x, self.corner2[0] + robot_center_x], [self.corner1[1] + robot_center_y, self.corner2[1] + robot_center_y], colour)
-        plt.plot([self.corner2[0] + robot_center_x, self.corner3[0] + robot_center_x], [self.corner2[1] + robot_center_y, self.corner3[1] + robot_center_y], colour)
-        plt.plot([self.corner3[0] + robot_center_x, self.corner4[0] + robot_center_x], [self.corner3[1] + robot_center_y, self.corner4[1] + robot_center_y], colour)
-        plt.plot([self.corner4[0] + robot_center_x, self.corner1[0] + robot_center_x], [self.corner4[1] + robot_center_y, self.corner1[1] + robot_center_y], colour)
-        plt.axis('scaled')
+        if figurenum == 2:
+            plt.plot([self.corner1[0] + robot_center_x, self.corner2[0] + robot_center_x], [self.corner1[1] + robot_center_y, self.corner2[1] + robot_center_y], colour)
+            plt.plot([self.corner2[0] + robot_center_x, self.corner3[0] + robot_center_x], [self.corner2[1] + robot_center_y, self.corner3[1] + robot_center_y], colour)
+            plt.plot([self.corner3[0] + robot_center_x, self.corner4[0] + robot_center_x], [self.corner3[1] + robot_center_y, self.corner4[1] + robot_center_y], colour)
+            plt.plot([self.corner4[0] + robot_center_x, self.corner1[0] + robot_center_x], [self.corner4[1] + robot_center_y, self.corner1[1] + robot_center_y], colour)
+            plt.axis('scaled')
 ################################################################
 
     # plotting the four corners of rectangle on respective figures

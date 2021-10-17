@@ -11,7 +11,7 @@ class probe:
     def __init__(self, probe_index, circular_magnet_center, rectangular_magnet_input_orientation, galaxyORstar, Re, mu_1re, Mstar, magnet_label, hexabundle, rads, rotation_pickup, rotation_putdown, azAngs, IDs):
 
         self.index = probe_index
-        self.circular_magnet_center = np.array(circular_magnet_center) * HECTOR_plate_radius
+        self.circular_magnet_center = np.array(circular_magnet_center) #* HECTOR_plate_radius
         self.rectangular_magnet_input_orientation = rectangular_magnet_input_orientation
         self.circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
         self.galaxyORstar = galaxyORstar
@@ -103,6 +103,8 @@ class probe:
              + self.circular_rectangle_magnet_center_distance * cos(2 * pi - self.rectangular_magnet_orientation_modulo_radians),
              self.circular_magnet_center[1] \
              - self.circular_rectangle_magnet_center_distance * sin(2 * pi - self.rectangular_magnet_orientation_modulo_radians)]
+        else:
+            raise ValueError(f"This rectangular magnet has an orientation of {self.rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
 
         return np.array(self.rectangular_magnet_center)
 
