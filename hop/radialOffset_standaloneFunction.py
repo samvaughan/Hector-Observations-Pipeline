@@ -103,7 +103,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
             f.write(i)
 
 
-    df = df_read.rename(columns={'Magnet': '#Magnet'})
+    df = df.rename(columns={'Magnet': '#Magnet'})
     df.to_csv(outputFile, index=False, sep=',', mode='a')
 
     print('Output file produced by adjusting offset values to the input file')
