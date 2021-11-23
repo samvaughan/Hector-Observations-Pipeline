@@ -3,7 +3,7 @@ pd.options.mode.chained_assignment = None  # disabled warning about writes makin
 from math import atan,sin,cos,sqrt,degrees,radians,pi
 
 
-def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, T_configured=-10000, robot_centre=None, plate_radius=None, alpha=None):
+def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T_configured=-10000, robot_centre=None, plate_radius=None, alpha=None):
     
     ''' FUNCTION TO ADJUST THE RADIAL OFFSET FOR ALL MAGNETS IN CASE OF THERMAL EXPANSION OF THE PLATE
     INPUTS: 1. 'filename'- Mandatory Input required is the filename with location
@@ -43,18 +43,29 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
     with open(filename) as file:
         line = file.readline()
         skipline_count = 0
-        description = line
+        description = [line]
 
-        # count and store only lines starting with #
-        while line.startswith('#'):
+        # count and store only the description lines not starting with #
+        while (line.startswith('#') == False):
             line = file.readline()
-            if line[0] == '#':
-                description += line
+            if line[0] != '#':
+                description += [line]
             skipline_count += 1
 
 
-    df = pd.read_csv(filename, sep=',', comment='#')
-    
+    df_read = pd.read_csv(filename, sep=',', skiprows=skipline_count)
+
+    # renaming the '#Magnet' column name to remove the '#'
+    df = df_read.rename(columns={'#Magnet': 'Magnet'})
+
+    # updating description headers with parameters
+    description[2] = description[2].replace('-9999', str(offset))
+    description[5] = description[5].replace('1.0', str((round(offset/plate_radius,5) + 1)))
+
+    if T_observed != -10000 and T_configured != -10000:
+        description[3] = description[3].replace('9999.0000', str(T_configured))
+        description[4] = description[4].replace('9999.0000', str(T_observed))
+
     magnet_count = len(df)
 
     for i in range(magnet_count):
@@ -82,36 +93,17 @@ def radialOffset_standaloneFunction(filename, offset=-10000, T_observed=-10000, 
                     df['Center_y'][j] = y_rect + robot_centre[1]
 
 
-    outputFile = filename[:-4] + '_radialOffsetAdjusted.txt'
+    outputFile = filename[:-4] + '_radialOffsetAdjusted.csv'
 
-    hash_count = 0
 
     # write the description from input robot file at top of final output robot file
     with open(outputFile, 'w+') as f:
         
         for i in description:
-            if i == '#':
-                hash_count += 1
-                if hash_count == 4:
-                    break    
             f.write(i)
 
-        f.write('# Radial Offset Adjustment, ' + str(offset) + '\n')
-        f.write('# Radial offset is in millimetre(mm) with +ve values actioning radial outward movement \n')
-        f.write('# and -ve values actioning radial inward movement of the magnets. \n')
-        
-        if T_observed != -10000 and T_configured != -10000:
-            f.write('# Temp1, ' + str(T_observed) + '\n')
-            f.write('# Temp2, ' + str(T_configured) + '\n')
-            f.write('# Temp1 is the temperature the distortion code assumed the field would be observed at, \n')
-            f.write('# and Temp2 is the actual temperature it is going to be observed at in degrees C. \n')
-        
-            f.write('# Radial Scale factor, ' + str((( delta_T * alpha )+1)) +'\n')
-            f.write('# Radial scale factor is thermal coefficient of invar times temperature difference \n')
-            f.write('# applied radially relative to the plate centre.')
 
-        f.write('\n\n')
-
+    df = df.rename(columns={'Magnet': '#Magnet'})
     df.to_csv(outputFile, index=False, sep=',', mode='a')
 
     print('Output file produced by adjusting offset values to the input file')
@@ -192,9 +184,9 @@ def convert_modulus_angle(angle):
 
 ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_tile_000.txt'
+filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
 
-radialOffset_standaloneFunction(filename,0.558) # direct value of offset as input
+radialOffset_standaloneFunction(filename,None,15,35) # direct value of offset as input
 
 # T_observed = 30
 # T_configured = 23.0

@@ -277,7 +277,7 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
 
     return galaxyIDrecord, MagnetDict
 
-def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, mu_1re_cutoff, clusterNum, tileNum, flagsFile):
+def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, galaxyIDrecord, mu_1re_cutoff, clusterNum, flagsFile):
 
     hexabundleIndexAAOmega = 0
     hexabundleIndexHector = 0
@@ -326,7 +326,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                         elif hexabundleIndexAAOmega == 7:
                             case = 'J'
                             with open(flagsFile, 'a') as fp:
-                                writeToFile = 'ID CHECK. All AAOmega  hexabundles allocated, so shifting to Spector. Cluster/Batch :' + str(clusterNum) + ',tile ' + str(tileNum) + '; ' \
+                                writeToFile = 'ID CHECK. All AAOmega  hexabundles allocated, so shifting to Spector. Cluster/Batch :' + str(clusterNum) + '; ' \
                                               + i.__class__.__name__+' '+str(int(i.index))+', galaxy ID:'+str(recordID) \
                                               + ', hexabundle: ' + str(galaxyIDrecord[recordID]) + '\n'
                                 fp.write(writeToFile)
@@ -335,7 +335,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                         elif hexabundleIndexHector == 12:
                             case = 'G'
                             with open(flagsFile, 'a') as fp:
-                                writeToFile = 'ID CHECK. All Spector hexabundles allocated, so shifting to AAOmega. Cluster/Batch :'+str(clusterNum)+',tile '+str(tileNum)+'; ' \
+                                writeToFile = 'ID CHECK. All Spector hexabundles allocated, so shifting to AAOmega. Cluster/Batch :'+str(clusterNum)+'; ' \
                                               + i.__class__.__name__+' '+str(int(i.index))+', galaxy ID:'+str(recordID) \
                                               + ', hexabundle: '+ str(galaxyIDrecord[recordID]) + '\n'
                                 fp.write(writeToFile)
