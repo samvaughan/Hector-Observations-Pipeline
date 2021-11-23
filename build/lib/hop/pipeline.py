@@ -584,11 +584,11 @@ class HectorPipe:
         # fileNameGuides = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
         # # Input file 2
         # fileNameHexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number:03d}.txt"
-        fileNameGuides = Path(fileNameGuides).strip('HECTORConfig_Guides_')
-        fileNameHexa = Path(fileNameHexa).strip('HECTORConfig_Hexa_')
+        fileNameGuides = Path(fileNameGuides)
+        fileNameHexa = Path(fileNameHexa)
 
-        fileNameGuides_stem = fileNameGuides.stem
-        fileNameHexa_stem= fileNameHexa.stem
+        fileNameGuides_stem = fileNameGuides.stem.strip('HECTORConfig_Guides_')
+        fileNameHexa_stem= fileNameHexa.stem.strip('HECTORConfig_Hexa_')
         print('\n\n'+str(fileNameHexa))
 
         # files to be output to after arranging the guide and hexa probe data
