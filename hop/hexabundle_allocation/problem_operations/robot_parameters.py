@@ -28,14 +28,14 @@ def assign_magnet_labels(magnet, index1):
 
 
 # flagging unresolvable conflicts by recording them in file and assigning '0' placement order to them
-def check_for_unresolvable_conflict(magnet, conflictFile, max_order, clusterNum, tileNum):
+def check_for_unresolvable_conflict(magnet, conflictFile, max_order, clusterNum, tileName):
 
     # placement index checking and assigning placement order accordingly
     if magnet.placement_index == None:
         order = 0
         with open(conflictFile, 'a') as fp:
             conflict = magnet.__class__.__name__ + ' ' + str(int(magnet.index)) + ' is an unresolvable conflict,' + \
-                       ' detected in Cluster ' + str(clusterNum) + ', tile ' + str(tileNum) + '\n'
+                       ' detected in Cluster ' + str(clusterNum) + ', tile ' + str(tileName) + '\n'
             fp.write(conflict)
 
     else:

@@ -657,7 +657,7 @@ class HectorPipe:
         #***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***
         positioning_array,self.galaxyIDrecord = position_ordering.create_position_ordering_array(all_magnets, fully_blocked_magnets, \
                                                                          conflicted_magnets, MagnetDict, self.galaxyIDrecord, \
-                                                                         self.config['output_filename_stem'], tile_number, conflictFile)
+                                                                         self.config['output_filename_stem'], fileNameHexa, conflictFile)
 
         if plot:
             # draw all the magnets in the plots created earlier
@@ -684,7 +684,7 @@ class HectorPipe:
         self.robot_temperature = 19
         self.obs_temperature = 8
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(self.config['output_filename_stem'],tile_number,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(fileNameHexa_stem,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)
@@ -697,7 +697,7 @@ class HectorPipe:
         fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo_test_templateforTony[11][32].csv"
 
         # fibre slit info output file
-        output_fibreSlitInfo = f"{self.allocation_files_location_tiles}/Fibre_slitInfo_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv"
+        output_fibreSlitInfo = f"{self.allocation_files_location_tiles}/Fibre_slitInfo_{fileNameHexa_stem}.csv"
 
         # Output files printed only once, not for each tile
         output_fibreAAOmega = f"{self.allocation_files_location_tiles}/Hector_fibres_AAOmega.txt"

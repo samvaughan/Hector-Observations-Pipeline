@@ -290,7 +290,7 @@ def calculate_rectangular_magnet_center_coordinates(x,y,rectangular_magnet_input
         rectangular_magnet_center = [x + circular_rectangle_magnet_center_distance * cos(rectangular_magnet_orientation_modulo_radians), \
                                         y + circular_rectangle_magnet_center_distance * sin(rectangular_magnet_orientation_modulo_radians)]
 
-    elif pi / 2 < rectangular_magnet_orientation_modulo_radians < pi:
+    elif pi / 2 < rectangular_magnet_orientation_modulo_radians <= pi:
 
         rectangular_magnet_center = [x - circular_rectangle_magnet_center_distance * cos(pi - rectangular_magnet_orientation_modulo_radians), \
                                       y + circular_rectangle_magnet_center_distance * sin(pi - rectangular_magnet_orientation_modulo_radians)]
