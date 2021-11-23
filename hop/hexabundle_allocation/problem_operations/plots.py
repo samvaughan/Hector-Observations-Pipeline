@@ -271,7 +271,7 @@ def draw_circularSegments():
     plt.gcf().gca().add_artist(draw_circle3)
 
 
-def draw_all_magnets(magnets, clusterNum, tileNum, fileNameHexa, robot_figureFile, hexabundle_figureFile):
+def draw_all_magnets(magnets, clusterNum, fileNameHexa, robot_figureFile, hexabundle_figureFile):
     # plt.figure(2)
     # draw_magnet_pickup_areas(magnets, '--c')
 

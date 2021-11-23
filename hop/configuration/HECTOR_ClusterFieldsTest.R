@@ -25,8 +25,8 @@
 #* setwd('~/Science/Hector/Tiling/MAXI/Cluster_tests/HectorC1_tests_01/')
 
 #* Source the Hector Config file
-source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
-#source("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/configuration/HECTOR_Config_v3.2.R")
+#source(paste(Sys.getenv('HECTOROBSPIPELINE_LOC'), "/configuration/HECTOR_Config_v3.2.R", sep='/'))
+source("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/configuration/HECTOR_Config_v3.2.R")
 
 library("argparse")
 parser = ArgumentParser(description='Configure a Hector tile such that all targets are observable')
@@ -59,8 +59,8 @@ tmp_args=c('/Users/samvaughan/Science/Hector/Tiling/SAMI_Clusters/results/Tiling
              '--plot_filename', '/Users/samvaughan/Desktop/plot_output.pdf',
              '--plot', '--run_local')
 
-#args <- parser$parse_args(tmp_args)
-args <- parser$parse_args()
+args <- parser$parse_args(tmp_args)
+#args <- parser$parse_args()
 
 
 #* Get the targets. 
