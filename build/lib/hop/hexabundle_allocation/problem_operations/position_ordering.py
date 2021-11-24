@@ -50,7 +50,7 @@ def calculate_placement_ordering_of_all_blocked_magnets(list_of_fully_blocked_ma
 
 # creating position ordering array which is one of the main outputs of the whole magnet collision code
 def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicted_magnets, MagnetDict, galaxyIDrecord, \
-                                                                clusterNum, tileNum, conflictFile):
+                                                                clusterNum, tileName, conflictFile):
 
     # calculating placement ordering of all the blocked magnets
     calculate_placement_ordering_of_all_blocked_magnets(fully_blocked_magnets, conflicted_magnets)
@@ -67,7 +67,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
 
     # # carrying out the whole hexabundle allocation algorithm from hexabundles.py script
     # galaxyIDrecord, MagnetDict = overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(all_magnets, \
-    #                                                         galaxyIDrecord, mu_1re_cutoff, clusterNum, tileNum, flagsFile)
+    #                                                         galaxyIDrecord, mu_1re_cutoff, clusterNum, tileName, flagsFile)
 
     for magnet in all_magnets:
 
@@ -75,7 +75,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         available_pickup = [area.code for area in magnet.pickup_areas]
 
         # checking for magnets with unresolvable conflicts, which are flagged and assigned order of '0'
-        order = check_for_unresolvable_conflict(magnet,conflictFile,max_order,clusterNum,tileNum)
+        order = check_for_unresolvable_conflict(magnet,conflictFile,max_order,clusterNum,tileName)
 
         # adding magnet labels of rectangular: R01.. ,and circular: Blu,Mag,Gre,Yel
         # magnet,index1 = assign_magnet_labels(magnet,index1)

@@ -109,7 +109,7 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
 
 
 # creating the robotFile array for
-def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=-9999, obs_temp=-9999):
+def create_robotFileArray(tile_label, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=-9999, obs_temp=-9999):
 
     # guide probes do not have ID, so they are allocated a large negative integer
     positioning_array[:, 8] = [i if i != 'nan' else -999999 for i in positioning_array[:, 8]]
@@ -135,7 +135,7 @@ def create_robotFileArray(tile_batch, tile_number, positioning_array,robotFile,n
     # write the robot file array into the CSV file for the robot
     with open(robotFile, 'w+') as robotFile:
 
-        robotFile.write(f'#Label, {str(tile_batch)}_Tile_{str(tile_number)}\n')
+        robotFile.write(f'#Label, {tile_label}\n')
         robotFile.write(f"#Date_and_Time_file_created, {str(datetime.datetime.now().strftime('%d-%B-%y %H:%M:%S'))}\n")
 
         robotFile.write('#Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. \n')
