@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import pandas as pd
 import numpy as np
 import datetime
-import string
+import string as STRING # Added by Sam to workaround assignemnt to variable string
 import cv2
 import csv
 import re
@@ -56,6 +56,8 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
     fibre_data = pd.read_csv(fibre_file)
 
+    hexabundle_names = list(STRING.ascii_uppercase)[:21]
+
     # Creates a list containing w lists, each of h item/s, all filled with 0
     w, h1, h2 = 10, 820, 856
     new_arrayAAOmega = [['0' for x in range(w)] for y in range(h1)]
@@ -80,6 +82,13 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
             elif str(i) == 'BLOCK':
                 new_arrayAAOmega[j][4] = 'nan'
             elif str(i) == 'BROKEN':
+                # Added by Sam. We need to know if a broken fibre was a sky fibre or not
+                # If it's a hexabundle fibre, its bundle/plate value with be a capital letter from A to U
+                # So check for this and mark it as 'P'
+                if fibre_data['Bundle/plate'][j-1] in hexabundle_names:
+                    new_arrayAAOmega[j][1] = 'P'
+                else:
+                    new_arrayAAOmega[j][1] = 'S'
                 new_arrayAAOmega[j][4] = 'nan'
             new_arrayAAOmega[j][2] = new_arrayAAOmega[j][5] = fibre_data['Bundle/plate'][j-1]
             if fibre_data['Fibre_number'][j-1] > 0:
@@ -106,6 +115,13 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
             elif str(i) == 'BLOCK':
                 new_arraySpector[j-819][4] = 'nan'
             elif str(i) == 'BROKEN':
+                # Added by Sam. We need to know if a broken fibre was a sky fibre or not
+                # If it's a hexabundle fibre, its bundle/plate value with be a capital letter from A to U
+                # So check for this and mark it as 'P'
+                if fibre_data['Bundle/plate'][j-1] in hexabundle_names:
+                    new_arraySpector[j-819][1] = 'P'
+                else:
+                    new_arraySpector[j-819][1] = 'S'
                 new_arraySpector[j-819][4] = 'nan'
             new_arraySpector[j-819][2] = new_arraySpector[j-819][5] = fibre_data['Bundle/plate'][j - 1]
             if fibre_data['Fibre_number'][j - 1] > 0:
@@ -129,11 +145,11 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
         if i == 0:
             output_fibreFile = output_fibreAAOmega
             fibre_array = new_arrayAAOmega
-            string = 'AAOmega'
+            string_to_save = 'AAOmega'
         elif i == 1:
             output_fibreFile = output_fibreSpector
             fibre_array = new_arraySpector
-            string = 'Spector'
+            string_to_save = 'Spector'
 
         my_file = Path(output_fibreFile)
         if my_file.is_file():
@@ -142,7 +158,7 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
             # write the fibre file array into the CSV file for the fibre spectrograph
             with open(output_fibreFile, 'w+') as output_fibre:
                 output_fibre.write('# Experimental implementation of Hector_fibres_')
-                output_fibre.write(string+'.txt\n')
+                output_fibre.write(string_to_save+'.txt\n')
                 output_fibre.write('# \n')
                 output_fibre.write('#   Ayoan Sadman\n')
                 output_fibre.write('#   ')

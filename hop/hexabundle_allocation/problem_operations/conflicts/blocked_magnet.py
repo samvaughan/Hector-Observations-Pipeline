@@ -82,7 +82,7 @@ def print_fully_blocked_magnets(fully_blocked_magnets, conflictsRecord, fileName
 
         # write fully blocked magnets on file
         with open(conflictsRecord,'a') as fp:
-            conflict = magnet.__class__.__name__ + ' ' + str(int(magnet.index)) + ' ' + fileNameHexa + '\n'
+            conflict = magnet.__class__.__name__ + ' ' + str(int(magnet.index)) + ' ' + fileNameHexa.as_posix() + '\n'
             fp.write(conflict)
 
     # if none of the magnets are fully blocked then print 'None'
