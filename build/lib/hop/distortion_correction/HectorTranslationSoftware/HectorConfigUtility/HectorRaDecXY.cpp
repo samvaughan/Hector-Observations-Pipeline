@@ -72,6 +72,18 @@
 //                     thermal correction instead of the linear approximation
 //                     that didn't reverse precisely. Not because it mattered,
 //                     but I wanted to understand what was going on. KS.
+//     26th Jul 2021.  Made ThermalOffset() static and public, adding a DebugHandler arg.
+//                     Created TelecentricityOffsetS() method, a static version
+//                     of TelecentricityOffset(), passing through various extra
+//                     arguments.  Created static version of TeleCorrFromRaDec()
+//                     (passing through extra rguments). The intent here is to
+//                     allow the basic functionality to be available to the
+//                     2dF control task and the fpcal program.  They will 
+//                     reimplement some bits of the conversion (as needed) but
+//                     need access to these components.
+//     23rd Nov 2021.  Following some confusion abput the precise orientation
+//                     of the XY coordinate system, introduced I_RotXyMatrix to
+//                     allow experimentation with rotating the coordinates. KS.
 //
 
 #include "HectorRaDecXY.h"
@@ -108,6 +120,18 @@ HectorRaDecXY::HectorRaDecXY (void) : I_Debug("RaDec")
    I_EnableMechOffset = true;
    I_EnableLin = true;
    
+   //  The default rotation matrix is the identity matrix (as is its inverse,
+   //  of course).
+   
+   I_RotXyMat[0] = 1.0;
+   I_RotXyMat[1] = 0.0;
+   I_RotXyMat[2] = 0.0;
+   I_RotXyMat[3] = 1.0;
+   I_RotXyInv[0] = 1.0;
+   I_RotXyInv[1] = 0.0;
+   I_RotXyInv[2] = 0.0;
+   I_RotXyInv[3] = 1.0;
+
    //  We hard-code the coefficient of expansion for the plate, which is
    //  assumed to be invar. This is in microns/metre per degree C.
    
@@ -173,14 +197,15 @@ void HectorRaDecXY::SetDebugLevels (const std::string& Levels)
 //  ObsWave     Observing wavelength in microns.
 //  RobotTemp   Temperature of plate when configured by robot (deg K)
 //  ObsTemp     Temperature of plate during observation (deg K)
+//  RotXYMat    Rotation matrix to apply to XY plate positions (4 elements).
 //  DisFilePath The path for the 2dF distortion file to use.
 //  LinFilePath The path for the 2dF linearity file to use.
 
 bool HectorRaDecXY::Initialise (
    double CenRa, double CenDec, double Mjd, double Dut, double AtmosTemp,
    double Press, double Humid, double CenWave, double ObsWave,
-   double RobotTemp, double ObsTemp, const std::string& DistFilePath,
-   const std::string& LinFilePath)
+   double RobotTemp, double ObsTemp, double RotXyMat[],
+   const std::string& DistFilePath, const std::string& LinFilePath)
 {
    
    bool ReturnOK = false;
@@ -225,15 +250,36 @@ bool HectorRaDecXY::Initialise (
       TdfXyInit (Mjd,Dut,AtmosTemp,Press,Humid,CenWave,ObsWave,
                  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
                  I_Dist,&I_XYPars,&Status);
-      if (Status != STATUS__OK) {
+   }
+   if (Status == STATUS__OK) {
+   
+      //  Copy the rotation matrix into the instance array variable I_RotXyMat,
+      //  and calculate its inverse.
+      
+      if (RotXyMat) {
+         for (int I = 0; I < 4; I++) I_RotXyMat[I] = RotXyMat[I];
+         double Det = RotXyMat[0] * RotXyMat[3] - RotXyMat[1] * RotXyMat[2];
+         if (Det == 0.0) {
+            I_ErrorText =
+               "XY rotation matrix has a zero determinant. Cannot be inverted.";
+         } else {
+            I_RotXyInv[0] = RotXyMat[3] / Det;
+            I_RotXyInv[1] = -1.0 * RotXyMat[1] / Det;
+            I_RotXyInv[2] = -1.0 * RotXyMat[2] / Det;
+            I_RotXyInv[3] = RotXyMat[0] / Det;
+         }
+      }
+   }
+   if (Status != STATUS__OK) {
+      if (I_ErrorText == "") {
          std::string StatusText = StatusToText(Status);
          if (StatusText == "") StatusText = "Unexpected error";
          I_ErrorText =
             "Failed to initialise XT conversion routines - " + StatusText;
-      } else {
-         I_Initialised = true;
-         ReturnOK = true;
       }
+   } else {
+      I_Initialised = true;
+      ReturnOK = true;
    }
    
    return ReturnOK;
@@ -355,16 +401,25 @@ bool HectorRaDecXY::XY2RaDec (
          "Cannot convert X,Y to Ra,Dec - Conversion routines not initialised";
    } else {
    
+      //  Apply the rotation matrix introduced to allow for experimentation
+      //  with the plate coordinate axes.
+      
+      I_Debug.Logf ("Trace","In XY2RaDec, X Y %f %f",X,Y);
+      double XRot,YRot;
+      XRot = (X * I_RotXyMat[0]) + (Y * I_RotXyMat[1]);
+      YRot = (X * I_RotXyMat[2]) + (Y * I_RotXyMat[3]);
+      I_Debug.Logf ("Trace","In XY2RaDec, axis rotation gives X, Y %f %f\n",
+                                                                  XRot,YRot);
+   
       //  The X,Y positions will be those set by the robot during configuration,
       //  but these will need to be modified to allow for thermal expansion.
       
-      I_Debug.Logf ("Trace","In XY2RaDec, X Y %f %f",X,Y);
       double CorrX,CorrY;
-      ThermalOffset (X,Y,I_ObsTemp,I_RobotTemp,I_CTE,&CorrX,&CorrY);
+      ThermalOffset (XRot,YRot,I_ObsTemp,I_RobotTemp,I_CTE,&CorrX,&CorrY,&I_Debug);
       double LocalX = CorrX;
       double LocalY = CorrY;
       I_Debug.Logf ("Trace","In XY2RaDec, Thermal offset: %f %f X Y now %f %f",
-                                            CorrX - X,CorrY - Y,CorrX,CorrY);
+                                    CorrX - XRot,CorrY - YRot,CorrX,CorrY);
 
       //  Now apply the telecentricity correction.
 
@@ -456,12 +511,22 @@ bool HectorRaDecXY::RaDec2XY (
          //  temp. We need the position the robot will use at configuration
          //  time.
          
-         ThermalOffset (*X,*Y,I_RobotTemp,I_ObsTemp,I_CTE,&CorrX,&CorrY);
+         ThermalOffset (*X,*Y,I_RobotTemp,I_ObsTemp,I_CTE,&CorrX,&CorrY, &I_Debug);
          I_Debug.Logf ("Trace",
                 "In RaDec2XY, Thermal offset: %f %f X Y now %f %f",
                                        CorrX - *X,CorrY - *Y,CorrX,CorrY);
          *X = CorrX;
          *Y = CorrY;
+         
+         //  Apply the inverse rotation matrix so this X,Y result is in the
+         //  same coordinate orientation as is used for the sky fibre positions.
+         
+         double XRot = *X;
+         double YRot = *Y;
+         *X = (XRot * I_RotXyInv[0]) + (YRot * I_RotXyInv[1]);
+         *Y = (XRot * I_RotXyInv[2]) + (YRot * I_RotXyInv[3]);
+         I_Debug.Logf ("Trace",
+            "In RaDec2XY, axis rotation %f %f X Y now %f %f",XRot,YRot,*X,*Y);
 
          //  Just for fun, convert that back to Ra Dec and compare. This at
          //  least checks if the coordinate conversion code can be reversed
@@ -514,15 +579,55 @@ bool HectorRaDecXY::RaDec2XY (
 void HectorRaDecXY::TeleCorrFromRaDec (
    double Ra, double Dec, double X, double Y, double* CorrX, double* CorrY) {
 
+
+  /*
+   * Invoke the static version passing through the member variable
+   * values it needs.
+   */
+  TeleCorrFromRaDec(I_CenRa, I_CenDec, Ra, Dec, X, Y, CorrX, CorrY, 
+                    I_EnableTelecentricity, I_EnableMechOffset, &I_Debug);
+}
+
+// ----------------------------------------------------------------------------------
+
+//                    T e l e  C o r r  F r o m  R a  D e c
+//
+//  Static version of TeleCorrFromRaDec(), in which the field centre position
+//   is specified and there is no dependence on an object of the class.  Used
+//   to implement the non-static version and allows external access.
+//
+//  Given a field centre and apparent RA,Dec position on the sky and the corresponding X,Y
+//  coordinates on the field plate calculated on the basis of 2dF distortion,
+//  applies the telecentricity correction due to the various prism angles used
+//  by Hector and returns the new X,Y values corrected for telecentricity.
+//
+//  CenRa   Apparent RA of field centre, radians.
+//  CenDec  Apparent Dec of field centre, radians.
+//  Ra      Apparent RA in radians.
+//  Dec     Apparent Dec in radians.
+//  X       Calculated field plate X coordinate in microns.
+//  Y       Calculated field plate Y coordinate in microns.
+//  CorrX   X value with the telecontricity correction applied.
+//  CorrY   Y value with the telecontricity correction applied.
+//  Debug   If non-null, the address of a debug handler.
+
+void HectorRaDecXY::TeleCorrFromRaDec (
+    double CenRa, double CenDec, double Ra, double Dec, 
+    double X, double Y, double* CorrX, double* CorrY,
+    bool TeleOffEnable,
+    bool MechOffEnable,
+    DebugHandler *Debug) 
+{
+
    //  Given the Ra and Dec and the central Ra Dec of the field plate, work out
    //  the angle between the two positions. This angle determines the prism that
    //  will be used for this position.
    
-   double AngleRad = slaDsep (I_CenRa, I_CenDec, Ra, Dec);
+   double AngleRad = slaDsep (CenRa, CenDec, Ra, Dec);
    
    //  And that in turn determines the offset.
    
-   double Offset = TelecentricityOffset (AngleRad);
+   double Offset = TelecentricityOffsetS (AngleRad, nullptr, TeleOffEnable, MechOffEnable, Debug);
    
    //  The rest is simple trig.
    
@@ -530,6 +635,7 @@ void HectorRaDecXY::TeleCorrFromRaDec (
    *CorrX = X * (R + Offset) / R;
    *CorrY = Y * (R + Offset) / R;
 }
+
 
 // ----------------------------------------------------------------------------------
 
@@ -697,8 +803,47 @@ bool HectorRaDecXY::TeleCorrFromXY (
 //  to the Hector zone number corresponding to that angle.
 //
 //  AngleRad    The angle to the position in question, in radians.
+//  ZonPtr      If non-null, return the calculated zone here
 
 double HectorRaDecXY::TelecentricityOffset (double AngleRad, int* ZonePtr) {
+
+  // Call the static version, passing through various values from the object.
+  return TelecentricityOffsetS(AngleRad, ZonePtr, 
+                               I_EnableTelecentricity,
+                               I_EnableMechOffset,
+                               &I_Debug);
+                        
+}
+
+//                  T e l e c e n t r i c i t y  O f f s e t S
+//
+//  Static version of the above TelecentricityOffset().
+//
+//  Calculates the offset in microns radially outward from a given field plate
+//  position (specified in terms of the angle between the coordiantes it represents
+//  and the field centre, so a point at the field centre is at an angle of zero,
+//  one at the edge of the 1 degree field of the instrument will be at an angle
+//  of 1.0 deg - but note that the angle is passed to this routine in radians, just
+//  because all angles in the calls to HectorRaDecXY routines are in radians, and
+//  consistency is a virtue). Note that the returned offset will always be -ve,
+//  because there are two offsets involved, one outward and the other inward and
+//  the inward is always larger. (Originally, the code ignored the inward offset,
+//  which is why it was written to return an outward offset.) If ZonePtr is
+//  passed as non-null, this should be the address of an int that will be set
+//  to the Hector zone number corresponding to that angle.
+//
+//  AngleRad       The angle to the position in question, in radians.
+//  ZonPtr         If non-null, return the calculated zone here
+//  TeleOffEnable  Enable the Telecentricity correction.
+//  MechOffEnable  Enable the mechanical offset correction.
+//  Debug      If non-null, the address of a debug handler.
+
+double HectorRaDecXY::TelecentricityOffsetS (
+    double AngleRad, int* ZonePtr,
+    bool TeleOffEnable,
+    bool MechOffEnable,
+    DebugHandler *Debug) {
+
 
    //  In Peter Gillingham's document 2dF_distortion_prism_effects.pdf, there is a
    //  table and a graph showing the offsets as they vary depending on the field
@@ -756,19 +901,19 @@ double HectorRaDecXY::TelecentricityOffset (double AngleRad, int* ZonePtr) {
    //  opposite drection to the telecentricity offset.
    
    double FinalOffset = 0.0;
-   if (I_EnableTelecentricity) FinalOffset = Offset;
-   if (I_EnableMechOffset) FinalOffset -= MechOffset;
+   if (TeleOffEnable) FinalOffset = Offset;
+   if (MechOffEnable) FinalOffset -= MechOffset;
 
    //  This may be a useful diagnostic to enable
    
-   if (I_Debug.Active("Offsets")) {
+   if ((Debug)&&Debug->Active("Offsets")) {
       char Text[1024];
       snprintf (Text,sizeof(Text),
               "Angle %.4f deg, Zone %d, Tele offset: %8.2f mu%s,"
               " Mech offset: %8.2f mu%s",
-         AngleDeg,Zone,Offset,I_EnableTelecentricity ? "" : " (disabled)",
-                        MechOffset,I_EnableMechOffset ? "" : " (disabled)");
-      I_Debug.Log("Offsets",std::string(Text));
+                AngleDeg,Zone,Offset, (TeleOffEnable ? "" : " (disabled)"),
+                MechOffset, (MechOffEnable ? "" : " (disabled)"));
+      Debug->Log("Offsets",std::string(Text));
    }
    
    //  Return the calculated zone, if that was wanted.
@@ -782,6 +927,8 @@ double HectorRaDecXY::TelecentricityOffset (double AngleRad, int* ZonePtr) {
 
 //                        T h e r m a l  O f f s e t
 //
+//  Static member
+//
 //  Calculates the change in X,Y position on the plate due to the difference
 //  between the temperature of the plate at a given tempreature and the
 //  the temperature of the plate at a target temperature.
@@ -793,13 +940,17 @@ double HectorRaDecXY::TelecentricityOffset (double AngleRad, int* ZonePtr) {
 //  CTE        Plate coefficient of thermal expansion (microns/metre per deg C).
 //  CorrX      Corrected plate position in X.
 //  CorrY      Corrected plate position in Y.
+//  Debug      If non-null, the address of a debug handler.
+//             
 //
 //  Note this routine can be used for both the forward and reverse corrections
 //  from Ra,Dec to X,Y and Yx,Y back to Ra,Dec, but the current and target
 //  temperatures need to be reversed in the two cases.
 //
-void HectorRaDecXY::ThermalOffset (double X, double Y, double Temp,
-         double TargetTemp, double CTE, double* CorrX, double* CorrY)
+void HectorRaDecXY::ThermalOffset (
+    double X, double Y, double Temp,
+    double TargetTemp, double CTE, double* CorrX, double* CorrY,
+    DebugHandler *Debug)
 {
    static const double MicronsPerMetre = 1.0e6;
    double DeltaT = Temp - TargetTemp;
@@ -823,12 +974,12 @@ void HectorRaDecXY::ThermalOffset (double X, double Y, double Temp,
    
    *CorrX = X * (R + Offset) / R;
    *CorrY = Y * (R + Offset) / R;
-   if (I_Debug.Active("Temp")) {
+   if ((Debug)&&(Debug->Active("Temp"))) {
       char Text[1024];
       snprintf (Text,sizeof(Text),
          "X,Y [%f,%f], Temp %.2f (K) Target temp %.2f (K), DeltaX,Y [%f,%f] mu",
                                      X,Y,Temp,TargetTemp,*CorrX - X,*CorrY - Y);
-      I_Debug.Log("Temp",std::string(Text));
+      Debug->Log("Temp",std::string(Text));
    }
 }
 

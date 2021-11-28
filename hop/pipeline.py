@@ -88,6 +88,7 @@ class HectorPipe:
         self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds")  
         self.TdF_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFlinear0.sds")  
         self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
+
         if Profit_files_location is None:
             self.Profit_files_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles")
         else:
@@ -104,8 +105,19 @@ class HectorPipe:
         if not self.ConfigurationCode_location.exists():
             raise FileNotFoundError("The Configuration Code seems to not exist")
 
+        # Files used in the hexabundle allocation
         self.excel_files_for_allocation_location = Path(__file__).parent / Path("hexabundle_allocation")
+        # Location of the P and Q offset file
+        self.offsetFile = self.excel_files_for_allocation_location / Path("Hexa_final_prism_gluing_PQ_table.xlsx")
+        # Location of the Fibre Slit Info file
+        self.fibre_file = self.excel_files_for_allocation_location / Path("Fibre_slitInfo_final.csv")
 
+        if not self.offsetFile.exists():
+            raise FileNotFoundError("The P and Q offset file seems to not exist")
+
+        if not self.fibre_file.exists():
+            raise FileNotFoundError("The Fibre slit info file seems to not exist")
+        
         self.have_targets_catalogue = False
         self.have_standard_star_catalogue = False
         self.have_guide_star_catalogue = False
@@ -232,7 +244,7 @@ class HectorPipe:
 
 
 
-    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, use_galaxy_priorities=True, robot_temperature=19, obs_temperature=8, label="a test_label", plateID="a test_plateID", date=datetime.date.today().strftime("%Y %m %d"), check_sky_fibres=True):
+    def tile_field(self, configure_tiles=True, apply_distortion_correction=True, plot=True, config_timeout=None, use_galaxy_priorities=True, robot_temperature=15, obs_temperature=15, label="a test_label", plateID="a test_plateID", date=datetime.date.today().strftime("%Y %m %d"), check_sky_fibres=True):
 
         """
         Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. 
@@ -390,7 +402,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=15, obs_temp=15, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix='1 0 0 -1'):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -401,7 +413,7 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}", f'xymatrix={rot_matrix}']
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if not check_sky_fibres:
@@ -627,8 +639,7 @@ class HectorPipe:
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
-        offsetFile = f"{self.excel_files_for_allocation_location}/Hexa_final_prism_gluing_dummy_example.xlsx"
-        all_magnets = offsets.hexaPositionOffset(all_magnets,offsetFile)
+        all_magnets = offsets.hexaPositionOffset(all_magnets,self.offsetFile)
 
         # create magnet pickup areas for all the magnets
         plots.create_magnet_pickup_areas(all_magnets)
@@ -684,8 +695,8 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_robot}/Robot_{fileNameHexa_stem}.txt"
 
         ## DUMMY VALUES TO BE REMOVED ##
-        self.robot_temperature = 19
-        self.obs_temperature = 8
+        self.robot_temperature = 15
+        self.obs_temperature = 15
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(fileNameHexa_stem,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 
@@ -695,9 +706,6 @@ class HectorPipe:
         # produce final files with consistent layout and no extra commas
         file_arranging.finalFiles(all_magnets, outputFile, fileNameHexa)
 
-        # fibre input file to be read
-        # Input file 4 - fibres
-        fibre_file = f"{self.excel_files_for_allocation_location}/Fibre_slitInfo_test_templateforTony[11][32].csv"
 
         # fibre slit info output file
         output_fibreSlitInfo = f"{self.allocation_files_location_tiles}/Fibre_slitInfo_{fileNameHexa_stem}.csv"
@@ -710,10 +718,10 @@ class HectorPipe:
         #{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt"
 
         # create fibre slit info file for each tile updating the skyfibres with position 0
-        fibres.create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo)
+        fibres.create_fibreSlit_info_file(fileNameHexa,self.fibre_file,output_fibreSlitInfo)
 
         # create the fibre spectrograph files for each of AAOmega and Spector
-        new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector)
+        new_arrayAAOmega,new_arraySpector = fibres.extract_fibreInfo(self.fibre_file,output_fibreAAOmega,output_fibreSpector)
 
         # create the hexabundle fibre coordinate data files
         fibres.create_hexabundleFibre_coordData(output_hexabundle_coordData)

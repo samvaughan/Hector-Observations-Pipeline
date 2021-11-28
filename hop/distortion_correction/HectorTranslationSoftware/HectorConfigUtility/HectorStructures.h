@@ -46,6 +46,7 @@
 //                     details structure. Added LinFilePath to the observation
 //                     details structure. KS.
 //     15th Jun 2021.  Added ModelPars and NumberPars to the program details. KS.
+//     24th Nov 2021.  Added XYRotMatrix to HectorUtilProgDetails structure. KS.
 //
 // ----------------------------------------------------------------------------------
 
@@ -179,6 +180,8 @@ struct HectorUtilProgDetails {
    double Mjd = 0.0;                     // Obs date and time as Mjd.
    float RobotTemp = 0.0;                // Robot configuration temp, deg K.
    float ObsTemp = 0.0;                  // Estimated observation temp, deg K.
+   std::string RotMatString = "";        // Rotation matrix as specified as string
+   double XYRotMatrix[4] = {1.,0.,0.,1.};// Rotation matrix applied to X,Y values
    double ModelPars[C_MODEL_PARMS];      // Coordinate model parameters
    int NumberPars = 0;                   // Number of items used in Pars.
    HectorRaDecXY CoordConverter;         // Instance of coordinate converter

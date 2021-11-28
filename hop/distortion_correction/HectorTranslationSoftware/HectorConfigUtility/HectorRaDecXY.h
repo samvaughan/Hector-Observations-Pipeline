@@ -94,6 +94,9 @@
 //     13th Jun 2021.  Replaced TeleCorrToRaDec(), TeleCorrToXY() with,
 //                     respectively TeleCorrFromXY(0), TeleCorrFromRaDec().
 //                     Added GetModel(). KS.
+//     23rd Nov 2021.  Introduced I_RotXyMatrix to allow experimentation with
+//                     the XY coordinate system for the plate. Added RotXYMat
+//                     to the Initialise() call. KS.
 //
 // ----------------------------------------------------------------------------------
 
@@ -118,7 +121,7 @@ public:
    //  Initialisation
    bool Initialise (double CenRa, double CenDec, double Mjd, double Dut,
          double AtmosTemp, double Press, double Humid, double CenWave,
-         double ObsWave, double RobotTemp, double ObsTemp,
+         double ObsWave, double RobotTemp, double ObsTemp, double RotXyMat[],
          const std::string& DistFilePath, const std::string& LinFilePath);
    //  Get model details - required for the output file header
    bool GetModel (double Pars[], int MaxPars, int* NumPars);
@@ -139,6 +142,27 @@ public:
    //  Disable/re-enable the linearity correction - old setting returned.
    bool DisableLin (bool Disable);
 
+   //  Calculates the telecentricity correction based on an Ra,Dec value.
+   static void TeleCorrFromRaDec (double CenRa, double CenDec, 
+                                  double Ra, double Dec, double X, double Y,
+                                  double* CorrX, double* CorrY,
+                                  bool TeleOffEnable = true,
+                                  bool MechOffEnable = true,
+                                  DebugHandler *Debug = nullptr);
+
+
+   //  Calculate telecentricity offset in microns from angle from plate centre.
+   static double TelecentricityOffsetS(double AngleRad, int* Zone = NULL,
+                                       bool TeleOffEnable = true,
+                                       bool MechOffEnable = true,
+                                       DebugHandler *Debug = nullptr);
+
+   //  Calculate change in position due to temperature difference
+   static void ThermalOffset (double X, double Y, double Temp,
+                              double TargetTemp, double CTE, double* CorrX, double* CorrY,
+                               DebugHandler *Debug);
+
+
 private:
    //  Utility routine to convert status codes to text.
    const std::string StatusToText (StatusType Status);
@@ -149,9 +173,6 @@ private:
    bool TeleCorrFromXY (double X, double Y, double* CorrX, double* CorrY);
    //  Calculate telecentricity offset in microns from angle from plate centre.
    double TelecentricityOffset (double AngleRad, int* Zone = NULL);
-   //  Calculate change in position due to temperature difference
-   void ThermalOffset (double X, double Y, double Temp,
-         double TargetTemp, double CTE, double* CorrX, double* CorrY);
    //  Applies both 2dF linearity and XY->RaDec corrections.
    bool Pos2RaDec (double X, double Y, double *Ra, double*Dec);
    //  Applies both 2dF RaDec -> XY and linearity corrections.
@@ -198,6 +219,10 @@ private:
    TdfLinType I_Lin;
    //  Structure holding combined XY transformation parameters.
    TdfXyType I_XYPars;
+   //  A rotation matrix allowing X,Y positions to be flipped etc if needed.
+   double I_RotXyMat[4];
+   //  And its inverse.
+   double I_RotXyInv[4];
    //  Description of last error, if any.
    std::string I_ErrorText;
    //  Debug handler used to control level of debugging

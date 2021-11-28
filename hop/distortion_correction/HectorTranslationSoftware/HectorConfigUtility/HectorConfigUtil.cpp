@@ -151,6 +151,10 @@
 //     15th Jun 2015.  Now gets the model parameters from the coordinate
 //                     converter and writes them and the robot and observing
 //                     temp values to the output file, as Tony requested. KS.
+//     23rd Nov 2021.  Following some confusion abput the precise orientation
+//                     of the XY coordinate system, introduced an additional
+//                     rotation matrix to allow experimentation with rotating
+//                     the coordinates. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -328,6 +332,40 @@ bool ValidReal (const string& String, double* Value)
    return Valid;
 }
 
+// ----------------------------------------------------------------------------------
+
+//                      P a r s e  R o t  M a t  S t r i n g
+//
+//  This routine extracts the double precision values for the X Y rotation matrix
+//  from the string supplied on the command line.
+
+void ParseRotMatString (std::string& RotMatString, double XYRotMatrix[],
+                                              bool& Ok, std::string& Error)
+{
+   //  Do nothing is Ok is passed already set false.
+   
+   if (Ok) {
+   
+      //  If the string is null, use the default identity matrix.
+      
+      if (RotMatString == "") {
+         XYRotMatrix[0] = 1.0;
+         XYRotMatrix[1] = 0.0;
+         XYRotMatrix[2] = 0.0;
+         XYRotMatrix[3] = 1.0;
+      } else {
+      
+         //  This parsing is pretty crude, but will do for the moment.
+         
+         int Nvals = sscanf(RotMatString.c_str(),"%lf %lf %lf %lf",
+            &XYRotMatrix[0],&XYRotMatrix[1],&XYRotMatrix[2],&XYRotMatrix[3]);
+         if (Nvals != 4) {
+            Ok = false;
+            Error = "Invalid floating point values given for rotation matrix";
+         }
+      }
+   }
+}
 
 // ----------------------------------------------------------------------------------
 
@@ -406,6 +444,8 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
    BoolArg SkyArg(TheHandler,"Sky",0,"NoSave",true,
       "Check positions of sky fibres for contamination");
    StringArg DebugArg(TheHandler,"Debug",0,"NoSave","","Debug levels");
+   StringArg RotMatArg(TheHandler,"XYMatrix",0,"NoSave","",
+                                 "XY Rotation matrix, ie \"1 0 0 1\"");
 
    if (TheHandler.IsInteractive()) TheHandler.ReadPrevious();
 
@@ -443,7 +483,13 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
    ProgDetails->LinCorrection = LinArg.GetValue(&Ok,&Error);
    ProgDetails->CheckSky = SkyArg.GetValue(&Ok,&Error);
    ProgDetails->DebugLevels = DebugArg.GetValue(&Ok,&Error);
+   ProgDetails->RotMatString = RotMatArg.GetValue(&Ok,&Error);
    if (!Ok) ProgDetails->Error = Error;
+   
+   //  Work out the XY rotation values from the supplied string.
+   
+   ParseRotMatString (ProgDetails->RotMatString,ProgDetails->XYRotMatrix,
+                                                              Ok,Error);
    
    //  The temperatures are given in deg C, so need to be converted to deg K
    
@@ -1101,7 +1147,7 @@ void GetObsDetails (
    if (!ProgDetails->CoordConverter.Initialise(ObsDetails->CenRa,ObsDetails->CenDec,
       ObsDetails->Mjd,ObsDetails->Dut,ObsDetails->Temp,ObsDetails->Press,
          ObsDetails->Humid,ObsDetails->CenWave,ObsDetails->ObsWave,
-            ProgDetails->RobotTemp,ProgDetails->ObsTemp,
+            ProgDetails->RobotTemp,ProgDetails->ObsTemp,ProgDetails->XYRotMatrix,
                ObsDetails->DistFilePath,ObsDetails->LinFilePath)) {
       string Error = "Error initialising coordinate converter: " +
                                      ProgDetails->CoordConverter.GetError();

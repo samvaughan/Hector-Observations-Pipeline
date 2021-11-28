@@ -390,7 +390,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=19, obs_temp=8, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix="1 0 0 1"):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -401,11 +401,14 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}", f'xymatrix={rot_matrix}']
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if not check_sky_fibres:
             DC_bash_code += ["nosky"]
+
+        if turn_off_linearity:
+            DC_bash_code += ["nolin"]
 
         
         process = subprocess.Popen(DC_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
