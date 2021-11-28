@@ -79,6 +79,8 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
                 new_arrayAAOmega[j][4] = 'Good'
             elif str(i) == 'BLOCK':
                 new_arrayAAOmega[j][4] = 'nan'
+            elif str(i) == 'BROKEN':
+                new_arrayAAOmega[j][4] = 'nan'
             new_arrayAAOmega[j][2] = new_arrayAAOmega[j][5] = fibre_data['Bundle/plate'][j-1]
             if fibre_data['Fibre_number'][j-1] > 0:
                 new_arrayAAOmega[j][3] = round(fibre_data['Fibre_number'][j-1])
@@ -102,6 +104,8 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
                 new_arraySpector[j-819][1] = 'P'
                 new_arraySpector[j-819][4] = 'Good'
             elif str(i) == 'BLOCK':
+                new_arraySpector[j-819][4] = 'nan'
+            elif str(i) == 'BROKEN':
                 new_arraySpector[j-819][4] = 'nan'
             new_arraySpector[j-819][2] = new_arraySpector[j-819][5] = fibre_data['Bundle/plate'][j - 1]
             if fibre_data['Fibre_number'][j - 1] > 0:
