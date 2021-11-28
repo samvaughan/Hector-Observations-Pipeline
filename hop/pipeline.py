@@ -602,8 +602,8 @@ class HectorPipe:
         fileNameGuides = Path(fileNameGuides)
         fileNameHexa = Path(fileNameHexa)
 
-        fileNameGuides_stem = fileNameGuides.stem.strip('HECTORConfig_Guides_')
-        fileNameHexa_stem= fileNameHexa.stem.strip('HECTORConfig_Hexa_')
+        fileNameGuides_stem = fileNameGuides.stem.strip('Guides_')
+        fileNameHexa_stem= fileNameHexa.stem.strip('Hexas_')
         print('\n\n'+str(fileNameHexa))
 
         # files to be output to after arranging the guide and hexa probe data
@@ -690,7 +690,7 @@ class HectorPipe:
 
         # final two output files
         # Output file 2
-        outputFile = f"{self.allocation_files_location_tiles}/{fileNameHexa_stem}.txt"
+        outputFile = f"{self.allocation_files_location_tiles}/HECTOROutput_Hexas_{fileNameHexa_stem}.txt"
         # Output file 3
         robotFile = f"{self.allocation_files_location_robot}/Robot_{fileNameHexa_stem}.txt"
 
@@ -739,6 +739,8 @@ class HectorPipe:
         skyFibre_SpectorFigure = f"{self.plot_location}/skyfibre_slitletSpector_{fileNameHexa_stem}.pdf"
         # create figure of magnified sky fibre positioning in slitlets
         fibres.create_skyFibreSlitlet_figure(fileNameHexa=fileNameHexa, new_arrayAAOmega=new_arrayAAOmega, new_arraySpector=new_arraySpector, skyFibre_AAOmegaFigure=skyFibre_AAOmegaFigure, skyFibre_SpectorFigure=skyFibre_SpectorFigure)
+
+        plt.close('all')
 
         # just to check each tile's whole operation time
         # print("\t \t -----   %s seconds   -----" % (time.time() - start_time))
