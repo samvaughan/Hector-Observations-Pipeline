@@ -73,7 +73,7 @@ def rectangular_magnet_is_fully_blocked(list_of_blocked_pickup_areas):
 # print out the fully blocked magnets list on terminal, and write them in the conflicts record file
 def print_fully_blocked_magnets(fully_blocked_magnets, conflictsRecord, fileNameHexa):
 
-    print('Fully blocked magnets:')
+    print('\n\nSOME MAGNETS ARE FULLY BLOCKED\n\nFully blocked magnets:')
 
     for magnet in fully_blocked_magnets:
 
@@ -87,4 +87,4 @@ def print_fully_blocked_magnets(fully_blocked_magnets, conflictsRecord, fileName
 
     # if none of the magnets are fully blocked then print 'None'
     if fully_blocked_magnets == []:
-        print('None.')
+        print('\nNo magnets are fully blocked!')
