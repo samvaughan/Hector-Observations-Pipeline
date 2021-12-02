@@ -22,8 +22,8 @@ def create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo):
     pd.set_option('display.max_columns', 12)
 
     fibre_data = pd.read_csv(fibre_file)
-    print(skyfibreDict)
-    print(fibre_data)
+    # print(skyfibreDict)
+    # print(fibre_data)
 
     nullPosition_skyFibre = {}
     index_1 = 0
@@ -138,8 +138,8 @@ def extract_fibreInfo(fibre_file,output_fibreAAOmega,output_fibreSpector):
 
         j += 1
 
-    print(new_arrayAAOmega)
-    print(new_arraySpector)
+    # print(new_arrayAAOmega)
+    # print(new_arraySpector)
 
     for i in range(2):
         if i == 0:
@@ -212,7 +212,7 @@ def create_hexabundleFibre_coordData(output_hexabundle_coordData):
                 ring = 7
             file_array[j - 1][1] = ring
 
-        print(file_array)
+        # print(file_array)
 
         output_file = output_hexabundle_coordData + 'hexabundle_' + i + '.txt'
 
@@ -263,7 +263,7 @@ def convert_rectangularMagnetOrientation(magnet):
 
 def create_slitletFigure(new_arrayAAOmega,new_arraySpector,fibreFigure_AAOmega, fibreFigure_Spector):
 
-    print((new_arrayAAOmega))
+    # print((new_arrayAAOmega))
     print('figure being created')
     # fibre_data = pd.read_excel(fibre_file)
 
@@ -626,7 +626,7 @@ def create_skyFibreSlitlet_figure( fileNameHexa, new_arrayAAOmega, new_arraySpec
     fs = 5
 
     skyfibreDict = read_sky_fibre_file(fileNameHexa)
-    print(skyfibreDict)
+    # print(skyfibreDict)
 
     skyFibresArray_AAOmega = {}
     for i in new_arrayAAOmega[1:]:
@@ -636,17 +636,17 @@ def create_skyFibreSlitlet_figure( fileNameHexa, new_arrayAAOmega, new_arraySpec
             value_2 = i[9]
 
             fibre_num = i[3]
-            print(value, fibre_num)
+            #print(value, fibre_num)
             if value == 'nan':
                 value_3 = 0
             else:
-                print(skyfibreDict[value][fibre_num-1][fibre_num])
+                #print(skyfibreDict[value][fibre_num-1][fibre_num])
                 value_3 = skyfibreDict[value][fibre_num-1][fibre_num] # position
             skyFibresArray_AAOmega.setdefault(key, []).append({value: [value_2,value_3,fibre_num]})
 
-    print('HERE skyfibre dictionary \n')
-    print(new_arrayAAOmega)
-    print(skyFibresArray_AAOmega)
+    # print('HERE skyfibre dictionary \n')
+    # print(new_arrayAAOmega)
+    # print(skyFibresArray_AAOmega)
 
     for slitlet_count in range(13):
 
@@ -746,16 +746,16 @@ def create_skyFibreSlitlet_figure( fileNameHexa, new_arrayAAOmega, new_arraySpec
             value_2 = i[9]
 
             fibre_num = i[3]
-            print(value, fibre_num)
+            #print(value, fibre_num)
             if value == 'nan':
                 value_3 = 0 # position
             else:
-                print(skyfibreDict[value][fibre_num - 1][fibre_num])
+                #print(skyfibreDict[value][fibre_num - 1][fibre_num])
                 value_3 = skyfibreDict[value][fibre_num - 1][fibre_num]  # position
             skyFibresArray_Spector.setdefault(key, []).append({value: [value_2, value_3, fibre_num]})
 
 
-    print(skyFibresArray_Spector)
+    #print(skyFibresArray_Spector)
 
     for slitlet_count in range(19):
 
@@ -866,17 +866,20 @@ def plot_bar_from_dict(dict, ax=None):
     return ax
 
 # check for magnet count per annulus and record any warnings on text file
-def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch , annuli_count_magnetCasing):
+def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch , annuli_count_magnetCasing):
 
-    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
-    tile_1_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    tile_1_fname_stem = Path(tile_1_hexa).stem.strip('Hexas_')
+    tile_2_fname_stem = Path(tile_2_hexa).stem.strip('Hexas_')
 
     # proxy output files
-    plate_file_1 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
-    plate_file_2 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
+    plate_file_1 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{tile_1_fname_stem}.txt"
+    plate_file_2 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{tile_2_fname_stem}.txt"
     # Output files 1
     guide_outputFile_1 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
     guide_outputFile_2 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
@@ -1095,10 +1098,10 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
 
 
 # PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
-def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile):
+def createskyfibreChanges_plot(self, tile_1_hexa, tile_2_hexa, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile):
 
-    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
     pistonChange_count = 0
 
@@ -1107,7 +1110,7 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
 
     skyfibreDict_tile1 = read_sky_fibre_file(tile_1_hexa)
     skyfibreDict_tile2 = read_sky_fibre_file(tile_2_hexa)
-    print(skyfibreDict_tile1)
+    #print(skyfibreDict_tile1)
 
     draw_circularSegments()
 
@@ -1115,7 +1118,7 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
     skyfibreDict = skyfibreDict_tile1
     angle_subplate = [7, 5, 3, 1, -1, -3, -5, -7]
     radii = 270
-    print(skyfibreDict)
+    #print(skyfibreDict)
 
     # sky fibres top batch
     angle = 30
@@ -1124,7 +1127,7 @@ def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfi
         x, y, rotation = coordinates_and_angle_of_skyFibres(angle, radii)
         plt.annotate(skyfibreTitles_top[i], (x, y), color='black', rotation=rotation, fontsize=11, ha='center',
                      va='center')
-        print(range(len(skyfibreDict[skyfibreTitles_top[i]])))
+        #print(range(len(skyfibreDict[skyfibreTitles_top[i]])))
         for j in range(0, len(skyfibreDict[skyfibreTitles_top[i]])):
             if int(skyfibreDict[skyfibreTitles_top[i]][j][j + 1]) in [2,3]:
                 pistonChange_count += 1
@@ -1385,7 +1388,7 @@ def skyfibreChanges_pistonChange_count(self, tile_number_1, tile_number_2):
 
     skyfibreDict_tile1 = read_sky_fibre_file(tile_1_hexa)
     skyfibreDict_tile2 = read_sky_fibre_file(tile_2_hexa)
-    print(skyfibreDict_tile1)
+    #print(skyfibreDict_tile1)
 
     ##  sky_fibre_annotations function slightly edited to makr positions 2 & 3 in yellow
     skyfibreDict = skyfibreDict_tile1
@@ -1446,7 +1449,7 @@ def skyfibreChanges_pistonChange_count(self, tile_number_1, tile_number_2):
             elif skyfibreDict[skyfibreTitles_right[i]][j][j + 1] == 1 and skyfibreDict_tile1[skyfibreTitles_right[i]][j][j + 1] == 0:
                 pistonChange_count += 1
 
-    print(pistonChange_count)
+    #print(pistonChange_count)
     return pistonChange_count
 
 
@@ -1455,7 +1458,7 @@ def plotHist_pistonChange_count_batch(self, pistonChange_countBatch, tile_batch,
 
     # count of piston change in each pair of tiles for whole batch
     S = pistonChange_countBatch
-    print(S)
+    #print(S)
 
     # histogram plot file name
     magnetCount_barPlot = f"{self.plot_location}/pistonChangeCount_barPlot_{self.config['output_filename_stem']}.pdf"

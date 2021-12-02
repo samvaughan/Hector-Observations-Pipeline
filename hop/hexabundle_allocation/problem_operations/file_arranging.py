@@ -129,8 +129,8 @@ def create_robotFileArray(tile_label, positioning_array,robotFile,newrow,fully_b
     robotFilearray = np.delete(robotFilearray, [13], 1)
 
     # TEST PRINT
-    print('\n')
-    print(robotFilearray)
+    #print('\n')
+    #print(robotFilearray)
 
     # write the robot file array into the CSV file for the robot
     with open(robotFile, 'w+') as robotFile:

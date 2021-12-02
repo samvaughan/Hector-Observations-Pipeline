@@ -105,7 +105,7 @@ def allocate_hexas():
         problem_operations.plots.draw_all_magnets(all_magnets,clusterNum,tileNum,figureFile)  #***********
 
         # checking positioning_array prints out all desired parameters
-        print(positioning_array)
+        #print(positioning_array)
 
         # insert column heading and print only rectangular magnet rows in the csv file
         newrow = ['Magnet', 'Label', 'Center_x', 'Center_y', 'rot_holdingPosition', 'rot_platePlacing', 'order', 'Pickup_option', 'ID','Index', 'Hexabundle']

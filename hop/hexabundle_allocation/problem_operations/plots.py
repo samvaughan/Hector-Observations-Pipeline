@@ -185,9 +185,9 @@ def sky_fibre_annotations(skyfibre_file):
 
     # filename = 'Sky_fibre_position_example.csv'
     skyfibreDict = read_sky_fibre_file(skyfibre_file)
-    print(skyfibreDict)
+    #print(skyfibreDict)
     string = str(skyfibreDict['H3'][5].keys())
-    print(re.sub('[^0-9]', '', string))
+    #print(re.sub('[^0-9]', '', string))
 
     #sky fibres top batch
     angle = 30

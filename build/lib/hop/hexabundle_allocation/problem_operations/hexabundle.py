@@ -86,7 +86,7 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
                     # Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = case
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID), case)
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(case, None)
@@ -103,7 +103,7 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
                     # Galaxy without ID repeat being allocated the same hexabundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = galaxyIDrecord[recordID]
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID),galaxyIDrecord[recordID])
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(galaxyIDrecord[recordID], None)
@@ -114,8 +114,8 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
                     elif ('I' <= galaxyIDrecord[recordID] <= 'T'):
                         hexabundleIndexHector += 1
 
-                    print(hexabundleIndexHector)
-                    print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
+                    #print(hexabundleIndexHector)
+                    #print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
 
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
@@ -149,9 +149,9 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
     # getting a count of the probe types- hexa and guides
     GuidesCount, HexaCount = get_probe_count(MagnetDict)
 
-    print(hexabundleDict)
-    print(GuidesCount)
-    print(HexaCount)
+    #print(hexabundleDict)
+    #print(GuidesCount)
+    #print(HexaCount)
 
     Mu_1re_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['mu_1re'])
 
@@ -168,14 +168,14 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
             for hexabundle in hexabundleDict:
                 if hexabundleDict[hexabundle][0] == 'A':
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     hexabundleIndexAAOmega += 1
                     break
             # removing the allocated hexabundle from the hexabundle dictionary
             del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
-    print(hexabundleDict)
-    print(hexabundleIndexAAOmega)
+    #print(hexabundleDict)
+    #print(hexabundleIndexAAOmega)
 
     ## SECOND CRITERIA FOR HEXABUNDLE ALLOCATION: Spector
     Mstar_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['Mstar'])
@@ -188,14 +188,14 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
             for hexabundle in reversed(hexabundleDict):
                 if hexabundleDict[hexabundle][0] == 'S':
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     hexabundleIndexHector += 1
                     break
             # removing the allocated hexabundle from the hexabundle dictionary
             del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
-    print(hexabundleDict)
-    print(hexabundleIndexHector)
+    #print(hexabundleDict)
+    #print(hexabundleIndexHector)
 
     # THIRD CRITERIA FOR HEXABUNDLE ALLOCATION FOR REMAINING AAOMEGA AND SPECTOR
     hexabundleIndexThirdCriteria = (HexaCount-2) - hexabundleIndexAAOmega - hexabundleIndexHector
@@ -208,17 +208,17 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
             for hexabundle in hexabundleDict:
                 if hexabundleDict[hexabundle][1] != '61':
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     hexabundleIndexRemaining += 1
                     break
             # removing the allocated hexabundle from the hexabundle dictionary
             hexabundleDict.pop(MagnetDict[magnet[0]]['hexabundle'], None)#del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
 
-    print(hexabundleDict)
-    print(hexabundleIndexRemaining)
-    print(hexabundleIndexThirdCriteria)
-    print('\n')
+    # print(hexabundleDict)
+    # print(hexabundleIndexRemaining)
+    # print(hexabundleIndexThirdCriteria)
+    # print('\n')
 
     i = 0
     j = 0
@@ -228,23 +228,23 @@ def overall_hexabundle_size_allocation_operation_version1(all_magnets, galaxyIDr
         if ('rectangular_magnet' in magnet[0]) and (magnet[1]['hexabundle'] == 'NA') \
         and hexabundleIndexRemaining < hexabundleIndexThirdCriteria:
 
-            print(sorted(hexabundleDict.items(), key = lambda p: p[0][0],reverse=True))
+            #print(sorted(hexabundleDict.items(), key = lambda p: p[0][0],reverse=True))
             for item in sorted(hexabundleDict.items(), key = lambda p: p[0][0],reverse=True):
-                print(item[0])
+                #print(item[0])
                 if hexabundleDict[item[0]][0] == 'S':
                     MagnetDict[magnet[0]]['hexabundle'] = item[0]
-                    print(magnet)
+                    #print(magnet)
                     hexabundleIndexRemaining += 1
                     break
                 elif hexabundleDict[item[0]][0] == 'A':
                     MagnetDict[magnet[0]]['hexabundle'] = item[0]
-                    print(magnet)
+                    #print(magnet)
                     hexabundleIndexRemaining += 1
                     break
             # removing the allocated hexabundle from the hexabundle dictionary
             hexabundleDict.pop(MagnetDict[magnet[0]]['hexabundle'], None)  # del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
-    print(hexabundleDict)
+    #print(hexabundleDict)
 
     # I AND D hexabundles of 91 cores being checked and resolved to make hexabundle 'I' have lower Mstar value
     MagnetDict = cores91_hexabundles_sortedByMstar(MagnetDict)
@@ -359,7 +359,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                     # Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = case
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID), case)
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(case, None)
@@ -376,7 +376,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                     # Galaxy without ID repeat being allocated the same hexabundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = galaxyIDrecord[recordID]
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID),galaxyIDrecord[recordID])
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(galaxyIDrecord[recordID], None)
@@ -387,8 +387,8 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                     elif ('I' <= galaxyIDrecord[recordID] <= 'T'):
                         hexabundleIndexHector += 1
 
-                    print(hexabundleIndexHector)
-                    print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
+                    #print(hexabundleIndexHector)
+                    #print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
 
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
@@ -415,9 +415,9 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
     # getting a count of the probe types- hexa and guides
     GuidesCount, HexaCount = get_probe_count(MagnetDict)
 
-    print(hexabundleDict)
-    print(GuidesCount)
-    print(HexaCount)
+    # print(hexabundleDict)
+    # print(GuidesCount)
+    # print(HexaCount)
 
     Re_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['Re'], reverse=True)  # largest Re at first
     Mstar_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['Mstar'])
@@ -428,7 +428,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
         if int(hexabundleDict[hexabundle][1]) > 61:
             large_bundle_count += 1
 
-    print(large_bundle_count)
+    #print(large_bundle_count)
     large_bundle_index = 0
     # Allocating all hexabundles greater than 61 based on Re<12
     for magnet in Re_Sort:
@@ -437,8 +437,8 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) > 61:  # check for larger hexabundles
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
-                    print('Larger hexabundles')
+                    #print(magnet)
+                    #print('Larger hexabundles')
                     large_bundle_index += 1
                     if hexabundleDict[hexabundle][0] == 'A':
                         hexabundleIndexAAOmega += 1
@@ -455,7 +455,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) > 61:  # check for larger hexabundles
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     print('Larger hexabundles but with more than Re=12')
                     large_bundle_index += 1
                     if hexabundleDict[hexabundle][0] == 'A':
@@ -474,7 +474,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
     # I AND D hexabundles of 91 cores being checked and resolved to make hexabundle 'I' have lower Mstar value
     MagnetDict = cores91_hexabundles_sortedByMstar(MagnetDict)
 
-    print('\nLarger hexabundles more than 61 have been allocated.\n')
+    #print('\nLarger hexabundles more than 61 have been allocated.\n')
 
     X = mu_1re_cutoff
     print('mu_1re cutoff, X = ' + str(X))
@@ -485,7 +485,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) == 61 and hexabundleDict[hexabundle][0] == 'S':  # check for larger hexabundles
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     print('mu_1re<X: 61 hexabundles to Spector')
                     hexabundleIndexHector += 1
                     break
@@ -497,7 +497,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) == 61 and hexabundleDict[hexabundle][0] == 'A':  # check for larger hexabundles
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     print('mu_1re<X: 61 hexabundles to AAOmega')
                     hexabundleIndexAAOmega += 1
                     break
@@ -512,7 +512,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) == 61 and hexabundleDict[hexabundle][0] == 'S':  # check for larger hexabundles
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     print('mu_1re>X: 61 hexabundles to Spector')
                     hexabundleIndexHector += 1
                     break
@@ -531,7 +531,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
             del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
     print('\nAll 61 hexabundles have been allocated as well.\n')
-    print(hexabundleDict)
+    #print(hexabundleDict)
 
     # checking for repeats of hexabundle
     result = check_for_hexabundle_allocation_repeats(MagnetDict)
@@ -644,7 +644,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     # Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = case
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID), case)
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(case, None)
@@ -661,7 +661,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     # Galaxy without ID repeat being allocated the same hexabundle and recorded
                     MagnetDict[i.__class__.__name__ + ' ' + str(int(i.index))]['hexabundle'] = galaxyIDrecord[recordID]
                     hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID),galaxyIDrecord[recordID])
-                    print(hexabundleRepeatwithsameID)
+                    #print(hexabundleRepeatwithsameID)
 
                     # Respective hexabundle being taken out of hexabundle dictionary as it's allocated already
                     hexabundleDict.pop(galaxyIDrecord[recordID], None)
@@ -672,8 +672,8 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     elif ('I' <= galaxyIDrecord[recordID] <= 'T'):
                         hexabundleIndexHector += 1
 
-                    print(hexabundleIndexHector)
-                    print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
+                    #print(hexabundleIndexHector)
+                    #print(MagnetDict[i.__class__.__name__+' '+str(int(i.index))]['hexabundle'])
 
 
         # To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records
@@ -700,15 +700,15 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
     # getting a count of the probe types- hexa and guides
     GuidesCount, HexaCount = get_probe_count(MagnetDict)
 
-    print(hexabundleDict)
-    print(GuidesCount)
-    print(HexaCount)
+    #print(hexabundleDict)
+    #print(GuidesCount)
+    #print(HexaCount)
 
     Re_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['Re'], reverse=True)  # largest Re at first
     Mstar_Sort = sorted(MagnetDict.items(), key=lambda x: x[1]['Mstar'])
 
     lowMstar_spector_number = round((12 / 19) * len(mu_1re_lt22_INDEX))
-    print(lowMstar_spector_number)
+    #print(lowMstar_spector_number)
     Mstar_median_lowerhalf = {}
     Mstar_median_higherhalf = {}
     Mstar_Sort_count = 0
@@ -724,12 +724,12 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
             Mstar_median_higherhalf[key] = MagnetDict[key]
             Mstar_Sort_count += 1
 
-    print(Mstar_median_lowerhalf)
-    print(Mstar_median_higherhalf)
-    print(len(Mstar_median_lowerhalf))
-    print(len(Mstar_median_higherhalf))
-    print('\nMedian based sorting')
-    print(lowMstar_spector_number)
+    # print(Mstar_median_lowerhalf)
+    # print(Mstar_median_higherhalf)
+    # print(len(Mstar_median_lowerhalf))
+    # print(len(Mstar_median_higherhalf))
+    # print('\nMedian based sorting')
+    # print(lowMstar_spector_number)
 
     lowMstar_Sort_count = 0
     highMstar_Sort_count = 0
@@ -743,7 +743,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     for hexabundle in hexabundleDict:
                         if hexabundleDict[hexabundle][0] == 'S':  # check for first Spector
                             MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                            print(magnet)
+                            #print(magnet)
                             hexabundleIndexHector += 1
                             lowMstar_Sort_count += 1
                             break
@@ -758,7 +758,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     for hexabundle in hexabundleDict:
                         if hexabundleDict[hexabundle][0] == 'A':  # check for first AAOmega
                             MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                            print(magnet)
+                            #print(magnet)
                             hexabundleIndexAAOmega += 1
                             highMstar_Sort_count += 1
                             break
@@ -770,7 +770,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
             for hexabundle in hexabundleDict:
                 if int(hexabundleDict[hexabundle][1]) > 61:  # check for greater hexabundle
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     if hexabundleDict[hexabundle][0] == 'A':
                         hexabundleIndexAAOmega += 1
                     elif hexabundleDict[hexabundle][0] == 'S':
@@ -779,7 +779,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     break
                 elif int(hexabundleDict[hexabundle][1]) == 61:
                     MagnetDict[magnet[0]]['hexabundle'] = hexabundle
-                    print(magnet)
+                    #print(magnet)
                     if hexabundleDict[hexabundle][0] == 'A':
                         hexabundleIndexAAOmega += 1
                     elif hexabundleDict[hexabundle][0] == 'S':
@@ -788,11 +788,11 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
                     break
             del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
 
-    print(hexabundleIndexAAOmega)
-    print(hexabundleIndexHector)
+    # print(hexabundleIndexAAOmega)
+    # print(hexabundleIndexHector)
 
-    print(lowMstar_Sort_count)
-    print(highMstar_Sort_count)
+    # print(lowMstar_Sort_count)
+    # print(highMstar_Sort_count)
 
     print('Galaxies with less than Mu_1re=22 allocated\n')
 
@@ -822,7 +822,7 @@ def overall_hexabundle_size_allocation_operation_version2_median(all_magnets, ga
 
     print('Galaxies with more than Mu_1re=22 allocated\n')
 
-    print(hexabundleDict)
+    # print(hexabundleDict)
 
     # I AND D hexabundles of 91 cores being checked and resolved to make hexabundle 'I' have lower Mstar value
     MagnetDict = cores91_hexabundles_sortedByMstar(MagnetDict)
@@ -938,7 +938,7 @@ def resolve_hexabundle_allocation_repeats(result,hexabundleRepeatwithsameID,Magn
         print('Allocation WRONG WRONG WRONG WRONG WRONG!')
         hexabundleRepeatwithsameID = sorted(hexabundleRepeatwithsameID)
         hexabundleRepeatwithsameID.insert(len(hexabundleRepeatwithsameID), '')
-        print(hexabundleRepeatwithsameID)
+        #print(hexabundleRepeatwithsameID)
         sourcelist = 'ABCDEFGIJKLMNOPQRST'
         for repeatOnes in sourcelist:
             checkForRepeat = 0
@@ -947,8 +947,8 @@ def resolve_hexabundle_allocation_repeats(result,hexabundleRepeatwithsameID,Magn
                     if checkForRepeat > 0:
                         MagnetDict[magnet]['hexabundle'] = result[indexx]
                         indexx += 1
-                        print('HERE')
-                        print(MagnetDict[magnet]['hexabundle'])
+                        #rint('HERE')
+                        #print(MagnetDict[magnet]['hexabundle'])
                     checkForRepeat += 1
             # print(MagnetDict[magnet]['hexabundle'])
         if checkForRepeat == 0 and indexx == 0:

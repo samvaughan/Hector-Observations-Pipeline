@@ -27,7 +27,7 @@ def hexaPositionOffset(all_magnets, offsetFile):
     df_adjusted.index = df_adjusted.index + 1
     df_final = df_adjusted
 
-    print(df_final)
+    #print(df_final)
 
     # create dictionaries to store the offset values of P and Q, and ang to store rectangular magnet orientation
     ang = {}
@@ -60,12 +60,12 @@ def hexaPositionOffset(all_magnets, offsetFile):
                 # rectangular_centre = i.center
                 # print(rectangular_centre)
 
-    print(ang)
-    print(offset_distance_P)
-    print(offset_distance_Q)
+    #print(ang)
+    # print(offset_distance_P)
+    # print(offset_distance_Q)
 
-    print('HEREEEEEEE')
-    print(range(len(all_magnets)))
+    #print('HEREEEEEEE')
+    #print(range(len(all_magnets)))
 
     # calculate and make the changes to x and y positions of circular magnets as per offset values
     for i in range(len(all_magnets)):

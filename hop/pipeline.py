@@ -541,7 +541,7 @@ class HectorPipe:
             dataframe.to_csv(f, index=False)
 
 
-    def make_output_file_for_Tony(self, tile_number):
+    def make_output_file_for_Tony(self, tile_file, robot_file):
 
         """
         Take our output files and make them into a format which Tony can read in.
@@ -551,12 +551,13 @@ class HectorPipe:
             * things which are specified as an integer must be made an integer, not a floating point number
         """
 
-        tileFile = Path(f"{self.allocation_files_location_tiles}/tile_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
-        # Output file 3
-        robotFile = Path(f"{self.allocation_files_location_robot}/Robot_{self.config['output_filename_stem']}_tile_{tile_number:03d}.txt")
+        tile_file = Path(f"{tile_file}")
+        robot_file = Path(f"{robot_file}")
 
-        outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv")
-        outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{self.config['output_filename_stem']}_tile_{tile_number:03d}.csv")
+        filename_stem = tile_file.stem.split('HECTOROutput_Hexas_')[1]
+
+        outputTileFile = Path(f"{self.final_tiles_correct_format_location}/Tile_FinalFormat_{filename_stem}.csv")
+        outputRobotFile = Path(f"{self.final_tiles_correct_format_location}/Robot_FinalFormat_{filename_stem}.csv")
 
         # Clear the output files if they already exist
         if outputTileFile.exists():
@@ -567,23 +568,26 @@ class HectorPipe:
 
         ### The Tile File
 
-        tile_header_lines, tile_header_linenumbers = self._read_file_get_header(tileFile)
+        tile_header_lines, tile_header_linenumbers = self._read_file_get_header(tile_file)
 
         # Get the contents of the file:
-        output_tile_contents = pd.read_csv(tileFile, comment='#')
+        output_tile_contents = pd.read_csv(tile_file, comment='#')
         # Convert things which are nan values in integer columns to -99
         # The integer columns are: probe, priority, type, SkyPosition, order, order_c
-        integer_columns = ['probe', 'priority', 'type', 'SkyPosition', 'order', 'order_C']
+        integer_columns = ['probe', 'ID', 'priority', 'type', 'SkyPosition', 'order', 'order_C']
         # Replace NAs with -99
         output_tile_contents.loc[:, integer_columns] = output_tile_contents.loc[:, integer_columns].fillna(-99).astype(int)
         # Now change the types of these columns to be integers
         output_tile_contents = output_tile_contents.astype(dict(zip(integer_columns, ['int64']*len(integer_columns))))
-        self._write_file_with_header(outfilename=outputTileFile, header=tile_header_lines, dataframe=output_tile_contents)
+
+        # Only select the required columns
+        columns = ["probe","ID","x","y","rads","angs","azAngs","angs_azAng","RA","DEC","g_mag","r_mag","i_mag","z_mag","y_mag","GAIA_g_mag","GAIA_bp_mag","GAIA_rp_mag","Mstar","Re","z","GAL_MU_E_R","pmRA","pmDEC","priority","MagnetX_noDC","MagnetY_noDC","type","MagnetX","MagnetY","SkyPosition","fibre_type","Magnet","Label","order","Pickup_option","Index","Hexabundle","probe_orientation","rectMag_inputOrientation","Magnet_C","Label_C","order_C","Pickup_option_C","offset_P","offset_Q"]
+        self._write_file_with_header(outfilename=outputTileFile, header=tile_header_lines, dataframe=output_tile_contents.loc[:, columns])
         
 
         # Now do the robot file
-        robot_header_lines, robot_header_linenumbers = self._read_file_get_header(robotFile)
-        output_robot_contents = pd.read_csv(robotFile, comment='#')
+        robot_header_lines, robot_header_linenumbers = self._read_file_get_header(robot_file)
+        output_robot_contents = pd.read_csv(robot_file, comment='#')
         self._write_file_with_header(outfilename=outputRobotFile, header=robot_header_lines, dataframe=output_robot_contents)
         
 
@@ -786,7 +790,7 @@ class HectorPipe:
 
         return fig, axs
 
-    def show_skyfibreChanges_and_magnetCountPerAnnuli(self, tile_number_1=None, tile_number_2=None, tile_batch=None, tileBatch_count=None, tileBatch_skyFibreChange = 'OFF'):
+    def show_skyfibreChanges_and_magnetCountPerAnnuli(self, tile_fname_1=None, tile_fname_2=None, tile_1_guide=None, tile_2_guide=None, tile_batch=None, tileBatch_count=None, tileBatch_skyFibreChange = 'OFF'):
 
         ''' FUNCTION TO SHOW CHANGES IN SKYFIBRE SUB-PLATE NUMBERS AND MAGNET COUNT CHECK PERFORMED BETWEEN TWO TILES
             TWO OPTIONS TO RUN THIS FUNCTION
@@ -813,17 +817,19 @@ class HectorPipe:
 
         pistonChange_countBatch = []
 
-        if (tile_number_1 != None) and (tile_number_2 != None):
+        if (tile_fname_1 != None) and (tile_fname_2 != None):
 
             # ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###
+            tile_1_fname_stem = Path(tile_fname_1).stem.strip('Hexas_')
+            tile_2_fname_stem = Path(tile_fname_2).stem.strip('Hexas_')
 
-            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}_previous.jpg"
-            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}_current.jpg"
-            subplateSkyfibre_figureFile = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{self.config['output_filename_stem']}_tile_orginal-{tile_number_1:03d}_new-{tile_number_2:03d}.jpg"
-            fibres.createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile)
+            subplateSkyfibre_figureFile_tile1 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_{tile_1_fname_stem}_previous.jpg"
+            subplateSkyfibre_figureFile_tile2 = f"{self.plot_location}/subPlate_changeSkyfibrePlot_subPlate_changeSkyfibrePlot_{tile_2_fname_stem}_current.jpg"
+            subplateSkyfibre_figureFile = f"{self.plot_location}/subPlate_changeSkyfibrePlot__previous_{tile_1_fname_stem}_new_{tile_2_fname_stem}.jpg"
+            fibres.createskyfibreChanges_plot(self, tile_fname_1, tile_fname_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile)
 
             # check for magnet count per annulus and record any warnings on text file
-            fibres.check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch, annuli_count_magnetCasing)
+            #fibres.check_magnetCount_perAnnulus(self, tile_fname_1, tile_fname_2, tile_1_guide, tile_2_guide, annuliCount_batch, annuli_count_magnetCasing)
 
         elif (tile_batch != None) and (tileBatch_count != None):
 

@@ -866,17 +866,20 @@ def plot_bar_from_dict(dict, ax=None):
     return ax
 
 # check for magnet count per annulus and record any warnings on text file
-def check_magnetCount_perAnnulus(self, tile_number_1, tile_number_2, annuliCount_batch , annuli_count_magnetCasing):
+def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch , annuli_count_magnetCasing):
 
-    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
-    tile_1_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_guide = f"{self.configuration_location}/HECTORConfig_Guides_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+
+    tile_1_fname_stem = Path(tile_1_hexa).stem.strip('Hexas_')
+    tile_2_fname_stem = Path(tile_2_hexa).stem.strip('Hexas_')
 
     # proxy output files
-    plate_file_1 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
-    plate_file_2 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
+    plate_file_1 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{tile_1_fname_stem}.txt"
+    plate_file_2 = f"{self.allocation_files_location_base}/Hexa_and_Guides_{tile_2_fname_stem}.txt"
     # Output files 1
     guide_outputFile_1 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_1:03d}.txt"
     guide_outputFile_2 = f"{self.allocation_files_location_tiles}/HECTOROutput_Guides_{self.config['output_filename_stem']}_tile_{tile_number_2:03d}.txt"
@@ -1095,10 +1098,10 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
 
 
 # PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
-def createskyfibreChanges_plot(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile):
+def createskyfibreChanges_plot(self, tile_1_hexa, tile_2_hexa, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile):
 
-    tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
-    tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
+    # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
+    # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
 
     pistonChange_count = 0
 
