@@ -27,6 +27,7 @@ library(yaml)
 hector_constants <<- read_yaml("/Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/constants/HECTOR_CONSTANTS.yaml")
 
 
+
 #Field dimensions and parameters:
 fov <<- hector_constants$HECTOR_plate_radius*2  #diameter of the field in mm
 skybuffer<<-8 #clear-edge buffer
@@ -66,6 +67,7 @@ gexcl_radius <<- sqrt(2.*((gtip_w/2)^2))
 #The code will try for at most 15 times that before starting to swap a probe.
 #timeout<<-180 #180 seconds x 15 is about half an hour and is about right. Less than about 90 seconds led to problems in highly conflicted field..
 timeout<<-250 #Increased to account for longer conflict calculation time due to rounded heads so code still has enough time time try enough angles variations.
+timeout_behaviour = 'error'
 
 #angle step going around the head to approximate circle as a polygon. The smaller angles are more precice but lead to longer configuration time.
 delta_poly<<-5 #5 degrees leads to a 0.1% radius buffer around the head and configuration seems to take a bit longer than a square head.
@@ -660,7 +662,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
     print(paste('Starting (again) with delta_ang =', as.character(delta_ang)))
     
     newangs=angs 
-    withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout='warning')
+    withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
     if (FALSE %in% (angs==newangs)){
       angs=newangs
     } else {
@@ -686,7 +688,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       conflicts=find_probe_conflicts(probes=probes, pos=pos, angs=angs)
       nconflicts=dim(conflicts)[1]
       if (nconflicts >0){
-        withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout='warning')
+        withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
       }
       if (FALSE %in% (angs==newangs)){
         angs=newangs
@@ -704,7 +706,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       print('Could not find a solution with delta_ang=20, trying delta_ang=45')
       delta_ang=45
       newangs=angs
-      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout='warning')
+      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
       if (FALSE %in% (angs==newangs)){
         angs=newangs
       } else {
@@ -722,7 +724,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       print('Could not find a solution with delta_ang=45, trying delta_ang=90')
       delta_ang=90
       newangs=angs
-      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout='warning')
+      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
       if (FALSE %in% (angs==newangs)){
         angs=newangs
       } else {
@@ -882,41 +884,70 @@ cleanconflictedguides <- function(angs,pos=pos, guidepos=pos_master$guidepos){
   
   #Dividing into quadrants:
   first_q=clguidepos[clguidepos[,'x']<0 & clguidepos[,'y']<0,]
-  print(first_q)
+  #print(first_q)
   second_q=clguidepos[clguidepos[,'x']<0 & clguidepos[,'y']>=0,]
-  print(second_q)
+  #print(second_q)
   third_q=clguidepos[clguidepos[,'x']>=0 & clguidepos[,'y']>=0,]
-  print(third_q)
+  #print(third_q)
   fourth_q=clguidepos[clguidepos[,'x']>=0 & clguidepos[,'y']<0,]
-  print(fourth_q)
+  #print(fourth_q)
   
   oclguidepos=data.frame(x=double(),y=double()) #ordered and cleaned guide positions.
-  
   #Cycling through by quadrant to ensure guides from all corners of the plate get prioritised:
   gui=1
+  print(gui)
+  
+  
+  remaining_first_q = nrow(as.matrix(first_q))
+  remaining_second_q = nrow(as.matrix(second_q))
+  remaining_third_q = nrow(as.matrix(third_q))
+  remaining_fourth_q = nrow(as.matrix(fourth_q))
+                            
   while ((length(oclguidepos[,1]) < length(clguidepos[,1])) & gui < length(clguidepos[,1])){
-    if (length(as.matrix(first_q))>2){
-      try(assign('oclguidepos',rbind(oclguidepos, first_q[gui,])), TRUE)
+    
+    if (remaining_first_q > 0) {
+      if (nrow(as.matrix(first_q))>1){
+        assign('oclguidepos',rbind(oclguidepos, first_q[gui,]))
+        remaining_first_q = remaining_first_q -1
     } else{
-      try(assign('oclguidepos',rbind(oclguidepos, as.vector(first_q))), TRUE)
+      assign('oclguidepos',rbind(oclguidepos, as.vector(first_q)))
+      remaining_first_q = remaining_first_q -1
     }
-    if (length(as.matrix(second_q))>2){
-      try(assign('oclguidepos',rbind(oclguidepos, second_q[gui,])), TRUE)
+      
+    }
+    if (remaining_second_q > 0){
+      
+    if (nrow(as.matrix(second_q))>1 & remaining_second_q > 0){
+      assign('oclguidepos',rbind(oclguidepos, second_q[gui,]))
+      remaining_second_q = remaining_second_q -1
     } else {
-      try(assign('oclguidepos',rbind(oclguidepos, as.vector(second_q))), TRUE)
+      assign('oclguidepos',rbind(oclguidepos, as.vector(second_q)))
+      remaining_second_q = remaining_second_q - 1
     }
-    if (length(as.matrix(third_q))>2){
-      try(assign('oclguidepos',rbind(oclguidepos, third_q[gui,])), TRUE)
+    }
+    
+    if (remaining_third_q > 0){
+    if (nrow(as.matrix(third_q))>1){
+      assign('oclguidepos',rbind(oclguidepos, third_q[gui,]))
+      remaining_third_q = remaining_third_q -1
     } else {
-      try(assign('oclguidepos',rbind(oclguidepos, as.vector(third_q))), TRUE)
+      assign('oclguidepos',rbind(oclguidepos, as.vector(third_q)))
+      remaining_third_q = remaining_third_q -1
     }
-    if (length(as.matrix(fourth_q))>2){
-      try(assign('oclguidepos',rbind(oclguidepos, fourth_q[gui,])), TRUE)
+    }
+    if (remaining_fourth_q > 0){
+    if (nrow(as.matrix(fourth_q))>1){
+      assign('oclguidepos',rbind(oclguidepos, fourth_q[gui,]))
+      remaining_fourth_q = remaining_fourth_q -1
     } else{
-      try(assign('oclguidepos',rbind(oclguidepos, as.vector(fourth_q))), TRUE)
+      assign('oclguidepos',rbind(oclguidepos, as.vector(fourth_q)))
+      remaining_fourth_q = remaining_fourth_q -1
+    }
     }
     gui=gui+1
+    print(c('oclguidepos is length', length(oclguidepos[,1])))
   }
+  #print(c("OCLguidepos has ", nrow(oclguidepos), "rows"))
   colnames(oclguidepos)=c('x','y')
   
   return(oclguidepos)
@@ -1098,7 +1129,7 @@ configure_stdstars <- function(pos, angs, cegs, stdpos){
       #print(tempos)
       #print(tempangs)
       #print(tempconflicts)
-      withTimeout(expr=assign('tempangs',MinimizeConflicts(pos=tempos, angs=tempangs, cegs=tempcegs, probe_conflicts=tempconflicts)), timeout=timeout, onTimeout='warning')
+      withTimeout(expr=assign('tempangs',MinimizeConflicts(pos=tempos, angs=tempangs, cegs=tempcegs, probe_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour)
 
       draw_all(x=pos_master$pos[,'x'],y=pos_master$pos[,'y'],xs=clstdpos[,'x'],ys=clstdpos[,'y'],xg=pos_master$guidepos[,'x'],yg=pos_master$guidepos[,'y'], interactive=visualise)
       temprobes = defineprobe(x=tempos[,'x'],y=tempos[,'y'],angs=tempangs, interactive=visualise)
@@ -1179,7 +1210,7 @@ configure_guidestars <- function(pos, angs, cegs, guidepos){ #In this case, pos 
     
     if (nconflicts > 0) {
       newgangs=tempgangs
-      withTimeout(expr=assign('newgangs',MinimizeGuideConflicts(pos=pos, angs=angs, cegs=cegs, gpos=tempgpos, gangs=tempgangs, gcegs=gcegs, guide_conflicts=tempconflicts)), timeout=timeout, onTimeout='warning')
+      withTimeout(expr=assign('newgangs',MinimizeGuideConflicts(pos=pos, angs=angs, cegs=cegs, gpos=tempgpos, gangs=tempgangs, gcegs=gcegs, guide_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour)
       tempgprobes=defineguideprobe(gxs=tempgpos[,'x'],gys=tempgpos[,'y'],gangs=newgangs, interactive=visualise)
       tempconflicts=find_guide_conflicts(probes=probes, pos=pos, angs=angs, gprobes=tempgprobes, gpos=tempgpos, gangs=newgangs)
       nconflicts=dim(tempconflicts)[1]

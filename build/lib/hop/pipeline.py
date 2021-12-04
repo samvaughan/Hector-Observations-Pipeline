@@ -1,4 +1,3 @@
-import numpy as np 
 import os
 import glob
 from pathlib import Path
@@ -10,6 +9,7 @@ import itertools
 import datetime
 import shlex
 import shutil
+import numpy as np
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -130,6 +130,16 @@ class HectorPipe:
                             }
 
         return header_dictionary
+
+    def read_header_dictionary_from_file(self, filename):
+        
+        header_dict={}
+        with open(filename, 'r') as f:
+            
+            for l in self._read_file_get_header(filename)[0]:
+                key, value = l.split(',', 1)
+                header_dict[key] = value
+        return header_dict
 
     def load_input_catalogue(self):
         """
@@ -582,11 +592,25 @@ class HectorPipe:
 
         # Only select the required columns
         columns = ["probe","ID","x","y","rads","angs","azAngs","angs_azAng","RA","DEC","g_mag","r_mag","i_mag","z_mag","y_mag","GAIA_g_mag","GAIA_bp_mag","GAIA_rp_mag","Mstar","Re","z","GAL_MU_E_R","pmRA","pmDEC","priority","MagnetX_noDC","MagnetY_noDC","type","MagnetX","MagnetY","SkyPosition","fibre_type","Magnet","Label","order","Pickup_option","Index","Hexabundle","probe_orientation","rectMag_inputOrientation","Magnet_C","Label_C","order_C","Pickup_option_C","offset_P","offset_Q"]
+
+        # Make sure that our IDs aren't written in standard form
+        def _fix_integer_value(val):
+            # This takes a value and makes sure it's an integer (e.g. 5.135143786217539e+18 becomes 5135143786217538560).
+            # The try/except clause is to not change the skyfibre IDs (which are strings, e.g Sky-H7-4)
+            try:
+                return int(float(val))
+            except ValueError:
+                return val
+
+        output_tile_contents['ID'] = output_tile_contents['ID'].apply(_fix_integer_value)
+
         self._write_file_with_header(outfilename=outputTileFile, header=tile_header_lines, dataframe=output_tile_contents.loc[:, columns])
         
 
         # Now do the robot file
         robot_header_lines, robot_header_linenumbers = self._read_file_get_header(robot_file)
+
+
         output_robot_contents = pd.read_csv(robot_file, comment='#')
         self._write_file_with_header(outfilename=outputRobotFile, header=robot_header_lines, dataframe=output_robot_contents)
         
@@ -609,6 +633,17 @@ class HectorPipe:
         fileNameGuides_stem = fileNameGuides.stem.strip('Guides_')
         fileNameHexa_stem= fileNameHexa.stem.strip('Hexas_')
         print('\n\n'+str(fileNameHexa))
+
+        # Read in the tile file to get the header, if we don't have a 'LABEL' keyword in it already
+        try:
+            label_string = self.header_dictionary['LABEL']
+        except KeyError:
+            header_dict={}
+            for l in self._read_file_get_header(fileNameHexa)[0]:
+                key, value = l.lstrip('#').split(',', 1)
+                header_dict[key] = value
+            label_string = header_dict['LABEL']
+
 
         # files to be output to after arranging the guide and hexa probe data
         # proxy output file
@@ -702,7 +737,7 @@ class HectorPipe:
         self.robot_temperature = 15
         self.obs_temperature = 15
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(fileNameHexa_stem,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(label_string,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)

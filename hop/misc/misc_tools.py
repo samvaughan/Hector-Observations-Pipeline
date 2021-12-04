@@ -113,8 +113,10 @@ def update_header(filename, header_dictionary):
         # Reverse the list and add each one to the start of the file- this keeps the original order
         # without having to increment the index
         for key, value in header_dictionary.items():
-            lines.insert(0, f"{key},{value}\n") 
+            lines.insert(0, f"{key},{value}") 
         f.seek(0)                 # file pointer locates at the beginning to write the whole file again
         f.writelines(lines)       # write whole lists again to the same file
 
     return header_dictionary
+
+

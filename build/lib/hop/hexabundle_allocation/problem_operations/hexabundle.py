@@ -463,10 +463,7 @@ def overall_hexabundle_size_allocation_operation_version3_largerBundlePriority(a
                     elif hexabundleDict[hexabundle][0] == 'S':
                         hexabundleIndexHector += 1
                     with open(flagsFile, 'a') as fp:
-                        writeToFile = 'RARE case of larger hexabundles greater than 61-cores left for allocation after Re<12: ' \
-                                      'Cluster/Batch :' + str(clusterNum) + ',tile ' + str(tileNum) + '; ' \
-                                      + str(magnet[0]) + ', ID:' + str(recordID) + ', hexabundle: ' + str(
-                            hexabundle) + '\n'
+                        writeToFile = f'RARE case of larger hexabundles greater than 61-cores left for allocation after Re<12: Cluster/Batch {clusterNum}, {str(magnet[0])}, {str(recordID)},  hexabundle: {str(hexabundle)}\n'
                         fp.write(writeToFile)
                     break
             del hexabundleDict[MagnetDict[magnet[0]]['hexabundle']]
