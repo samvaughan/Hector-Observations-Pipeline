@@ -956,7 +956,8 @@ def resolve_hexabundle_allocation_repeats(result,hexabundleRepeatwithsameID,Magn
     return MagnetDict, hexabundleRepeatwithsameID,indexx
 
 def resolve_unallocated_hexabundle(unallocatedOnes,result,MagnetDict,indexx):
-
+    
+    
     if unallocatedOnes != False:
         print('NOT ALL ARE ALLOCATED')
         MagnetDict[unallocatedOnes]['hexabundle'] = result[indexx]

@@ -86,7 +86,7 @@ class HectorPipe:
 
         # Locations of all the Hector Config code
         self.TdF_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds")  
-        self.TdF_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/tdFlinear0.sds")  
+        self.TdF_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/HectorLinear.sds")  
         self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
 
         if Profit_files_location is None:
@@ -412,7 +412,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=15, obs_temp=15, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix='1 0 0 -1'):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=15, obs_temp=15, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix=''):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.

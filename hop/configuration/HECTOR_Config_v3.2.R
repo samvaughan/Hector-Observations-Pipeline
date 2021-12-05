@@ -66,7 +66,7 @@ gexcl_radius <<- sqrt(2.*((gtip_w/2)^2))
 #Setting timeout time (in cpu seconds, I think) for how long each attempt lasts before moving on. 
 #The code will try for at most 15 times that before starting to swap a probe.
 #timeout<<-180 #180 seconds x 15 is about half an hour and is about right. Less than about 90 seconds led to problems in highly conflicted field..
-timeout<<-250 #Increased to account for longer conflict calculation time due to rounded heads so code still has enough time time try enough angles variations.
+timeout<<-60 #Increased to account for longer conflict calculation time due to rounded heads so code still has enough time time try enough angles variations.
 timeout_behaviour = 'error'
 
 #angle step going around the head to approximate circle as a polygon. The smaller angles are more precice but lead to longer configuration time.
@@ -662,7 +662,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
     print(paste('Starting (again) with delta_ang =', as.character(delta_ang)))
     
     newangs=angs 
-    withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+    try(withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour), silent=TRUE)
     if (FALSE %in% (angs==newangs)){
       angs=newangs
     } else {
@@ -688,7 +688,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       conflicts=find_probe_conflicts(probes=probes, pos=pos, angs=angs)
       nconflicts=dim(conflicts)[1]
       if (nconflicts >0){
-        withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+        try(withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour))
       }
       if (FALSE %in% (angs==newangs)){
         angs=newangs
@@ -706,7 +706,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       print('Could not find a solution with delta_ang=20, trying delta_ang=45')
       delta_ang=45
       newangs=angs
-      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+      try(withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour))
       if (FALSE %in% (angs==newangs)){
         angs=newangs
       } else {
@@ -724,7 +724,7 @@ wrapMinimizeConflicts <- function(pos=pos, angs=angs, cegs=cegs, init_delta_ang=
       print('Could not find a solution with delta_ang=45, trying delta_ang=90')
       delta_ang=90
       newangs=angs
-      withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+      try(withTimeout(assign('newangs',MinimizeConflicts(pos=pos, angs=angs, cegs=cegs, delta_ang=delta_ang, probe_conflicts=conflicts)), timeout=timeout, onTimeout=timeout_behaviour))
       if (FALSE %in% (angs==newangs)){
         angs=newangs
       } else {
