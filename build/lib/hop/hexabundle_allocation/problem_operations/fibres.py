@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import datetime
 import string as STRING # Added by Sam to workaround assignemnt to variable string
-import cv2
 import csv
 import re
 import random
@@ -1362,15 +1361,21 @@ def createskyfibreChanges_plot(self, tile_1_hexa, tile_2_hexa, subplateSkyfibre_
     plt.savefig(subplateSkyfibre_figureFile_tile2, dpi=1200)
 
     # read the images
-    img1 = cv2.imread(subplateSkyfibre_figureFile_tile1)
-    img2 = cv2.imread(subplateSkyfibre_figureFile_tile2)
+    im1 = plt.imread(subplateSkyfibre_figureFile_tile1)
+    im2 = plt.imread(subplateSkyfibre_figureFile_tile2)
 
     # horizontally concatenates images of same height
-    im_h = cv2.hconcat([img1, img2])
+    fig, axs = plt.subplots(ncols=2, figsize=(15, 8))
+    axs[0].imshow(im1)
+    axs[1].imshow(im2)
+    #im_h = cv2.hconcat([img1, img2])
+    for ax in axs:
+        ax.axis('off')
+
 
     # show the output image
     # cv2.imshow('man_image.jpeg', im_h)
-    cv2.imwrite(subplateSkyfibre_figureFile, im_h)
+    fig.savefig(subplateSkyfibre_figureFile, bbox_inches='tight')
 
     return pistonChange_count
 

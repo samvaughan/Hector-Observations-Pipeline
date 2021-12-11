@@ -59,11 +59,11 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #             '--plot_filename', '/Users/samvaughan/Science/Hector/Targets/Commissioning/HandMade/results/TilingOutputs/060_m22/Plots/060_m22_guides_central.pdf',
 #             '--plot', '--run_local')
 
-tmp_args=c('/Users/samvaughan/Science/Hector/Targets/Commissioning/HandMade/results/TilingOutputs/060_m22/DistortionCorrected/DC_tile_060_m22_guides_central.csv',
-           '/Users/samvaughan/Science/Hector/Targets/Commissioning/HandMade/results/TilingOutputs/060_m22/DistortionCorrected/guide_DC_tile_060_m22_guides_central.csv',
-           '/Users/samvaughan/Desktop/Hexas_tile_060_m22_guides_central_CONFIGURED.csv',
-           '/Users/samvaughan/Desktop/Guides_tile_060_m22_guides_central_CONFIGURED.csv',
-           '--plot_filename', '/Users/samvaughan/Desktop/060_m22_guides_central.pdf',
+tmp_args=c('/Users/samvaughan/Science/Hector/Targets/Commissioning/BlankSkyField/results/TilingOutputs/Blank_Sky_Field/DistortionCorrected/DC_060_m22_blank_sky_field.csv',
+           '/Users/samvaughan/Science/Hector/Targets/Commissioning/BlankSkyField/results/TilingOutputs/Blank_Sky_Field/DistortionCorrected/guide_DC_060_m22_blank_sky_field.csv',
+           '/Users/samvaughan/Desktop/blank_sky_CONFIGURED.csv',
+           '/Users/samvaughan/Desktop/guide_blank_sky_CONFIGURED.csv',
+           '--plot_filename', '/Users/samvaughan/Desktop/blank_sky.pdf',
            '--plot', '--run_local')
 
 args <- parser$parse_args(tmp_args)
