@@ -243,12 +243,12 @@ class HectorPipe:
         return tile
 
 
-    def _run_tiling_code(self, proximity, current_tile, use_galaxy_priorities):
+    def _run_tiling_code(self, proximity, current_tile, use_galaxy_priorities, tile_out_fname=None, guide_out_fname=None):
 
         
         df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec = tiling.make_best_tile(self.df_targets, self.df_guide_stars, self.df_standard_stars, proximity=proximity, tiling_parameters=self.config, tiling_type=self.config['tiling_type'], selection_type=self.config['allocation_type'], fill_spares_with_repeats=self.config['fill_spares_with_repeats'], use_galaxy_priorities=use_galaxy_priorities)
 
-        tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True, columns_in_order=self.config['columns_for_target_tile_saving'], guide_columns_in_order=self.config['columns_for_guide_tile_saving'])
+        tiling.save_tile_outputs(f"{self.config['output_folder']}", self.df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters=self.config, tile_number=current_tile, plot=True, columns_in_order=self.config['columns_for_target_tile_saving'], guide_columns_in_order=self.config['columns_for_guide_tile_saving'], tile_out_name=tile_out_fname, guide_out_name=guide_out_fname)
 
         return df_targets, tile_df, guide_stars_for_tile, tile_RA, tile_Dec
 
@@ -423,7 +423,7 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"'{date}'", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if rot_matrix != '':

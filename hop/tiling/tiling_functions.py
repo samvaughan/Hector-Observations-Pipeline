@@ -471,7 +471,7 @@ def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, til
     return df_targets, tile_members, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec
 
 
-def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number, columns_in_order, guide_columns_in_order, plot=True):
+def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, standard_stars_for_tile, tile_RA, tile_Dec, tiling_parameters, tile_number, columns_in_order, guide_columns_in_order, plot=True, tile_out_name=None, guide_out_name=None):
     """
     Save the outputs from a single tile. These are:
         * A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns ID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!
@@ -492,8 +492,10 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
         plot (bool, optional): Whether to save a plot of the tile. Default is True
     """
 
-    tile_out_name = f"tile_{tile_number:03}.fld"
-    guide_out_name = f"guide_tile_{tile_number:03}.fld"
+    if tile_out_name is None:
+        tile_out_name = f"tile_{tile_number:03}.fld"
+    if guide_out_name is None:
+        guide_out_name = f"guide_tile_{tile_number:03}.fld"
 
     # Add in the MagnetX and MagnetY values, using the Hector plate radius from the constants file
     tile_df['MagnetX_noDC'] = (tile_df['RA'] - tile_RA) * hector_constants.HECTOR_plate_radius * 1e3
