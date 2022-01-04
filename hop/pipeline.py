@@ -10,6 +10,7 @@ import datetime
 import shlex
 import shutil
 import numpy as np
+import shlex
 
 from hop.misc import misc_tools
 from hop.misc import pandas_tools as P
@@ -423,7 +424,7 @@ class HectorPipe:
         # Touch the output file so it already exists
         Path(tile_out_fname_after_DC).touch()
         # Now call Keith's code
-        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"'{date}'", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
+        DC_bash_code = [f"{self.DistortionCorrection_binary_location}",  f"{tile_out_fname}", f"{guide_tile_out_fname}", f"{tile_out_fname_after_DC}", f"{label}", f"{plateID}", f"{date}", f"{robot_temp}", f"{obs_temp}", f"{distortion_file}", f'{linearity_file}', f"{sky_fibre_file}", f"{profit_file_dir}"]
 
         # Turn off the sky fibre checking if check_sky_fibres is False
         if rot_matrix != '':
@@ -435,7 +436,7 @@ class HectorPipe:
             DC_bash_code += ["nolin"]
 
         if verbose:
-            print(" ".join(DC_bash_code))
+            print(shlex.join(DC_bash_code))
 
         process = subprocess.Popen(DC_bash_code, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output, error = process.communicate()
@@ -456,6 +457,10 @@ class HectorPipe:
             for ln in fi:
                 if ln.startswith("#"):
                     header.append(ln)
+
+        #Keith's code spits out the header in the reverse order to the one we want, so fix that here:
+        header = list(reversed(header))
+
 
         # Convert the header list to a header dictionary
         # The extra argument to split is "maxsplits", i.e. we only want to split on the first occurence
