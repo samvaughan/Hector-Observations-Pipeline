@@ -458,6 +458,10 @@ class HectorPipe:
                 if ln.startswith("#"):
                     header.append(ln)
 
+        #Keith's code spits out the header in the reverse order to the one we want, so fix that here:
+        header = list(reversed(header))
+
+
         # Convert the header list to a header dictionary
         # The extra argument to split is "maxsplits", i.e. we only want to split on the first occurence
         header_keys = [h.strip().split(',', 1)[0] for h in header]
