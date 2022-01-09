@@ -182,15 +182,15 @@ def convert_modulus_angle(angle):
 
 
 
-### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
+# ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
+# filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
 
-radialOffset_standaloneFunction(filename,None,15,35) # direct value of offset as input
+# radialOffset_standaloneFunction(filename,None,15,35) # direct value of offset as input
 
-# T_observed = 30
-# T_configured = 23.0
-# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+# # T_observed = 30
+# # T_configured = 23.0
+# # radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
 
 

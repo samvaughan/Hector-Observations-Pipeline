@@ -10,9 +10,11 @@ HECTOR_plate_center_coordinate             : [0.0,0.0]
 HECTOR_plate_radius                        : 226.0 # previous value=260.0
 robot_arm_length                           : 14.50
 robot_arm_width                            : 10
-robot_center_x                             : 329.5
-robot_center_y                             : 300
-
+# robot_center_x                             : 329.5
+# robot_center_y                             : 300
+# Change to the robot centre values based on Julia's email on 09/01/2022
+robot_center_x                             : 324.470
+robot_center_y                             : 279.834
 #circular_rectangle_magnet_center_distance  = (circular_magnet_radius + circular_rectangle_magnet_distance
                                               #+ rectangle_magnet_length / 2.0)
 
