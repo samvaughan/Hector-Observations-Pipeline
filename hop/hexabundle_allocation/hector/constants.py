@@ -30,3 +30,4 @@ elif (robot_arm_width >= ((rectangle_magnet_length - robot_arm_width) / 2)):
 # robot file center coordinates, depending on the mechanical mounting of the plate
 robot_center_x = constants_dict['robot_center_x']
 robot_center_y = constants_dict['robot_center_y']
+print(f"Robot centre is at {robot_center_x}, {robot_center_y}")
