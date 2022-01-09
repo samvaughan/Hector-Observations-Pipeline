@@ -743,8 +743,8 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_robot}/Robot_{fileNameHexa_stem}.txt"
 
         ## DUMMY VALUES TO BE REMOVED ##
-        self.robot_temperature = 12
-        self.obs_temperature = 12
+        self.robot_temperature = 20
+        self.obs_temperature = 20
         # creating robotFile array and storing it in robot file
         positioning_array, robotFilearray = file_arranging.create_robotFileArray(label_string,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
 

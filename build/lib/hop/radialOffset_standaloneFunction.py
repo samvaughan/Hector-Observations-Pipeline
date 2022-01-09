@@ -37,7 +37,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
     if T_observed != -10000 and T_configured != -10000:
         delta_T = T_configured - T_observed
         offset = plate_radius * ( delta_T * alpha )  
-        print('Offset calculated based on temperature change = '+str(offset)+' mm')
+        #print('Offset calculated based on temperature change = '+str(offset)+' mm')
 
     # getting count of lines to skip at top of file, which contain other information
     with open(filename) as file:
@@ -68,6 +68,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
 
     magnet_count = len(df)
 
+    print(f"Offset is {offset}")
     for i in range(magnet_count):
         
         if df['Magnet'][i] == 'circular_magnet':
@@ -75,22 +76,31 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
             x = df['Center_x'][i]-robot_centre[0]
             y = df['Center_y'][i]-robot_centre[1]
             theta = atan(y/x)
+            
+
+            delta_x = cos(theta) * offset
+            delta_y = sin(theta) * offset
+
+            print(f"dX is {delta_x}")
+            print(f"dY is {delta_y}")
 
             if x >= 0:
-                df['Center_x'][i] = df['Center_x'][i] + ( cos(theta) * offset )
-                df['Center_y'][i] = df['Center_y'][i] + ( sin(theta) * offset )
+                df['Center_x'][i] = df['Center_x'][i] + delta_x
+                df['Center_y'][i] = df['Center_y'][i] + delta_y
             else:
-                df['Center_x'][i] = df['Center_x'][i] - ( cos(theta) * offset )
-                df['Center_y'][i] = df['Center_y'][i] - ( sin(theta) * offset )
+                df['Center_x'][i] = df['Center_x'][i] - delta_x
+                df['Center_y'][i] = df['Center_y'][i] - delta_y
 
             for j in range(magnet_count):
         
                 if df['Magnet'][j] == 'rectangular_magnet' and df['Index'][j] == df['Index'][i]:
                     
-                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x + ( cos(theta) * offset ), y + ( sin(theta) * offset ), df['rectMag_inputOrientation'][i])
+                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x + delta_x, y + delta_y, df['rectMag_inputOrientation'][i])
+
 
                     df['Center_x'][j] = x_rect + robot_centre[0]
                     df['Center_y'][j] = y_rect + robot_centre[1]
+                    print(f"x is {df['Center_x'][i]}, x_rect is {x_rect + robot_centre[0]}")
 
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.csv'
@@ -182,15 +192,15 @@ def convert_modulus_angle(angle):
 
 
 
-### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
+# ### CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below 
 
-filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
+# filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
 
-radialOffset_standaloneFunction(filename,None,15,35) # direct value of offset as input
+# radialOffset_standaloneFunction(filename,None,15,35) # direct value of offset as input
 
-# T_observed = 30
-# T_configured = 23.0
-# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+# # T_observed = 30
+# # T_configured = 23.0
+# # radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
 
 
 

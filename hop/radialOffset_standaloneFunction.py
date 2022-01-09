@@ -37,7 +37,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
     if T_observed != -10000 and T_configured != -10000:
         delta_T = T_configured - T_observed
         offset = plate_radius * ( delta_T * alpha )  
-        print('Offset calculated based on temperature change = '+str(offset)+' mm')
+        #print('Offset calculated based on temperature change = '+str(offset)+' mm')
 
     # getting count of lines to skip at top of file, which contain other information
     with open(filename) as file:
@@ -68,6 +68,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
 
     magnet_count = len(df)
 
+    print(f"Offset is {offset}")
     for i in range(magnet_count):
         
         if df['Magnet'][i] == 'circular_magnet':
@@ -75,22 +76,31 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
             x = df['Center_x'][i]-robot_centre[0]
             y = df['Center_y'][i]-robot_centre[1]
             theta = atan(y/x)
+            
+
+            delta_x = cos(theta) * offset
+            delta_y = sin(theta) * offset
+
+            print(f"dX is {delta_x}")
+            print(f"dY is {delta_y}")
 
             if x >= 0:
-                df['Center_x'][i] = df['Center_x'][i] + ( cos(theta) * offset )
-                df['Center_y'][i] = df['Center_y'][i] + ( sin(theta) * offset )
+                df['Center_x'][i] = df['Center_x'][i] + delta_x
+                df['Center_y'][i] = df['Center_y'][i] + delta_y
             else:
-                df['Center_x'][i] = df['Center_x'][i] - ( cos(theta) * offset )
-                df['Center_y'][i] = df['Center_y'][i] - ( sin(theta) * offset )
+                df['Center_x'][i] = df['Center_x'][i] - delta_x
+                df['Center_y'][i] = df['Center_y'][i] - delta_y
 
             for j in range(magnet_count):
         
                 if df['Magnet'][j] == 'rectangular_magnet' and df['Index'][j] == df['Index'][i]:
                     
-                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x + ( cos(theta) * offset ), y + ( sin(theta) * offset ), df['rectMag_inputOrientation'][i])
+                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x + delta_x, y + delta_y, df['rectMag_inputOrientation'][i])
+
 
                     df['Center_x'][j] = x_rect + robot_centre[0]
                     df['Center_y'][j] = y_rect + robot_centre[1]
+                    print(f"x is {df['Center_x'][i]}, x_rect is {x_rect + robot_centre[0]}")
 
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.csv'
@@ -134,6 +144,8 @@ def calculate_rectangular_magnet_orientation(x,y,rectangular_magnet_input_orient
 
     circular_magnet_orientation = calculate_circular_magnet_orientation(x,y)
 
+    print(circular_magnet_orientation)
+    print(rectangular_magnet_input_orientation)
     rectangular_magnet_absolute_orientation_degree = 90 - circular_magnet_orientation - degrees(rectangular_magnet_input_orientation)
 
     return rectangular_magnet_absolute_orientation_degree
@@ -147,25 +159,27 @@ def calculate_rectangular_magnet_center_coordinates(x,y,rectangular_magnet_input
 
     circular_rectangle_magnet_center_distance = 27.2
 
-    if 0 < rectangular_magnet_orientation_modulo_radians < pi / 2:
+    if 0 < rectangular_magnet_orientation_modulo_radians <= pi / 2:
 
         rectangular_magnet_center =  [x + circular_rectangle_magnet_center_distance * cos(rectangular_magnet_orientation_modulo_radians), \
                                         y + circular_rectangle_magnet_center_distance * sin(rectangular_magnet_orientation_modulo_radians)]
 
-    elif pi / 2 < rectangular_magnet_orientation_modulo_radians < pi:
+    elif pi / 2 < rectangular_magnet_orientation_modulo_radians <= pi:
 
         rectangular_magnet_center = [x - circular_rectangle_magnet_center_distance * cos(pi - rectangular_magnet_orientation_modulo_radians), \
                                       y + circular_rectangle_magnet_center_distance * sin(pi - rectangular_magnet_orientation_modulo_radians)]
 
-    elif pi < rectangular_magnet_orientation_modulo_radians < 3 * pi / 2:
+    elif pi < rectangular_magnet_orientation_modulo_radians <= 3 * pi / 2:
 
         rectangular_magnet_center = [x - circular_rectangle_magnet_center_distance * sin(3 * pi / 2 - rectangular_magnet_orientation_modulo_radians), \
                                       y - circular_rectangle_magnet_center_distance * cos(3 * pi / 2 - rectangular_magnet_orientation_modulo_radians)]
 
-    elif 3 * pi / 2 < rectangular_magnet_orientation_modulo_radians < 2 * pi:
+    elif 3 * pi / 2 < rectangular_magnet_orientation_modulo_radians <= 2 * pi:
 
         rectangular_magnet_center = [x + circular_rectangle_magnet_center_distance * cos(2 * pi - rectangular_magnet_orientation_modulo_radians),
                                       y - circular_rectangle_magnet_center_distance * sin(2 * pi - rectangular_magnet_orientation_modulo_radians)]
+    else:
+            raise ValueError(f"This rectangular magnet has an orientation of {rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
 
     return rectangular_magnet_center
 
