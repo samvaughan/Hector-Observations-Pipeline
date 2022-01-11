@@ -155,6 +155,10 @@
 //                     of the XY coordinate system, introduced an additional
 //                     rotation matrix to allow experimentation with rotating
 //                     the coordinates. KS.
+//     11th Jan 2022.  Failure to check the position of a single sky fibre now
+//                     generates a warning, rather than being treated as a
+//                     fatal error. The total number of such failures is also
+//                     logged as a warning. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -1367,8 +1371,6 @@ void GetSkyFibreDetails (
                   FibreDetails.X[Posn] = Values[0] * Mm2microns;
                   FibreDetails.Y[Posn] = Values[1] * Mm2microns;
                   FibreDetails.Radius[Posn] = Values[2] * Mm2microns;
-                  //printf("Fibre %c%ld %ld posn %d X %f Y %f rad %f\n",
-                  //   Type,TypeNo,FibreNo,Posn,Values[0],Values[1],Values[2]);
                }
                if (!ProgDetails->Ok) break;
                SkyFibreList->push_back(FibreDetails);
@@ -1514,6 +1516,7 @@ void ConvertSkyFibreCoordinates (
 //  that the Sky fibre details have already been read into the elements of
 //  the SkyFibreList, and that any necessary parameters have been set in the
 //  ProgDetails structure.
+//
 
 void CheckSkyFibresAreClear (
    vector<HectorSkyFibre> *SkyFibreList,
@@ -1522,6 +1525,8 @@ void CheckSkyFibresAreClear (
    if (!ProgDetails->Ok) return;
    
    if (ProgDetails->CheckSky) {
+   
+      int FailedChecks = 0;
    
       //  The contamination checks are performed using a ProfitSkyCheck object,
       //  which needs to be initialised with the name of the directory containing
@@ -1532,7 +1537,7 @@ void CheckSkyFibresAreClear (
       ProfitSkyCheck SkyChecker;
    
       SkyChecker.SetDebugLevels (ProgDetails->DebugLevels);
-   
+         
       if (!SkyChecker.Initialise (ProgDetails->ProfitDirectory,
          ProgDetails->CentreRa * DR2D,ProgDetails->CentreDec * DR2D,
                                              ProgDetails->FieldRadius * DR2D)) {
@@ -1546,11 +1551,14 @@ void CheckSkyFibresAreClear (
          //  preferred order, ie starting at 1, then 2, then 3, see if the
          //  checker thinks that position is clear. If so, use it. If none
          //  are clear, fall back on position 0 - which doesn't need to be
-         //  checked for contamination.
+         //  checked for contamination. As of Jan 2022, a failure to check an
+         //  individual sky position (possibly because of a missing mask file)
+         //  now only generates a warning, and no longer stops the program
+         //  from running.
          
-         double RadiusDeg = ProgDetails->SkyRadiusAsec / 3600.0;
-         int NFibres = (*SkyFibreList).size();
-         for (int IFibre = 0; IFibre < NFibres; IFibre++) {
+        double RadiusDeg = ProgDetails->SkyRadiusAsec / 3600.0;
+        int NFibres = (*SkyFibreList).size();
+        for (int IFibre = 0; IFibre < NFibres; IFibre++) {
             HectorSkyFibre* FibreDetails = &(*SkyFibreList)[IFibre];
             FibreDetails->ChosenPosn = 0;
             for (int Posn = 1; Posn < 4; Posn++) {
@@ -1571,13 +1579,13 @@ void CheckSkyFibresAreClear (
                
                if (!SkyChecker.CheckUseForSky(RaDeg,DecDeg,RadiusDeg,&Clear)) {
                   char FibreId[32];
-                  snprintf (FibreId,sizeof(FibreId),"%c%d %d",
+                  snprintf (FibreId,sizeof(FibreId),"%c%d %d (%d)",
                        FibreDetails->SubplateType,FibreDetails->SubplateNo,
-                                                  FibreDetails->FibreNumber);
-                  ProgDetails->Error = SkyChecker.GetError() + " (Sky fibre " +
-                                                         string(FibreId) + ")";
-                  ProgDetails->Ok = false;
-                  break;
+                                       FibreDetails->FibreNumber,Posn);
+                  ProgDetails->Warnings.push_back(SkyChecker.GetError() +
+                                    " (Sky fibre " + string(FibreId) + ")");
+                  FailedChecks++;
+                  continue;
                }
                if (Clear) {
                   FibreDetails->ChosenPosn = Posn;
@@ -1589,6 +1597,12 @@ void CheckSkyFibresAreClear (
                 FibreDetails->SubplateType,FibreDetails->SubplateNo,
                 FibreDetails->FibreNumber,FibreDetails->ChosenPosn);
          }
+      }
+      
+      if (FailedChecks > 0) {
+         ProgDetails->Warnings.push_back(
+            "Total number of sky fibre positions that could not be checked = " +
+                                              TcsUtil::FormatInt(FailedChecks));
       }
       
    } else {

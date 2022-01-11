@@ -48,6 +48,14 @@
 //     22nd Dec 2020. Added explicit include of wcslib.h. KS.
 //      6th Jan 2021. Added coordinate range diagnostics. KS.
 //     18th Jan 2021. Added use of a DebugHandler to control debugging. KS.
+//      6th Jan 2022. Added GetFileDetsils(), as the start of the re-organisation
+//                    to handle mask files covering different Ra,Dec ranges. KS.
+//     11th Jan 2022. Re-organisation now mainly complete. File names can now
+//                    contain Ra,Dec range information as well as Ra,Dec centre
+//                    positions, and those that don't can be processed and
+//                    renamed so that they do. A number of new routines have
+//                    been added to support this, and any variables used to
+//                    assume a common range for all mask files have gone. KS.
 
 // ----------------------------------------------------------------------------------
 
@@ -58,6 +66,7 @@
 #include <list>
 #include <stdlib.h>
 
+#include "fitsio.h"
 #include "wcslib.h"
 
 #include "ArrayManager.h"
@@ -102,12 +111,32 @@ public:
 private:
    //  Build up list of files in the mask file directory
    bool GetListOfMaskFiles (void);
-   //  Extract Ra,Dec coordinates of image centre from file name.
+   //  Extract Ra,Dec coordinates of image centre from file name, and ranges.
    bool GetCoordsFromFileName (const std::string& FileName,
-                                      double* CenRaDeg, double* CenDecDeg);
-   //  Read one of the mask files, checking coordinates and possibly reading data.
+         std::string& Prefix, std::string& Extension,
+         double* CenRaDeg, double* CenDecDeg, bool* HasRanges,
+         double* RaRangeDeg, double*DecRangeDeg);
+   //  Read one of the mask files, checking coordinates and reading its data.
    bool ReadAndCheckFile (
-      const std::string& MaskFile, double FileRa, double FileDec);
+      const std::string& MaskFile, double FileRaDeg, double FileDecDeg,
+                           double FileRaRangeDeg, double FileDecRangeDeg);
+   //  Open a named mask file.
+   bool OpenMaskFile (const std::string& MaskFile,fitsfile** Fptr);
+   //  Close a mask file opened by OpenMaskFile().
+   void CloseMaskFile (fitsfile* Fptr);
+   //  Get the details of an open mask file - size, coordinates, range, etc.
+   bool GetFileDetails (const std::string& MaskFile,
+                          fitsfile* Fptr, ProfitFileDetails* FileDetails);
+   //  Read the data from an open file and add to list of mask data in use.
+   bool ReadFileData (const std::string& MaskFile,
+                          fitsfile* Fptr, ProfitFileDetails* FileDetails);
+   //  Check WCS range of a mask file and read its data if it overlaps field.
+   bool CheckWCSandReadFile (
+          const std::string& MaskFile, double FileRaDeg, double FileDecDeg,
+                           double* FileRaRangeDeg, double* FileDecRangeDeg);
+   //  Rename a mask file with the full range information
+   bool RenameMaskFile (
+     const std::string& MaskFile,double FileRaRangeDeg, double FileDecRangeDeg);
    //  Fix a problem with FITS headers shown by one early mask file example.
    void TidyHeaderFloats(char* HeaderPtr,int NKeys,int* NFixed);
    //  Utility giving Ra,Dec coords and range for a single pixel.
@@ -135,10 +164,6 @@ private:
    double I_CentralDecDeg;
    //  The radius of the field being checked, in degrees.
    double I_FieldRadiusDeg;
-   //  The assumed size of each mask in RA in degrees.
-   double I_MaskRaSizeDeg;
-   //  The assumed size of each mask in RA in degrees.
-   double I_MaskDecSizeDeg;
    //  Range of coordinates tested (RAmin,Decmin,RAmax,DecMax) - diagnostic.
    double I_RaDecRange[4];
    //  Used to manage access to multi-dimensional arrays.

@@ -81,8 +81,8 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
             delta_x = cos(theta) * offset
             delta_y = sin(theta) * offset
 
-            print(f"dX is {delta_x}")
-            print(f"dY is {delta_y}")
+            #print(f"dX is {delta_x}")
+            #print(f"dY is {delta_y}")
 
             if x >= 0:
                 df['Center_x'][i] = df['Center_x'][i] + delta_x
@@ -100,7 +100,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
 
                     df['Center_x'][j] = x_rect + robot_centre[0]
                     df['Center_y'][j] = y_rect + robot_centre[1]
-                    print(f"x is {df['Center_x'][i]}, x_rect is {x_rect + robot_centre[0]}")
+                    print(f"i is {i}, j is {j}, Circular magnet is at {df['Center_x'][i]}, old_centre is {df['Center_x'][j]}, new centre is {x_rect + robot_centre[0]}")
 
 
     outputFile = filename[:-4] + '_radialOffsetAdjusted.csv'
@@ -144,9 +144,10 @@ def calculate_rectangular_magnet_orientation(x,y,rectangular_magnet_input_orient
 
     circular_magnet_orientation = calculate_circular_magnet_orientation(x,y)
 
-    print(circular_magnet_orientation)
-    print(rectangular_magnet_input_orientation)
+    #print(f"Circiular magnet orientation is {circular_magnet_orientation}")
+    #print(f"rectangular_magnet_input_orientation is {degrees(rectangular_magnet_input_orientation)}" )
     rectangular_magnet_absolute_orientation_degree = 90 - circular_magnet_orientation - degrees(rectangular_magnet_input_orientation)
+    #print(f"rectangular_magnet_absolute_orientation_degree is {rectangular_magnet_absolute_orientation_degree}")
 
     return rectangular_magnet_absolute_orientation_degree
 

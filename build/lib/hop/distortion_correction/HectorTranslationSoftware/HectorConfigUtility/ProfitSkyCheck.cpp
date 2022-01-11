@@ -16,7 +16,11 @@
 //
 //     For more details, see the comments in ProfitSkyCheck.h
 //
-//  Remaining issues: None of this has been tested in anger yet.
+//  Remaining issues: The original version of this code was used for the first
+//     Hector observing run in Dec 2021. Since then, this has been restructured
+//     to allow for mask files with different Ra,Dec ranges to those for the
+//     original ProFit files, and that needed  changes to the file name format.
+//     These aspects are still to be tested in anger.
 //
 //  Author(s): Keith Shortridge, K&V  (Keith@KnaveAndVarlet.com.au)
 //
@@ -35,6 +39,22 @@
 //                     mask showing clear is now assumed to be enough to declare
 //                     the position clear - this assumes false positives are
 //                     most likely to be due to transient objects. KS.
+//     16th Dec 2021.  In CheckUseForSky() added SkyCheckDist debug option, and
+//                     fixed problem where having a reversed Ra or Dec scale
+//                     (leading to a -ve delta Ra or Dec for the pixels) would
+//                     cause pixels not to be tested. In ReadAndCheckFile(), the
+//                     "Files" diagnostic was giving the Ra range value for both
+//                     Ra and Dec ranges. Corrected. KS.
+//      6th Jan 2022.  Added GetFileDetsils(), as the start of the re-organisation
+//                     to handle mask files covering different Ra,Dec ranges. KS.
+//     11th Jan 2022.  Re-organisation now mainly complete. File names can now
+//                     contain Ra,Dec range information as well as Ra,Dec centre
+//                     positions, and those that don't can be processed and
+//                     renamed so that they do. A number of new routines have
+//                     been added to support this, and any variables used to
+//                     assume a common range for all mask files have gone. Also
+//                     the warnings about file names not matching the actual WCS
+//                     coordinates now use more realistic tests. KS.
 
 // ----------------------------------------------------------------------------------
 
@@ -46,20 +66,15 @@
 #include <math.h>
 #include <string.h>
 
-#include "fitsio.h"
-#include "wcslib.h"
-
 #include "ProfitSkyCheck.h"
 
 #include "TcsUtil.h"
 
+#include "slalib.h"
+#include "slamac.h"
+
 using std::string;
 using std::list;
-
-//  For the moment, assume the size of a mask is square, the same for each mask,
-//  and is fixed. See programming notes.
-
-static const double C_MASK_SIZE_IN_DEG = 1.0;
 
 //  One quite common conversion value.
 
@@ -86,15 +101,6 @@ ProfitSkyCheck::ProfitSkyCheck (void) : I_Debug("Profit")
    I_CentralDecDeg = 0.0;
    I_FieldRadiusDeg = 0.0;
    
-   //  The size of each mask file is a bit of a moot point. It could be read
-   //  from each file, but then we're back having to read each file at least
-   //  once and having to remember it so we don't have to do this again. For
-   //  the moment we assume each mask is the same size, and we hard-code the
-   //  value. See programming notes.
-   
-   I_MaskRaSizeDeg = C_MASK_SIZE_IN_DEG;
-   I_MaskDecSizeDeg = C_MASK_SIZE_IN_DEG;
-   
    //  Initial impossible values for the Ra,Dec range tested.
    
    I_RaDecRange[0] = 720.0;  // Min Ra
@@ -106,7 +112,8 @@ ProfitSkyCheck::ProfitSkyCheck (void) : I_Debug("Profit")
    //  If new calls to I_Debug.Log() or I_Debug.Logf() are added, the levels
    //  they use need to be included in this list.
    
-   I_Debug.LevelsList("Files,SkyCheck,SkyCheckFiles,SkyCheckCoords");
+   I_Debug.LevelsList(
+        "Files,SkyCheck,SkyCheckFiles,SkyCheckCoords,SkyCheckDist");
 
 }
 
@@ -189,31 +196,65 @@ bool ProfitSkyCheck::Initialise (
          //  decode it, we don't treat this as an error, but we ignore the file
          //  and log a warning about it. See programming notes.
          
-         double FileRa,FileDec;
-         if (!GetCoordsFromFileName (MaskFile,&FileRa,&FileDec)) {
+         double FileRaDeg,FileDecDeg,FileRaRangeDeg,FileDecRangeDeg;
+         bool HasRanges;
+         string Prefix;
+         string Extension;
+         if (!GetCoordsFromFileName (MaskFile,Prefix,Extension,
+             &FileRaDeg,&FileDecDeg,&HasRanges,&FileRaRangeDeg,&FileDecRangeDeg)) {
             I_Warnings.push_back(I_ErrorText);
             continue;   // Handle next file.
          }
          
-         //  We have an Ra,Dec from the file name. See if that overlaps the field
-         //  in question. If not, we ignore the file. See programming notes - we
-         //  could check the WCS data in each file instead of using the name,
-         //  but we don't.
+         //  We now have two possibilities, depending on whether or not the file
+         //  name included Ra,Dec range information or not.
          
-         if (!FileOverlapsField(FileRa,FileDec,I_MaskRaSizeDeg,I_MaskDecSizeDeg,
-                              I_CentralRaDeg,I_CentralDecDeg,I_FieldRadiusDeg)) {
-            continue;   // Handle next file.
-         }
+         if (HasRanges) {
+         
+            //  If we have the Ra,Dec range from the file name, we can immediately
+            //  see if the mask file overlaps the field in question.  If not, we
+            //  ignore the file.
 
-         //  This is a file that overlaps the field. Open it up, check the
-         //  WCS data in the header against the file's claimed central Ra,Dec,
-         //  read the mask data, and add the relevant details to the file list
-         //  in I_FileDetails.
+            if (!FileOverlapsField(
+                        FileRaDeg,FileDecDeg,FileRaRangeDeg,FileDecRangeDeg,
+                              I_CentralRaDeg,I_CentralDecDeg,I_FieldRadiusDeg)) {
+               continue;   // Handle next file.
+            }
+            
+            //  This is a file that overlaps the field. Open it up, check the
+            //  WCS data in the header against the file's claimed central Ra,Dec,
+            //  and range, read the mask data, and add the relevant details to
+            //  the file list in I_FileDetails.
+            
+            OkSoFar = ReadAndCheckFile (MaskFile,FileRaDeg,FileDecDeg,
+                                           FileRaRangeDeg,FileDecRangeDeg);
+            if (!OkSoFar) break;  // Break from file loop, showing a problem.
+
+         } else {
          
-         OkSoFar = ReadAndCheckFile (MaskFile,FileRa,FileDec);
-         if (!OkSoFar) break;  // Break from file loop, showing a problem.
+            //  This is the trickier case where the file name does not include
+            //  range information. In this case, we have to get that range
+            //  information by opening the file and examining the WCS data it
+            //  contains. Then we can decide if the mask file overlaps the field
+            //  in question and, if so, read its mask data and add the relevant
+            //  details to I_FileDetails. This sequence is best hived off to a
+            //  separate routine, CheckWCSandReadFile().
+            
+            OkSoFar = CheckWCSandReadFile (MaskFile,FileRaDeg,FileDecDeg,
+                                          &FileRaRangeDeg,&FileDecRangeDeg);
+            
+            //  And we rename the file. Failure here shouldn't stop us - it
+            //  may be that the files are write-protected, and that's fine.
+            //  But we issue a warning.
+            
+            if (OkSoFar) {
+               if (!RenameMaskFile (MaskFile,FileRaRangeDeg,FileDecRangeDeg)) {
+                  I_Warnings.push_back(I_ErrorText);
+               }
+            }
+         }
          
-         //break;  //  DEBUG - quit after one file.
+         //break;  //  DEBUG - quit after one file (useful for testing sometimes).
       }
       if (!OkSoFar) break;
       
@@ -263,20 +304,44 @@ void ProfitSkyCheck::SetDebugLevels (const std::string& Levels)
 //
 //                G e t  C o o r d s  F r o m  F i l e  N a m e
 //
-//  I'm assuming that all the Profit mask files will follow a naming convention
-//  that includes the coordinates of the centre of the image. This is certainly
-//  the case for the example files I was sent by Luca, which all have names like
-//  "segmap_gama_350.6_-32.1.fits", ie "segmap_gama_<Ra>_<Dec>.fits". I also want
-//  to allow for the possibility that compressed versions of these files are
+//  There is some history associated with the interface to this routine.
+//  I originally assumed that all the Profit mask files would follow a naming
+//  convention that included the coordinates of the centre of the image. This was
+//  certainly the case for the example files I was sent by Luca, which all had names
+//  like"segmap_gama_350.6_-32.1.fits", ie "segmap_gama_<Ra>_<Dec>.fits". I also
+//  wanted to allow for the possibility that compressed versions of these files were
 //  being used, so there might be .gz extensions following this usual name string.
 //  If any of that changes, this will have to be reworked.
+//
+//  However, what this scheme missed was any consideration of the range in Ra,Dec
+//  covered by each file. The first production version of the code simply had two
+//  hard-coded values for the Ra,Dec ranges of the ProFit files, which happened to
+//  all cover exactly the same square range. it eventually became clear that the code
+//  would have to deal with other mask files, some of which would cover other ranges,
+//  and the best scheme would be to have these ranges coded into the file names as
+//  well, even if this meant re-naming files to match. (Note that the range can be
+//  determined by opening the files and processing the WCS data, but this has a
+//  lot of overheads, particularly when a lot of compressed files are involved.
+//  Doing this once and renaming the files once this is done is acceptable, but doing
+//  this each run of the program is not.)
+//
+//  So the code now expects to find files called either "<prefix>_<Ra>_<Dec>.fits"
+//  or "prefix_<Ra>_<Dec>_<RaRange>_<DecRange>.fits" (or the .fits.gz versions).
+//  If the range information is present, it returns HasRanges set to true and the
+//  range values in RaRangeDeg and DecRangeDeg. Otherwise it sets HasRanges false,
+//  and returns range values of zero. It also returns the prefix string used, and
+//  the file extension, to simplify renaming of the file if this is needed.
 
 bool ProfitSkyCheck::GetCoordsFromFileName (const string& FileName,
-                                      double* CenRaDeg, double* CenDecDeg)
-
+         string& Prefix, string& Extension, double* CenRaDeg, double* CenDecDeg,
+         bool* HasRanges, double* RaRangeDeg, double*DecRangeDeg)
 {
    bool ReturnOK = false;
    
+   *HasRanges = false;
+   *RaRangeDeg = 0.0;
+   *DecRangeDeg = 0.0;
+
    //  Convert the file name to lower case, and try to split off the extension(s).
    //  I'm assuming it's safe to look for a ".f" from the end of the string to
    //  find the start of the extensions, since the file presumably has a .fits
@@ -284,51 +349,150 @@ bool ProfitSkyCheck::GetCoordsFromFileName (const string& FileName,
    //  a file that's been selected on the basis of having a FITS extension, and
    //  they all start with ".f".
    
+   int NValues = 0;
+   double Values[4];
    string LowerName = FileName;
    std::transform(LowerName.begin(),LowerName.end(),LowerName.begin(),
                         [](unsigned char c){ return std::tolower(c); });
-   size_t ExtPosn = LowerName.rfind(".f");
-   if (ExtPosn != string::npos) {
+   size_t EndPosn = LowerName.rfind(".f");
+   if (EndPosn != string::npos) {
    
       //  We've found a ".f". Clip off anything to the right of that, and
-      //  now look for the underscore that starts the Dec part of the file name.
+      //  now look for the underscore that starts the last numeric value in the
+      //  file name. Then keep working back until we have either 4 numbers
+      //  or we hit something that doesn't fit the pattern we're looking for.
+      //  The first time through the loop, EndPosn points to the . beginning
+      //  the file extension. Subsequent times through, it points to the underscore
+      //  delimiting the start of the number we parsed in the previous loop.
       
-      LowerName.erase(ExtPosn);
-      size_t UscorePosn = LowerName.rfind('_');
-      if (UscorePosn != string::npos) {
-      
-         //  Extract the Dec string, try to decode it, trim it from the name
-         //  string, and look for the underscore delimiting the RA part of the
-         //  name and repeat the performance.
-         
-         string Dec = LowerName.substr(UscorePosn + 1);
-         double CenDec = 0.0;
-         int Items = 0;
-         Items = sscanf(Dec.c_str(),"%lf",&CenDec);
-         if (Items == 1) {
-            LowerName.erase(UscorePosn);
-            UscorePosn = LowerName.rfind('_');
-            if (UscorePosn != string::npos) {
-               string Ra = LowerName.substr(UscorePosn + 1);
-               double CenRa = 0.0;
-               Items = sscanf(Ra.c_str(),"%lf",&CenRa);
-               if (Items == 1) {
-               
-                  //  Finally, we have a properly decoded file name.
-                  
-                  *CenRaDeg = CenRa;
-                  *CenDecDeg = CenDec;
-                  ReturnOK = true;
-               }
-            }
-         }
-      }
-      if (!ReturnOK) {
-         I_ErrorText = "Filename '" + FileName +
-                           "' does not have Ra,Dec encoded as expected";
-      }
+      Extension = FileName.substr(EndPosn,string::npos);
+      do {
+         LowerName.erase(EndPosn);
+         size_t UscorePosn = LowerName.rfind('_');
+         if (UscorePosn == string::npos) break;
+         string ValueStr = LowerName.substr(UscorePosn + 1);
+         double Value = 0.0;
+         int Items = sscanf(ValueStr.c_str(),"%lf",&Value);
+         if (Items != 1) break;
+         Values[NValues] = Value;
+         NValues++;
+         EndPosn = UscorePosn;
+      } while (NValues < 4);
+   }
+   
+   //  After all that, we should have either 2 or 4 numbers depending on whether
+   //  the file name incldded the range information or not. Anythig else isn't
+   //  a file name we were expecting to find, and we'll return an error.
+   //  Remember the values are parsed from the end of the string moving to the
+   //  beginning.
+   
+   if (NValues == 2) {
+      *CenRaDeg = Values[1];
+      *CenDecDeg = Values[0];
+      *HasRanges = false;
+      *RaRangeDeg = 0.0;
+      *DecRangeDeg = 0.0;
+      ReturnOK = true;
+   } else if (NValues == 4) {
+      *CenRaDeg = Values[3];
+      *CenDecDeg = Values[2];
+      *HasRanges = true;
+      *RaRangeDeg = Values[1];
+      *DecRangeDeg = Values[0];
+      ReturnOK = true;
+   }
+   if (ReturnOK) {
+      Prefix = FileName.substr(0,EndPosn);
+   } else {
+      I_ErrorText = "Filename '" + FileName +
+                           "' does not have Ra,Dec values encoded as expected";
    }
    return ReturnOK;
+}
+
+// ----------------------------------------------------------------------------------
+//
+//                         R e n a m e  M a s k  F i l e
+//
+//  Passed the original name of a mask file, renames it to include the full Ra,Dec
+//  centre position and Ra,Dec range as determined. All this does is insert the
+//  range information between ar the end of the file name, in front of the extension.
+//  This therefore assumes that the file already has the Centre Ra,Dec position
+//  encoded in the file name. The routine does try to check this.
+
+bool ProfitSkyCheck::RenameMaskFile (
+        const string& MaskFile,double FileRaRangeDeg, double FileDecRangeDeg)
+{
+   bool ReturnOK = true;
+   
+   //  The code that follows is very similar to that in GetCoordsFromFileName(),
+   //  except that ere we're using this to a) locate the position of the extension
+   //  - which is the point where we will insert the range information - and b)
+   //  simply check that there are only two numeric values already encoded in the
+   //  filename. It's possible that this code and that in GetCoordsFromFileName()
+   //  could be reqorked to get rid of this duplication, but it looks more work
+   //  than it's worth. (The reason GetCoordsFromFileName() returns Prefix and
+   //  Extension is that originally this was the intention, but it proved that
+   //  that interface didn't quite do what was wanted here.
+   
+   string LowerName = MaskFile;
+   std::transform(LowerName.begin(),LowerName.end(),LowerName.begin(),
+                        [](unsigned char c){ return std::tolower(c); });
+   bool ParsedOK = false;
+   int NValues = 0;
+   string Extension;
+   string Prefix;
+   size_t EndPosn = LowerName.rfind(".f");
+   if (EndPosn != string::npos) {
+   
+      //  We've got the start of the extension. Note the part of the filename
+      //  that goes before, and the extension itself.
+      
+      Extension = MaskFile.substr(EndPosn,string::npos);
+      Prefix = MaskFile.substr(0,EndPosn);
+      
+      //  We could skip right now to formatting the new name for the file, but
+      //  let's work back through the file name and see how many numeric values
+      //  it has. All we're doing is counting them - the values don't matter.
+      //  If we get anything other than two, we have a potential problem.
+      
+      do {
+         LowerName.erase(EndPosn);
+         size_t UscorePosn = LowerName.rfind('_');
+         if (UscorePosn == string::npos) break;
+         string ValueStr = LowerName.substr(UscorePosn + 1);
+         double Value = 0.0;
+         int Items = sscanf(ValueStr.c_str(),"%lf",&Value);
+         if (Items != 1) break;
+         NValues++;
+         EndPosn = UscorePosn;
+      } while (NValues < 4);
+      if (NValues == 2) ParsedOK = true;
+      
+   } if (ParsedOK) {
+   
+      //  All looks fine. Try to rename the file.
+      
+      char Numbers[64];
+      sprintf (Numbers,"_%.2f_%.2f",fabs(FileRaRangeDeg),fabs(FileDecRangeDeg));
+      string NewName = Prefix + string(Numbers) + Extension;
+      I_Debug.Logf ("Files","Renaming %s' as '%s'",MaskFile.c_str(),NewName.c_str());
+      int Result = rename(MaskFile.c_str(),NewName.c_str());
+      if (Result != 0) {
+         string ErrorString(string(strerror(errno)));
+         I_ErrorText = "Error renaming '" + MaskFile + "': " + ErrorString;
+         ReturnOK = false;
+      }
+   } else {
+   
+      //  We don't like the look of the file name. Say so.
+      
+      I_ErrorText = "Unable to rename file '" + MaskFile +
+                     "'. Existing file name does not parse as expected.";
+      ReturnOK = false;
+   }
+   return ReturnOK;
+
 }
 
 
@@ -363,8 +527,8 @@ bool ProfitSkyCheck::LocatePixFromCoords (ProfitFileDetails& FileDetails,
    //  Set up the starting point for the first iteration. We start at the centre
    //  of the image, and assume the scales in Ra and Dec are the average scales
    //  across the whole image. It's not perfect, because the Ra,Dec scales vary
-   //  slightly across the image - that's why we have to iterate - but it's a good
-   //  start.
+   //  slightly across the image - that's why we have to iterate - but it's a
+   //  good start.
    
    double FIx = (double(Nx) + 1.0) / 2.0;
    double FIy = (double(Ny) + 1.0) / 2.0;
@@ -465,7 +629,7 @@ bool ProfitSkyCheck::LocatePixFromCoords (ProfitFileDetails& FileDetails,
          TcsUtil::FormatInt(MaxTries) + " iterations";
       ReturnOK = false;
    }
-
+   
    return ReturnOK;
    
 }
@@ -552,82 +716,188 @@ bool ProfitSkyCheck::GetPixelDims (
 //  mask rectangle (probably really a square) and the field circle. All arguments
 //  are in degrees.
 //
-//  Note that this is treated as a simple exercise in coordinate geometry,
-//  looking for the possible overlap of a given circle with a given rectangle
-//  that is parallel to the coordinate axes. Clearly, that isn't strictly the
-//  case for Profit masks, with their slightly non-linear coordinate systems,
-//  but I'm assuming it's good enough.
+//  Originally, this routine treated the problem as a simple exercise in
+//  coordinate geometry, looking for the intersection of a rctangle with a circle,
+//  but in fact the cos(Dec) effect of declination on Ra means that the circle
+//  becomes stretched out as declinations increase, and that sort of cleverness
+//  is just over-complicating a problem that can be handled much more simply
+//  by treating this as the overlap of two rectangles giving the extremes
+//  of the Ra,Dec vlaues for a) the mask and b) the field. The important thing
+//  is not to miss out any mask files; picking up a few unnecessarily adds a
+//  bit of overhead, but doesn't really matter.
+//  (For what it's still worth, the original rectangle/circle intersection code
+//  was based on this StackOverflow answer by e.James:
+//       https://stackoverflow.com/questions/401847/
+//                 circle-rectangle-collision-detection-intersection
 
 bool ProfitSkyCheck::FileOverlapsField (
    double MaskCentreRa, double MaskCentreDec, double MaskRaRange,
       double MaskDecRange, double FieldCentreRa, double FieldCentreDec,
       double FieldRadius)
 {
-   //  The code here is a reworking (mostly just changing the variable names
-   //  to match those passed) of the code in the second answer in
-   //  https://stackoverflow.com/questions/401847/
-   //                 circle-rectangle-collision-detection-intersection
-   //  by e.James, to whom I'm grateful. The answer there includes a diagram
-   //  in colour that I can't reproduce here, but I've extracted bits of the
-   //  comments here, although without the references to the diagram, which
-   //  would make it all much clearer.
-   //
-   //  "The first pair of lines calculate the absolute values of the x and y
-   //  difference between the center of the circle and the center of the rectangle.
-   //  The second pair of lines eliminate the easy cases where the circle is far
-   //  enough away from the rectangle (in either direction) that no intersection
-   //  is possible.
-   //  The third pair of lines handle the easy cases where the circle is close
-   //  enough to the rectangle (in either direction) that an intersection is
-   //  guaranteed. Note that this step must be done after step 2 for the logic
-   //  to make sense.
-   //  The remaining lines calculate the difficult case where the circle may
-   //  intersect the corner of the rectangle. To solve, compute the distance from
-   //  the center of the circle and the corner, and then verify that the distance
-   //  is not more than the radius of the circle."
+   //  Work out the differences between the mask and field centres
    
    double CentreDiffRa = fabs(FieldCentreRa - MaskCentreRa);
    double CentreDiffDec = fabs(FieldCentreDec - MaskCentreDec);
+   
+   //  If either of these are greater than the combined half-widths of the rectangles
+   //  (allowing for the cos(dec) effect for Ra, and not necessarily assuming the
+   //  range values we were passed were absolute values) then there's no interection.
+   
+   double CosDec = cos(FieldCentreDec * DD2R);
+   if (CentreDiffRa > (fabs(MaskRaRange) * 0.5 + FieldRadius / CosDec)) { return false; }
+   if (CentreDiffDec > (fabs(MaskDecRange) * 0.5 + FieldRadius)) { return false; }
+   
+   //  Otherwise, they overlap in both Ra and Dec, so they intersect.
+   
+   return true;
 
-   if (CentreDiffRa > (MaskRaRange * 0.5 + FieldRadius)) { return false; }
-   if (CentreDiffDec > (MaskDecRange * 0.5 + FieldRadius)) { return false; }
-
-   if (CentreDiffRa <= (MaskRaRange * 0.5)) { return true; }
-   if (CentreDiffDec <= (MaskDecRange * 0.5)) { return true; }
-
-   double CornerDistSq =
-      (CentreDiffRa - MaskRaRange * 0.5) * (CentreDiffRa - MaskRaRange * 0.5) +
-      (CentreDiffDec - MaskDecRange * 0.5) * (CentreDiffDec - MaskDecRange * 0.5);
-   return (CornerDistSq <= (FieldRadius * FieldRadius));
 }
 
 // ----------------------------------------------------------------------------------
 //
-//                      R e a d  A n d  C h e c k  F i l e
+//                      C h e c k  W C S  a n d  R e a d  F i l e
 //
-//  Read one of the mask files, checking coordinates and possibly reading data.
-//  The file name passed should be the path name of a file that's already been
-//  identified as a FITS format file that is expected to have Profit mask data,
-//  and which is believed to cover an area of sky that overlaps the field in
-//  question, on the basis of the central Ra,Dec embedded in its filename. That
-//  Ra,Dec centre value is passed so it can be checked against the actual WCS
-//  data in the file. This routine accesses the header for the file, checks
-//  that it holds 2D data centered as expected, read in the data and adds a
-//  file details structure for the file to the list held in I_FileDetails.
+//   This routine handles tha case of a mask file whose name does not include
+//   range information. In this case the file needs to be opened and the range
+//   information determined from the WCS data in the header. If the central
+//   Ra,Dec and the determined range shows that this file potentially overlaps
+//   the current field of interest, then the file's mask data is read in and
+//   its details added to the list held in I_FileDetails. The routine is passed
+//   the central Ra,Dec for the mask, which it is assumed was encoded in the
+//   file name, and it checks that this matches the WCS data held in the file.
+//   This routine returns the Ra,Dec range determined from the WCS data, and
+//   this can be used to rename the file if required.
 
-bool ProfitSkyCheck::ReadAndCheckFile (
-   const string& MaskFile, double FileRa, double FileDec)
+bool ProfitSkyCheck::CheckWCSandReadFile (
+   const std::string& MaskFile, double FileRaDeg, double FileDecDeg,
+                              double* FileRaRangeDeg, double* FileDecRangeDeg)
+{
+   bool ReturnOK = true;
+   
+   fitsfile* Fptr = NULL;
+   ProfitFileDetails FileDetails;
+   
+   bool OKSoFar = true;
+   
+   do {
+   
+      //  Open the file. An error here indicates this isn't a FITS format file.
+      
+      OKSoFar = OpenMaskFile (MaskFile,&Fptr);
+      if (!OKSoFar) break;
+      
+      //  Get the file details including the WCS values. An error here may just
+      //  mean this isn't a mask file, althogh it may be a perfectly good FITS file.
+      //  We treat this as a severe error, but maybe it should just be a warning?
+      
+      OKSoFar = GetFileDetails (MaskFile,Fptr,&FileDetails);
+      if (!OKSoFar) break;
+      
+      //  Warn if the central Ra,Dec from the file name doesn't match that shown
+      //  from the WCS data. Really, you'd think it should be good to a pixel, but
+      //  actually the files usually only give a centre to one place of decimals
+      //  in degrees, so the best we can hope for (even with proper rounding) is
+      //  probably accuracy to .05 deg, and maybe we should just test for right
+      //  to .1 deg - which will pick up glaring errors, but no more.
+      
+      double MidRa = FileDetails.MidRa;
+      double MidDec = FileDetails.MidDec;
+      if ((fabs(MidRa - FileRaDeg) > 0.1) || (fabs(MidDec - FileDecDeg) > 0.1)) {
+         I_Warnings.push_back("File: " + MaskFile + " image centre from WCS " +
+                     FormatRaDecDeg(MidRa,MidDec) + " does not match file name");
+      }
+
+      //  Get the Ra,Dec ranges from the file details, and see if this overlaps
+      //  the field. If it doesn't. we don't bother to read in the file data,
+      //  but this isn't an error.
+      
+      *FileRaRangeDeg = FileDetails.DeltaRa * (FileDetails.Nx - 1);
+      *FileDecRangeDeg = FileDetails.DeltaDec * (FileDetails.Ny - 1);
+      if (!FileOverlapsField(FileRaDeg,FileDecDeg,*FileRaRangeDeg,*FileDecRangeDeg,
+                          I_CentralRaDeg,I_CentralDecDeg,I_FieldRadiusDeg)) break;
+      
+      //  If we get here, this overlaps the field. Read in its data and add to
+      //  the I_FileDetails list.
+      
+      OKSoFar = ReadFileData (MaskFile,Fptr,&FileDetails);
+   } while (false);
+   
+   //  Close the file - this is safe, even if the file wasn't opened properly.
+   
+   CloseMaskFile (Fptr);
+   
+   if (!OKSoFar) ReturnOK = false;
+   
+   return ReturnOK;
+}
+
+// ----------------------------------------------------------------------------------
+//
+//                         O p e n  M a s k  F i l e
+//
+//  Opens a namesd FITS file, returning a pointer to the fitsfile structure
+//  used by the cfitsio routines. This routine returns true if the file was
+//  opened OK, false (with an error description set into I_ErrorText) if there
+//  was an error.
+
+bool ProfitSkyCheck::OpenMaskFile (
+   const std::string& MaskFile, fitsfile** Fptr)
+{
+   bool ReturnOK = true;
+   
+   char FitsError[80];
+   int Status = 0;
+   I_Debug.Log ("Files","Opening file " + MaskFile);
+   fits_open_file (Fptr,MaskFile.c_str(),READONLY,&Status);
+   if (Status != 0) {
+      fits_get_errstatus (Status,FitsError);
+      I_ErrorText = "Failed to open '" + MaskFile + "' : " + string(FitsError);
+      ReturnOK = false;
+   }
+   return ReturnOK;
+
+}
+
+// ----------------------------------------------------------------------------------
+//
+//                         C l o s e  M a s k  F i l e
+//
+//  Given a pointer to the fitsfile structure as returned when the file was
+//  opened by a call to fits_open_file(), this routine closes the file. Note
+//  that this routine does not report errors, and can be called at the end
+//  of processing the file even if errors have occurred in that processing,
+//  simply to ensure that the file is not left open. If Fptr is passed as null.
+//  which it will be if the original fits_open_file() call failed, this routine
+//  does nothing.
+
+void ProfitSkyCheck::CloseMaskFile (fitsfile* Fptr)
+{
+   int Status = 0;
+   if (Fptr) fits_close_file (Fptr,&Status);
+}
+
+
+// ----------------------------------------------------------------------------------
+//
+//                      G e t  F i l e  D e t a i l s
+//
+//  Passed the addresss of a fitsfile structure for an already opened mask
+//  file, this routine fills in a ProfitFileDetails structure with the array
+//  dimensions, the Ra,Dec centre and range, and the WCS information. It
+//  does not read in the data from the file. This also does some basic checks
+//  on the mask file - does it contain a 2D array, for example? The routine
+//  returns true if it processes the file without problems. Otherwise it
+//  returns false - which may indicate that it isn't a valid FITS format file,
+//  or that it doesn't have valid WCS data, or simply that it isn't a 2D file.
+
+bool ProfitSkyCheck::GetFileDetails (
+   const std::string& MaskFile, fitsfile* Fptr, ProfitFileDetails* FileDetails)
 {
    static const int C_MaxDims = 7;
    
    bool ReturnOK = true;
    
-   //  If we want to use this file, we'll put the relevant details in here
-   //  and add it to the I_FileDetails list.
-   
-   ProfitFileDetails FileDetails;
-   
-   fitsfile* Fptr = NULL;
    char* HeaderPtr = NULL;
    wcsprm* WcsPtr = NULL;
 
@@ -639,24 +909,11 @@ bool ProfitSkyCheck::ReadAndCheckFile (
    
    do {
 
-      //  It looks as if this is a file we're interested in. We open it up and
-      //  start looking at the header values. We are mainly interested in the
-      //  WCS coordinates and the size of the main data (mask) array. First,
-      //  open the file.
-      
       char FitsError[80];
       int Status = 0;
-      I_Debug.Log ("Files","Opening file " + MaskFile);
-      fits_open_file (&Fptr,MaskFile.c_str(),READONLY,&Status);
-      if (Status != 0) {
-         fits_get_errstatus (Status,FitsError);
-         I_ErrorText = "Failed to open '" + MaskFile + "' : " + string(FitsError);
-         OKSoFar = false;
-         break;
-      }
       
-      //  Now get the dimensions of the main array from the NAXIS and NAXIS1
-      //  and NAXIS2 keywords.
+      //  The file is already open. Get the dimensions of the main array from
+      //  the NAXIS and NAXIS1 and NAXIS2 keywords.
       
       long Dims[C_MaxDims];
       int NDims;
@@ -722,13 +979,6 @@ bool ProfitSkyCheck::ReadAndCheckFile (
       }
       (void) wcsfix (1,IntDims,WcsPtr,Statuses);
       
-      //  At this point, WcsPtr is set up and can be used for coordinate
-      //  transformations. This next block of code is probably unnecessary, but
-      //  it's worth keeping for diagnostic purposes, and it provides the useful
-      //  check of calculating the central Ra,Dec position for the mask and
-      //  the range it covers, to compare with the coordinates from the file name
-      //  and the asumed mask dimensions.
-      
       //  Set up wcs2ps() to convert 5 coordinate pairs - NDims is 2. The corners
       //  of the mask, and the very centre - note that the pixel coordinates
       //  of the very centre of the bottom left pixel are 1.0,1.0, and those
@@ -773,83 +1023,190 @@ bool ProfitSkyCheck::ReadAndCheckFile (
       double DeltaRa = RaRange1toNx / double(Nx - 1);
       double DeltaDec = DecRange1toNy / double(Ny - 1);
       
-      //  We check for consistency. Is the central position what we expected
-      //  from the file name? Is the mask coverage roughly what we have been
-      //  assuming? If not, warn about this. A mask coverage less than expected
-      //  would be more of a problem than having more than expected.
-      
-      if ((fabs(MidRa - FileRa) * DegToAsec > 1.0) ||
-               (fabs(MidDec - FileDec) * DegToAsec > 1.0)) {
-         I_Warnings.push_back("File: " + MaskFile + " image centre from WCS " +
-                     FormatRaDecDeg(MidRa,MidDec) + " does not match file name");
-      }
-      I_Debug.Logf ("Files","Ra range = %f, Dec range = %f",
-                                  fabs(RaRange1toNx),fabs(RaRange1toNx));
-      if ((fabs(fabs(RaRange1toNx) - I_MaskRaSizeDeg) > I_MaskRaSizeDeg * 0.2) ||
-         (fabs(fabs(RaRange1toNx) - I_MaskDecSizeDeg) > I_MaskDecSizeDeg * 0.2)) {
-         I_Warnings.push_back("File: " + MaskFile + " image range from WCS " +
-            FormatRaDecDeg(fabs(RaRange1toNx),fabs(DecRange1toNy)) +
-                     " differs significantly from assumed range " +
-                             FormatRaDecDeg(I_MaskRaSizeDeg,I_MaskDecSizeDeg));
-      }
-      
       //  At this point, we can set up the fields for the structure
       //  used to describe this file. Note that we copy the WCS information
       //  into this structure, so we can happily free the original version
       //  read from the file.
       
-      FileDetails.Path = MaskFile;
-      FileDetails.Nx = Nx;
-      FileDetails.Ny = Ny;
-      FileDetails.DataArray = NULL;
-      FileDetails.MidRa = MidRa;
-      FileDetails.MidDec = MidDec;
-      FileDetails.DeltaRa = DeltaRa;
-      FileDetails.DeltaDec = DeltaDec;
-      memcpy (&FileDetails.Wcs,WcsPtr,sizeof(wcsprm));
+      FileDetails->Path = MaskFile;
+      FileDetails->Nx = Nx;
+      FileDetails->Ny = Ny;
+      FileDetails->DataArray = NULL;
+      FileDetails->MidRa = MidRa;
+      FileDetails->MidDec = MidDec;
+      FileDetails->DeltaRa = DeltaRa;
+      FileDetails->DeltaDec = DeltaDec;
+      memcpy (&(FileDetails->Wcs),WcsPtr,sizeof(wcsprm));
       
-      //  Finally, we read in the mask data. Perhaps we should check BITPIX
-      //  to see what native format is being used for the data. This assumes
-      //  32 bit signed int data.
-      
-      int** DataArray = (int**) I_ArrayManager.Malloc2D(sizeof(float),Ny,Nx);
-      long long StartPixel = 1;
-      long long PixelsThisTime = Nx * Ny;
-      float Nullval = 0.0;
-      int Anynull = 0;
-      int* BaseData = (int*) I_ArrayManager.BaseArray (DataArray);
-      fits_read_img(Fptr, TINT, StartPixel, PixelsThisTime, &Nullval,
-                                                BaseData, &Anynull, &Status);
-      if (Status != 0) {
-         fits_get_errstatus (Status,FitsError);
-         I_ErrorText = "Failed to read mask data from '" + MaskFile +
-                                              "' : " + string(FitsError);
-         I_ArrayManager.Free(DataArray);
-         DataArray = NULL;
-         OKSoFar = false;
-         break;
-      }
-      
-      //  All OK. Set the address of the Mask data in the file details structure,
-      //  and add that structure to the list of such structures that we use to
-      //  access the data from the various masks that overlap the field.
-      
-      FileDetails.DataArray = DataArray;
-      I_FileDetails.push_back(FileDetails);
-      break;
+      I_Debug.Logf ("Files","Mask %d by %d pixels, centre at %f, %f",Nx,Ny,MidRa,MidDec);
+      I_Debug.Logf ("Files","Ra range %f deg, Dec range %f deg",RaRange1toNx,DecRange1toNy);
       
    } while (false);
    
    //  We can now release any resources we allocated during the process.
-                  
+   
    int IgnoreStatus = 0;
    if (HeaderPtr) fits_free_memory(HeaderPtr,&IgnoreStatus);
    HeaderPtr = NULL;
    if (WcsPtr) free(WcsPtr);
    WcsPtr = NULL;
+
+   ReturnOK = OKSoFar;
+   
+   return ReturnOK;
+
+}
+
+// ----------------------------------------------------------------------------------
+//
+//                      R e a d  F i l e  D a t a
+//
+//  Passed the addresss of a fitsfile structure for an already opened 2D mask
+//  file, this routine reads in the mask data from that file and records the
+//  address of that data in a ProfitFileDetails structure. The routine
+//  returns true if it processes the file without problems. Otherwise it
+//  returns false - which may indicate that it isn't a valid FITS format file.
+//  If the data is read OK, its details are added to the list of mask data
+//  in use held in the list I_FileDetails.
+
+bool ProfitSkyCheck::ReadFileData (
+   const std::string& MaskFile, fitsfile* Fptr, ProfitFileDetails* FileDetails)
+{
+   bool ReturnOK = true;
+   
+   char FitsError[80];
    int Status = 0;
-   if (Fptr) fits_close_file (Fptr,&Status);
-   Fptr = NULL;
+   
+   //  Note the assumption that the file is already open and contains 2D
+   //  data.
+   
+   //  We read in the mask data. Perhaps we should check BITPIX
+   //  to see what native format is being used for the data. This assumes
+   //  32 bit signed int data.
+
+   int Nx = FileDetails->Nx;
+   int Ny = FileDetails->Ny;
+   int** DataArray = (int**) I_ArrayManager.Malloc2D(sizeof(float),Ny,Nx);
+   long long StartPixel = 1;
+   long long PixelsThisTime = Nx * Ny;
+   float Nullval = 0.0;
+   int Anynull = 0;
+   int* BaseData = (int*) I_ArrayManager.BaseArray (DataArray);
+   fits_read_img(Fptr, TINT, StartPixel, PixelsThisTime, &Nullval,
+                                             BaseData, &Anynull, &Status);
+   if (Status == 0) {
+   
+      //  All OK. Set the address of the Mask data in the file details structure,
+      //  and add that structure to the list of such structures that we use to
+      //  access the data from the various masks that overlap the field.
+
+      FileDetails->DataArray = DataArray;
+      I_FileDetails.push_back(*FileDetails);
+
+   } else {
+   
+      fits_get_errstatus (Status,FitsError);
+      I_ErrorText = "Failed to read mask data from '" + MaskFile +
+                                           "' : " + string(FitsError);
+      I_ArrayManager.Free(DataArray);
+      DataArray = NULL;
+      ReturnOK = false;
+   }
+
+   return ReturnOK;
+}
+
+
+// ----------------------------------------------------------------------------------
+//
+//                      R e a d  A n d  C h e c k  F i l e
+//
+//  Read one of the mask files, checking coordinates and reading its data.
+//  The file name passed should be the path name of a file that's already been
+//  identified as a FITS format file that is expected to have Profit mask data,
+//  and which is believed to cover an area of sky that overlaps the field in
+//  question, on the basis of the central Ra,Dec embedded in its filename. That
+//  Ra,Dec centre value is passed so it can be checked against the actual WCS
+//  data in the file. This routine accesses the header for the file, checks
+//  that it holds 2D data centered as expected, read in the data and adds a
+//  file details structure for the file to the list held in I_FileDetails.
+
+bool ProfitSkyCheck::ReadAndCheckFile (
+   const string& MaskFile, double FileRaDeg, double FileDecDeg,
+   double FileRaRangeDeg, double FileDecRangeDeg)
+{
+   bool ReturnOK = true;
+   
+   //  If we want to use this file, we'll put the relevant details in here
+   //  and add it to the I_FileDetails list.
+   
+   ProfitFileDetails FileDetails;
+   
+   fitsfile* Fptr = NULL;
+
+   //  There are a few steps here, and I'm using the same overall scheme as in
+   //  Initialise(), with a do structure that can be broken out of if anything
+   //  goes wrong. (There aren't as many as steps there used to be, because
+   //  quite a bit of the code was moved into GetFileDetails() in Jan 2022.)
+   
+   bool OKSoFar = true;
+   
+   do {
+
+      //  It looks as if this is a file we're interested in. We open it up and
+      //  start looking at the header values. We are mainly interested in the
+      //  WCS coordinates and the size of the main data (mask) array. First,
+      //  open the file.
+      
+      fitsfile* Fptr;
+      OKSoFar = OpenMaskFile (MaskFile,&Fptr);
+      if (!OKSoFar) break;
+
+      //  Now get the details of the file data array and its Ra,Dec coordinates
+      //  into FileDetails. It's not quite clear to me what the best thing to
+      //  do if there's an error from GetFileDetails(). It may just be that
+      //  we have a FITS file in the mask file directory that isn't actually
+      //  a mask. We could ignore it, but I suspect it's better to bail at
+      //  this point and do something about this rogue file. GetFileDetails()
+      //  will have already set I_ErrorText.
+      
+      OKSoFar = GetFileDetails (MaskFile,Fptr,&FileDetails);
+      if (!OKSoFar) break;
+      
+      //  We check for consistency. Is the central position what we expected
+      //  from the file name? Is the mask coverage roughly what we have been
+      //  assuming? If not, warn about this. A mask coverage less than expected
+      //  would be more of a problem than having more than expected. See comments
+      //  to CheckWCSandReadFile() for discussion of mask centre accuracy. (A
+      //  similar argument says the ranges should be good to 0.01 deg.)
+      
+      double MidRa = FileDetails.MidRa;
+      double MidDec = FileDetails.MidDec;
+      if ((fabs(MidRa - FileRaDeg) > 0.1) || (fabs(MidDec - FileDecDeg) > 0.1)) {
+         I_Warnings.push_back("File: " + MaskFile + " image centre from WCS " +
+                     FormatRaDecDeg(MidRa,MidDec) + " does not match file name");
+      }
+      
+      double RaRange1toNx = FileDetails.DeltaRa * (FileDetails.Nx - 1);
+      double DecRange1toNy = FileDetails.DeltaDec * (FileDetails.Ny - 1);
+      I_Debug.Logf ("Files","Ra range = %f, Dec range = %f",
+                                  fabs(RaRange1toNx),fabs(DecRange1toNy));
+      if ((fabs(fabs(RaRange1toNx) - fabs(FileRaRangeDeg)) > 0.01) ||
+         (fabs(fabs(DecRange1toNy) - fabs(FileDecRangeDeg)) > 0.01)) {
+         I_Warnings.push_back("File: " + MaskFile + " image range from WCS " +
+            FormatRaDecDeg(fabs(RaRange1toNx),fabs(DecRange1toNy)) +
+                     " differs significantly from assumed range " +
+                             FormatRaDecDeg(FileRaRangeDeg,FileDecRangeDeg));
+      }
+      
+      OKSoFar = ReadFileData (MaskFile,Fptr,&FileDetails);
+      if (!OKSoFar) break;
+      
+   } while (false);
+   
+   //  We can now release any resources we allocated during the process.
+                  
+   CloseMaskFile(Fptr);
 
    ReturnOK = OKSoFar;
    
@@ -1118,12 +1475,20 @@ bool ProfitSkyCheck::CheckUseForSky (
                //  the point is within the rectangle.)
                
                double DistSq = 0.0;
-               double DistRa = fabs(RaDeg - Ra) - DeltaRaDeg * 0.5;
-               double DistDec = fabs(DecDeg - Dec) - DeltaDecDeg * 0.5;
+               double DistRa = fabs(RaDeg - Ra) - fabs(DeltaRaDeg) * 0.5;
+               double DistDec = fabs(DecDeg - Dec) - fabs(DeltaDecDeg) * 0.5;
                if ((DistRa > 0.0) || (DistDec > 0.0)) {
                   DistSq = DistRa * DistRa + DistDec * DistDec;
                }
-               if (DistSq <= (RadiusDeg * RadiusDeg)) {
+               bool CheckPixel = (DistSq <= (RadiusDeg * RadiusDeg));
+               
+               I_Debug.Logf("SkyCheckDist",
+                  "Pixel[%d,%d] = %d, Ra,Dec dist = %f,%f will %s",
+                  Ix,Iy,Details.DataArray[Iy - 1][Ix - 1],
+                  DistRa * DegToAsec, DistDec * DegToAsec,
+                  CheckPixel ? "check" : "ignore");
+               
+               if (CheckPixel) {
                   if (Details.DataArray[Iy - 1][Ix - 1] > 0.0) {
                   
                      //  We've found one contaminated pixel, and that's all
@@ -1267,7 +1632,7 @@ string ProfitSkyCheck::FormatRaDecDeg (double RaDeg, double DecDeg)
 //  A diagnostic routine that reports the range of coordinates checked
 //  so far. Calling this resets the array used to keep track of the range,
 //  so the effect if to report the range of coordinates converted since the
-//  start fo the program or the last time this was called.
+//  start of the program or the last time this was called.
 
 void ProfitSkyCheck::ReportRaDecRange (void)
 {
@@ -1296,22 +1661,71 @@ void ProfitSkyCheck::ReportRaDecRange (void)
 }
 
 // ----------------------------------------------------------------------------------
+//
+//                      M a i n   ( t e s t  p r o g r a m )
+//
+//  This is a small main test program that can be used to test this code in a
+//  standalone way. It is only compiled if the compiler symbol ProfitSkyTest is
+//  defined. On my test laptop, this can be used to link it:
+//
+//      g++ -o ProfitCheck -D ProfitSkyTest -I ../Packages/wcslib-5.16
+//        -I ../Packages/wcslib-5.16/C -I ../Packages/Misc/ -std=c++11
+//        ProfitSkyCheck.cpp ../Packages/wcslib-5.16/C /libwcs-5.16.a
+//        ../Packages/Misc/ArrayManager.o ../Packages/Misc/TcsUtil.o
+//        ../Packages/Misc/Wildcard.o ../Packages/cfitsio/libcfitsio.a
+
+#ifdef ProfitSkyTest
+
+int main(int argc, char* argv[])
+{
+   if (argc < 7) {
+      printf ("Usage: directory name, ra, dec, radius, pointra, pointdec\n");
+   } else {
+      ProfitSkyCheck TheChecker;
+      TheChecker.SetDebugLevels("*.files");
+      bool Status = TheChecker.Initialise(argv[1],atof(argv[2]),atof(argv[3]),
+              atof(argv[4]));
+      if (!Status) {
+         printf ("Error: %s\n",TheChecker.GetError().c_str());
+      }
+      bool Clear = false;
+      Status = TheChecker.CheckUseForSky(atof(argv[5]),atof(argv[6]),
+                                                   3.0 / 3600.0,&Clear);
+      if (!Status) {
+         printf ("Error: %s\n",TheChecker.GetError().c_str());
+      } else {
+         if (Clear) printf ("Clear\n");
+         else printf("Obscured\n");
+      }
+   }
+   return 0;
+}
+
+#endif
+
+// ----------------------------------------------------------------------------------
 
 /*                        P r o g r a m m i n g  N o t e s
 
+   o  The code as originally written ignored the cos(dec) effect that causes
+      RA values to get closer together as the declination increases. This is
+      mainly an issue with the operation of FileOverlapsField(), which should
+      now be fixed.
+      
+   o  As of Jan 2022, this code has been significantly reworked to allow for the
+      use of mask files with Ra,Dec ranges that differ fro the square formats
+      of the original Profit mask files.
+ 
    o  I've realised that throughout this code there is an assumption that the
       first axis of the Profit files (the X-axis) is RA and the second axis
-      (the Y-axis) is Dec. If that ever gets changes, someone is going to have
+      (the Y-axis) is Dec. If that ever gets changed, someone is going to have
       to look quite carefully at this code in order to sort that out. This is
       left as an exercise to the reader. (Or as a warning not to mess with the
       Profit file format!)
  
-   o  If we can't get a central Ra,Dec out of a file's name, we could always
-      open it up anyway and get them from the WCS in the header. The code doesn't
-      do this, but we could just call ReadAndCheckFile() with 'unknown' Ra,Dec
-      values from the file name.
- 
-   o  Similarly, we could ignore the overlap calculated on the basis of the file
+   o  (This note was put here early on in the development of this code, and I
+      think it explains the thinking behind some of the design.)
+      We could ignore the overlap calculated on the basis of the file
       name and get it for each file on the basis of the WCS data. In fact, we
       could ignore the file name entirely! The problem here isn't that opening a
       .fits file and just checking the WCS coordinates takes time, because it
@@ -1338,36 +1752,22 @@ void ProfitSkyCheck::ReportRaDecRange (void)
    o  This assumes the main data array in the ProFit files is integer. It may
       be that the code should check BITPIX and use whatever format is being used
       to avoid unnecessary conversion.
+ 
+   o  In testing, I hit an embarassing bug in the TCS routine that formats a
+      value in degrees into degrees,arcminutes,arcsec and fractions of arcsec.
+      In one case a value that was almost exactly 2.0 arcsec was displayed as
+      000:00:01.100. I believe the code had formatted a fractional value os
+      something like .9998 but had rounded this to 10000 and truncated this to
+      three digits, leaving it as 100 for the fractional arcsec part. This
+      ought to be fixed! But it may hang around for a while, so just beware of
+      this if there seem to be inexplicable arcsec values in the diagnostics.
 */
 
-/*
-int main(int argc, char* argv[])
-{
-   if (argc < 7) {
-      printf ("Usage: directory name, ra, dec, radius, pointra, pointdec\n");
-   } else {
-      ProfitSkyCheck TheChecker;
-      bool Status = TheChecker.Initialise(argv[1],atof(argv[2]),atof(argv[3]),
-              atof(argv[4]));
-      if (!Status) {
-         printf ("Error: %s\n",TheChecker.GetError().c_str());
-      }
-      bool Clear = false;
-      Status = TheChecker.CheckUseForSky(atof(argv[5]),atof(argv[6]),
-                                                   3.0 / 3600.0,&Clear);
-      if (!Status) {
-         printf ("Error: %s\n",TheChecker.GetError().c_str());
-      } else {
-         if (Clear) printf ("Clear\n");
-         else printf("Obscured\n");
-      }
-   }
-   return 0;
-}
-*/
 
 /*  A snippet of code that used to be in Initialise(), used for testing the
-    iterative pixel location.
+    iterative pixel location.  It may be worth re-instating, but note that
+    there needs to be a check to make sure RaDec->XY isn't tested at the
+    same time as XY->RaDec, as that will just lead to an infinite loop.
  
                   double MaxRaErr = 0.0,MaxDecErr = 0.0;
                   int IxRaAt = 0, IyRaAt = 0;
