@@ -106,6 +106,11 @@ class probe:
         else:
             raise ValueError(f"This rectangular magnet has an orientation of {self.rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
 
+        
+        # Print the distance between the circular magnet and the rectangular magnet
+        radial_distance = np.sqrt((self.rectangular_magnet_center[0] - self.circular_magnet_center[0])**2 + (self.rectangular_magnet_center[1] - self.circular_magnet_center[1])**2)
+        print(f"Radial dist between cm and rm: {radial_distance}")
+
         return np.array(self.rectangular_magnet_center)
 
     def extract_circular_magnet_parameters(self):
