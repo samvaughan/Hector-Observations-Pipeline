@@ -675,6 +675,8 @@ class HectorPipe:
         offset_circularAnnulus = {'Blu':0.0, 'Gre':0.0, 'Yel':0.0, 'Mag':0.0}
         all_magnets = offsets.magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_magnets)
 
+        import ipdb; ipdb.set_trace()
+        
         # file to report flags regarding special cases of hexabundle allocation
         flagsFile = f'{self.allocation_files_location_base}/Flags.txt'
 

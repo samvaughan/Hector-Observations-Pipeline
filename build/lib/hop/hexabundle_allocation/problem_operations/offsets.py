@@ -114,6 +114,7 @@ def hexaPositionOffset(all_magnets, offsetFile):
             all_magnets[i].view_y = all_magnets[i].center[0]
             all_magnets[i].view_x = - all_magnets[i].center[1]
 
+    
     print('\n\n\n')
 
     # recalculate positions of x and y for rectangular magnets as per adjusted circular magnet coordinates
@@ -133,7 +134,13 @@ def hexaPositionOffset(all_magnets, offsetFile):
 
                     # recalculate rectangular magnet center coordinates as per updated circular magnet center
                     all_magnets[i].center = probe.calculate_rectangular_magnet_center_coordinates(all_magnets[i])
-                    # print('AFTER:'+str(all_magnets[i].center))
+
+                    #Added by Sam 14/01/22
+                    ## UPDATE THE VIEW ATTRIBUTES TOO- otherwise the rectangular magnets aren't using their updated centres!
+                    all_magnets[i].view_x = - all_magnets[i].center[1]
+                    all_magnets[i].view_y = all_magnets[i].center[0]
+
+
 
     # print("DONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
     # angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
