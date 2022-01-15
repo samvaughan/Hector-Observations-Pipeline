@@ -107,6 +107,14 @@ def hexaPositionOffset(all_magnets, offsetFile):
             all_magnets[i].circular_magnet_center = all_magnets[i].center
             all_magnets[i].orientation = probe.calculate_circular_magnet_orientation(all_magnets[i])
 
+            # Added by Sam on 15/01/2022: Update the Circular magnet AzAngs value
+            updated_AzAngs = np.arctan2(all_magnets[i].center[1], all_magnets[i].center[0]) + np.pi
+            delta_AzAngs = all_magnets[i].azAngs - updated_AzAngs
+            print(f"AzAngs was {all_magnets[i].azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
+            all_magnets[i].azAngs = updated_AzAngs
+
+            #
+
             # print('Updated orientation_circular = ' + str(all_magnets[i].orientation))
             # print('Circular After:'+str(all_magnets[i].center))
 
@@ -132,6 +140,8 @@ def hexaPositionOffset(all_magnets, offsetFile):
                     all_magnets[i].circular_magnet_center = all_magnets[j].center
                     all_magnets[i].circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
 
+
+                    #import ipdb; ipdb.set_trace()
                     # recalculate rectangular magnet center coordinates as per updated circular magnet center
                     all_magnets[i].center = probe.calculate_rectangular_magnet_center_coordinates(all_magnets[i])
 
@@ -251,6 +261,7 @@ def magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_
                     all_magnets[j].view_y = all_magnets[j].center[0]
                     all_magnets[j].view_x = - all_magnets[j].center[1]
 
+
     return all_magnets
 
 
@@ -327,7 +338,7 @@ def convert_modulus_angle(angle):
 
 
 
-def magnetOffsets_asColumns_toFile():
-    #
+# def magnetOffsets_asColumns_toFile():
+#     #
 
-    return
+#     return

@@ -19,7 +19,7 @@ plt.rc('ytick', labelsize=30)    # fontsize of the tick labels
 plt.rc('legend', fontsize=30)    # legend fontsize
 plt.rc('figure', titlesize=30)   # fontsize of the figure title
 
-# creating annotated text on the magnets to differentiate the type adn size of hexabundles used and for labels
+# creating annotated text on the magnets to differentiate the type and size of hexabundles used and for labels
 def annotate_text_in_plot(magnet):
     rotation_matrix = rotational_matrix(convert_degrees_to_radians(magnet.orientation))
 

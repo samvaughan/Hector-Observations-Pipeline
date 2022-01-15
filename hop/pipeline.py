@@ -687,6 +687,7 @@ class HectorPipe:
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
+        
         all_magnets = offsets.hexaPositionOffset(all_magnets,self.offsetFile)
 
         # create magnet pickup areas for all the magnets

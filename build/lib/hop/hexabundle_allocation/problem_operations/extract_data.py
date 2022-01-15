@@ -82,20 +82,21 @@ def create_list_of_probes_from_file(file,guideFileList):
     # appending all the probes to the probes list
     i = 0
     for each_probe in probe_number:
-        list_of_probes.append(probe(probe_number[i],
-                                    [circular_magnet_center_x[i],circular_magnet_center_y[i]],
-                                     rectangle_magnet_input_orientation[i],
-                                     galaxyORstar[i],
-                                     Re[i],
-                                     mu_1re[i],
-                                     Mstar[i],
-                                     magnet_label[i],
-                                     hexabundle[i],
-                                     rads[i],
-                                     rotation_pickup[i],
-                                     rotation_putdown[i],
-                                     azAngs[i],
-                                     IDs[i]))
+        list_of_probes.append(probe(probe_index=probe_number[i],
+                                    circular_magnet_center=[circular_magnet_center_x[i],circular_magnet_center_y[i]],
+                                     rectangular_magnet_input_orientation=rectangle_magnet_input_orientation[i],
+                                     galaxyORstar=galaxyORstar[i],
+                                     Re=Re[i],
+                                     mu_1re=mu_1re[i],
+                                     Mstar=Mstar[i],
+                                     magnet_label=magnet_label[i],
+                                     hexabundle=hexabundle[i],
+                                     rads=rads[i],
+                                     rotation_pickup=rotation_pickup[i],
+                                     rotation_putdown=rotation_putdown[i],
+                                     azAngs=azAngs[i],
+                                     IDs=IDs[i],
+                                     angs=angs[i]))
 
         i += 1
 
@@ -124,6 +125,7 @@ def create_list_of_circular_and_rectangular_magnets_from_file(file,guideFileList
     # extracting the rectangular magnet parameters respectively from the probes list
     for each_probe in list_of_probes:
         list_of_rectangular_magnet.append(each_probe.extract_rectangular_magnet_parameters())
+
 
     return list_of_circular_magnet,list_of_rectangular_magnet
 

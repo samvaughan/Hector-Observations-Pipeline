@@ -2,11 +2,14 @@ from ...general_operations.geometry_shapes.rectangle import rectangle
 from ...hector.constants import rectangle_magnet_length,rectangle_magnet_width,robot_arm_width
 from math import sin, cos, pi
 from ...hector.magnets.pickup_areas import inward, outward
+# from 
+
+### SHOULD ALSO INHERIT FROM PROBE CLASS HERE!
 
 class rectangular_magnet(rectangle):
 
     # initializing a rectangular magnet with all respective parameters
-    def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs):
+    def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs, angs):
 
         length = rectangle_magnet_length
         width = rectangle_magnet_width
@@ -25,6 +28,8 @@ class rectangular_magnet(rectangle):
         self.azAngs = azAngs
         self.rectangular_magnet_input_orientation = rectangular_magnet_input_orientation
         self.IDs = IDs
+        self.angs = angs
+        self.rectangular_magnet_absolute_orientation_degree = orientation
 
     # calculating the distance between magnet center to pickup area center
     def calculate_center_magnet_to_center_pickup_area_length(self):
