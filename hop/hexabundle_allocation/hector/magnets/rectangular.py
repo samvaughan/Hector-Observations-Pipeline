@@ -9,7 +9,7 @@ from ...hector.magnets.pickup_areas import inward, outward
 class rectangular_magnet(rectangle):
 
     # initializing a rectangular magnet with all respective parameters
-    def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs, angs):
+    def __init__(self,center,orientation,index,galaxyORstar,Re,mu_1re,Mstar,magnet_label,hexabundle,rads,rotation_pickup,rotation_putdown,azAngs,rectangular_magnet_input_orientation,IDs, angs, plot_orientation):
 
         length = rectangle_magnet_length
         width = rectangle_magnet_width
@@ -30,6 +30,7 @@ class rectangular_magnet(rectangle):
         self.IDs = IDs
         self.angs = angs
         self.rectangular_magnet_absolute_orientation_degree = orientation
+        self.plot_orientation = plot_orientation
 
     # calculating the distance between magnet center to pickup area center
     def calculate_center_magnet_to_center_pickup_area_length(self):

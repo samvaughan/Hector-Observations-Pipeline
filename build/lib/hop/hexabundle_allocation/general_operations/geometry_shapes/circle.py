@@ -27,18 +27,18 @@ class circle:
         self.y_coordinates_positive = np.sqrt(np.abs(self.radius ** 2 - (self.x_coordinates - self.center[0]) ** 2)) + self.center[1]
 
     # plotting the circle on respective figures
-    def draw_circle(self,colour):
+    def draw_circle(self,colour, ax1, ax2):
 
         circle.calculate_circle_all_coordinates(self)
 
-        plt.figure(1)
-        plt.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha=0.5)
-        plt.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha=0.5)
-        plt.axis('scaled')
+        #plt.figure(1)
+        ax1.plot(self.x_coordinates, self.y_coordinates_negative, colour, alpha=0.5)
+        ax1.plot(self.x_coordinates, self.y_coordinates_positive, colour, alpha=0.5)
+        ax1.axis('scaled')
 
 ################################################################
-        plt.figure(2)
-        plt.plot(self.x_coordinates + robot_center_x, (self.y_coordinates_negative + robot_center_y), colour)
-        plt.plot(self.x_coordinates + robot_center_x, (self.y_coordinates_positive + robot_center_y), colour)
-        plt.axis('scaled')
+        #plt.figure(2)
+        ax2.plot(self.x_coordinates + robot_center_x, (self.y_coordinates_negative + robot_center_y), colour)
+        ax2.plot(self.x_coordinates + robot_center_x, (self.y_coordinates_positive + robot_center_y), colour)
+        ax2.axis('scaled')
 ################################################################

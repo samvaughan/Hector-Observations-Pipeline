@@ -122,9 +122,6 @@ def calculate_pickup_putdown_angles(magnet, available_pickup):
     elif magnet.__class__.__name__ == 'rectangular_magnet':
         magnet.rotation_pickup = 180
 
-        # angs_azangs + azAngs
-        #  = (angs - AzAngs) + AzAngs
-        #  = angs
         ang_azAngs = convert_radians_to_degrees(magnet.rectangular_magnet_input_orientation) + 270
         #import ipdb; ipdb.set_trace()
         if ang_azAngs < 180 and azAngs < 90:
@@ -143,7 +140,7 @@ def calculate_pickup_putdown_angles(magnet, available_pickup):
             magnet.rotation_putdown = (450 - azAngs) + (180 - ang_azAngs)
             if 'I' in available_pickup:
                 magnet.rotation_putdown = magnet.rotation_putdown - 180
-    print(magnet.rotation_putdown)
+    #print(magnet.rotation_putdown)
     return magnet
 
 

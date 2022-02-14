@@ -110,7 +110,7 @@ def hexaPositionOffset(all_magnets, offsetFile):
             # Added by Sam on 15/01/2022: Update the Circular magnet AzAngs value
             updated_AzAngs = np.arctan2(all_magnets[i].center[1], all_magnets[i].center[0]) + np.pi
             delta_AzAngs = all_magnets[i].azAngs - updated_AzAngs
-            print(f"AzAngs was {all_magnets[i].azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
+            #print(f"AzAngs was {all_magnets[i].azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
             all_magnets[i].azAngs = updated_AzAngs
 
             #
@@ -123,7 +123,7 @@ def hexaPositionOffset(all_magnets, offsetFile):
             all_magnets[i].view_x = - all_magnets[i].center[1]
 
     
-    print('\n\n\n')
+    #print('\n\n\n')
 
     # recalculate positions of x and y for rectangular magnets as per adjusted circular magnet coordinates
     for i in range(len(all_magnets)):

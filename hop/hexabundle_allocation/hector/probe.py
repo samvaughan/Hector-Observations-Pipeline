@@ -61,22 +61,29 @@ class probe:
 
         return self.circular_magnet_orientation
 
+    def calculate_rectangular_magnet_orientation_for_plots(self):
+        """
+        The old calculation of the rectangular magnet orientation seems to work well with the labels on the plots and the correct ones below don't. Probably a matplotlib rectangle orientation thing? I don't get the difference as the old ones are always factors of 360 from the new ones...
+        Until it's debugged, just use the old values
+        """
+        probe.calculate_circular_magnet_orientation(self)
+        old_orientation = (90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation))# % 360
+
+        return old_orientation
+
     # calculating the rectangular magnet orientation with respect to the circular magnet
     def calculate_rectangular_magnet_orientation(self):
 
-       #probe.calculate_circular_magnet_orientation(self)
-
-       ### Comments by Sam
-       # Not sure I understand this function?
-       # 90 - self.circular_magnet_orientation is AzAngs
-       # self.rectangular_magnet_input_orientation is Angs_AzAngs
-        
-       
-       #b = (90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation)) % 360       
+       probe.calculate_circular_magnet_orientation(self)
+       old_orientation = (90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation))# % 360
        #a = 270 - np.degrees(self.angs)
+       
+
        rectangular_magnet_absolute_orientation_degree = 270 - np.degrees(self.angs)
        # print(f"Rmag_orientation calculated = {b:.7f}, angs={a:.7f}")
        #import ipdb; ipdb.set_trace()
+
+       #print(f"{self.hexabundle}: old={old_orientation:.3f}, new={rectangular_magnet_absolute_orientation_degree:.3f}")
 
        return rectangular_magnet_absolute_orientation_degree
 
@@ -154,7 +161,8 @@ class probe:
                                   azAngs=self.azAngs,
                                   rectangular_magnet_input_orientation=self.rectangular_magnet_input_orientation,
                                   IDs=self.IDs,
-                                  angs=self.angs)
+                                  angs=self.angs,
+                                  plot_orientation=self.calculate_rectangular_magnet_orientation_for_plots())
 
         # if r_magnet.hexabundle == "A":
         #     import ipdb; ipdb.set_trace()

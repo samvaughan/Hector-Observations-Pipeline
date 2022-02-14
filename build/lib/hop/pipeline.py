@@ -695,9 +695,12 @@ class HectorPipe:
 
         if plot:
             #************** # creating plots and drawing pickup areas
-            plt.clf()
-            plt.close()
-            HECTOR_plate().draw_circle('r')
+            fig_hexa, ax_hexa = plt.subplots()
+            fig_robot, ax_robot = plt.subplots() 
+            #plt.figure(1)
+            # plt.clf()
+            # plt.close()
+            HECTOR_plate().draw_circle(colour='r', ax1=ax_hexa, ax2=ax_robot)
             # plots.draw_magnet_pickup_areas(all_magnets, '--c')
             #**************
 
@@ -728,8 +731,8 @@ class HectorPipe:
             robot_figureFile = f"{self.plot_location}/robotPlot_{fileNameHexa_stem}.pdf"
             # Output file- figure 2
             hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{fileNameHexa_stem}.pdf"
-            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile)  #***********
-
+            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile, fig_hexa, ax_hexa, fig_robot, ax_robot)  #***********
+            
         # checking positioning_array prints out all desired parameters
         # print(positioning_array)
 
