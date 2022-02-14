@@ -59,7 +59,7 @@ class HectorPipe:
         self.header_dictionary = self.make_header_dictionary()
 
         # Set up the output folders
-        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres", "FinalOuputs"]
+        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres", "FinalOutputs"]
         folders = misc_tools.create_output_directories(self.config['output_folder'], subfolders_to_be_made)
 
         # Add these as class attributes
@@ -72,7 +72,7 @@ class HectorPipe:
         self.allocation_files_location_base = folders['Allocation']
         self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
         self.allocation_files_location_robot = folders['Allocation/robot_outputs']
-        self.final_tiles_correct_format_location = folders['FinalOuputs']
+        self.final_tiles_correct_format_location = folders['FinalOutputs']
 
         # Set up the log files
         self.logger, self.logger_R_code = misc_tools.set_up_loggers(self.config)
