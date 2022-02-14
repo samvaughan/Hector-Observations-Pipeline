@@ -59,7 +59,7 @@ class HectorPipe:
         self.header_dictionary = self.make_header_dictionary()
 
         # Set up the output folders
-        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres", "FinalOuputs"]
+        subfolders_to_be_made = ['Logs', 'Configuration', 'Tiles', 'Plots', 'DistortionCorrected', "DistortionCorrected/Plots", "Allocation", "Allocation/tile_outputs", "Allocation/robot_outputs", "Fibres", "FinalOutputs"]
         folders = misc_tools.create_output_directories(self.config['output_folder'], subfolders_to_be_made)
 
         # Add these as class attributes
@@ -72,7 +72,7 @@ class HectorPipe:
         self.allocation_files_location_base = folders['Allocation']
         self.allocation_files_location_tiles = folders['Allocation/tile_outputs']
         self.allocation_files_location_robot = folders['Allocation/robot_outputs']
-        self.final_tiles_correct_format_location = folders['FinalOuputs']
+        self.final_tiles_correct_format_location = folders['FinalOutputs']
 
         # Set up the log files
         self.logger, self.logger_R_code = misc_tools.set_up_loggers(self.config)
@@ -687,6 +687,7 @@ class HectorPipe:
 
         #### Offset functions- still a work in progress- need to determine input source and add column to output file
         # Input file 3 - offsets
+        
         all_magnets = offsets.hexaPositionOffset(all_magnets,self.offsetFile)
 
         # create magnet pickup areas for all the magnets
@@ -694,9 +695,12 @@ class HectorPipe:
 
         if plot:
             #************** # creating plots and drawing pickup areas
-            plt.clf()
-            plt.close()
-            HECTOR_plate().draw_circle('r')
+            fig_hexa, ax_hexa = plt.subplots()
+            fig_robot, ax_robot = plt.subplots() 
+            #plt.figure(1)
+            # plt.clf()
+            # plt.close()
+            HECTOR_plate().draw_circle(colour='r', ax1=ax_hexa, ax2=ax_robot)
             # plots.draw_magnet_pickup_areas(all_magnets, '--c')
             #**************
 
@@ -727,8 +731,8 @@ class HectorPipe:
             robot_figureFile = f"{self.plot_location}/robotPlot_{fileNameHexa_stem}.pdf"
             # Output file- figure 2
             hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{fileNameHexa_stem}.pdf"
-            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile)  #***********
-
+            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile, fig_hexa, ax_hexa, fig_robot, ax_robot)  #***********
+            
         # checking positioning_array prints out all desired parameters
         # print(positioning_array)
 

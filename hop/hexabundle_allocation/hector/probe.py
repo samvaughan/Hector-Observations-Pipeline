@@ -8,7 +8,7 @@ from .magnets.rectangular import rectangular_magnet
 class probe:
 
     # intializing a probe with all the respective parameters
-    def __init__(self, probe_index, circular_magnet_center, rectangular_magnet_input_orientation, galaxyORstar, Re, mu_1re, Mstar, magnet_label, hexabundle, rads, rotation_pickup, rotation_putdown, azAngs, IDs):
+    def __init__(self, probe_index, circular_magnet_center, rectangular_magnet_input_orientation, galaxyORstar, Re, mu_1re, Mstar, magnet_label, hexabundle, rads, rotation_pickup, rotation_putdown, azAngs, IDs, angs):
 
         self.index = probe_index
         self.circular_magnet_center = np.array(circular_magnet_center) #* HECTOR_plate_radius
@@ -25,6 +25,10 @@ class probe:
         self.rotation_putdown = rotation_putdown
         self.azAngs = azAngs
         self.IDs = IDs
+        self.angs = angs
+
+
+        self.rectangular_magnet_absolute_orientation_degree = self.calculate_rectangular_magnet_orientation()
 
     # calculating circular magnet orientation based on magnet center, categorizing them in four quadrants
     def calculate_circular_magnet_orientation(self):
@@ -49,25 +53,43 @@ class probe:
             self.circular_magnet_orientation = \
             2 * pi - atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
 
+
         # converting orientation form from radians to degrees
         self.circular_magnet_orientation = convert_radians_to_degrees(self.circular_magnet_orientation)
 
+
+
         return self.circular_magnet_orientation
+
+    def calculate_rectangular_magnet_orientation_for_plots(self):
+        """
+        The old calculation of the rectangular magnet orientation seems to work well with the labels on the plots and the correct ones below don't. Probably a matplotlib rectangle orientation thing? I don't get the difference as the old ones are always factors of 360 from the new ones...
+        Until it's debugged, just use the old values
+        """
+        probe.calculate_circular_magnet_orientation(self)
+        old_orientation = (90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation))# % 360
+
+        return old_orientation
 
     # calculating the rectangular magnet orientation with respect to the circular magnet
     def calculate_rectangular_magnet_orientation(self):
 
        probe.calculate_circular_magnet_orientation(self)
+       old_orientation = (90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation))# % 360
+       #a = 270 - np.degrees(self.angs)
+       
 
-       self.rectangular_magnet_absolute_orientation_degree = \
-       90 - self.circular_magnet_orientation - convert_radians_to_degrees(self.rectangular_magnet_input_orientation)
+       rectangular_magnet_absolute_orientation_degree = 270 - np.degrees(self.angs)
+       # print(f"Rmag_orientation calculated = {b:.7f}, angs={a:.7f}")
+       #import ipdb; ipdb.set_trace()
 
-       return self.rectangular_magnet_absolute_orientation_degree
+       #print(f"{self.hexabundle}: old={old_orientation:.3f}, new={rectangular_magnet_absolute_orientation_degree:.3f}")
+
+       return rectangular_magnet_absolute_orientation_degree
 
     # calculating the rectangular magnet center coordinates from its orientation, and categorizing in four quadrants
     def calculate_rectangular_magnet_center_coordinates(self):
 
-        probe.calculate_rectangular_magnet_orientation(self)
 
         self.rectangular_magnet_orientation_modulo_radians = \
         convert_modulus_angle(convert_degrees_to_radians(90 - self.rectangular_magnet_absolute_orientation_degree))
@@ -107,17 +129,41 @@ class probe:
             raise ValueError(f"This rectangular magnet has an orientation of {self.rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
 
         
-        # Print the distance between the circular magnet and the rectangular magnet
-        radial_distance = np.sqrt((self.rectangular_magnet_center[0] - self.circular_magnet_center[0])**2 + (self.rectangular_magnet_center[1] - self.circular_magnet_center[1])**2)
- 
+        # # Print the distance between the circular magnet and the rectangular magnet
+        # radial_distance = np.sqrt((self.rectangular_magnet_center[0] - self.circular_magnet_center[0])**2 + (self.rectangular_magnet_center[1] - self.circular_magnet_center[1])**2)
+        # print(f"Radial dist between cm and rm: {radial_distance}")
+
         return np.array(self.rectangular_magnet_center)
 
     def extract_circular_magnet_parameters(self):
-        return circular_magnet(self.circular_magnet_center, probe.calculate_circular_magnet_orientation(self), self.index, self.galaxyORstar, self.Re,
+
+        c_magnet = circular_magnet(self.circular_magnet_center, probe.calculate_circular_magnet_orientation(self), self.index, self.galaxyORstar, self.Re,
                     self.mu_1re, self.Mstar, self.magnet_label, self.hexabundle, self.rads, self.rotation_pickup, self.rotation_putdown, self.azAngs, self.rectangular_magnet_input_orientation, self.IDs)
+        # if c_magnet.hexabundle == "A":
+        #     import ipdb; ipdb.set_trace()
+        return c_magnet
 
     def extract_rectangular_magnet_parameters(self):
-        return rectangular_magnet(probe.calculate_rectangular_magnet_center_coordinates(self),
-                                  probe.calculate_rectangular_magnet_orientation(self),self.index, self.galaxyORstar,self.Re,self.mu_1re,self.Mstar,
-                    self.magnet_label, self.hexabundle, self.rads, self.rotation_pickup, self.rotation_putdown, self.azAngs, self.rectangular_magnet_input_orientation, self.IDs)
+        #import ipdb; ipdb.set_trace()
 
+        r_magnet = rectangular_magnet(center=self.calculate_rectangular_magnet_center_coordinates(),
+                                  orientation=self.calculate_rectangular_magnet_orientation(),
+                                  index=self.index, 
+                                  galaxyORstar=self.galaxyORstar,
+                                  Re=self.Re,
+                                  mu_1re=self.mu_1re,
+                                  Mstar=self.Mstar,
+                                  magnet_label=self.magnet_label,
+                                  hexabundle=self.hexabundle,
+                                  rads=self.rads,
+                                  rotation_pickup=self.rotation_pickup,
+                                  rotation_putdown=self.rotation_putdown,
+                                  azAngs=self.azAngs,
+                                  rectangular_magnet_input_orientation=self.rectangular_magnet_input_orientation,
+                                  IDs=self.IDs,
+                                  angs=self.angs,
+                                  plot_orientation=self.calculate_rectangular_magnet_orientation_for_plots())
+
+        # if r_magnet.hexabundle == "A":
+        #     import ipdb; ipdb.set_trace()
+        return r_magnet

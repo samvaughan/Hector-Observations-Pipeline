@@ -159,6 +159,16 @@
 //                     generates a warning, rather than being treated as a
 //                     fatal error. The total number of such failures is also
 //                     logged as a warning. KS.
+//     14th Jan 2022.  The HectorRaDecXY routines all work with apparent places,
+//                     but were being passed mean places. This has been fixed.
+//                     The code also now applies the proper motion values
+//                     associated with targets in the HectorTarget structures,
+//                     but at present these are all zero. (There needs to be
+//                     a convention for proper motion column names in the
+//                     input files to support this properly.) KS.
+//      14th Feb 2022. Now sets the atmospheric temperature to be the same as
+//                     that specified for the observing temperature of the
+//                     plate, rather than allowing this to default to 285K. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -930,6 +940,73 @@ void ReadInputFile (
 
 // ----------------------------------------------------------------------------------
 
+//                        M e a n  2  A p p a r e n t
+//
+//  Packages up a call to slaMap() to convert a position from mean to apparent
+//  coordinates. The position is passed in MeanRa,MeanDec as a mean J2000
+//  position in radians, and is returned in AppRa,AppDec as an apparent position
+//  in radians for the Mjd value held in ProgDetails->Mjd. This routine also
+//  applies the proper motion values for Ra and Dec passed in PmRa and PmDec
+//  in degrees per Julian year. (This routine does not apply the radial and
+//  parallax corrections supported by SlaMap(), but coud easily be extended
+//  to do so.)
+
+void Mean2Apparent (
+   HectorUtilProgDetails* ProgDetails, double MeanRa, double MeanDec,
+   double PmRa, double PmDec, double* AppRa, double* AppDec)
+{
+   //  SlaMap() documentation often mentions that slaMapqk() can be more
+   //  efficient when a lot of conversions are being performed. On a modern
+   //  machine this probably makes little difference, and in any case isn't
+   //  needed for this program,
+   
+   slaMap (MeanRa,MeanDec,PmRa,PmDec,0.0,0.0,2000.0,ProgDetails->Mjd,
+                                                           AppRa,AppDec);
+   
+/*  This is diagnostic code to look at the difference the conversion makes
+    (assuming the first call is for the field centre, which it will be), and
+    to check that the slalib calls at least produce reversible results.
+ 
+   double DR2A = DR2D * 3600.0;
+   static bool First = true;
+   static double FirstRaDiff,FirstDecDiff;
+   double RaDiff = fabs(*AppRa - MeanRa);
+   double DecDiff = fabs(*AppDec - MeanDec);
+   if (First) {
+      FirstRaDiff = RaDiff;
+      FirstDecDiff = DecDiff;
+      First = false;
+   }
+   printf ("DEBUG: Mean2App: date %f, diff (asec) %f %f\n",ProgDetails->Mjd,
+                RaDiff * DR2A,DecDiff * DR2A);
+   printf ("DEBUG: diff from first (asec) %f %f\n",
+         fabs(FirstRaDiff - RaDiff) * DR2A,fabs(FirstDecDiff - DecDiff) * DR2A);
+
+   double NewRa,NewDec;
+   slaAmp (*AppRa,*AppDec,ProgDetails->Mjd,2000.0,&NewRa,&NewDec);
+   printf ("DEBUG: Reverse back to mean: diff (asec) %f %f\n",
+                fabs(NewRa - MeanRa) * DR2A,fabs(NewDec - MeanDec) * DR2A);
+*/
+}
+
+// ----------------------------------------------------------------------------------
+
+//                        A p p a r e n t  2  M e a n
+//
+//  Packages up a call to slaAmp() to convert a position from apparent to mean
+//  coordinates. The position is passed in AppRa,AppDec as an apparent position
+//  in radians for the Mjd value held in ProgDetails->Mjd, and is returned in
+//  AppRa,AppDec as a mean J2000 position in radians.
+
+void Apparent2Mean (
+   HectorUtilProgDetails* ProgDetails, double AppRa, double AppDec,
+   double* MeanRa, double* MeanDec)
+{
+   slaAmp (AppRa,AppDec,ProgDetails->Mjd,2000.0,MeanRa,MeanDec);
+}
+
+// ----------------------------------------------------------------------------------
+
 //                        P a r s e  O b s  T i m e
 //
 //  The parsing of the observation time string is sufficiently complex that it
@@ -1116,9 +1193,11 @@ void GetObsDetails (
    
    //  These met values are those used for 2dF in the testharness program, which
    //  is probably as good a set of defaults as any. They'll do for the moment
-   //  as a set of default values.
+   //  as a set of default values, although we now assume that the atmospheric
+   //  temperature and the observing temperature for the plate are the same.
+   //  (Previously, a standard default value of 285K was being used.)
    
-   ObsDetails->Temp = 285;        // Temperature in degrees Kelvin.
+   ObsDetails->Temp = ProgDetails->ObsTemp; // Temperature in degrees Kelvin.
    ObsDetails->Press = 900;       // Pressure in mm Hg.
    ObsDetails->Humid = 0.5;       // Humidity - as a fraction, ie 0 - 1.
    ObsDetails->ObsWave = 0.60;    // Wavelength in microns.
@@ -1148,7 +1227,11 @@ void GetObsDetails (
    //  Once we have the observation details, we can initialise the coordinate
    //  converter included in the ProgDetails structure.
    
-   if (!ProgDetails->CoordConverter.Initialise(ObsDetails->CenRa,ObsDetails->CenDec,
+   double CenRaMean = ObsDetails->CenRa;
+   double CenDecMean = ObsDetails->CenDec;
+   double CenRaApp,CenDecApp;
+   Mean2Apparent (ProgDetails,CenRaMean,CenDecMean,0.0,0.0,&CenRaApp,&CenDecApp);
+   if (!ProgDetails->CoordConverter.Initialise(CenRaApp,CenDecApp,
       ObsDetails->Mjd,ObsDetails->Dut,ObsDetails->Temp,ObsDetails->Press,
          ObsDetails->Humid,ObsDetails->CenWave,ObsDetails->ObsWave,
             ProgDetails->RobotTemp,ProgDetails->ObsTemp,ProgDetails->XYRotMatrix,
@@ -1223,8 +1306,12 @@ void ConvertTargetCoordinates (
       for (int ITarget = 0; ITarget < NumberTargets; ITarget++) {
          double MeanRa = (*TargetList)[ITarget].MeanRa;
          double MeanDec = (*TargetList)[ITarget].MeanDec;
+         double PmRa = (*TargetList)[ITarget].PMRa;
+         double PmDec = (*TargetList)[ITarget].PMDec;
+         double AppRa,AppDec;
+         Mean2Apparent (ProgDetails,MeanRa,MeanDec,PmRa,PmDec,&AppRa,&AppDec);
          double X,Y;
-         if (!ProgDetails->CoordConverter.RaDec2XY(MeanRa,MeanDec,&X,&Y)) {
+         if (!ProgDetails->CoordConverter.RaDec2XY(AppRa,AppDec,&X,&Y)) {
             char Error[1024];
             snprintf (Error,sizeof(Error),
                "Error converting Ra %f Dec %f to X,Y: %s\n",
@@ -1479,16 +1566,18 @@ void ConvertSkyFibreCoordinates (
          for (int IPosn = 0; IPosn < 4; IPosn++) {
             double X = (*SkyFibreList)[ISky].X[IPosn];
             double Y = (*SkyFibreList)[ISky].Y[IPosn];
-            double MeanDec,MeanRa;
-            if (!ProgDetails->CoordConverter.XY2RaDec(X,Y,&MeanRa,&MeanDec)) {
+            double AppRa,AppDec;
+            if (!ProgDetails->CoordConverter.XY2RaDec(X,Y,&AppRa,&AppDec)) {
                char Error[1024];
                snprintf (Error,sizeof(Error),
                   "Error converting X %f Y %f to Ra,Dec: %s",
-                  MeanRa,MeanDec,ProgDetails->CoordConverter.GetError().c_str());
+                  AppRa,AppDec,ProgDetails->CoordConverter.GetError().c_str());
                ProgDetails->Ok = false;
                ProgDetails->Error = Error;
                break;
             }
+            double MeanRa,MeanDec;
+            Apparent2Mean (ProgDetails,AppRa,AppDec,&MeanRa,&MeanDec);
             (*SkyFibreList)[ISky].MeanRa[IPosn] = MeanRa;
             (*SkyFibreList)[ISky].MeanDec[IPosn] = MeanDec;
          }
@@ -1967,6 +2056,14 @@ int main (int Argc, char* Argv[]) {
      command line parameters. I'm not sure this is really what's wanted -
      should there be a better way of supplying the observing conditions (not
      just the temperature) assumed and hard-coded in GetObsDetails()?
+ 
+   o Further to the above point, as of 14th Feb 2022, the plate observing
+     temperature (obs_temp) is being used for the atmospheric temperature
+     instead of the default 285K value. This is probably a more realistic
+     assumption, but it may still be best to have a way of specifying all the
+     observing conditions explicitly. (It seems the humidity and pressure may
+     have less effect than the temperature, but this probably needs to be
+     checked in more detail.)
  
    o I have not checked that the positions calculated by the program are
      actually correct, and frankly, I'm not sure how to do that!

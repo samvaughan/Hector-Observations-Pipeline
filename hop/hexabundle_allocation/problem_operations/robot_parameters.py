@@ -87,6 +87,8 @@ def assign_preferable_pickupDirection(available_pickup):
 
 # angles required by the robotic arm to pick up and then put down the magnet in correct position
 def calculate_pickup_putdown_angles(magnet, available_pickup):
+
+    #import ipdb; ipdb.set_trace()
     azAngs = convert_radians_to_degrees(magnet.azAngs)
 
     # rotation for pickup and putdown of circular magnets
@@ -119,7 +121,9 @@ def calculate_pickup_putdown_angles(magnet, available_pickup):
     # rotation for pickup and putdown of rectangular magnets
     elif magnet.__class__.__name__ == 'rectangular_magnet':
         magnet.rotation_pickup = 180
+
         ang_azAngs = convert_radians_to_degrees(magnet.rectangular_magnet_input_orientation) + 270
+        #import ipdb; ipdb.set_trace()
         if ang_azAngs < 180 and azAngs < 90:
             magnet.rotation_putdown = (90 - azAngs) + (180 - ang_azAngs)
             if 'I' in available_pickup:
@@ -136,17 +140,17 @@ def calculate_pickup_putdown_angles(magnet, available_pickup):
             magnet.rotation_putdown = (450 - azAngs) + (180 - ang_azAngs)
             if 'I' in available_pickup:
                 magnet.rotation_putdown = magnet.rotation_putdown - 180
-
+    #print(magnet.rotation_putdown)
     return magnet
 
 
 # checking angle to make sure it is within the range of 0 to 360
 def check_for_negative_twopi_angle(angle):
 
-    if angle < 0:
-        angle = 360 + angle
-    elif angle > 360:
-        angle = angle - 360
+    # if angle < 0:
+    #     angle = 360 + angle
+    # elif angle > 360:
+    #     angle = angle - 360
 
-    return angle
+    return angle % 360
 
