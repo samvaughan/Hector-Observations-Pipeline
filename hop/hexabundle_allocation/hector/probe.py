@@ -94,7 +94,7 @@ class probe:
         self.rectangular_magnet_orientation_modulo_radians = \
         convert_modulus_angle(convert_degrees_to_radians(90 - self.rectangular_magnet_absolute_orientation_degree))
 
-        if 0 < self.rectangular_magnet_orientation_modulo_radians <= pi / 2:
+        if 0 <= self.rectangular_magnet_orientation_modulo_radians <= pi / 2:
 
             self.rectangular_magnet_center = \
             [self.circular_magnet_center[0] \

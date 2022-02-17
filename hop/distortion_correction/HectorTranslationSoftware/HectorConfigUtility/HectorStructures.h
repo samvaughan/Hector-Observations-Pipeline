@@ -47,6 +47,10 @@
 //                     details structure. KS.
 //     15th Jun 2021.  Added ModelPars and NumberPars to the program details. KS.
 //     24th Nov 2021.  Added XYRotMatrix to HectorUtilProgDetails structure. KS.
+//     16th Feb 2022.  Added PmRaItem and PmDecItem to HectorUtilProgDetails
+//                     structure. Note about units added to comments for PMRa
+//                     and PMDec fields in HectorTarget structure. Added
+//                     PmCorrection to ProgDetails. KS.
 //
 // ----------------------------------------------------------------------------------
 
@@ -85,8 +89,9 @@ const static int C_MODEL_PARMS = 20;
 struct HectorTarget {
    double MeanRa = 0.0;       // Target Ra in radians
    double MeanDec = 0.0;      // Target Dec in radians
-   double PMRa = 0.0;         // Proper motion in RA
-   double PMDec = 0.0;        // Proper motion in Dec.
+   double PMRa = 0.0;         // Proper motion in RA (radians/year) - note:
+                              // this is NOT corrected for cos(dec) effect.
+   double PMDec = 0.0;        // Proper motion in Dec (radians/year).
    HectorTargetType Type
                    = UNKNOWN; // From the galaxy or guide files?.
    double X = 0.0;            // Calculated X position on field plate in microns
@@ -168,6 +173,7 @@ struct HectorUtilProgDetails {
    bool MechCorrection = true;           // Apply mechanical offset corrections
    bool TeleCorrection = true;           // Apply telecentricity corrections
    bool LinCorrection = true;            // Apply linearity corrections
+   bool PmCorrection = true;             // Apply proper motion corrections
    bool CheckSky = true;                 // Check sky fibre contamination
    int ExpectedAFibres = 0;              // # of expected AAOmega sky fibres
    int ExpectedHFibres = 0;              // # of expected Hector sky fibres
@@ -175,8 +181,10 @@ struct HectorUtilProgDetails {
    std::string ListOfFields = "";        // List of data fields as in input file.
    std::vector<std::string> FieldNames;  // The data fields list as separate names.
    std::vector<int> GuideFieldIndices;   // Guide field indices for each data field.
-   int RaItem = 0;                       // Field item for Ra (used for sky fibres)
-   int DecItem = 0;                      // Field item for Dec (used for sky fibres)
+   int RaItem = 0;                       // Field item for Ra
+   int DecItem = 0;                      // Field item for Dec
+   int PmRaItem = 0;                     // Field item for Ra proper motion
+   int PmDecItem = 0;                    // Field item for Dec proper motion
    double Mjd = 0.0;                     // Obs date and time as Mjd.
    float RobotTemp = 0.0;                // Robot configuration temp, deg K.
    float ObsTemp = 0.0;                  // Estimated observation temp, deg K.
