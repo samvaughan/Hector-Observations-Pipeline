@@ -88,13 +88,13 @@
   FLFLAGS  :=
 
 # C preprocessor and options.
-  CPP      := x86_64-apple-darwin13.4.0-clang -E
-  CPPFLAGS := -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -DHAVE_CONFIG_H
+  CPP      := gcc -E
+  CPPFLAGS :=  -DHAVE_CONFIG_H
   WCSTRIG  := WRAPPER
 
 # C compiler and options.
-  CC       := x86_64-apple-darwin13.4.0-clang
-  CFLAGS   := -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include
+  CC       := gcc
+  CFLAGS   := -g -O2
 
 # Fortran compiler and options.
   FC       := gfortran
@@ -102,7 +102,7 @@
 
 # Static object library.
   WCSLIB   := libwcs-$(LIBVER).a
-  RANLIB   := /opt/anaconda3/envs/snakemake/bin/x86_64-apple-darwin13.4.0-ranlib
+  RANLIB   := ranlib
 
 # Shared (dynamic) library (see note 3 above).
   SHRLIB   := libwcs.5.16.dylib
@@ -147,7 +147,7 @@
 # -------------------------------------------------------------------
 # Linker options (use CC for linking).
   LD       = $(CC)
-  LDFLAGS := -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib
+  LDFLAGS := 
 
 # PGPLOT (see note 4 above).
   PGPLOTINC := 
@@ -159,7 +159,7 @@
   GETWCSTAB  := 
 
 # Libraries required by the above Fortran compiler.
-  FLIBS :=  -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm
+  FLIBS :=  -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm
 
 # Libraries required by WCSLIB itself.
   LIBS := -lm 

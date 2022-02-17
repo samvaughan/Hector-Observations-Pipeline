@@ -30,15 +30,15 @@ Kernel configured for up to 8 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3 4 5 6 7
 Primary memory available: 8.00 gigabytes
-Default processor set: 423 tasks, 2671 threads, 8 processors
-Load average: 2.40, Mach factor: 5.58
+Default processor set: 407 tasks, 2154 threads, 8 processors
+Load average: 2.36, Mach factor: 5.63
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
 PATH: /Users/samvaughan/Software/2dfdr_install/bin
 PATH: /Users/samvaughan/.cargo/bin
-PATH: /opt/anaconda3/envs/snakemake/bin
+PATH: /opt/anaconda3/bin
 PATH: /opt/anaconda3/condabin
 PATH: /Users/samvaughan/anaconda3/bin
 PATH: /usr/local/bin
@@ -63,64 +63,67 @@ configure:2677: found /usr/bin/flex
 configure:2688: result: flex
 configure:2705: Using Flex version 2.5.35.
 configure:2767: checking for gcc
-configure:2794: result: x86_64-apple-darwin13.4.0-clang
+configure:2783: found /usr/bin/gcc
+configure:2794: result: gcc
 configure:3023: checking for C compiler version
-configure:3032: x86_64-apple-darwin13.4.0-clang --version >&5
-clang version 10.0.0 
-Target: x86_64-apple-darwin13.4.0
+configure:3032: gcc --version >&5
+Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+Target: x86_64-apple-darwin18.7.0
 Thread model: posix
-InstalledDir: /opt/anaconda3/envs/snakemake/bin
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/c++/4.2.1
 configure:3043: $? = 0
-configure:3032: x86_64-apple-darwin13.4.0-clang -v >&5
-clang version 10.0.0 
-Target: x86_64-apple-darwin13.4.0
+configure:3032: gcc -v >&5
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/c++/4.2.1
+Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+Target: x86_64-apple-darwin18.7.0
 Thread model: posix
-InstalledDir: /opt/anaconda3/envs/snakemake/bin
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 configure:3043: $? = 0
-configure:3032: x86_64-apple-darwin13.4.0-clang -V >&5
-clang-10: error: argument to '-V' is missing (expected 1 value)
-clang-10: error: no input files
+configure:3032: gcc -V >&5
+clang: error: unsupported option '-V -Wno-atomic-implicit-seq-cst'
+clang: error: no input files
 configure:3043: $? = 1
-configure:3032: x86_64-apple-darwin13.4.0-clang -qversion >&5
-clang-10: error: unknown argument '-qversion'; did you mean '--version'?
-clang-10: error: no input files
+configure:3032: gcc -qversion >&5
+clang: error: unknown argument '-qversion', did you mean '--version'?
+clang: error: no input files
 configure:3043: $? = 1
 configure:3063: checking whether the C compiler works
-configure:3085: x86_64-apple-darwin13.4.0-clang -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c  >&5
+configure:3085: gcc    conftest.c  >&5
 configure:3089: $? = 0
 configure:3137: result: yes
 configure:3140: checking for C compiler default output file name
 configure:3142: result: a.out
 configure:3148: checking for suffix of executables
-configure:3155: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c  >&5
+configure:3155: gcc -o conftest    conftest.c  >&5
 configure:3159: $? = 0
 configure:3181: result: 
 configure:3203: checking whether we are cross compiling
-configure:3211: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c  >&5
+configure:3211: gcc -o conftest    conftest.c  >&5
 configure:3215: $? = 0
 configure:3222: ./conftest
 configure:3226: $? = 0
 configure:3241: result: no
 configure:3246: checking for suffix of object files
-configure:3268: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:3268: gcc -c   conftest.c >&5
 configure:3272: $? = 0
 configure:3293: result: o
 configure:3297: checking whether we are using the GNU C compiler
-configure:3316: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:3316: gcc -c   conftest.c >&5
 configure:3316: $? = 0
 configure:3325: result: yes
-configure:3334: checking whether x86_64-apple-darwin13.4.0-clang accepts -g
-configure:3354: x86_64-apple-darwin13.4.0-clang -c -g -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:3334: checking whether gcc accepts -g
+configure:3354: gcc -c -g  conftest.c >&5
 configure:3354: $? = 0
 configure:3395: result: yes
-configure:3412: checking for x86_64-apple-darwin13.4.0-clang option to accept ISO C89
-configure:3475: x86_64-apple-darwin13.4.0-clang  -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:3412: checking for gcc option to accept ISO C89
+configure:3475: gcc  -c -g -O2  conftest.c >&5
 configure:3475: $? = 0
 configure:3488: result: none needed
 configure:3513: checking how to run the C preprocessor
-configure:3544: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:3544: gcc -E  conftest.c
 configure:3544: $? = 0
-configure:3558: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:3558: gcc -E  conftest.c
 conftest.c:10:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
          ^~~~~~~~~~~~~~~~~~
@@ -137,10 +140,10 @@ configure: failed program was:
 | #define WCSLIB_VERSION 5.16
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:3583: result: x86_64-apple-darwin13.4.0-clang -E
-configure:3603: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:3583: result: gcc -E
+configure:3603: gcc -E  conftest.c
 configure:3603: $? = 0
-configure:3617: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:3617: gcc -E  conftest.c
 conftest.c:10:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
          ^~~~~~~~~~~~~~~~~~
@@ -158,42 +161,44 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:3693: checking for gcc
-configure:3720: result: x86_64-apple-darwin13.4.0-clang
+configure:3720: result: gcc
 configure:3949: checking for C compiler version
-configure:3958: x86_64-apple-darwin13.4.0-clang --version >&5
-clang version 10.0.0 
-Target: x86_64-apple-darwin13.4.0
+configure:3958: gcc --version >&5
+Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+Target: x86_64-apple-darwin18.7.0
 Thread model: posix
-InstalledDir: /opt/anaconda3/envs/snakemake/bin
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/c++/4.2.1
 configure:3969: $? = 0
-configure:3958: x86_64-apple-darwin13.4.0-clang -v >&5
-clang version 10.0.0 
-Target: x86_64-apple-darwin13.4.0
+configure:3958: gcc -v >&5
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/c++/4.2.1
+Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+Target: x86_64-apple-darwin18.7.0
 Thread model: posix
-InstalledDir: /opt/anaconda3/envs/snakemake/bin
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 configure:3969: $? = 0
-configure:3958: x86_64-apple-darwin13.4.0-clang -V >&5
-clang-10: error: argument to '-V' is missing (expected 1 value)
-clang-10: error: no input files
+configure:3958: gcc -V >&5
+clang: error: unsupported option '-V -Wno-atomic-implicit-seq-cst'
+clang: error: no input files
 configure:3969: $? = 1
-configure:3958: x86_64-apple-darwin13.4.0-clang -qversion >&5
-clang-10: error: unknown argument '-qversion'; did you mean '--version'?
-clang-10: error: no input files
+configure:3958: gcc -qversion >&5
+clang: error: unknown argument '-qversion', did you mean '--version'?
+clang: error: no input files
 configure:3969: $? = 1
 configure:3973: checking whether we are using the GNU C compiler
 configure:4001: result: yes
-configure:4010: checking whether x86_64-apple-darwin13.4.0-clang accepts -g
+configure:4010: checking whether gcc accepts -g
 configure:4071: result: yes
-configure:4088: checking for x86_64-apple-darwin13.4.0-clang option to accept ISO C89
+configure:4088: checking for gcc option to accept ISO C89
 configure:4164: result: none needed
-configure:4188: checking for x86_64-apple-darwin13.4.0-clang option to accept ISO C99
-configure:4337: x86_64-apple-darwin13.4.0-clang  -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4188: checking for gcc option to accept ISO C99
+configure:4337: gcc  -c -g -O2  conftest.c >&5
 configure:4337: $? = 0
 configure:4350: result: none needed
-configure:4458: checking for x86_64-apple-darwin13.4.0-clang option to accept ISO Standard C
+configure:4458: checking for gcc option to accept ISO Standard C
 configure:4469: result: none needed
 configure:4477: checking for an ANSI C-conforming const
-configure:4543: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4543: gcc -c -g -O2  conftest.c >&5
 configure:4543: $? = 0
 configure:4550: result: yes
 configure:4559: checking for grep that handles long lines and -e
@@ -201,53 +206,53 @@ configure:4617: result: /usr/bin/grep
 configure:4622: checking for egrep
 configure:4684: result: /usr/bin/grep -E
 configure:4689: checking for ANSI C header files
-configure:4709: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4709: gcc -c -g -O2  conftest.c >&5
 configure:4709: $? = 0
-configure:4782: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c  >&5
+configure:4782: gcc -o conftest -g -O2   conftest.c  >&5
 configure:4782: $? = 0
 configure:4782: ./conftest
 configure:4782: $? = 0
 configure:4793: result: yes
 configure:4806: checking for sys/types.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for sys/stat.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for stdlib.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for string.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for memory.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for strings.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for inttypes.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for stdint.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4806: checking for unistd.h
-configure:4806: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4806: gcc -c -g -O2  conftest.c >&5
 configure:4806: $? = 0
 configure:4806: result: yes
 configure:4818: checking for size_t
-configure:4818: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4818: gcc -c -g -O2  conftest.c >&5
 configure:4818: $? = 0
-configure:4818: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4818: gcc -c -g -O2  conftest.c >&5
 conftest.c:56:21: error: expected expression
 if (sizeof ((size_t)))
                     ^
@@ -316,9 +321,9 @@ configure: failed program was:
 | }
 configure:4818: result: yes
 configure:4842: checking for off_t
-configure:4842: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4842: gcc -c -g -O2  conftest.c >&5
 configure:4842: $? = 0
-configure:4842: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4842: gcc -c -g -O2  conftest.c >&5
 conftest.c:56:20: error: expected expression
 if (sizeof ((off_t)))
                    ^
@@ -387,9 +392,9 @@ configure: failed program was:
 | }
 configure:4842: result: yes
 configure:4853: checking for int8_t
-configure:4853: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4853: gcc -c -g -O2  conftest.c >&5
 configure:4853: $? = 0
-configure:4853: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4853: gcc -c -g -O2  conftest.c >&5
 conftest.c:57:24: error: 'test_array' declared as an array with a negative size
 static int test_array [1 - 2 * !((int8_t) (((((int8_t) 1 << N) << N) - 1) * 2 + 1)
                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -462,9 +467,9 @@ configure: failed program was:
 | }
 configure:4853: result: yes
 configure:4864: checking for int16_t
-configure:4864: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4864: gcc -c -g -O2  conftest.c >&5
 configure:4864: $? = 0
-configure:4864: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4864: gcc -c -g -O2  conftest.c >&5
 conftest.c:57:24: error: 'test_array' declared as an array with a negative size
 static int test_array [1 - 2 * !((int16_t) (((((int16_t) 1 << N) << N) - 1) * 2 + 1)
                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -537,16 +542,13 @@ configure: failed program was:
 | }
 configure:4864: result: yes
 configure:4875: checking for int32_t
-configure:4875: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4875: gcc -c -g -O2  conftest.c >&5
 configure:4875: $? = 0
-configure:4875: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
-conftest.c:58:53: warning: overflow in expression; result is -2147483648 with type 'int' [-Winteger-overflow]
-                 < (int32_t) (((((int32_t) 1 << N) << N) - 1) * 2 + 2))];
-                                                                  ^
+configure:4875: gcc -c -g -O2  conftest.c >&5
 conftest.c:57:24: error: 'test_array' declared as an array with a negative size
 static int test_array [1 - 2 * !((int32_t) (((((int32_t) 1 << N) << N) - 1) * 2 + 1)
                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning and 1 error generated.
+1 error generated.
 configure:4875: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -615,95 +617,95 @@ configure: failed program was:
 | }
 configure:4875: result: yes
 configure:4886: checking for uint8_t
-configure:4886: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4886: gcc -c -g -O2  conftest.c >&5
 configure:4886: $? = 0
 configure:4886: result: yes
 configure:4900: checking for uint16_t
-configure:4900: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4900: gcc -c -g -O2  conftest.c >&5
 configure:4900: $? = 0
 configure:4900: result: yes
 configure:4912: checking for uint32_t
-configure:4912: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:4912: gcc -c -g -O2  conftest.c >&5
 configure:4912: $? = 0
 configure:4912: result: yes
 configure:4928: checking for ANSI C header files
 configure:5032: result: yes
 configure:5044: checking ctype.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking ctype.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for ctype.h
 configure:5044: result: yes
 configure:5044: checking errno.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking errno.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for errno.h
 configure:5044: result: yes
 configure:5044: checking limits.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking limits.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for limits.h
 configure:5044: result: yes
 configure:5044: checking locale.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking locale.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for locale.h
 configure:5044: result: yes
 configure:5044: checking math.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking math.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for math.h
 configure:5044: result: yes
 configure:5044: checking setjmp.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking setjmp.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for setjmp.h
 configure:5044: result: yes
 configure:5044: checking stdarg.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking stdarg.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for stdarg.h
 configure:5044: result: yes
 configure:5044: checking stdio.h usability
-configure:5044: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:5044: gcc -c -g -O2  conftest.c >&5
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking stdio.h presence
-configure:5044: x86_64-apple-darwin13.4.0-clang -E -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c
+configure:5044: gcc -E  conftest.c
 configure:5044: $? = 0
 configure:5044: result: yes
 configure:5044: checking for stdio.h
@@ -713,7 +715,7 @@ configure:5044: result: yes
 configure:5044: checking for string.h
 configure:5044: result: yes
 configure:5066: checking for floor in -lm
-configure:5091: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm   >&5
+configure:5091: gcc -o conftest -g -O2   conftest.c -lm   >&5
 conftest.c:38:6: warning: incompatible redeclaration of library function 'floor' [-Wincompatible-library-redeclaration]
 char floor ();
      ^
@@ -722,13 +724,13 @@ conftest.c:38:6: note: 'floor' is a builtin with type 'double (double)'
 configure:5091: $? = 0
 configure:5100: result: yes
 configure:5111: checking for _LARGEFILE_SOURCE value needed for large files
-configure:5130: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5130: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5130: $? = 0
 configure:5158: result: no
 configure:5181: checking for stdlib.h
 configure:5181: result: yes
 configure:5191: checking for GNU libc compatible malloc
-configure:5215: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5215: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5215: $? = 0
 configure:5215: ./conftest
 configure:5215: $? = 0
@@ -736,13 +738,13 @@ configure:5225: result: yes
 configure:5248: checking for stdlib.h
 configure:5248: result: yes
 configure:5258: checking for GNU libc compatible realloc
-configure:5282: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5282: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5282: $? = 0
 configure:5282: ./conftest
 configure:5282: $? = 0
 configure:5292: result: yes
 configure:5320: checking whether lstat correctly handles trailing slash
-configure:5346: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5346: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5346: $? = 0
 configure:5346: ./conftest
 configure:5346: $? = 1
@@ -830,13 +832,13 @@ configure: failed program was:
 | }
 configure:5363: result: no
 configure:5382: checking whether stat accepts an empty string
-configure:5402: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5402: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5402: $? = 0
 configure:5402: ./conftest
 configure:5402: $? = 0
 configure:5412: result: no
 configure:5430: checking for vprintf
-configure:5430: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5430: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:60:6: warning: incompatible redeclaration of library function 'vprintf' [-Wincompatible-library-redeclaration]
 char vprintf ();
      ^
@@ -845,12 +847,12 @@ conftest.c:60:6: note: 'vprintf' is a builtin with type 'int (const char *, stru
 configure:5430: $? = 0
 configure:5430: result: yes
 configure:5436: checking for _doprnt
-configure:5436: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5436: gcc -o conftest -g -O2   conftest.c -lm  >&5
 Undefined symbols for architecture x86_64:
   "__doprnt", referenced from:
-      _main in conftest-3e2d95.o
+      _main in conftest-941888.o
 ld: symbol(s) not found for architecture x86_64
-clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5436: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -930,7 +932,7 @@ configure: failed program was:
 | }
 configure:5436: result: no
 configure:5450: checking for floor
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:61:6: warning: incompatible redeclaration of library function 'floor' [-Wincompatible-library-redeclaration]
 char floor ();
      ^
@@ -939,7 +941,7 @@ conftest.c:61:6: note: 'floor' is a builtin with type 'double (double)'
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for memset
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:62:6: warning: incompatible redeclaration of library function 'memset' [-Wincompatible-library-redeclaration]
 char memset ();
      ^
@@ -948,7 +950,7 @@ conftest.c:62:6: note: 'memset' is a builtin with type 'void *(void *, int, unsi
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for pow
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:63:6: warning: incompatible redeclaration of library function 'pow' [-Wincompatible-library-redeclaration]
 char pow ();
      ^
@@ -957,11 +959,11 @@ conftest.c:63:6: note: 'pow' is a builtin with type 'double (double, double)'
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for setlocale
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for sqrt
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:65:6: warning: incompatible redeclaration of library function 'sqrt' [-Wincompatible-library-redeclaration]
 char sqrt ();
      ^
@@ -970,7 +972,7 @@ conftest.c:65:6: note: 'sqrt' is a builtin with type 'double (double)'
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for strchr
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:66:6: warning: incompatible redeclaration of library function 'strchr' [-Wincompatible-library-redeclaration]
 char strchr ();
      ^
@@ -979,7 +981,7 @@ conftest.c:66:6: note: 'strchr' is a builtin with type 'char *(const char *, int
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5450: checking for strstr
-configure:5450: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5450: gcc -o conftest -g -O2   conftest.c -lm  >&5
 conftest.c:67:6: warning: incompatible redeclaration of library function 'strstr' [-Wincompatible-library-redeclaration]
 char strstr ();
      ^
@@ -988,9 +990,9 @@ conftest.c:67:6: note: 'strstr' is a builtin with type 'char *(const char *, con
 configure:5450: $? = 0
 configure:5450: result: yes
 configure:5462: checking for cosd in -lsunmath
-configure:5487: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lsunmath  -lm  >&5
+configure:5487: gcc -o conftest -g -O2   conftest.c -lsunmath  -lm  >&5
 ld: library not found for -lsunmath
-clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5487: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1054,12 +1056,12 @@ configure: failed program was:
 | }
 configure:5496: result: no
 configure:5506: checking for sincos
-configure:5506: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5506: gcc -o conftest -g -O2   conftest.c -lm  >&5
 Undefined symbols for architecture x86_64:
   "_sincos", referenced from:
-      _main in conftest-9bbfa1.o
+      _main in conftest-023c1f.o
 ld: symbol(s) not found for architecture x86_64
-clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:5506: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1146,25 +1148,25 @@ configure: failed program was:
 | }
 configure:5506: result: no
 configure:5521: checking size of int
-configure:5526: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5526: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5526: $? = 0
 configure:5526: ./conftest
 configure:5526: $? = 0
 configure:5540: result: 4
 configure:5554: checking size of long int
-configure:5559: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5559: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5559: $? = 0
 configure:5559: ./conftest
 configure:5559: $? = 0
 configure:5573: result: 8
 configure:5587: checking size of long long int
-configure:5592: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5592: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5592: $? = 0
 configure:5592: ./conftest
 configure:5592: $? = 0
 configure:5606: result: 8
 configure:5638: checking for printf z format modifier for size_t type
-configure:5663: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm  >&5
+configure:5663: gcc -o conftest -g -O2   conftest.c -lm  >&5
 configure:5663: $? = 0
 configure:5663: ./conftest
 configure:5663: $? = 0
@@ -1216,12 +1218,12 @@ configure:6003: result: x86_64-apple-darwin18.7.0
 configure:6027: checking how to get verbose linking output from gfortran
 configure:6037: gfortran -c -g -O2 -I. conftest.f >&5
 configure:6037: $? = 0
-configure:6055: gfortran -o conftest -g -O2 -I. -v -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.f -lm
+configure:6055: gfortran -o conftest -g -O2 -I. -v conftest.f -lm
 Using built-in specs.
 Target: x86_64-apple-darwin18
 Thread model: posix
 gcc version 9.1.0 (Homebrew GCC 9.1.0) 
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccNlnHbD.s
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc0mi7NS.s
 GNU Fortran (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
@@ -1230,22 +1232,21 @@ GNU Fortran2008 (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
- as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc02eeml.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccNlnHbD.s
+ as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccVukou0.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc0mi7NS.s
 Apple LLVM version 10.0.1 (clang-1001.0.46.4)
 Target: x86_64-apple-darwin18.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
- "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name ccNlnHbD.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc02eeml.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccNlnHbD.s
+ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name cc0mi7NS.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccVukou0.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc0mi7NS.s
 Reading specs from /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../../libgfortran.spec
 rename spec lib to liborig
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/snakemake/lib /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc02eeml.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccVukou0.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
 collect2 version 9.1.0
-/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/snakemake/lib /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc02eeml.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
+/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccVukou0.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
 @(#)PROGRAM:ld  PROJECT:ld64-450.3
 BUILD 18:16:53 Apr  5 2019
 configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
 Library search paths:
-	/opt/anaconda3/envs/snakemake/lib
 	/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0
 	/usr/local/Cellar/gcc/9.1.0/lib/gcc/9
 	/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
@@ -1254,12 +1255,12 @@ Framework search paths:
 dsymutil conftest
 configure:6138: result: -v
 configure:6140: checking for Fortran 77 libraries of gfortran
-configure:6163: gfortran -o conftest -g -O2 -I. -v -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.f -lm
+configure:6163: gfortran -o conftest -g -O2 -I. -v conftest.f -lm
 Using built-in specs.
 Target: x86_64-apple-darwin18
 Thread model: posix
 gcc version 9.1.0 (Homebrew GCC 9.1.0) 
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccYl0USQ.s
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/f951 conftest.f -ffixed-form -I . -fPIC -feliminate-unused-debug-symbols -quiet -dumpbase conftest.f -mmacosx-version-min=10.14.0 -mtune=core2 -auxbase conftest -g -O2 -version -fintrinsic-modules-path /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/finclude -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc84jnXP.s
 GNU Fortran (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
@@ -1268,44 +1269,42 @@ GNU Fortran2008 (Homebrew GCC 9.1.0) version 9.1.0 (x86_64-apple-darwin18)
 	compiled by GNU C version 9.1.0, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.21-GMP
 
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
- as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccX63AJT.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccYl0USQ.s
+ as -arch x86_64 -v -I . -force_cpusubtype_ALL -mmacosx-version-min=10.14 -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccLdCjQ0.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc84jnXP.s
 Apple LLVM version 10.0.1 (clang-1001.0.46.4)
 Target: x86_64-apple-darwin18.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
- "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name ccYl0USQ.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccX63AJT.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccYl0USQ.s
+ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1as -triple x86_64-apple-macosx10.14.0 -filetype obj -main-file-name cc84jnXP.s -target-cpu penryn -I . -fdebug-compilation-dir /Users/samvaughan/Science/Hector/HectorObservationPipeline/hop/distortion_correction/HectorTranslationSoftware/Packages/wcslib-5.16 -dwarf-debug-producer Apple LLVM version 10.0.1 (clang-1001.0.46.4) -I . -dwarf-version=4 -mrelocation-model pic -o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccLdCjQ0.o /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//cc84jnXP.s
 Reading specs from /usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../../libgfortran.spec
 rename spec lib to liborig
- /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/snakemake/lib /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccX63AJT.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
+ /usr/local/Cellar/gcc/9.1.0/libexec/gcc/x86_64-apple-darwin18/9.1.0/collect2 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccLdCjQ0.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v -idsym -dsym
 collect2 version 9.1.0
-/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/snakemake/lib /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccX63AJT.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
+/usr/bin/ld -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/ -dynamic -arch x86_64 -macosx_version_min 10.14.0 -weak_reference_mismatches non-weak -o conftest -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. /var/folders/bd/ym7_px1s7_53zt92h0rfdb000000gp/T//ccLdCjQ0.o -lgfortran -no_compact_unwind -lSystem -lgcc_ext.10.5 -lgcc -lquadmath -lm -lgcc_ext.10.5 -lgcc -lSystem -v
 @(#)PROGRAM:ld  PROJECT:ld64-450.3
 BUILD 18:16:53 Apr  5 2019
 configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
 Library search paths:
-	/opt/anaconda3/envs/snakemake/lib
 	/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0
 	/usr/local/Cellar/gcc/9.1.0/lib/gcc/9
 	/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
 Framework search paths:
 	/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/
 dsymutil conftest
-configure:6359: result:  -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm
+configure:6359: result:  -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm
 configure:6377: checking for dummy main to link with Fortran 77 libraries
-configure:6411: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lm   -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
+configure:6411: gcc -o conftest -g -O2   conftest.c -lm   -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
 configure:6411: $? = 0
 configure:6456: result: none
 configure:6489: checking for Fortran 77 name-mangling scheme
 configure:6502: gfortran -c -g -O2 -I. conftest.f >&5
 configure:6502: $? = 0
-configure:6543: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c cfortran_test.o -lm   -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
-ld: warning: object file (cfortran_test.o) was built for newer OSX version (10.14) than being linked (10.9)
+configure:6543: gcc -o conftest -g -O2   conftest.c cfortran_test.o -lm   -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
 Undefined symbols for architecture x86_64:
   "_foobar", referenced from:
-      _main in conftest-53259f.o
+      _main in conftest-b00863.o
      (maybe you meant: _foobar_)
 ld: symbol(s) not found for architecture x86_64
-clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:6543: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1380,17 +1379,15 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:6543: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c cfortran_test.o -lm   -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
-ld: warning: object file (cfortran_test.o) was built for newer OSX version (10.14) than being linked (10.9)
+configure:6543: gcc -o conftest -g -O2   conftest.c cfortran_test.o -lm   -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
 configure:6543: $? = 0
-configure:6601: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c cfortran_test.o -lm   -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
-ld: warning: object file (cfortran_test.o) was built for newer OSX version (10.14) than being linked (10.9)
+configure:6601: gcc -o conftest -g -O2   conftest.c cfortran_test.o -lm   -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm >&5
 configure:6601: $? = 0
 configure:6643: result: lower case, underscore, no extra underscore
 configure:6721: checking for printf$LDBLStub in -lSystemStubs
-configure:6754: x86_64-apple-darwin13.4.0-clang -o conftest -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib conftest.c -lSystemStubs  -lm  >&5
+configure:6754: gcc -o conftest -g -O2   conftest.c -lSystemStubs  -lm  >&5
 ld: library not found for -lSystemStubs
-clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:6754: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1469,7 +1466,8 @@ configure: failed program was:
 | }
 configure:6764: result: no
 configure:6818: checking for ranlib
-configure:6845: result: /opt/anaconda3/envs/snakemake/bin/x86_64-apple-darwin13.4.0-ranlib
+configure:6834: found /usr/bin/ranlib
+configure:6845: result: ranlib
 configure:6917: checking whether ln -s works
 configure:6921: result: yes
 configure:6942: checking for a BSD-compatible install
@@ -1484,7 +1482,7 @@ configure:7111: result: no
 configure:7139: checking for special C compiler options needed for large files
 configure:7192: result: no
 configure:7198: checking for _FILE_OFFSET_BITS value needed for large files
-configure:7231: x86_64-apple-darwin13.4.0-clang -c -march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include -D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include conftest.c >&5
+configure:7231: gcc -c -g -O2  conftest.c >&5
 configure:7231: $? = 0
 configure:7271: result: no
 configure:7384: WARNING: CFITSIO disabled
@@ -1529,20 +1527,20 @@ ac_cv_c_int8_t=yes
 ac_cv_c_uint16_t=yes
 ac_cv_c_uint32_t=yes
 ac_cv_c_uint8_t=yes
-ac_cv_env_CC_set=set
-ac_cv_env_CC_value=x86_64-apple-darwin13.4.0-clang
-ac_cv_env_CFLAGS_set=set
-ac_cv_env_CFLAGS_value='-march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include'
-ac_cv_env_CPPFLAGS_set=set
-ac_cv_env_CPPFLAGS_value='-D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include'
+ac_cv_env_CC_set=
+ac_cv_env_CC_value=
+ac_cv_env_CFLAGS_set=
+ac_cv_env_CFLAGS_value=
+ac_cv_env_CPPFLAGS_set=
+ac_cv_env_CPPFLAGS_value=
 ac_cv_env_CPP_set=
 ac_cv_env_CPP_value=
 ac_cv_env_F77_set=
 ac_cv_env_F77_value=
 ac_cv_env_FFLAGS_set=
 ac_cv_env_FFLAGS_value=
-ac_cv_env_LDFLAGS_set=set
-ac_cv_env_LDFLAGS_value='-Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib'
+ac_cv_env_LDFLAGS_set=
+ac_cv_env_LDFLAGS_value=
 ac_cv_env_LIBS_set=
 ac_cv_env_LIBS_value=
 ac_cv_env_XMKMF_set=
@@ -1555,7 +1553,7 @@ ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
 ac_cv_f77_compiler_gnu=yes
 ac_cv_f77_dummy_main=none
-ac_cv_f77_libs=' -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm'
+ac_cv_f77_libs=' -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm'
 ac_cv_f77_mangling='lower case, underscore, no extra underscore'
 ac_cv_fortran_dummy_main=none
 ac_cv_func__doprnt=no
@@ -1599,11 +1597,11 @@ ac_cv_objext=o
 ac_cv_path_EGREP='/usr/bin/grep -E'
 ac_cv_path_GREP=/usr/bin/grep
 ac_cv_path_install='/usr/local/bin/ginstall -c'
-ac_cv_prog_CPP='x86_64-apple-darwin13.4.0-clang -E'
+ac_cv_prog_CPP='gcc -E'
 ac_cv_prog_FLEX=flex
-ac_cv_prog_ac_ct_CC=x86_64-apple-darwin13.4.0-clang
+ac_cv_prog_ac_ct_CC=gcc
 ac_cv_prog_ac_ct_F77=gfortran
-ac_cv_prog_ac_ct_RANLIB=/opt/anaconda3/envs/snakemake/bin/x86_64-apple-darwin13.4.0-ranlib
+ac_cv_prog_ac_ct_RANLIB=ranlib
 ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=
 ac_cv_prog_cc_g=yes
@@ -1624,12 +1622,12 @@ ac_cv_type_size_t=yes
 ## ----------------- ##
 
 ARCH='x86_64-darwin18.7.0'
-CC='x86_64-apple-darwin13.4.0-clang'
+CC='gcc'
 CFITSIOINC=''
 CFITSIOLIB=''
-CFLAGS='-march=core2 -mtune=haswell -mssse3 -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/snakemake/include'
-CPP='x86_64-apple-darwin13.4.0-clang -E'
-CPPFLAGS='-D_FORTIFY_SOURCE=2 -mmacosx-version-min=10.9 -isystem /opt/anaconda3/envs/snakemake/include'
+CFLAGS='-g -O2'
+CPP='gcc -E'
+CPPFLAGS=''
 DEFS='-DHAVE_CONFIG_H'
 ECHO_C='\c'
 ECHO_N=''
@@ -1639,14 +1637,14 @@ EXEEXT=''
 F77='gfortran'
 FFLAGS='-g -O2 -I.'
 FLEX='flex'
-FLIBS=' -L/opt/anaconda3/envs/snakemake/lib -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm'
+FLIBS=' -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0 -L/usr/local/Cellar/gcc/9.1.0/lib/gcc/9/gcc/x86_64-apple-darwin18/9.1.0/../../.. -lgfortran -lquadmath -lm'
 GETWCSTAB=''
 GREP='/usr/bin/grep'
 INSTALL_DATA='${INSTALL} -m 644'
 INSTALL_PROGRAM='${INSTALL}'
 INSTALL_SCRIPT='${INSTALL}'
 INSTDIR='Fortran utils'
-LDFLAGS='-Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/snakemake/lib -L/opt/anaconda3/envs/snakemake/lib'
+LDFLAGS=''
 LIBOBJS=' ${LIBOBJDIR}lstat$U.o'
 LIBS='-lm '
 LIBVER='5.16'
@@ -1662,7 +1660,7 @@ PACKAGE_VERSION='5.16'
 PATH_SEPARATOR=':'
 PGPLOTINC=''
 PGPLOTLIB=''
-RANLIB='/opt/anaconda3/envs/snakemake/bin/x86_64-apple-darwin13.4.0-ranlib'
+RANLIB='ranlib'
 SHELL='/bin/sh'
 SHRFLAGS='-fPIC'
 SHRLD='$(CC) $(SHRFLAGS) -dynamiclib -single_module -compatibility_version 5 -current_version 5.16'
@@ -1673,7 +1671,7 @@ SONAME='libwcs.5.dylib'
 SUBDIRS='C Fortran utils'
 TSTDIRS='C Fortran'
 XMKMF=''
-ac_ct_CC='x86_64-apple-darwin13.4.0-clang'
+ac_ct_CC='gcc'
 ac_ct_F77='gfortran'
 bindir='${exec_prefix}/bin'
 build='x86_64-apple-darwin18.7.0'

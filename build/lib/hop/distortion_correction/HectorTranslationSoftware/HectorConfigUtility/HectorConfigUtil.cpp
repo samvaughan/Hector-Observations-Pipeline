@@ -74,6 +74,7 @@
 //     -nomech          Disables the magnet offset correction
 //     -nolin           Disables the linearity correction.
 //     -nosky           Disables the sky fibre contamination checks
+//     -nopm            Disables proper motion corrections
 //     -debug "levels"  Switches on various diagnostic levels. Here, "levels"
 //                      is a comma-separated list of strings of the form
 //                      "subsystem.level". These can contain wildcard characters,
@@ -159,6 +160,20 @@
 //                     generates a warning, rather than being treated as a
 //                     fatal error. The total number of such failures is also
 //                     logged as a warning. KS.
+//     14th Jan 2022.  The HectorRaDecXY routines all work with apparent places,
+//                     but were being passed mean places. This has been fixed.
+//                     The code also now applies the proper motion values
+//                     associated with targets in the HectorTarget structures,
+//                     but at present these are all zero. (There needs to be
+//                     a convention for proper motion column names in the
+//                     input files to support this properly.) KS.
+//      14th Feb 2022. Now sets the atmospheric temperature to be the same as
+//                     that specified for the observing temperature of the
+//                     plate, rather than allowing this to default to 285K. KS.
+//      16th Feb 2022. Now gets proper motion values from the inout files, using
+//                     the pmRA and pmDec columns. (Which it seems have been
+//                     there for a while - something I'd mossed). Also added
+//                     the -nopm option for test purposes. KS.
 //
 //  Note:
 //     The structure of this code has a main program that simply calls a set of
@@ -206,7 +221,8 @@ extern "C" {
 const double ZeroDegCinDegK = 273.15;
 
 //  A global DebugHandler is used for the code in this file. (The RaDec
-//  conversion and SkyCheck subsystems have their own DebugHandlers.)
+//  conversion and SkyCheck subsystems have their own DebugHandlers.) The
+//  levels this responds to are set at the start of the code for main().
 
 #include "DebugHandler.h"
 
@@ -447,6 +463,8 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
       "Apply linearity corrections");
    BoolArg SkyArg(TheHandler,"Sky",0,"NoSave",true,
       "Check positions of sky fibres for contamination");
+   BoolArg PmArg(TheHandler,"Pm",0,"NoSave",true,
+      "Apply proper motion corrections to target positions");
    StringArg DebugArg(TheHandler,"Debug",0,"NoSave","","Debug levels");
    StringArg RotMatArg(TheHandler,"XYMatrix",0,"NoSave","",
                                  "XY Rotation matrix, ie \"1 0 0 1\"");
@@ -486,6 +504,7 @@ void SetUpProgDetails (int Argc,char** Argv,HectorUtilProgDetails* ProgDetails)
    ProgDetails->MechCorrection = OffsetArg.GetValue(&Ok,&Error);
    ProgDetails->LinCorrection = LinArg.GetValue(&Ok,&Error);
    ProgDetails->CheckSky = SkyArg.GetValue(&Ok,&Error);
+   ProgDetails->PmCorrection = PmArg.GetValue(&Ok,&Error);
    ProgDetails->DebugLevels = DebugArg.GetValue(&Ok,&Error);
    ProgDetails->RotMatString = RotMatArg.GetValue(&Ok,&Error);
    if (!Ok) ProgDetails->Error = Error;
@@ -536,6 +555,8 @@ void ReadInputFile (
    HectorUtilProgDetails* ProgDetails)
 {
    if (!ProgDetails->Ok) return;
+   
+   const double MilliArcsecToRadians = DD2R / (1000.0 * 3600.0);
    
    //  I do have a pretty good idea of the format of the input file, although a
    //  few details are still TBD. Actually, I think a better description is that
@@ -601,6 +622,8 @@ void ReadInputFile (
          int ObjectItems = 0;
          int RaItem = -1;
          int DecItem = -1;
+         int PmRaItem = -1;
+         int PmDecItem = -1;
          for (;;) {
             char Line[1024];
             if (fgets (Line,sizeof(Line),TargetFile)) {
@@ -715,6 +738,8 @@ void ReadInputFile (
                   //  2nd and 3rd fields. The first field should be the ID field
                   //  that gives the name of the object, but we don't need that for
                   //  this program, so don't treat it in any sort of special way.
+                  //  We are also hoping to find proper motion information, in
+                  //  columns called "pmRA" and "pmDec".
                   
                   ObjectItems = ItemCount;
                   for (int I = 0; I < ObjectItems; I++) {
@@ -722,8 +747,15 @@ void ReadInputFile (
                         RaItem = I;
                      }  else if (TcsUtil::MatchCaseBlind(Tokens[I],"Dec")) {
                         DecItem = I;
+                     } else if (TcsUtil::MatchCaseBlind(Tokens[I],"pmRA")) {
+                        PmRaItem = I;
+                     }  else if (TcsUtil::MatchCaseBlind(Tokens[I],"pmDec")) {
+                        PmDecItem = I;
                      }
                   }
+                  
+                  //  See if we found these expected columns.
+                  
                   if (RaItem < 0) {
                      snprintf (Error,sizeof(Error),
                         "Line %d: Could not find RA in: '%s'",LineNumber,Line);
@@ -734,11 +766,30 @@ void ReadInputFile (
                         "Line %d: Could not find Dec in: '%s'",LineNumber,Line);
                      ProgDetails->Warnings.push_back(string(Error));
                   }
+                  
+                  //  Only warn about missing proper motion columns if we're
+                  //  planning to use them.
+                  
+                  if (ProgDetails->PmCorrection) {
+                     if (PmRaItem < 0) {
+                        snprintf (Error,sizeof(Error),
+                           "Line %d: Could not find pmRA in: '%s'",LineNumber,Line);
+                        ProgDetails->Warnings.push_back(string(Error));
+                     }
+                     if (PmDecItem < 0) {
+                        snprintf (Error,sizeof(Error),
+                           "Line %d: Could not find pmDEC in: '%s'",LineNumber,Line);
+                        ProgDetails->Warnings.push_back(string(Error));
+                     }
+                  } else {
+                     G_Debug.Log ("Pm","Proper motion corrections are disabled");
+                  }
 
                   //  We can live without most of the other fields, but we do need
                   //  Ra,Dec positions for each object. And we need to remember
                   //  which fields are Ra and Dec for when we write out the
-                  //  sky fibre details.
+                  //  sky fibre details. We can live with letting proper motion
+                  //  values default to zero.
                   
                   if (RaItem < 0 || DecItem < 0) {
                      ProgDetails->Ok = false;
@@ -746,7 +797,9 @@ void ReadInputFile (
                   }
                   ProgDetails->RaItem = RaItem;
                   ProgDetails->DecItem = DecItem;
-                  
+                  ProgDetails->PmRaItem = PmRaItem;
+                  ProgDetails->PmDecItem = PmDecItem;
+
                   //  Now, things are different for the galaxy and the guide files,
                   //  because they may have different sets of items. We make no
                   //  assumptions about most of the fields, but we do assume that:
@@ -859,7 +912,9 @@ void ReadInputFile (
                   
                   //  We will have bailed out if RaItem and DecItem were
                   //  not set in parsing the header. The others can be allowed to
-                  //  default to the values defined by the structure.
+                  //  default to the values defined by the structure. Note that
+                  //  the Ra,Dec values in the file are in degrees, and we want
+                  //  them in radians.
                   
                   ThisTarget.OriginalLine = LineString;
                   double Ra = atof(Tokens[RaItem].c_str());
@@ -867,7 +922,38 @@ void ReadInputFile (
                   ThisTarget.MeanRa = Ra * DD2R;
                   ThisTarget.MeanDec = Dec * DD2R;
                   ThisTarget.Type = FileType;
+                  
+                  //  Proper motions. We assume the units are milli-arcsec/year,
+                  //  which we convert to radians/year so they can be passed
+                  //  directly to slaMap(). AND we do assume the files have the
+                  //  cos(dec) correction applied to the RA value, and we undo
+                  //  this, because Slalib assumes this correction hasn't been
+                  //  done.
+                  
+                  double PmRa = 0.0;
+                  double PmDec = 0.0;
+                  
+                  if (ProgDetails->PmCorrection) {
+                     double CosDec = cos(ThisTarget.MeanDec);
+                     if (PmRaItem >= 0) {
+                        PmRa = atof(Tokens[PmRaItem].c_str());
+                        if (CosDec != 0.0) PmRa = PmRa / CosDec;
+                     }
+                     if (PmDecItem >= 0) {
+                        PmDec = atof(Tokens[PmDecItem].c_str());
+                     }
+                     G_Debug.Logf(
+                        "Pm","%s, CosDec %f, PmRa %f, PmDec %f (masec/y)",
+                                      Tokens[0].c_str(),CosDec,PmRa,PmDec);
+                  }
 
+                  //  Convert from milli-arcsec/year to radians/year
+                  
+                  ThisTarget.PMRa = PmRa * MilliArcsecToRadians;
+                  ThisTarget.PMDec = PmDec * MilliArcsecToRadians;
+
+                  //  Add this to the list of targets.
+                  
                   (*TargetList).push_back(ThisTarget);
                   if (FileType == GUIDE) GuideCount++;
                }
@@ -926,6 +1012,73 @@ void ReadInputFile (
       }
    }
    
+}
+
+// ----------------------------------------------------------------------------------
+
+//                        M e a n  2  A p p a r e n t
+//
+//  Packages up a call to slaMap() to convert a position from mean to apparent
+//  coordinates. The position is passed in MeanRa,MeanDec as a mean J2000
+//  position in radians, and is returned in AppRa,AppDec as an apparent position
+//  in radians for the Mjd value held in ProgDetails->Mjd. This routine also
+//  applies the proper motion values for Ra and Dec passed in PmRa and PmDec
+//  in degrees per Julian year. (This routine does not apply the radial and
+//  parallax corrections supported by SlaMap(), but coud easily be extended
+//  to do so.)
+
+void Mean2Apparent (
+   HectorUtilProgDetails* ProgDetails, double MeanRa, double MeanDec,
+   double PmRa, double PmDec, double* AppRa, double* AppDec)
+{
+   //  SlaMap() documentation often mentions that slaMapqk() can be more
+   //  efficient when a lot of conversions are being performed. On a modern
+   //  machine this probably makes little difference, and in any case isn't
+   //  needed for this program,
+   
+   slaMap (MeanRa,MeanDec,PmRa,PmDec,0.0,0.0,2000.0,ProgDetails->Mjd,
+                                                           AppRa,AppDec);
+   
+/*  This is diagnostic code to look at the difference the conversion makes
+    (assuming the first call is for the field centre, which it will be), and
+    to check that the slalib calls at least produce reversible results.
+ 
+   double DR2A = DR2D * 3600.0;
+   static bool First = true;
+   static double FirstRaDiff,FirstDecDiff;
+   double RaDiff = fabs(*AppRa - MeanRa);
+   double DecDiff = fabs(*AppDec - MeanDec);
+   if (First) {
+      FirstRaDiff = RaDiff;
+      FirstDecDiff = DecDiff;
+      First = false;
+   }
+   printf ("DEBUG: Mean2App: date %f, diff (asec) %f %f\n",ProgDetails->Mjd,
+                RaDiff * DR2A,DecDiff * DR2A);
+   printf ("DEBUG: diff from first (asec) %f %f\n",
+         fabs(FirstRaDiff - RaDiff) * DR2A,fabs(FirstDecDiff - DecDiff) * DR2A);
+
+   double NewRa,NewDec;
+   slaAmp (*AppRa,*AppDec,ProgDetails->Mjd,2000.0,&NewRa,&NewDec);
+   printf ("DEBUG: Reverse back to mean: diff (asec) %f %f\n",
+                fabs(NewRa - MeanRa) * DR2A,fabs(NewDec - MeanDec) * DR2A);
+*/
+}
+
+// ----------------------------------------------------------------------------------
+
+//                        A p p a r e n t  2  M e a n
+//
+//  Packages up a call to slaAmp() to convert a position from apparent to mean
+//  coordinates. The position is passed in AppRa,AppDec as an apparent position
+//  in radians for the Mjd value held in ProgDetails->Mjd, and is returned in
+//  AppRa,AppDec as a mean J2000 position in radians.
+
+void Apparent2Mean (
+   HectorUtilProgDetails* ProgDetails, double AppRa, double AppDec,
+   double* MeanRa, double* MeanDec)
+{
+   slaAmp (AppRa,AppDec,ProgDetails->Mjd,2000.0,MeanRa,MeanDec);
 }
 
 // ----------------------------------------------------------------------------------
@@ -1116,9 +1269,11 @@ void GetObsDetails (
    
    //  These met values are those used for 2dF in the testharness program, which
    //  is probably as good a set of defaults as any. They'll do for the moment
-   //  as a set of default values.
+   //  as a set of default values, although we now assume that the atmospheric
+   //  temperature and the observing temperature for the plate are the same.
+   //  (Previously, a standard default value of 285K was being used.)
    
-   ObsDetails->Temp = 285;        // Temperature in degrees Kelvin.
+   ObsDetails->Temp = ProgDetails->ObsTemp; // Temperature in degrees Kelvin.
    ObsDetails->Press = 900;       // Pressure in mm Hg.
    ObsDetails->Humid = 0.5;       // Humidity - as a fraction, ie 0 - 1.
    ObsDetails->ObsWave = 0.60;    // Wavelength in microns.
@@ -1148,7 +1303,11 @@ void GetObsDetails (
    //  Once we have the observation details, we can initialise the coordinate
    //  converter included in the ProgDetails structure.
    
-   if (!ProgDetails->CoordConverter.Initialise(ObsDetails->CenRa,ObsDetails->CenDec,
+   double CenRaMean = ObsDetails->CenRa;
+   double CenDecMean = ObsDetails->CenDec;
+   double CenRaApp,CenDecApp;
+   Mean2Apparent (ProgDetails,CenRaMean,CenDecMean,0.0,0.0,&CenRaApp,&CenDecApp);
+   if (!ProgDetails->CoordConverter.Initialise(CenRaApp,CenDecApp,
       ObsDetails->Mjd,ObsDetails->Dut,ObsDetails->Temp,ObsDetails->Press,
          ObsDetails->Humid,ObsDetails->CenWave,ObsDetails->ObsWave,
             ProgDetails->RobotTemp,ProgDetails->ObsTemp,ProgDetails->XYRotMatrix,
@@ -1223,8 +1382,12 @@ void ConvertTargetCoordinates (
       for (int ITarget = 0; ITarget < NumberTargets; ITarget++) {
          double MeanRa = (*TargetList)[ITarget].MeanRa;
          double MeanDec = (*TargetList)[ITarget].MeanDec;
+         double PmRa = (*TargetList)[ITarget].PMRa;
+         double PmDec = (*TargetList)[ITarget].PMDec;
+         double AppRa,AppDec;
+         Mean2Apparent (ProgDetails,MeanRa,MeanDec,PmRa,PmDec,&AppRa,&AppDec);
          double X,Y;
-         if (!ProgDetails->CoordConverter.RaDec2XY(MeanRa,MeanDec,&X,&Y)) {
+         if (!ProgDetails->CoordConverter.RaDec2XY(AppRa,AppDec,&X,&Y)) {
             char Error[1024];
             snprintf (Error,sizeof(Error),
                "Error converting Ra %f Dec %f to X,Y: %s\n",
@@ -1479,16 +1642,18 @@ void ConvertSkyFibreCoordinates (
          for (int IPosn = 0; IPosn < 4; IPosn++) {
             double X = (*SkyFibreList)[ISky].X[IPosn];
             double Y = (*SkyFibreList)[ISky].Y[IPosn];
-            double MeanDec,MeanRa;
-            if (!ProgDetails->CoordConverter.XY2RaDec(X,Y,&MeanRa,&MeanDec)) {
+            double AppRa,AppDec;
+            if (!ProgDetails->CoordConverter.XY2RaDec(X,Y,&AppRa,&AppDec)) {
                char Error[1024];
                snprintf (Error,sizeof(Error),
                   "Error converting X %f Y %f to Ra,Dec: %s",
-                  MeanRa,MeanDec,ProgDetails->CoordConverter.GetError().c_str());
+                  AppRa,AppDec,ProgDetails->CoordConverter.GetError().c_str());
                ProgDetails->Ok = false;
                ProgDetails->Error = Error;
                break;
             }
+            double MeanRa,MeanDec;
+            Apparent2Mean (ProgDetails,AppRa,AppDec,&MeanRa,&MeanDec);
             (*SkyFibreList)[ISky].MeanRa[IPosn] = MeanRa;
             (*SkyFibreList)[ISky].MeanDec[IPosn] = MeanDec;
          }
@@ -1878,7 +2043,7 @@ int main (int Argc, char* Argv[]) {
    //  Set the debug levels supported by the global debugger used by this
    //  code file.
    
-   G_Debug.LevelsList ("Range,Fibres");
+   G_Debug.LevelsList ("Range,Fibres,Pm");
    
    //  This is where the program starts. Set up the program details - these
    //  may depend on the command line arguments. This main routine is as simple
@@ -1967,6 +2132,14 @@ int main (int Argc, char* Argv[]) {
      command line parameters. I'm not sure this is really what's wanted -
      should there be a better way of supplying the observing conditions (not
      just the temperature) assumed and hard-coded in GetObsDetails()?
+ 
+   o Further to the above point, as of 14th Feb 2022, the plate observing
+     temperature (obs_temp) is being used for the atmospheric temperature
+     instead of the default 285K value. This is probably a more realistic
+     assumption, but it may still be best to have a way of specifying all the
+     observing conditions explicitly. (It seems the humidity and pressure may
+     have less effect than the temperature, but this probably needs to be
+     checked in more detail.)
  
    o I have not checked that the positions calculated by the program are
      actually correct, and frankly, I'm not sure how to do that!
