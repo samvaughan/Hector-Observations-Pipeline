@@ -639,8 +639,8 @@ class HectorPipe:
         fileNameGuides = Path(fileNameGuides)
         fileNameHexa = Path(fileNameHexa)
 
-        fileNameGuides_stem = fileNameGuides.stem.strip('Guides_')
-        fileNameHexa_stem= fileNameHexa.stem.strip('Hexas_')
+        fileNameGuides_stem = fileNameGuides.stem.replace("Guides_", "")
+        fileNameHexa_stem= fileNameHexa.stem.replace("Hexas_", "")
         print('\n\n'+str(fileNameHexa))
 
         # Read in the tile file to get the header, if we don't have a 'LABEL' keyword in it already
