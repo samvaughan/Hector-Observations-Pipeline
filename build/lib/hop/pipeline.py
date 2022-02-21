@@ -625,7 +625,7 @@ class HectorPipe:
         
 
 
-    def allocate_hexabundles_for_single_tile(self, fileNameGuides, fileNameHexa, plot=False):
+    def allocate_hexabundles_for_single_tile(self, fileNameGuides, fileNameHexa, robot_temperature, obs_temperature, plot=False):
 
         ### FIXME- add documentation here
 
@@ -639,8 +639,8 @@ class HectorPipe:
         fileNameGuides = Path(fileNameGuides)
         fileNameHexa = Path(fileNameHexa)
 
-        fileNameGuides_stem = fileNameGuides.stem.strip('Guides_')
-        fileNameHexa_stem= fileNameHexa.stem.strip('Hexas_')
+        fileNameGuides_stem = fileNameGuides.stem.replace("Guides_", "")
+        fileNameHexa_stem= fileNameHexa.stem.replace("Hexas_", "")
         print('\n\n'+str(fileNameHexa))
 
         # Read in the tile file to get the header, if we don't have a 'LABEL' keyword in it already
@@ -747,10 +747,8 @@ class HectorPipe:
         robotFile = f"{self.allocation_files_location_robot}/Robot_{fileNameHexa_stem}.txt"
 
         ## DUMMY VALUES TO BE REMOVED ##
-        self.robot_temperature = 20
-        self.obs_temperature = 20
         # creating robotFile array and storing it in robot file
-        positioning_array, robotFilearray = file_arranging.create_robotFileArray(label_string,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=self.robot_temperature, obs_temp=self.obs_temperature)
+        positioning_array, robotFilearray = file_arranging.create_robotFileArray(label_string,positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=robot_temperature, obs_temp=obs_temperature)
 
         # adjusting the positioning array to merge only selected parameters to the output file
         positioning_array, positioning_array_circular = file_arranging.positioningArray_adjust_and_mergetoFile(positioning_array, plate_file, outputFile, newrow,newrow_circular)

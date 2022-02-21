@@ -29,7 +29,8 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
         plate_radius = 226.0
 
     if robot_centre == None:
-        robot_centre = [329.5,300.0]
+        #robot_centre = [329.5,300.0]
+        robot_centre = [324.47, 297.834]
 
     if alpha == None:
         alpha = 1.2 * (10**(-6))
@@ -146,8 +147,10 @@ def calculate_rectangular_magnet_orientation(x,y,rectangular_magnet_input_orient
 
     #print(f"Circiular magnet orientation is {circular_magnet_orientation}")
     #print(f"rectangular_magnet_input_orientation is {degrees(rectangular_magnet_input_orientation)}" )
-    rectangular_magnet_absolute_orientation_degree = 90 - circular_magnet_orientation - degrees(rectangular_magnet_input_orientation)
+    olf_rectangular_magnet_absolute_orientation_degree = 90 - circular_magnet_orientation - degrees(rectangular_magnet_input_orientation)
     #print(f"rectangular_magnet_absolute_orientation_degree is {rectangular_magnet_absolute_orientation_degree}")
+
+    rectangular_magnet_absolute_orientation_degree = 270 - np.degrees(self.angs)
 
     return rectangular_magnet_absolute_orientation_degree
 
