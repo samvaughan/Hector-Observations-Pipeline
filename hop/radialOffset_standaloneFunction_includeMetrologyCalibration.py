@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import warnings
 
-def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T_configured=-10000, robot_centre=None,
+def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=-10000, T_configured=-10000, robot_centre=None,
                                     plate_radius=None, alpha=None, apply_metr_calib=True, robot_shifts_file='./robot_shifts_abs.csv'):
     
     ''' FUNCTION TO ADJUST THE RADIAL OFFSET FOR ALL MAGNETS IN CASE OF THERMAL EXPANSION OF THE PLATE
@@ -75,6 +75,7 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
 
     magnet_count = len(df)
 
+    
     print(f"Offset is {offset}")
     for i in range(magnet_count):
         
@@ -88,8 +89,8 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
             delta_x = cos(theta) * offset
             delta_y = sin(theta) * offset
 
-            print(f"dX is {delta_x}")
-            print(f"dY is {delta_y}")
+            # print(f"dX is {delta_x}")
+            # print(f"dY is {delta_y}")
             if x >= 0:
                 delta_x *= 1
                 delta_y *= 1
@@ -108,9 +109,14 @@ def radialOffset_standaloneFunction(filename, offset=-9999, T_observed=-10000, T
         
                 if df.loc[j, 'Magnet'] == 'rectangular_magnet' and df.loc[j, 'Index'] == df.loc[i, 'Index']:
                     
-                    [x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x, y, delta_x, delta_y, df.loc[i, 'rectMag_inputOrientation'])
+                    ####
+                    ## Need to understand this function and why it's not giving the exact same values out when the offset is 0
+                    # I think it comes back to how the angle of the magnet is used/calculated
+                    #[x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x, y, delta_x, delta_y, df.loc[i, 'rectMag_inputOrientation'])
+                    x_rect = df.loc[j, 'Center_x'] - robot_centre[0]
+                    y_rect = df.loc[j, 'Center_y'] - robot_centre[1]
 
-                    print(f"i is {i}, j is {j}, Circular magnet is at {df.loc[i, 'Center_x']}, old_centre is {df.loc[j, 'Center_x']}, new centre is {x_rect + robot_centre[0]}")
+                    print(f"Circular magnet is at {df.loc[i, 'Center_x']}, old_centre is ({df.loc[j, 'Center_x']:.5f}, {df.loc[j, 'Center_y']:.5f}) , new centre is ({x_rect + robot_centre[0]:.5f}, {y_rect + robot_centre[1]:.5f}) ")
                     df.loc[j, 'Center_x'] = x_rect + robot_centre[0]
                     df.loc[j, 'Center_y'] = y_rect + robot_centre[1]
 
