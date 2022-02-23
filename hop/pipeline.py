@@ -413,7 +413,7 @@ class HectorPipe:
         self.N_tiles = current_tile
 
 
-    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=12, obs_temp=12, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix=''):
+    def apply_distortion_correction(self, tile_out_fname, guide_tile_out_fname, tile_out_fname_after_DC, guide_tile_out_fname_after_DC, tile_RA, tile_Dec, guide_stars_for_tile, verbose=False, plot_save_filename=None, date="", robot_temp=12, obs_temp=12, label="test_label", plateID="test_plateID", distortion_file="", linearity_file="", sky_fibre_file="", profit_file_dir="", check_sky_fibres=True, turn_off_linearity=False, rot_matrix='', apply_PM_corr=True, debug_levels=None):
 
         """
         Take a tile file from the tiling process and apply Keith's distortion correction code. Then turn his one output file into the two output files which Caro's configuration code expects. We also need to do some work to edit the headers/etc.
@@ -430,10 +430,14 @@ class HectorPipe:
         if rot_matrix != '':
             DC_bash_code +=[f"xymatrix={rot_matrix}"]
         if not check_sky_fibres:
-            DC_bash_code += ["nosky"]
+            DC_bash_code += ["-nosky"]
+        if not apply_PM_corr:
+            DC_bash_code += ['-nopm']
+        if debug_levels is not None:
+            DC_bash_code += ['-debug', f"{debug_levels}"]
 
         if turn_off_linearity:
-            DC_bash_code += ["nolin"]
+            DC_bash_code += ["-nolin"]
 
         if verbose:
             print(shlex.join(DC_bash_code))

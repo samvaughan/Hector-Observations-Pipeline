@@ -12,6 +12,7 @@ hop/.DS_Store
 hop/__init__.py
 hop/pipeline.py
 hop/radialOffset_standaloneFunction.py
+hop/radialOffset_standaloneFunction_includeMetrologyCalibration.py
 hop/__pycache__/__init__.cpython-37.pyc
 hop/__pycache__/__init__.cpython-38.pyc
 hop/__pycache__/__init__.cpython-39.pyc
