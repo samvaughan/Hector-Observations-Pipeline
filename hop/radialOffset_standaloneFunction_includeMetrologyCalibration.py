@@ -260,7 +260,7 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
     theta_d = popt[2]
-    output_theta_d = input_theta_d - theta_d ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
+    output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
     print('Applied metrology-based calibration, using the fitted coefficients:')
     print(popt)
