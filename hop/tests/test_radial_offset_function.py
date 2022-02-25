@@ -11,7 +11,7 @@ Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 
 
 # Share global variables between tests
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def config():
     return dict(robot_centre = [324.470,297.834], robot_shifts_file="tests/data/radial_offset_function_files/robot_shifts_abs_220222120000.csv", example_robot_file="tests/data/radial_offset_function_files/Robot_file_for_testing.csv")
 
@@ -67,7 +67,6 @@ class Test_radial_offset_file_numerical_values:
 
         assert np.array_equal(old_x_values, new_x_values)
 
-
     def test_original_y_values_are_returned_when_no_offset_applied(self, robot_dataframe, config):
 
         old_y_values = robot_dataframe.Center_y
@@ -77,7 +76,6 @@ class Test_radial_offset_file_numerical_values:
         new_y_values = updated_df.Center_y
 
         assert np.array_equal(old_y_values, new_y_values)
-
 
     @pytest.mark.parametrize("centre, offset, result", [
         ((50, 50), np.sqrt(2),  (51, 51)), 
@@ -102,16 +100,7 @@ class Test_radial_offset_file_numerical_values:
         assert np.allclose(a=[new_x - result[0], new_y - result[1]], b=[0, 0])
 
 
-    @pytest.mark.parametrize("centre, offset", [
-        ((50, 50), 1),
-        ((50, 50),  12),
-        ((-50, 50), -3),
-        ((-50, 50),  np.sqrt(6)),
-        ((50, -50), -np.pi),
-        ((50, -50),  300),
-        ((-50, -50), 150),
-        ((-50, -50),  np.sqrt(2))
-        ])
+    @given(centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0.0, max_value=1000.0)), offset=st.floats(min_value=-1000, max_value=1000))
     def test_radial_offset_has_correct_magnitude(self, centre, offset):
 
         circular_magnet = pd.DataFrame(dict(Center_x=centre[0], Center_y=centre[1]), index=[0])
@@ -119,14 +108,13 @@ class Test_radial_offset_file_numerical_values:
 
         offset_length = np.sqrt((circular_magnet.Center_x - new_x)**2 + (circular_magnet.Center_y - new_y)**2)
 
+        # Make an exception to test for a magnet at the plate centre where the offset will be 0
+        if (centre[0] == 0.0) & (centre[1] == 0.0):
+            offset = 0
         assert np.isclose(np.abs(offset_length), np.abs(offset))
 
 
-    @pytest.mark.parametrize("circular_magnet_centre, angle", [
-        ((10, 10), np.radians(0)),
-        ((10, 10), np.radians(45)),
-        ((-30, 50), np.radians(270))
-        ])
+    @given(circular_magnet_centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0.0, max_value=1000.0)), angle=st.floats(min_value=-360, max_value=360))
     def test_rectangular_magnets_are_along_line_through_centre_of_circular_magnet(self, circular_magnet_centre, angle):
 
         x_rect, y_rect = radial.calculate_rectangular_magnet_centre_coordinates(circular_magnet_centre[0], circular_magnet_centre[1], angle)
@@ -136,26 +124,32 @@ class Test_radial_offset_file_numerical_values:
 
         assert np.allclose([delta_x, delta_y], [0, 0])
 
-    @pytest.mark.parametrize("circular_magnet_centre, telecentricity_colour, result", [
-        ((10, 10), 'Blu', 20.7*0.001),
-        ((10, 10), 'Gre', 42.0*0.001),
-        ((-30, 50), 'Yel', 61.2*0.001),
-        ((-30, 50), 'Mag', 79.9*0.001),
-        ])
-    def test_telecentricity_correction_is_correct_magnitude(self, config, circular_magnet_centre, telecentricity_colour, result):
+    # @pytest.mark.parametrize("circular_magnet_centre, telecentricity_colour, result", [
+    #     ((10, 10), 'Blu', 20.7*0.001),
+    #     ((10, 10), 'Gre', 42.0*0.001),
+    #     ((-30, 50), 'Yel', 61.2*0.001),
+    #     ((-30, 50), 'Mag', 79.9*0.001),
+    #     ])
+    @given(circular_magnet_centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0, max_value=1000.0)), telecentricity_colour=st.sampled_from(['Blu', 'Gre', 'Yel', 'Mag']))
+    def test_telecentricity_correction_is_correct_magnitude(self, config, circular_magnet_centre, telecentricity_colour):
 
         magnet = pd.DataFrame(dict(Center_x=circular_magnet_centre[0], Center_y=circular_magnet_centre[1], Label=telecentricity_colour), index=[0])
         offset_x, offset_y = radial.calculate_telecentricity_correction(magnet, config['robot_centre'], verbose=False)
 
         offset_magnitude = np.sqrt(offset_x**2 + offset_y**2)
-        assert np.isclose(offset_magnitude, result)
 
-    @pytest.mark.parametrize("circular_magnet_centre, telecentricity_colour", [
-        ((10, 10), 'Blu'),
-        ((-10, 10), 'Gre'),
-        ((30, -50), 'Yel'),
-        ((-30, -50), 'Mag'),
-        ])
+        if telecentricity_colour == 'Blu':
+            correction_magnitude = 20.7*0.001
+        elif telecentricity_colour == 'Gre':
+            correction_magnitude = 42.0*0.001
+        elif telecentricity_colour == 'Yel':
+            correction_magnitude = 61.2*0.001
+        elif telecentricity_colour == 'Mag':
+             correction_magnitude = 79.9*0.001
+
+        assert np.isclose(offset_magnitude, correction_magnitude)
+
+    @given(circular_magnet_centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0, max_value=1000.0)), telecentricity_colour=st.sampled_from(['Blu', 'Gre', 'Yel', 'Mag']))
     def test_telecentricity_correction_is_radially_inwards(self, circular_magnet_centre, telecentricity_colour):
 
         magnet = pd.DataFrame(dict(Center_x=circular_magnet_centre[0], Center_y=circular_magnet_centre[1], Label=telecentricity_colour), index=[0])
@@ -167,22 +161,34 @@ class Test_radial_offset_file_numerical_values:
         # Calculate r and theta for the original position and the new position
         # The thetas should be equal and the r values should be smaller
         old_magnet_radius = np.sqrt(magnet.Center_x**2 + magnet.Center_y**2).values
-        old_magnet_theta = np.arctan(magnet.Center_y/magnet.Center_x).values
+        if (magnet.Center_y.values[0] != 0.0) & (magnet.Center_x.values[0] != 0.0):
+            old_magnet_theta = np.arctan(magnet.Center_y/magnet.Center_x).values
+        else:
+            old_magnet_theta = 0.0
 
         new_magnet_radius = np.sqrt(new_x**2 + new_y**2)
-        new_magnet_theta = np.arctan(new_y/new_x)
+        if (new_y != 0.0) & (new_x != 0.0):
+            new_magnet_theta = np.arctan(new_y/new_x)
+        else:
+            new_magnet_theta = 0.0
     
-        assert np.isclose(old_magnet_theta, new_magnet_theta) & (new_magnet_radius < old_magnet_radius)
+        assert np.isclose(old_magnet_theta, new_magnet_theta) & (new_magnet_radius <= old_magnet_radius)
 
-    @pytest.mark.parametrize("x, y, magnet, result", [
-        (10, 0, 'circular_magnet',  1.819E-02),
-        (530, 453, 'circular_magnet', 0.0657590317),
-        (30, 0, 'rectangular_magnet', 1.767E-02),
-        (300, 535, 'rectangular_magnet', 0.1137589425),
-        ])
-    def test_roll_correction(self, x, y, magnet, result):
+    @given(x=st.floats(allow_nan=False, allow_infinity=False, min_value=-1e5, max_value=1e5), y=st.floats(allow_nan=False, allow_infinity=False, min_value=-1e5, max_value=1e5), magnet=st.sampled_from(['circular_magnet', 'rectangular_magnet']))
+    def test_roll_correction(self, x, y, magnet):
 
-        assert np.allclose(radial.roll_correction(x, y, magnet), result)
+        if magnet == 'circular_magnet':
+            a = 3.313e-07
+            b = -4.507e-05
+            c = 1.819e-02
+        elif magnet == 'rectangular_magnet':
+            a = 4.133e-07
+            b = -4.151e-05
+            c = 1.767e-02
+
+        p = np.poly1d([a, b, c])
+
+        assert np.allclose(radial.roll_correction(x, y, magnet), p(y))
 
 
 class Test_metrology_calibration:

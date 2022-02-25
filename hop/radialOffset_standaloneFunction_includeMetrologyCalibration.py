@@ -184,6 +184,9 @@ def calculate_telecentricity_correction(magnet, robot_centre, verbose=True):
     elif telecentricity == 'Mag':
         radial_d = 79.9*0.001
 
+    if ((robot_centre_x - centre_x) == 0.0) & ((robot_centre_y - centre_y) == 0.0):
+        return 0.0, 0.0
+
     norm = np.sqrt((robot_centre_x - centre_x)**2 + (robot_centre_y - centre_y)**2)
     telentricity_offset_x = radial_d * (robot_centre_x - centre_x) / norm
     telentricity_offset_y = radial_d * (robot_centre_y - centre_y) / norm
@@ -197,6 +200,10 @@ def calculate_radial_offset(circular_magnet, radial_offset, robot_centre, apply_
     """
     x = (circular_magnet['Center_x'] - robot_centre[0]).values[0]
     y = (circular_magnet['Center_y'] - robot_centre[1]).values[0]
+
+    # If x and y are already at the plate centre, return them as they are since we don't know the direction to move them in (their radial offset direction isn't known)
+    if (x == 0.0) & (y == 0.0):
+        return 0, 0
 
     if apply_telecentricity_correction:
         telecentricity_x_corr, telecentricity_y_corr = calculate_telecentricity_correction(circular_magnet, robot_centre, verbose=verbose)
