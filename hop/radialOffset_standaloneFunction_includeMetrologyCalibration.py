@@ -97,7 +97,7 @@ def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_con
         orig_coords = np.array([df['Center_x'], df['Center_y']]).T
         theta_d = df['rot_platePlacing']
         metr_calibrated_coords, calibd_theta_d = perform_metrology_calibration(orig_coords, theta_d,
-                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file)
+                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
         df['rot_platePlacing'] = calibd_theta_d
@@ -322,23 +322,21 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", type=str, help='The object frame number you want to display')
-    parser.add_argument("robot_shifts_file")
+    parser.add_argument("robot_shifts_file", type=str, help='Filename of the robot metrology measurements')
+    parser.add_argument("--offset", default=0, type=float, help='Radial offset to apply in mm. +ve is outward, -ve is inwards')
+    parser.add_argument("--T_observed", default=None, type=float, help='Temperature at which the plate will be observed')
+    parser.add_argument("--T_configured", default=None, type=float, help='Temperature at which the plate is configured')
+    parser.add_argument("--silent", action="store_true", help="Turn off output from the code")
 
     args = parser.parse_args()
+    filename = args.filename
+    robot_shifts_file = args.robot_shifts_file
 
-    radialOffset_standaloneFunction(args.filename, robot_shifts_file=args.robot_shifts_file)
-
-## CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below
-
-# filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
-# radialOffset_standaloneFunction(filename,None,15,15) # direct value of offset as input
-
-# # Example specifying the metrology measurement file:
-# filename = './Robot_FinalFormat_tile_A3391_A3395_commissioning_tile_2_CONFIGURED_correct_header.csv'
-# radialOffset_standaloneFunction(filename,None,15,15, robot_shifts_file='./robot_shifts_abs.csv')
-
-# T_observed = 30
-# T_configured = 23.0
-# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+    #Optional Arguments
+    offset = args.offset
+    T_observed = args.T_observed
+    T_configured = args.T_configured
+    verbose = not args.silent
 
 
+    df = radialOffset_standaloneFunction(filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose)
