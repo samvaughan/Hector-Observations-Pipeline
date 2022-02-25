@@ -140,8 +140,6 @@ def hexaPositionOffset(all_magnets, offsetFile):
                     all_magnets[i].circular_magnet_center = all_magnets[j].center
                     all_magnets[i].circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
 
-
-                    #import ipdb; ipdb.set_trace()
                     # recalculate rectangular magnet center coordinates as per updated circular magnet center
                     all_magnets[i].center = probe.calculate_rectangular_magnet_center_coordinates(all_magnets[i])
 
@@ -251,8 +249,7 @@ def magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_
                 if all_magnets[j].__class__.__name__ == 'rectangular_magnet' and all_magnets[j].index == all_magnets[i].index:
 
                     # updating the rectangular magnet center coordinates by recalculating them based on rectangular magnet orientation
-                    [x_rect, y_rect] = calculate_rectangular_magnet_center_coordinates(all_magnets[i].center[0],
-                                        all_magnets[i].center[1], all_magnets[j].rectangular_magnet_input_orientation)
+                    [x_rect, y_rect] = calculate_rectangular_magnet_center_coordinates(all_magnets[i].center[0],all_magnets[i].center[1], all_magnets[j].rectangular_magnet_input_orientation)
 
                     all_magnets[j].center[0] = x_rect
                     all_magnets[j].center[1] = y_rect
