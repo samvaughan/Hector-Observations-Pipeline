@@ -111,7 +111,8 @@ def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_con
             df.at[index, 'Center_x'] = row['Center_x'] + roll_correction_offset
 
     # Write the output file with the expected file ending
-    outputFile = Path(filename).stem + '_radialOffsetAdjusted.csv'
+    fname = Path(filename)
+    outputFile = fname.parent / (fname.stem + '_radialOffsetAdjusted.csv')
     # write the description from input robot file at top of final output robot file
     with open(outputFile, 'w+') as f:
         for i in description:
