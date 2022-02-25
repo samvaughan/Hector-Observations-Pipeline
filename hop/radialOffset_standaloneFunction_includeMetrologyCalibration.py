@@ -144,8 +144,8 @@ def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_corr
             print(f"\t\tnew centre is ({new_x + robot_centre[0]:.3f}, {new_y + robot_centre[1]:.3f})")
 
         # Update the new centres of the circular magnets
-        df.at[circular_magnet.index, 'Center_x'] = new_x + robot_centre[0]
-        df.at[circular_magnet.index, 'Center_y'] = new_y + robot_centre[1]
+        df.at[circular_magnet.index[0], 'Center_x'] = new_x + robot_centre[0]
+        df.at[circular_magnet.index[0], 'Center_y'] = new_y + robot_centre[1]
 
         # Now find the centres of the rectangular magnets
         angle_for_rectangular_magnet= np.radians(270 - rectangular_magnet['rot_holdingPosition'] - rectangular_magnet['rot_platePlacing']).values[0]
@@ -157,8 +157,8 @@ def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_corr
             print(f"\t\tnew centre is ({x_rect + robot_centre[0]:.3f}, {y_rect + robot_centre[1]:.3f})")
 
         # Update the new centres of the rectangular magnets
-        df.at[rectangular_magnet.index, 'Center_x'] = x_rect + robot_centre[0]
-        df.at[rectangular_magnet.index, 'Center_y'] = y_rect + robot_centre[1]
+        df.at[rectangular_magnet.index[0], 'Center_x'] = x_rect + robot_centre[0]
+        df.at[rectangular_magnet.index[0], 'Center_y'] = y_rect + robot_centre[1]
 
     return df
 
