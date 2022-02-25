@@ -2,24 +2,59 @@ import numpy as np
 from .. import radialOffset_standaloneFunction_includeMetrologyCalibration as radial
 import pytest
 import pandas as pd
-
+from pathlib import Path
 """
 Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 """
 
-@pytest.fixture()
-def robot_dataframe():
-    print("Loading the dataframe...")
-    df = pd.read_csv("tests/Robot_file_for_testing.csv", skiprows=6)
-    df = df.rename(columns={'#Magnet':'Magnet'})
-    yield df
+
 
 # Share global variables between tests
 @pytest.fixture()
 def config():
-    return dict(robot_centre = [324.470,297.834])
+    return dict(robot_centre = [324.470,297.834], robot_shifts_file="tests/data/radial_offset_function_files/robot_shifts_abs_220222120000.csv", example_robot_file="tests/data/radial_offset_function_files/Robot_file_for_testing.csv")
 
-class Test_radialOffset_standaloneFunction_includeMetrologyCalibration:
+@pytest.fixture()
+def robot_dataframe(config):
+    print("Loading the dataframe...")
+    df = pd.read_csv(config['example_robot_file'], skiprows=6)
+    df = df.rename(columns={'#Magnet':'Magnet'})
+    yield df
+
+@pytest.fixture()
+def example_metrology_results():
+    yield pd.read_csv("tests/data/radial_offset_function_files/metrology_fitting_results_for_robot_shifts_file.csv")
+
+@pytest.fixture()
+def metrology_fit(robot_dataframe, config):
+    """
+    Run the metrology fit and return the results
+    """
+    orig_coords = np.array([robot_dataframe['Center_x'], robot_dataframe['Center_y']]).T
+    theta_d = robot_dataframe['rot_platePlacing']
+    metr_calibrated_coords, calibd_theta_d = radial.perform_metrology_calibration(orig_coords, theta_d, robot_centre=config['robot_centre'], robot_shifts_file=config['robot_shifts_file'])
+
+    yield (metr_calibrated_coords, calibd_theta_d)
+
+
+@pytest.fixture()
+def output_file(config):
+    """
+    Run the main function and return the output file as a pathlib Path object
+    """
+    filename = config['example_robot_file']
+    robot_shifts_file = config['robot_shifts_file']
+    df = radial.radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, verbose=False)
+    input_file = Path(config['example_robot_file'])
+    output_file = input_file.parent / (input_file.stem + "_radialOffsetAdjusted.csv")
+
+    yield output_file
+
+    # Now remove the output file
+   # output_file.unlink()
+
+
+class Test_radial_offset_file_numerical_values:
     
     def test_original_x_values_are_returned_when_no_offset_applied(self, robot_dataframe, config):
 
@@ -93,7 +128,7 @@ class Test_radialOffset_standaloneFunction_includeMetrologyCalibration:
         ])
     def test_rectangular_magnets_are_along_line_through_centre_of_circular_magnet(self, circular_magnet_centre, angle):
 
-        x_rect, y_rect = radial.calculate_rectangular_magnet_center_coordinates(circular_magnet_centre[0], circular_magnet_centre[1], angle)
+        x_rect, y_rect = radial.calculate_rectangular_magnet_centre_coordinates(circular_magnet_centre[0], circular_magnet_centre[1], angle)
 
         delta_x = circular_magnet_centre[0] + 27.2 * np.cos(angle) - x_rect
         delta_y = circular_magnet_centre[1] + 27.2 * np.sin(angle) - y_rect
@@ -137,3 +172,63 @@ class Test_radialOffset_standaloneFunction_includeMetrologyCalibration:
         new_magnet_theta = np.arctan(new_y/new_x)
     
         assert np.isclose(old_magnet_theta, new_magnet_theta) & (new_magnet_radius < old_magnet_radius)
+
+    @pytest.mark.parametrize("x, y, magnet, result", [
+        (10, 0, 'circular_magnet',  1.819E-02),
+        (530, 453, 'circular_magnet', 0.0657590317),
+        (30, 0, 'rectangular_magnet', 1.767E-02),
+        (300, 535, 'rectangular_magnet', 0.1137589425),
+        ])
+    def test_roll_correction(self, x, y, magnet, result):
+
+        assert np.allclose(radial.roll_correction(x, y, magnet), result)
+
+
+class Test_metrology_calibration:
+
+    def test_fitting_results_against_known_values_for_theta(self, example_metrology_results, metrology_fit):
+
+        metr_calibrated_coords, calibd_theta_d = metrology_fit
+
+        assert np.allclose(calibd_theta_d.values, example_metrology_results['theta'].values)
+
+    def test_fitting_results_against_known_values_for_x(self, example_metrology_results, metrology_fit):
+
+        metr_calibrated_coords, calibd_theta_d = metrology_fit
+
+        assert np.allclose(metr_calibrated_coords[:, 0], example_metrology_results['x'].values)
+
+
+    def test_fitting_results_against_known_values_for_y(self, example_metrology_results, metrology_fit):
+
+        metr_calibrated_coords, calibd_theta_d = metrology_fit
+
+        assert np.allclose(metr_calibrated_coords[:, 1], example_metrology_results['y'].values)
+
+
+
+class Test_radial_offset_file_saving_loading:
+
+    def test_output_file_exists(self, output_file):
+
+        assert output_file.exists()
+
+    def test_header_in_output_file(self, output_file):
+        # Make sure the first 6 lines are a header, as we expect
+        with open(output_file, 'r') as f:
+            lines = f.readlines()
+
+        header = lines[:6]
+
+        header_keys = [h.split(',', 1)[0] for h in header]
+
+        specimen_header_keys = [
+        "Label",
+        "Date_and_Time_file_created",
+        "Radial_Offset_Adjustment",
+        "RobotTemp",
+        "ObsTemp",
+        "Radial_Scale_factor"
+        ]
+
+        assert set(header_keys) == set(specimen_header_keys)

@@ -1,6 +1,6 @@
 Label, test
 Date_and_Time_file_created, 17-February-22 11:19:35
-Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets. 
+Radial_Offset_Adjustment, -9999 #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets.
 RobotTemp, 20.0000 #temperature (degrees C) the distortion code assumed the field would be observed at
 ObsTemp, 20.0000 #actual temperature (degrees C) it is going to be observed at
 Radial_Scale_factor, 1.0 #Radial scale factor is thermal coefficient of invar times temperature difference applied radially relative to the plate centre.
