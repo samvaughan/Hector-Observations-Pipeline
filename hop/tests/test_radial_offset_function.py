@@ -51,7 +51,7 @@ def output_file(config):
     yield output_file
 
     # Now remove the output file
-   # output_file.unlink()
+    output_file.unlink()
 
 
 class Test_radial_offset_file_numerical_values:
