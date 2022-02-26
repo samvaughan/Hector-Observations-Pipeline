@@ -5,230 +5,238 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import warnings
+from pathlib import Path
 
-def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=-10000, T_configured=-10000, robot_centre=None,
-                                    plate_radius=None, alpha=None, apply_metr_calib=True, robot_shifts_file='./robot_shifts_abs.csv'):
+def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, verbose=True):
     
-    ''' FUNCTION TO ADJUST THE RADIAL OFFSET FOR ALL MAGNETS IN CASE OF THERMAL EXPANSION OF THE PLATE
-    INPUTS: 1. 'filename'- Mandatory Input required is the filename with location
-                e.g. filename = 'D:/Hector/Hector_project_files/Hector/magnet_position/G15/Allocation/robot_outputs/Robot_GAMA_G15_DC_tile_000.txt'
-            2. 'Offset'- value of offset to be adjusted to all magnets in millimetre(mm)
-                +ve values will initiate radial outward movement of the magnets
-                -ve values will initiate radial inward movement of the magnets
-                e.g. offset = 0.02
-            3. 'T_observed' and 'T_configured'- 
-                # T_observed > T_configured then radial inward movement by magnet, assuming the plate has expanded
-                # T_observed < T_configured then radial outward movement by magnet, assuming the plate has contracted
-                # ΔT = T_configured - T_observed
-                # coeff. of thermal expansion, alpha = 1.2 × 10^−6 K^(−1),[Common grades of Invar, measured between 20 °C and 100 °C]
-                # offset = plate_radius x ( alpha ⋅ ΔT)
-                e.g. T_observed = 15, T_configured = 20
-            4. 'robot_centre', 'plate_radius', 'alpha'- These values are known and hence have their default values, but can 
-                also be input to account for changes in future, if any.
-                Default values: 'robot_centre = (324.470,297.834)', 'plate_radius=226.0 mm', 'alpha= 1.2 × 10^−6'
-                apply_metr_calib - if True, apply the metrology-based calibration, using coefficients fitted to measurments
-                    in 'robot_shifts_file'
-                'robot_shifts_file' - path and filename for the output file of the metrology measurements
-    OUTPUT:  A file with offset value adjusted saved in same directory as input file, with extended name of '_radialOffsetAdjusted' at the end.   
-    '''
+    """
+    Apply a number of corrections to the magnet positions in a Hector Robot file. The corrections are:
 
-    if plate_radius == None:
-        plate_radius = 226.0
+        * A radial shift inwards or outwards applied to all circular magnets to account for a difference in temperature between the plate at the time it was configured and the plate at the time it will be observed. Note that this offset can be entered in millimetres, or otherwise two temnperatures and a coefficient of thermal expansion can be given instead.
+        * A correction on the position of each circular magnet based on its radial position in one of four telecentricity annuli. The circular magnet is moved inwards to account for the fact the light is not truly plane-parallel across the plate. 
+        * A correction on the position of all magnets based on accurate calibration of the position and rotation of the plate using the pre-defined metrology markers. This correction can be decomposed into a shift of the plate centre, a shear term and a rotation. The derived correction is fit to the measurements in the robot_shifts_file.
+        * A correction on North/South position of all magnets based on the roll of the robot arm as it places each object. The extension of the robot arm to the far corner of the plate induces a small torque which affects its ability to place a magnet accurately. This torque has been measured and fitted with quadratic function which depends on the y value (in robot coordinates) of the magnet and is applied to its x value.
+    
+    For corrections which are applied to only the circular magnets, we then calculate the position of the rectangular magnets again to ensure that the distance between them is always 27.2mm. 
 
-    if robot_centre == None:
-        robot_centre = [324.470,297.834]
+    Inputs:
+        filename (str):
+            A Hector Robot file containing information about 27 circular and 27 rectnagular magnets to be placed on the plate.
+        offset (float, optional):
+            A radial offset (in mm) to be applied to all circular magnets. Negative values are towards the plate centre, positive values are away from the plate centre. The default is 0.0
+        T_observed (float, optional): 
+            The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None. 
+        T_configured (float, optional): 
+            The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.
+        plate_radius (float, optional):
+            The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0
+        alpha (float, optional):
+            The coefficient of thermal expansion of invar. Default is 1.2e-6
+        robot_centre (list, optional): 
+            A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn't change this unless you have a very good reason! Default is [324.470,297.834]
+        robot_shifts_file, (str, optional):
+            The location of the metrology measurements file. Default is 'robot_shifts_abs.csv'
+        apply_telecentricity_correction (bool, optional):
+            Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True. 
+        apply_metrology_calibration (bool, True):
+            Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
+        apply_roll_correction (bool, True):
+            Whether or not to apply the robot roll correction. Should always be True. Default is True. 
+        verbose (bool, True):
+            Print information about the corrections to the screen. Default is True. 
+    Outputs:
+        A file with offset value adjusted saved in same directory as input file, with extended name of '_radialOffsetAdjusted.csv' at the end. 
+    """
 
-    if alpha == None:
-        alpha = 1.2 * (10**(-6))
+    # Some basic argument checking
+    if T_observed is not None and T_configured is None:
+        raise ValueError("T_configured cannot be None if T_obsered is not None!")
 
-    if T_observed != -10000 and T_configured != -10000:
+    if T_observed is None and T_configured is not None:
+        raise ValueError("T_observed cannot be None if T_configured is not None!")
+
+    if T_observed is not None and T_configured is not None:
+        if offset != 0.0:
+            raise ValueError("If T_configured and T_observed are given then offset can't be given as well!")
         delta_T = T_configured - T_observed
         offset = plate_radius * ( delta_T * alpha )  
-        #print('Offset calculated based on temperature change = '+str(offset)+' mm')
-
+    
+    # Read in the file and save the header
     # getting count of lines to skip at top of file, which contain other information
     with open(filename) as file:
-        line = file.readline()
-        skipline_count = 0
-        description = [line]
+        lines = file.readlines()
+    header = lines[:6]
+    assert lines[6].startswith('#'), "The 7th line of this file doesn't start with #- have the headers changed? If so, update these lines of code!"
 
-        # count and store only the description lines not starting with #
-        while (line.startswith('#') == False):
-            line = file.readline()
-            if line[0] != '#':
-                description += [line]
-            skipline_count += 1
-
-
-    df_read = pd.read_csv(filename, sep=',', skiprows=skipline_count)
-
+    df_read = pd.read_csv(filename, sep=',', skiprows=6)
     # renaming the '#Magnet' column name to remove the '#'
     df = df_read.rename(columns={'#Magnet': 'Magnet'})
 
-    # updating description headers with parameters
-    description[2] = description[2].replace('-9999', str(offset))
-    description[5] = description[5].replace('1.0', str((round(offset/plate_radius,5) + 1)))
 
-    if T_observed != -10000 and T_configured != -10000:
-        description[3] = description[3].replace('9999.0000', str(T_configured))
-        description[4] = description[4].replace('9999.0000', str(T_observed))
+    # Updating the header of the robot file with the updated parameters (if any)
+    header[2] = f"Radial_Offset_Adjustment, {offset} #Radial offset is in millimetre(mm) with +ve values actioning radial outward movement and -ve values actioning radial inward movement of the magnets.\n"
+    header[5] = f"Radial_Scale_factor, {round(offset/plate_radius,5) + 1} #Radial scale factor is thermal coefficient of invar times temperature difference applied radially relative to the plate centre.\n"
 
-    magnet_count = len(df)
+    if T_observed is not None and T_configured is not None:
+        header[3] = f"RobotTemp, {T_configured:.5f} #temperature (degrees C) the distortion code assumed the field would be observed at\n"
+        header[4] = f"ObsTemp, {T_observed:.5f} #actual temperature (degrees C) it is going to be observed at\n"
 
-    
-    print(f"Offset is {offset}")
-    for i in range(magnet_count):
-        
-        if df.loc[i, 'Magnet'] == 'circular_magnet':
 
-            x = df.loc[i, 'Center_x'] - robot_centre[0]
-            y = df.loc[i, 'Center_y'] - robot_centre[1]
-            theta = atan(y/x)
-            
-
-            delta_x = cos(theta) * offset
-            delta_y = sin(theta) * offset
-
-            # print(f"dX is {delta_x}")
-            # print(f"dY is {delta_y}")
-            if x >= 0:
-                delta_x *= 1
-                delta_y *= 1
-                #df.loc[i, 'Center_x'] = df.loc[i, 'Center_x'] + delta_x
-                #df.loc[i, 'Center_y'] = df.loc[i, 'Center_y'] + delta_y
-            else:
-                delta_x *= -1
-                delta_y *= -1
-                #df.loc[i, 'Center_x'] = df.loc[i, 'Center_x'] - delta_x
-                #df.loc[i, 'Center_y'] = df.loc[i, 'Center_y'] - delta_y
-
-            df.loc[i, 'Center_x'] = df.loc[i, 'Center_x'] + delta_x
-            df.loc[i, 'Center_y'] = df.loc[i, 'Center_y'] + delta_y
-
-            for j in range(magnet_count):
-        
-                if df.loc[j, 'Magnet'] == 'rectangular_magnet' and df.loc[j, 'Index'] == df.loc[i, 'Index']:
-                    
-                    ####
-                    ## Need to understand this function and why it's not giving the exact same values out when the offset is 0
-                    # I think it comes back to how the angle of the magnet is used/calculated
-                    #[x_rect,y_rect] = calculate_rectangular_magnet_center_coordinates(x, y, delta_x, delta_y, df.loc[i, 'rectMag_inputOrientation'])
-                    x_rect = df.loc[j, 'Center_x'] - robot_centre[0]
-                    y_rect = df.loc[j, 'Center_y'] - robot_centre[1]
-
-                    print(f"Circular magnet is at {df.loc[i, 'Center_x']}, old_centre is ({df.loc[j, 'Center_x']:.5f}, {df.loc[j, 'Center_y']:.5f}) , new centre is ({x_rect + robot_centre[0]:.5f}, {y_rect + robot_centre[1]:.5f}) ")
-                    df.loc[j, 'Center_x'] = x_rect + robot_centre[0]
-                    df.loc[j, 'Center_y'] = y_rect + robot_centre[1]
-
+    # Apply the radial offsets
+    df = apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_correction=apply_telecentricity_correction, verbose=verbose)
 
     # Perform metrology-based calibration
-    if apply_metr_calib:
+    if apply_metrology_calibration:
         orig_coords = np.array([df['Center_x'], df['Center_y']]).T
         theta_d = df['rot_platePlacing']
         metr_calibrated_coords, calibd_theta_d = perform_metrology_calibration(orig_coords, theta_d,
-                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file)
+                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
         df['rot_platePlacing'] = calibd_theta_d
 
-    outputFile = filename[:-4] + '_radialOffsetAdjusted.csv'
+    # Apply the roll correction to the x values of the magnets _after_ the metrology correction
+    if apply_roll_correction:
+        if verbose:
+            print("\nApplying the Roll Correction")
+        for index, row in df.iterrows():
+            roll_correction_offset = roll_correction(row['Center_x'], row['Center_y'], row['Magnet'])
+            df.at[index, 'Center_x'] = row['Center_x'] + roll_correction_offset
+
+    # Write the output file with the expected file ending
+    fname = Path(filename)
+    outputFile = fname.parent / (fname.stem + '_radialOffsetAdjusted.csv')
+
+    # Replace the # at the start of the line with column names
+    df = df.rename(columns={'Magnet': '#Magnet'})
 
     # write the description from input robot file at top of final output robot file
-    with open(outputFile, 'w+') as f:
-        
-        for i in description:
-            f.write(i)
-
-
-    df = df.rename(columns={'Magnet': '#Magnet'})
+    with open(outputFile, 'w') as f:
+        for line in header:
+            f.write(line)
     df.to_csv(outputFile, index=False, sep=',', mode='a')
 
-    print('Output file produced by adjusting offset values to the input file')
+    if verbose:
+        print(f'Output file: {outputFile}')
     return df
 
-# calculating circular magnet orientation based on magnet center, categorizing them in four quadrants
-def calculate_circular_magnet_orientation(x,y):
 
-    if x >= 0 and y >= 0:
-        circular_magnet_orientation = atan(abs(y/x))
+def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_correction=True, verbose=True):
+    """
+    Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.
+    """
 
-    elif x < 0 and y >= 0:
-        circular_magnet_orientation = pi - atan(abs(y / x))
+    if verbose:
+        print(f"Applying an overall radial offset of {offset}mm to all circular magnets")
 
-    elif x < 0 and y < 0:
-        circular_magnet_orientation = pi + atan(abs(y / x))
+    # Loop through the hexabundles
+    all_hexabundles = df.loc[df['Magnet'] == 'circular_magnet', 'Hexabundle'].values
+    for hexabundle in all_hexabundles:
 
-    elif x >= 0 and y < 0:
-        circular_magnet_orientation = 2 * pi - atan(abs(y / x))
+        circular_magnet = df.loc[(df['Hexabundle'] == hexabundle) & (df['Magnet'] == 'circular_magnet')]
+        rectangular_magnet = df.loc[(df['Hexabundle'] == hexabundle) & (df['Magnet'] == 'rectangular_magnet')]
+        
+        new_x, new_y = calculate_radial_offset(circular_magnet, offset, robot_centre, apply_telecentricity_correction=apply_telecentricity_correction, verbose=verbose)
 
-    # converting orientation form from radians to degrees
-    circular_magnet_orientation = degrees(circular_magnet_orientation)
+        if verbose:
+            print(f"Hexabundle {hexabundle}: \n\tCircular magnet:")
+            print(f"\t\toriginal centre is ({circular_magnet['Center_x'].values[0]:.3f}, {circular_magnet['Center_y'].values[0]:.3f})")
+            print(f"\t\tnew centre is ({new_x + robot_centre[0]:.3f}, {new_y + robot_centre[1]:.3f})")
 
-    return circular_magnet_orientation
+        # Update the new centres of the circular magnets
+        df.at[circular_magnet.index[0], 'Center_x'] = new_x + robot_centre[0]
+        df.at[circular_magnet.index[0], 'Center_y'] = new_y + robot_centre[1]
 
-# calculating the rectangular magnet orientation with respect to the circular magnet
-def calculate_rectangular_magnet_orientation(x,y,rectangular_magnet_input_orientation):
+        # Now find the centres of the rectangular magnets
+        angle_for_rectangular_magnet= np.radians(270 - rectangular_magnet['rot_holdingPosition'] - rectangular_magnet['rot_platePlacing']).values[0]
+        [x_rect,y_rect] = calculate_rectangular_magnet_centre_coordinates(new_x, new_y, angle_for_rectangular_magnet)
 
-    circular_magnet_orientation = calculate_circular_magnet_orientation(x,y)
+        if verbose:
+            print("\tRectangular magnet:")
+            print(f"\t\toriginal centre is ({rectangular_magnet['Center_x'].values[0]:.3f}, {rectangular_magnet['Center_y'].values[0]:.3f})")
+            print(f"\t\tnew centre is ({x_rect + robot_centre[0]:.3f}, {y_rect + robot_centre[1]:.3f})")
 
-    #print(f"Circiular magnet orientation is {circular_magnet_orientation}")
-    #print(f"rectangular_magnet_input_orientation is {degrees(rectangular_magnet_input_orientation)}" )
-    rectangular_magnet_absolute_orientation_degree = 90 - circular_magnet_orientation - degrees(rectangular_magnet_input_orientation)
-    #print(f"rectangular_magnet_absolute_orientation_degree is {rectangular_magnet_absolute_orientation_degree}")
+        # Update the new centres of the rectangular magnets
+        df.at[rectangular_magnet.index[0], 'Center_x'] = x_rect + robot_centre[0]
+        df.at[rectangular_magnet.index[0], 'Center_y'] = y_rect + robot_centre[1]
 
-    #rectangular_magnet_absolute_orientation_degree = 270 - np.degrees(self.angs)
+    return df
 
-    return rectangular_magnet_absolute_orientation_degree
 
-# calculating the rectangular magnet center coordinates from its orientation, and categorizing in four quadrants
-def calculate_rectangular_magnet_center_coordinates(x,y, delta_x, delta_y, rectangular_magnet_input_orientation):
+def calculate_telecentricity_correction(magnet, robot_centre, verbose=True):
+    """
+    Find the required offset in the posotion of the circular magnets based on their telecentricity annulus
+    """
+    if verbose:
+        print("Applying the telecentricity offset...")
+    robot_centre_x, robot_centre_y = robot_centre
 
-    # Calculate the 
-    rectangular_magnet_absolute_orientation_degree = calculate_rectangular_magnet_orientation(x,y,rectangular_magnet_input_orientation)
+    centre_x = magnet.Center_x.values
+    centre_y = magnet.Center_y.values
+    telecentricity = magnet.Label.values
 
-    rectangular_magnet_orientation_modulo_radians = convert_modulus_angle(radians(90 - rectangular_magnet_absolute_orientation_degree))
+    if telecentricity == 'Blu':
+        radial_d = 20.7*0.001 #mm      
+    elif telecentricity == 'Gre':
+        radial_d = 42.0*0.001
+    elif telecentricity == 'Yel':
+        radial_d = 61.2*0.001  
+    elif telecentricity == 'Mag':
+        radial_d = 79.9*0.001
 
-    circular_rectangle_magnet_center_distance = 27.2
+    if ((robot_centre_x - centre_x) == 0.0) & ((robot_centre_y - centre_y) == 0.0):
+        return 0.0, 0.0
 
-    new_x = x + delta_x
-    new_y = y + delta_y
-    if 0 < rectangular_magnet_orientation_modulo_radians <= pi / 2:
+    norm = np.sqrt((robot_centre_x - centre_x)**2 + (robot_centre_y - centre_y)**2)
+    telentricity_offset_x = radial_d * (robot_centre_x - centre_x) / norm
+    telentricity_offset_y = radial_d * (robot_centre_y - centre_y) / norm
 
-        rectangular_magnet_center =  [new_x + circular_rectangle_magnet_center_distance * cos(rectangular_magnet_orientation_modulo_radians), \
-                                        new_y + circular_rectangle_magnet_center_distance * sin(rectangular_magnet_orientation_modulo_radians)]
+    return telentricity_offset_x[0], telentricity_offset_y[0]
 
-    elif pi / 2 < rectangular_magnet_orientation_modulo_radians <= pi:
+def calculate_radial_offset(circular_magnet, radial_offset, robot_centre, apply_telecentricity_correction=True, verbose=True):
 
-        rectangular_magnet_center = [new_x - circular_rectangle_magnet_center_distance * cos(pi - rectangular_magnet_orientation_modulo_radians), \
-                                      new_y + circular_rectangle_magnet_center_distance * sin(pi - rectangular_magnet_orientation_modulo_radians)]
+    """
+    Given an x and y calculate the total radial offsets to apply based on a temperature change and a fixed telecentricity correction 
+    """
+    x = (circular_magnet['Center_x'] - robot_centre[0]).values[0]
+    y = (circular_magnet['Center_y'] - robot_centre[1]).values[0]
 
-    elif pi < rectangular_magnet_orientation_modulo_radians <= 3 * pi / 2:
+    # If x and y are already at the plate centre, return them as they are since we don't know the direction to move them in (their radial offset direction isn't known)
+    if (x == 0.0) & (y == 0.0):
+        return 0, 0
 
-        rectangular_magnet_center = [new_x - circular_rectangle_magnet_center_distance * sin(3 * pi / 2 - rectangular_magnet_orientation_modulo_radians), \
-                                      new_y - circular_rectangle_magnet_center_distance * cos(3 * pi / 2 - rectangular_magnet_orientation_modulo_radians)]
-
-    elif 3 * pi / 2 < rectangular_magnet_orientation_modulo_radians <= 2 * pi:
-
-        rectangular_magnet_center = [new_x + circular_rectangle_magnet_center_distance * cos(2 * pi - rectangular_magnet_orientation_modulo_radians),
-                                      new_y - circular_rectangle_magnet_center_distance * sin(2 * pi - rectangular_magnet_orientation_modulo_radians)]
+    if apply_telecentricity_correction:
+        telecentricity_x_corr, telecentricity_y_corr = calculate_telecentricity_correction(circular_magnet, robot_centre, verbose=verbose)
     else:
-            raise ValueError(f"This rectangular magnet has an orientation of {rectangular_magnet_orientation_modulo_radians} and I can't calculate its centre")
+        telecentricity_x_corr = 0 
+        telecentricity_y_corr = 0
 
-    return rectangular_magnet_center
+    # Make a unit vector which points towards the origin
+    # The origin here is (0, 0) since we've already removed the plate centre offset
+    unit_vector = 1./(np.sqrt(x**2 + y**2)) * np.array([x, y]) - np.array([0, 0]) 
+    offset_vector = unit_vector * radial_offset
 
-# function to keep angle in range of 0 to 2pi
-def convert_modulus_angle(angle):
-    piX2 = 2 * pi
+    delta_x = offset_vector[0]
+    delta_y = offset_vector[1]
 
-    if angle > piX2:
-        angle = angle - piX2
-    if angle < 0:
-        angle = piX2 - abs(angle)
+    new_x = x + delta_x + telecentricity_x_corr
+    new_y = y + delta_y + telecentricity_y_corr
 
-    return angle
+    return new_x, new_y
 
 
-def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file):
+def calculate_rectangular_magnet_centre_coordinates(x, y, rm_angle):
+    """
+    The rectangular magnets always have to be 27.2 mm from their circular magnets, and at the appropriate angle
+    """
+    circular_rectangle_magnet_centre_distance = 27.2
+
+    rectangular_magnet_centre = [x + circular_rectangle_magnet_centre_distance * np.cos(rm_angle), y +circular_rectangle_magnet_centre_distance * np.sin(rm_angle)]
+    return rectangular_magnet_centre
+
+
+def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file, verbose=True):
+
     cent_wrt_origin = np.array([-270.5, 179.0])  # Manufactured offset between metrology origin and plate centre
 
     # Calculate correction coefficients from metrology
@@ -260,10 +268,10 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
     theta_d = popt[2]
-    output_theta_d = input_theta_d + theta_d ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
+    output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
-    print('Applied metrology-based calibration, using the fitted coefficients:')
-    print(popt)
+    if verbose:
+        print(f'\nApplied metrology-based calibration, using the following fitted coefficients: {popt}')
 
     return metr_calibrated_coords, output_theta_d
 
@@ -297,30 +305,43 @@ def fitting_fun(Xs, offsX, offsY, theta, sclX, sclY, sh1, sh2):
     return out
 
 
+def roll_correction(centre_x, centre_y, magnet):
+    """
+    Calculate the offset which should be applied to the robot x coordinate to account for the roll of the robot arm. 
+    """
+    if magnet == 'circular_magnet':
+        a = 3.313E-07
+        b = -4.507E-05
+        c = 1.819E-02
+    elif magnet == 'rectangular_magnet':  
+        a = 4.133E-07
+        b = -4.151E-05
+        c = 1.767E-02
 
+    roll_offset_centre_x = a * centre_y**2 + b * centre_y + c  
+
+    return roll_offset_centre_x
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", type=str, help='The object frame number you want to display')
-    parser.add_argument("robot_shifts_file")
+    parser.add_argument("robot_shifts_file", type=str, help='Filename of the robot metrology measurements')
+    parser.add_argument("--offset", default=0, type=float, help='Radial offset to apply in mm. +ve is outward, -ve is inwards')
+    parser.add_argument("--T_observed", default=None, type=float, help='Temperature at which the plate will be observed')
+    parser.add_argument("--T_configured", default=None, type=float, help='Temperature at which the plate is configured')
+    parser.add_argument("--silent", action="store_true", help="Turn off output from the code")
 
     args = parser.parse_args()
+    filename = args.filename
+    robot_shifts_file = args.robot_shifts_file
 
-    radialOffset_standaloneFunction(args.filename, robot_shifts_file=args.robot_shifts_file)
-
-## CALLING THE FUNCTION: provide the filename location and offset value or Temperatures as input to function as shown below
-
-# filename = 'C:/Users/Asus/Desktop/Hector_July/Robot_FinalFormat_G12_tile_000.csv'
-# radialOffset_standaloneFunction(filename,None,15,15) # direct value of offset as input
-
-# # Example specifying the metrology measurement file:
-# filename = './Robot_FinalFormat_tile_A3391_A3395_commissioning_tile_2_CONFIGURED_correct_header.csv'
-# radialOffset_standaloneFunction(filename,None,15,15, robot_shifts_file='./robot_shifts_abs.csv')
-
-# T_observed = 30
-# T_configured = 23.0
-# radialOffset_standaloneFunction(filename,-10000, T_observed, T_configured) # Observed and configured temperatures as input
+    #Optional Arguments
+    offset = args.offset
+    T_observed = args.T_observed
+    T_configured = args.T_configured
+    verbose = not args.silent
 
 
+    df = radialOffset_standaloneFunction(filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose)
