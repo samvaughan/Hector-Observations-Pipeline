@@ -671,7 +671,7 @@ class HectorPipe:
         file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
-        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList) #, magnetPair_offset)
+        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList)
 
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in
