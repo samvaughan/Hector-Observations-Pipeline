@@ -7,13 +7,25 @@ import pandas as pd
 import csv
 import string
 import sys
-import re
 
+"""
+TODO:
 
-# Adjusting offset to move circular magnet closer to OR far from rectangular magnet
+- One function here uses probe.calculate_rectangular_magnet_center_coordinates, the other uses the calculate_rectangular_magnet_center_coordinates function here. 
+- Change hexaPositionOffset to use the .csv Offset file rather than the excel version
+- Get rid of unused imports
+"""
+
 def hexaPositionOffset(all_magnets, offsetFile):
 
-    # read offset excel file as a dataframe
+    """
+    Apply the P and Q offsets to the circular magnets and then move the rectangular magnets accordingly. 
+    """
+
+    circular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "circular_magnet"]
+    rectangular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "rectangular_magnet"]
+
+    # Get the P and Q offsets from the file
     df = pd.read_excel(offsetFile, usecols=['Name', 'P', 'Q'], engine='openpyxl')
 
     # drop the rows with NA values in Q column
@@ -21,45 +33,36 @@ def hexaPositionOffset(all_magnets, offsetFile):
 
     # omit the information row via string length check
     df_adjusted = df[df['Name'].str.len() <= 5]
-    df_final = df_adjusted.set_index("Name")
+    # Set the index to be the hexabundle name
+    P_Q_offsets_df = df_adjusted.set_index("Name")
 
-    circular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "circular_magnet"]
-    rectangular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "rectangular_magnet"]
-
-    # Add in the orientation of the rectangular magnets
+    # Add in the orientation of the rectangular magnets to the dataframe
     ang = {r.hexabundle : r.orientation for r in rectangular_magnets}
-    df_final['rectangular_magnet_orientation'] = df_final.index.map(ang)
+    P_Q_offsets_df['rectangular_magnet_orientation'] = P_Q_offsets_df.index.map(ang)
 
     # calculate and make the changes to x and y positions of circular magnets as per offset values
     for magnet in circular_magnets:
 
         # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
-        angle_adjusted = 450 + df_final.loc[magnet.hexabundle, 'rectangular_magnet_orientation']
+        angle_adjusted = (90 + P_Q_offsets_df.loc[magnet.hexabundle, 'rectangular_magnet_orientation']) % 360
 
-        # check to adjust angle within 0 to 360 range
-        if angle_adjusted > 360:
-            angle_adjusted = angle_adjusted - 360
-
-        P_offset =  df_final.loc[magnet.hexabundle, 'P'] / 1000.0
-        Q_offset =  df_final.loc[magnet.hexabundle, 'Q'] / 1000.0
+        P_offset =  P_Q_offsets_df.loc[magnet.hexabundle, 'P'] / 1000.0
+        Q_offset =  P_Q_offsets_df.loc[magnet.hexabundle, 'Q'] / 1000.0
 
         # rotation matrix required for the offset adjustments of the circular magnets
         rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
 
         # subtracting offset distance moves circular magnet in opposite direction to rectangular magnet
         # (P-parallel movement to rectangular magnet)
-        magnet.center = (magnet.center[0] - rotation_matrix_circle[0][0] * P_offset,\
-                                 magnet.center[1] - rotation_matrix_circle[0][1] * P_offset)
+        magnet.center = (magnet.center[0] - rotation_matrix_circle[0][0] * P_offset, magnet.center[1] - rotation_matrix_circle[0][1] * P_offset)
 
         # subtracting offset distance moves circular magnet downwards with respect to the rectangular magnet on its right side
         # (Q-perpendicular movement to rectangular magnet)
-        magnet.center = (magnet.center[0] - rotation_matrix_circle[1][0] * Q_offset,\
-                                 magnet.center[1] - rotation_matrix_circle[1][1] * Q_offset)
+        magnet.center = (magnet.center[0] - rotation_matrix_circle[1][0] * Q_offset, magnet.center[1] - rotation_matrix_circle[1][1] * Q_offset)
 
         # storing offset values in all_magnets list for final output file
         magnet.offset_P = P_offset
         magnet.offset_Q = Q_offset
-
 
         # recalculating the circular magnet orientation with offset adjusted centre coordinates
         magnet.circular_magnet_center = magnet.center
@@ -67,45 +70,23 @@ def hexaPositionOffset(all_magnets, offsetFile):
 
         # Added by Sam on 15/01/2022: Update the Circular magnet AzAngs value
         updated_AzAngs = np.arctan2(magnet.center[1], magnet.center[0]) + np.pi
-        delta_AzAngs = magnet.azAngs - updated_AzAngs
-        #print(f"AzAngs was {magnet.azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
         magnet.azAngs = updated_AzAngs
 
         # updating plotting view for Robot file centre coordinates
         magnet.view_y = magnet.center[0]
         magnet.view_x = - magnet.center[1]
 
-    
-    #print('\n\n\n')
 
-    # recalculate positions of x and y for rectangular magnets as per adjusted circular magnet coordinates
-    for i in range(len(all_magnets)):
+    # Now recalculate the x/y positions of the rectangular magnets using the adjusted circular magnet coordinates
+    for c, r in zip(circular_magnets, rectangular_magnets):
 
-        if all_magnets[i].__class__.__name__ == 'rectangular_magnet':
+        assert c.hexabundle == r.hexabundle, "Our magnets are out of order!"
+        r.circular_magnet_center = c.center
+        r.circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
 
-            for j in range(len(all_magnets)):
-
-                if all_magnets[j].__class__.__name__ == 'circular_magnet' and all_magnets[i].index == all_magnets[j].index:
-                    # print(all_magnets[i].index)
-                    # print('BEFORE:'+str(all_magnets[i].center))
-
-                    # circular magnet centre is stored for rectangular magnets as well for calculation of center coordinates
-                    all_magnets[i].circular_magnet_center = all_magnets[j].center
-                    all_magnets[i].circular_rectangle_magnet_center_distance = circular_rectangle_magnet_center_distance
-
-                    # recalculate rectangular magnet center coordinates as per updated circular magnet center
-                    all_magnets[i].center = probe.calculate_rectangular_magnet_center_coordinates(all_magnets[i])
-
-                    #Added by Sam 14/01/22
-                    ## UPDATE THE VIEW ATTRIBUTES TOO- otherwise the rectangular magnets aren't using their updated centres!
-                    all_magnets[i].view_x = - all_magnets[i].center[1]
-                    all_magnets[i].view_y = all_magnets[i].center[0]
-
-
-
-    # print("DONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-    # angle = 90 + convert_radians_to_degrees(atan(abs(rectangular_centre[1]-circular_centre[1])/abs(rectangular_centre[0]-circular_centre[0])))
-    # print(angle)
+        r.center = probe.calculate_rectangular_magnet_center_coordinates(r)
+        r.view_x = -r.center[1]
+        r.view_y = r.center[0]
 
     return all_magnets
 
@@ -177,7 +158,6 @@ def magnetPair_radialPositionOffset_circularAnnulus(offset_circularAnnulus, all_
 
 # calculating the rectangular magnet orientation with respect to the circular magnet
 def calculate_rectangular_magnet_orientation(angs):
-
     """
     Transform the angle of the rectangular magnet into the correct frame (by subtracting pi)
     """
