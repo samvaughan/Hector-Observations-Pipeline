@@ -12,14 +12,14 @@ import shutil
 import numpy as np
 import shlex
 
-from hop.misc import misc_tools
-from hop.misc import pandas_tools as P
-from hop.misc import plotting_tools 
-from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
-from hop.target_selection import HectorSim
+from .misc import misc_tools
+from .misc import pandas_tools as P
+from .misc import plotting_tools 
+from .tiling import tiling_functions as tiling
+from .hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
+from .target_selection import HectorSim
 
-from hop.hexabundle_allocation.hector.plate import HECTOR_plate
+from .hexabundle_allocation.hector.plate import HECTOR_plate
 
 class HectorPipe:
 

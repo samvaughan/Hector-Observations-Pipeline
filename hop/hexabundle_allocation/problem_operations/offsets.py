@@ -21,106 +21,59 @@ def hexaPositionOffset(all_magnets, offsetFile):
 
     # omit the information row via string length check
     df_adjusted = df[df['Name'].str.len() <= 5]
+    df_final = df_adjusted.set_index("Name")
 
-    # reset the index of the adjusted dataframe with changes
-    df_adjusted = df_adjusted.reset_index(drop=True)
-    df_adjusted.index = df_adjusted.index + 1
-    df_final = df_adjusted
+    circular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "circular_magnet"]
+    rectangular_magnets = [magnet for magnet in all_magnets if magnet.__class__.__name__ == "rectangular_magnet"]
 
-    #print(df_final)
-
-    # create dictionaries to store the offset values of P and Q, and ang to store rectangular magnet orientation
-    ang = {}
-    offset_distance_P = {}
-    offset_distance_Q = {}
-
-    # loop through all_magnets list and offset dataframe to store offset values and rectangular magnet
-    # orientation values in dictionary with key as index
-    for i in all_magnets:
-
-        for j in range(1, len(df_final) + 1):
-
-            if i.__class__.__name__ == 'rectangular_magnet' and i.hexabundle == df_final['Name'][j]:
-                # getting the orientation of rectangular magnet with respect to North(up)
-                ang[i.index] = i.orientation
-
-                # storing the offset values in dictionary from the offset dataframe
-                offset_distance_P[i.index] = df_final['P'][j] / 1000
-                offset_distance_Q[i.index] = df_final['Q'][j] / 1000
-
-                print('Index: ' + str(i.index) + ' , Hexabundle: ' + str(i.hexabundle) + ' , offset_P: ' + str(
-                    df_final['P'][j] / 1000))
-
-                # print('orientation_rectangular = '+str(ang))
-                # azAngs = convert_radians_to_degrees(i.azAngs)
-                # print('azAngs_rectangular = '+str(azAngs))
-                # ang_azAngs = convert_radians_to_degrees(i.rectangular_magnet_input_orientation)
-                # print('ang_azAngs_rectangular = ' + str(ang_azAngs))
-                #
-                # rectangular_centre = i.center
-                # print(rectangular_centre)
-
-    #print(ang)
-    # print(offset_distance_P)
-    # print(offset_distance_Q)
-
-    #print('HEREEEEEEE')
-    #print(range(len(all_magnets)))
+    # Add in the orientation of the rectangular magnets
+    ang = {r.hexabundle : r.orientation for r in rectangular_magnets}
+    df_final['rectangular_magnet_orientation'] = df_final.index.map(ang)
 
     # calculate and make the changes to x and y positions of circular magnets as per offset values
-    for i in range(len(all_magnets)):
+    for magnet in circular_magnets:
 
-        if all_magnets[i].__class__.__name__ == 'circular_magnet':
+        # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
+        angle_adjusted = 450 + df_final.loc[magnet.hexabundle, 'rectangular_magnet_orientation']
 
-            # print(all_magnets[i].index)
-            # print('Circular Before'+str(all_magnets[i].center))
-            # print('Offset P = '+str(offset_distance_P[all_magnets[i].index]))
-            # print('Offset Q = '+str(offset_distance_Q[all_magnets[i].index]))
+        # check to adjust angle within 0 to 360 range
+        if angle_adjusted > 360:
+            angle_adjusted = angle_adjusted - 360
 
-            # adjusting the angle to ensure movement is about the rectangular magnet's centre axis
-            angle_adjusted = 450 + ang[all_magnets[i].index]
+        P_offset =  df_final.loc[magnet.hexabundle, 'P'] / 1000.0
+        Q_offset =  df_final.loc[magnet.hexabundle, 'Q'] / 1000.0
 
-            # check to adjust angle within 0 to 360 range
-            if angle_adjusted > 360:
-                angle_adjusted = angle_adjusted - 360
+        # rotation matrix required for the offset adjustments of the circular magnets
+        rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
 
-            # rotation matrix required for the offset adjustments of the circular magnets
-            rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
+        # subtracting offset distance moves circular magnet in opposite direction to rectangular magnet
+        # (P-parallel movement to rectangular magnet)
+        magnet.center = (magnet.center[0] - rotation_matrix_circle[0][0] * P_offset,\
+                                 magnet.center[1] - rotation_matrix_circle[0][1] * P_offset)
 
-            # subtracting offset distance moves circular magnet in opposite direction to rectangular magnet
-            # (P-parallel movement to rectangular magnet)
-            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[0][0] * offset_distance_P[all_magnets[i].index],\
-                                     all_magnets[i].center[1] - rotation_matrix_circle[0][1] * offset_distance_P[all_magnets[i].index])
+        # subtracting offset distance moves circular magnet downwards with respect to the rectangular magnet on its right side
+        # (Q-perpendicular movement to rectangular magnet)
+        magnet.center = (magnet.center[0] - rotation_matrix_circle[1][0] * Q_offset,\
+                                 magnet.center[1] - rotation_matrix_circle[1][1] * Q_offset)
 
-            # subtracting offset distance moves circular magnet downwards with respect to the rectangular magnet on its right side
-            # (Q-perpendicular movement to rectangular magnet)
-            all_magnets[i].center = (all_magnets[i].center[0] - rotation_matrix_circle[1][0] * offset_distance_Q[all_magnets[i].index],\
-                                     all_magnets[i].center[1] - rotation_matrix_circle[1][1] * offset_distance_Q[all_magnets[i].index])
+        # storing offset values in all_magnets list for final output file
+        magnet.offset_P = P_offset
+        magnet.offset_Q = Q_offset
 
-            # storing offset values in all_magnets list for final output file
-            all_magnets[i].offset_P = offset_distance_P[all_magnets[i].index]
-            all_magnets[i].offset_Q = offset_distance_Q[all_magnets[i].index]
 
-            # print('orientation_circular = ' + str(all_magnets[i].orientation))
+        # recalculating the circular magnet orientation with offset adjusted centre coordinates
+        magnet.circular_magnet_center = magnet.center
+        magnet.orientation = probe.calculate_circular_magnet_orientation(magnet)
 
-            # recalculating the circular magnet orientation with offset adjusted centre coordinates
-            all_magnets[i].circular_magnet_center = all_magnets[i].center
-            all_magnets[i].orientation = probe.calculate_circular_magnet_orientation(all_magnets[i])
+        # Added by Sam on 15/01/2022: Update the Circular magnet AzAngs value
+        updated_AzAngs = np.arctan2(magnet.center[1], magnet.center[0]) + np.pi
+        delta_AzAngs = magnet.azAngs - updated_AzAngs
+        #print(f"AzAngs was {magnet.azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
+        magnet.azAngs = updated_AzAngs
 
-            # Added by Sam on 15/01/2022: Update the Circular magnet AzAngs value
-            updated_AzAngs = np.arctan2(all_magnets[i].center[1], all_magnets[i].center[0]) + np.pi
-            delta_AzAngs = all_magnets[i].azAngs - updated_AzAngs
-            #print(f"AzAngs was {all_magnets[i].azAngs}, AzAngs is now {updated_AzAngs}, delta(AzAngs) is {delta_AzAngs}")
-            all_magnets[i].azAngs = updated_AzAngs
-
-            #
-
-            # print('Updated orientation_circular = ' + str(all_magnets[i].orientation))
-            # print('Circular After:'+str(all_magnets[i].center))
-
-            # updating plotting view for Robot file centre coordinates
-            all_magnets[i].view_y = all_magnets[i].center[0]
-            all_magnets[i].view_x = - all_magnets[i].center[1]
+        # updating plotting view for Robot file centre coordinates
+        magnet.view_y = magnet.center[0]
+        magnet.view_x = - magnet.center[1]
 
     
     #print('\n\n\n')

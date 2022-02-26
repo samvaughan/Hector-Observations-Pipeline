@@ -109,7 +109,7 @@ def create_position_ordering_array(all_magnets, fully_blocked_magnets, conflicte
         position_ordering_array.append(np.array(f))
 
     # change numpy array data type from '<U19' to 'object' type
-    position_ordering_array = np.array(position_ordering_array, dtype=np.object)
+    position_ordering_array = np.array(position_ordering_array, dtype=object)
 
 
     return np.array(position_ordering_array),galaxyIDrecord
