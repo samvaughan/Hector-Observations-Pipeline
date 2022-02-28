@@ -249,7 +249,7 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     # popt contains the optimised coefficients
     p0 = np.array([0, 0, 0, 1, 1, 0, 0])
     warnings.filterwarnings("ignore", message="Covariance")
-    popt, pcov = curve_fit(fitting_fun, metr_in_coords.reshape((8)), metr_wanted_coords.reshape((8)), p0=p0)
+    popt, pcov = curve_fit(fitting_fun, metr_wanted_coords.reshape((8)), metr_in_coords.reshape((8)), p0=p0)
 
     # # For DEBUG: Measure residuals for the marker measurements
     # corrected_data = apply_cal(metr_in_coords, popt)
@@ -268,7 +268,7 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
     theta_d = popt[2]
-    output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
+    output_theta_d = (input_theta_d + theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
     if verbose:
         print(f'\nApplied metrology-based calibration, using the following fitted coefficients: {popt}')

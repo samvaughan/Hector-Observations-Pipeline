@@ -668,7 +668,7 @@ class HectorPipe:
         df_guideFile, guideFileList = file_arranging.arrange_guidesFile(fileNameHexa, fileNameGuides, guide_outputFile)
 
         # Adding guides cluster txt file to hexa cluster txt file
-        file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
+        df_combined = file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
         all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList)
