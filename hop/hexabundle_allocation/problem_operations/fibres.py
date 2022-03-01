@@ -942,8 +942,6 @@ def check_tile_pair_magnet_counts(robot_file_1, robot_file_2):
 
     total_magnet_counts = {'Blu': 25, 'Gre': 27, 'Yel':31, 'Mag': 24}
 
-    N_totals = {}
-
     tile_change_passes = True
     failing_colours = []
     for magnet_colour in magnet_colours:
@@ -955,10 +953,11 @@ def check_tile_pair_magnet_counts(robot_file_1, robot_file_2):
         N_tile_2 = len(tile_2_magnets)
         N_total = N_tile_1 + N_tile_2
         print(f"Telecentricity Annulus: {long_magnet_names[magnet_colour]}")
-        print(f"\tTile 1 has {N_tile_1}\nTile 2 has {N_tile_2}\nTotal used is {N_tile_1 + N_tile_2} / {total_magnet_counts[magnet_colour]}")
+        print(f"\tTile 1 has {N_tile_1}, Tile 2 has {N_tile_2}")
+        print(f"\tTotal used: {N_tile_1 + N_tile_2} / {total_magnet_counts[magnet_colour]}")
 
 
-        if N_totals > total_magnet_counts[magnet_colour]:
+        if N_total > total_magnet_counts[magnet_colour]:
             print(f"These two tiles use more {magnet_colour} magnets than we have available!")
             tile_change_passes = False
             failing_colours.append(magnet_colour)

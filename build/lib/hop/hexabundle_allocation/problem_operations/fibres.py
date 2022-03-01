@@ -865,7 +865,9 @@ def plot_bar_from_dict(dict, ax=None):
     return ax
 
 # check for magnet count per annulus and record any warnings on text file
-def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch , annuli_count_magnetCasing):
+def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch):
+
+    annuli_count_magnetCasing = {'Blu': 18, 'Gre': 19, 'Yel': 22, 'Mag': 21}
 
     # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -925,6 +927,46 @@ def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, t
         annuliCount_batch[i] += [annuli_count[i]]
 
     return annuliCount_batch
+
+
+def check_tile_pair_magnet_counts(robot_file_1, robot_file_2):
+
+    magnet_colours = ['Blu', 'Gre', 'Yel', 'Mag']
+    long_magnet_names = {'Blu' : 'Blue', 'Yel':'Yellow', 'Gre':'Green', 'Mag':'Magenta'}
+    df_1 = pd.read_csv(robot_file_1, skiprows=6)
+    df_2 = pd.read_csv(robot_file_2, skiprows=6)
+
+
+    circular_magnets_1 = df_1.loc[df_1["#Magnet"] == "circular_magnet"]
+    circular_magnets_2 = df_2.loc[df_2["#Magnet"] == "circular_magnet"]
+
+    total_magnet_counts = {'Blu': 25, 'Gre': 27, 'Yel':31, 'Mag': 24}
+
+    tile_change_passes = True
+    failing_colours = []
+    for magnet_colour in magnet_colours:
+
+        tile_1_magnets = circular_magnets_1.loc[circular_magnets_1['Label'] == magnet_colour]
+        tile_2_magnets = circular_magnets_2.loc[circular_magnets_2['Label'] == magnet_colour]
+
+        N_tile_1 = len(tile_1_magnets)
+        N_tile_2 = len(tile_2_magnets)
+        N_total = N_tile_1 + N_tile_2
+        print(f"Telecentricity Annulus: {long_magnet_names[magnet_colour]}")
+        print(f"\tTile 1 has {N_tile_1}, Tile 2 has {N_tile_2}")
+        print(f"\tTotal used: {N_tile_1 + N_tile_2} / {total_magnet_counts[magnet_colour]}")
+
+
+        if N_total > total_magnet_counts[magnet_colour]:
+            print(f"These two tiles use more {magnet_colour} magnets than we have available!")
+            tile_change_passes = False
+            failing_colours.append(magnet_colour)
+
+    if not tile_change_passes:
+        raise ValueError(f"This combination of tiles failes! The combination uses too many of the following magnet colours: {', '.join([long_magnet_names[f] for f in failing_colours])}")
+
+
+
 
 # plot histogram for whole batch magnet count per annulus of tile pairs
 def plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count):
