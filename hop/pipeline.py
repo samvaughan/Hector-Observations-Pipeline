@@ -86,8 +86,8 @@ class HectorPipe:
         #     raise NameError("The Distortion Correction binary seems to not exist")
 
         # Locations of all the Hector Config code
-        self.Hector_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/HectorDistortion.sds")  
-        self.Hector_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/HectorLinear.sds")  
+        self.Hector_distortion_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorDistortion.sds")  
+        self.Hector_linearity_file_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorLinear.sds")  
         self.Hector_sky_fibre_location = Path(__file__).parent / Path("distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv")
 
         if Profit_files_location is None:
