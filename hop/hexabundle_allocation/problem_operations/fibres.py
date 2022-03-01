@@ -958,12 +958,12 @@ def check_tile_pair_magnet_counts(robot_file_1, robot_file_2):
 
 
         if N_total > total_magnet_counts[magnet_colour]:
-            print(f"These two tiles use more {magnet_colour} magnets than we have available!")
+            print(f"\t\t!!These two tiles use more {long_magnet_names[magnet_colour]} magnets than we have available!!")
             tile_change_passes = False
             failing_colours.append(magnet_colour)
 
     if not tile_change_passes:
-        raise ValueError(f"This combination of tiles failes! The combination uses too many of the following magnet colours: {', '.join([long_magnet_names[f] for f in failing_colours])}")
+        raise ValueError(f"\nThis combination of tiles doesn't work! It uses too many of the following magnet colours: {', '.join([long_magnet_names[f] for f in failing_colours])}")
 
 
 

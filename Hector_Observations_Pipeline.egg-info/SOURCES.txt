@@ -10,10 +10,7 @@ Hector_Observations_Pipeline.egg-info/dependency_links.txt
 Hector_Observations_Pipeline.egg-info/top_level.txt
 hop/.DS_Store
 hop/__init__.py
-hop/check_tile_change_magnet_count.py
 hop/pipeline.py
-hop/radialOffset_standaloneFunction.py
-hop/radialOffset_standaloneFunction_includeMetrologyCalibration.py
 hop/.hypothesis/examples/09dcddbb45b65624/247dc700f59e2c8b
 hop/.hypothesis/examples/09dcddbb45b65624/42ee6575d48474a9
 hop/.hypothesis/examples/09dcddbb45b65624/6f1cedaa63f34afc
