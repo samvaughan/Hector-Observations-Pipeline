@@ -1,6 +1,9 @@
 name: Hector Observations Pipeline
 
-on: [push]
+on:
+  push:
+    branches:
+      - refactoring
 
 jobs:
   build:
