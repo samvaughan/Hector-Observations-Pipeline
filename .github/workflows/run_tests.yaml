@@ -1,13 +1,9 @@
 name: Hector Observations Pipeline
 
-on:
-  push:
-    branches:
-      - refactoring
+on: push
 
 jobs:
   build:
-
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v2
