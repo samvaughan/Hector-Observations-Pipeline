@@ -12,14 +12,14 @@ import shutil
 import numpy as np
 import shlex
 
-from hop.misc import misc_tools
-from hop.misc import pandas_tools as P
-from hop.misc import plotting_tools 
-from hop.tiling import tiling_functions as tiling
-from hop.hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
-from hop.target_selection import HectorSim
+from .misc import misc_tools
+from .misc import pandas_tools as P
+from .misc import plotting_tools 
+from .tiling import tiling_functions as tiling
+from .hexabundle_allocation.problem_operations import extract_data, file_arranging, hexabundle, offsets, plots, position_ordering, robot_parameters, conflicts, fibres
+from .target_selection import HectorSim
 
-from hop.hexabundle_allocation.hector.plate import HECTOR_plate
+from .hexabundle_allocation.hector.plate import HECTOR_plate
 
 class HectorPipe:
 
@@ -668,10 +668,10 @@ class HectorPipe:
         df_guideFile, guideFileList = file_arranging.arrange_guidesFile(fileNameHexa, fileNameGuides, guide_outputFile)
 
         # Adding guides cluster txt file to hexa cluster txt file
-        file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
+        df_combined = file_arranging.merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file)
 
         # extracting all the magnets and making a list of them from the plate_file
-        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList) #, magnetPair_offset)
+        all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList)
 
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in

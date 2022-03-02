@@ -25,21 +25,19 @@ def arrange_guidesFile(fileNameHexa,fileNameGuides, guide_outputFile):
     df_guides = pd.read_csv(fileNameGuides, sep=',', comment='#')
 
     # crate a probe column to keep count to the guides dataframe
-    df_guides.insert(loc=0, column='probe', value=0)
-
+    #df_guides.insert(loc=0, column='probe', value=0)
 
     # creating data
     # frame for just galaxy probes from hexa config file
-    df = pd.read_csv(fileNameHexa,sep=',', comment='#')
-    mask = (df.type == 1) | (df.type == 0)
+    df = pd.read_csv(fileNameHexa, sep=',', comment='#')
+    mask = (df['type'] == 1) | (df['type'] == 0)
     df_hexas = df[mask]
 
     # reading the index value of last hex probe to get count of hexa probes
-    hexaCount = int(df_hexas.loc[df_hexas.index[-1], 'probe']) + 1
+    hexaCount = df_hexas.probe.max()#int(df_hexas.loc[df_hexas.index[-1], 'probe']) + 1
 
     # probe numbering for the guide probes, counting onward from hexa count
-    for i in range(len(df_guides['probe'])):
-        df_guides.loc[df_guides.index[i], 'probe'] = int(hexaCount + i)
+    df_guides['probe'] = np.arange(hexaCount + 1, hexaCount + 1 + len(df_guides))
 
     # creating columns for guide file list
     probe_number = list(df_guides['probe'])
@@ -94,19 +92,20 @@ def merge_hexaAndGuides(fileNameHexa, df_guideFile, plate_file):
     #         skipline_count += 1
 
     # creating dataframe for just galaxy probes from hexa config file
-    df1 = pd.read_csv(fileNameHexa,sep=',', comment='#')
-    mask = (df1.type == 1) | (df1.type == 0)
-    df_new = df1[mask]
+    df = pd.read_csv(fileNameHexa,sep=',', comment='#')
+    mask = (df.type == 1) | (df.type == 0)
+    df_hexabundles = df[mask]
 
     # joining dataframes of hexa and guide probes
-    df_plateFile = pd.concat([df_new, df_guideFile], sort=False)
+    df_combined = pd.concat([df_hexabundles, df_guideFile], sort=False)
 
     # fill out all the empty slots of parameters with NA
-    df_plateFile.fillna('', inplace=True)
+    df_combined.fillna('', inplace=True)
 
     # write the joined dataframe of hexa and guide probes on plate file
-    df_plateFile.to_csv(plate_file, index=False, sep=',', quoting=csv.QUOTE_NONE, escapechar=' ')
+    df_combined.to_csv(plate_file, index=False, sep=',', quoting=csv.QUOTE_NONE, escapechar=' ')
 
+    return df_combined
 
 # creating the robotFile array for
 def create_robotFileArray(tile_label, positioning_array,robotFile,newrow,fully_blocked_magnets_dictionary, robot_temp=-9999, obs_temp=-9999):
