@@ -11,7 +11,7 @@ import re
 import random
 from pathlib import Path
 from ..problem_operations import extract_data, file_arranging, plots
-from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres
+from ..problem_operations.plots import draw_circularSegments,sky_fibre_annotations,read_sky_fibre_file,coordinates_and_angle_of_skyFibres, plot_skyfibre_section
 
 
 def create_fibreSlit_info_file(fileNameHexa,fibre_file,output_fibreSlitInfo):
@@ -865,7 +865,9 @@ def plot_bar_from_dict(dict, ax=None):
     return ax
 
 # check for magnet count per annulus and record any warnings on text file
-def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch , annuli_count_magnetCasing):
+def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, tile_2_guide, annuliCount_batch):
+
+    annuli_count_magnetCasing = {'Blu': 18, 'Gre': 19, 'Yel': 22, 'Mag': 21}
 
     # tile_1_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{tile_number_1:03d}.txt"
     # tile_2_hexa = f"{self.configuration_location}/HECTORConfig_Hexa_{self.config['output_filename_stem']}_{(tile_number_2):03d}.txt"
@@ -926,6 +928,44 @@ def check_magnetCount_perAnnulus(self, tile_1_hexa, tile_2_hexa, tile_1_guide, t
 
     return annuliCount_batch
 
+
+def check_tile_pair_magnet_counts(robot_file_1, robot_file_2):
+
+    magnet_colours = ['Blu', 'Gre', 'Yel', 'Mag']
+    long_magnet_names = {'Blu' : 'Blue', 'Yel':'Yellow', 'Gre':'Green', 'Mag':'Magenta'}
+    df_1 = pd.read_csv(robot_file_1, skiprows=6)
+    df_2 = pd.read_csv(robot_file_2, skiprows=6)
+
+
+    circular_magnets_1 = df_1.loc[df_1["#Magnet"] == "circular_magnet"]
+    circular_magnets_2 = df_2.loc[df_2["#Magnet"] == "circular_magnet"]
+
+    total_magnet_counts = {'Blu': 25, 'Gre': 27, 'Yel':31, 'Mag': 24}
+
+    tile_change_passes = True
+    failing_colours = []
+    for magnet_colour in magnet_colours:
+
+        tile_1_magnets = circular_magnets_1.loc[circular_magnets_1['Label'] == magnet_colour]
+        tile_2_magnets = circular_magnets_2.loc[circular_magnets_2['Label'] == magnet_colour]
+
+        N_tile_1 = len(tile_1_magnets)
+        N_tile_2 = len(tile_2_magnets)
+        N_total = N_tile_1 + N_tile_2
+        print(f"Telecentricity Annulus: {long_magnet_names[magnet_colour]}")
+        print(f"\tTile 1 has {N_tile_1}, Tile 2 has {N_tile_2}")
+        print(f"\tTotal used: {N_tile_1 + N_tile_2} / {total_magnet_counts[magnet_colour]}")
+
+
+        if N_total > total_magnet_counts[magnet_colour]:
+            print(f"\t\t!!These two tiles use more {long_magnet_names[magnet_colour]} magnets than we have available!!")
+            tile_change_passes = False
+            failing_colours.append(magnet_colour)
+
+    if not tile_change_passes:
+        raise ValueError(f"\nThis combination of tiles doesn't work! It uses too many of the following magnet colours: {', '.join([long_magnet_names[f] for f in failing_colours])}")
+
+
 # plot histogram for whole batch magnet count per annulus of tile pairs
 def plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_count):
 
@@ -951,6 +991,55 @@ def plotHist_annuliCount_batch(self, annuliCount_batch, tile_batch, tileBatch_co
         plt.xlabel('Magnet Count for each tile pair', fontsize=20)
         plt.ylabel('Distribution weights in batch (sums to total of 1.0)', fontsize=20)
         plt.savefig(magnetCount_barPlot, dpi=200)
+
+
+
+def show_sky_fibre_changes(tile_1, tile_2):
+
+    """
+    Make a plot to show the changes in sky fibres between two plates.
+    Inputs:
+        tile_1 (str): Filename of the Hector Tile File (called Tile_FinalFormat...) file for plate 1
+        tile_2 (str): Filename of the Hector Tile File (called Tile_FinalFormat...) file for plate 2
+    Output:
+        (fig, ax)
+    """
+    tile_1 = Path(tile_1)
+    tile_2 = Path(tile_2)
+
+    assert tile_1.stem.startswith("Tile_FinalFormat"), f"Tile 1 must be a Hector robot tile file which starts with 'Tile_FinalFormat'. Currently it is {tile_1.stem}" 
+    assert tile_2.stem.startswith("Tile_FinalFormat"), f"Tile 2 must be a Hector robot tile file which starts with 'Tile_FinalFormat'. Currently it is {tile_2.stem}" 
+
+    skyfibreDict_tile1 = read_sky_fibre_file(tile_1)
+    skyfibreDict_tile2 = read_sky_fibre_file(tile_2)
+
+    fig, ax = plt.subplots(constrained_layout=True)
+    # Draw the circular telecentricity annulus
+    ax = draw_circularSegments(ax)
+
+    # sky_fibre_annotations(fig, tile_1)
+    sky_fibre_colours = []
+    for j, (key1, key2) in enumerate(zip(skyfibreDict_tile1, skyfibreDict_tile2)):
+        sky_fibre_colours.append([])
+        for fibre1, fibre2 in zip(skyfibreDict_tile1[key1], skyfibreDict_tile2[key2]):
+            if np.array_equal(list(fibre1.values()), list(fibre2.values())):
+                sky_fibre_colours[j].append('black')
+            else:
+                sky_fibre_colours[j].append('yellow')
+
+    angle_subplate = [7,5,3,1,-1,-3,-5,-7]
+    radius = 270
+
+    #sky fibres top batch
+    skyfibreTitles_top = ['H3','A3','H4','A4']
+    skyfibreTitles_left = ['A1', 'H1', 'H2', 'A2']
+    skyfibreTitles_right = ['H7', 'A5', 'H6', 'H5']
+
+    ax = plot_skyfibre_section(fig, ax, skyfibreDict_tile2, angle=30, radius=radius, angle_subplate=angle_subplate, skyfibre_titles=skyfibreTitles_top, delta_ang=20, colour_array=sky_fibre_colours)
+    ax = plot_skyfibre_section(fig, ax, skyfibreDict_tile2, angle=150, radius=radius, angle_subplate=angle_subplate, skyfibre_titles=skyfibreTitles_left, delta_ang=20, colour_array=sky_fibre_colours)
+    ax = plot_skyfibre_section(fig, ax, skyfibreDict_tile2, angle=-160, radius=radius, angle_subplate=angle_subplate, skyfibre_titles=skyfibreTitles_right, delta_ang=-20, colour_array=sky_fibre_colours)
+
+    return (fig, ax)
 
 # PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE
 def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2):
@@ -993,6 +1082,7 @@ def createHexabundleFigure_withChangeShown(self, tile_number_1, tile_number_2, s
     # skyfibreDict = read_sky_fibre_file(skyfibre_file)
     # print(skyfibreDict)
     string = str(skyfibreDict['H3'][5].keys())
+
 
     # sky fibres top batch
     angle = 30
