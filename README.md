@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.com/samvaughan/Hector-Observations-Pipeline.svg?branch=master)](https://travis-ci.com/samvaughan/Hector-Observations-Pipeline)
-[![Coverage Status](https://coveralls.io/repos/github/samvaughan/Hector-Observations-Pipeline/badge.svg?branch=master)](https://coveralls.io/github/samvaughan/Hector-Observations-Pipeline?branch=master)
+![Build Status](https://github.com/samvaughan/Hector-Observations-Pipeline/actions/workflows/run_tests.yaml/badge.svg)
 
 # The Hector Galaxy Survey Observation Pipeline
 
