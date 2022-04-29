@@ -28,10 +28,14 @@ def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, 
     grid_coords = _get_grid(RA, Dec, n_xx_yy)
 
     # These are True/False masks for each galaxy if a tile was placed at each grid coord. They're shapes (n_grid_coords x number of galaxies left to tile)
-    galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
-    galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
+    galaxies_in_FoV = np.zeros(len(grid_coords), len(targets_df), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV[i, :] = check_if_in_fov(targets_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, inner_FoV_radius).values
 
-    n_targets_in_FOV = (galaxies_in_outer_FoV * np.array(priorities)[None, :]).sum(axis=1) - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)
+    #galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
+    #galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
+
+    n_targets_in_FOV = (galaxies_in_FoV * np.array(priorities)[None, :]).sum(axis=1)# - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)
 
     # Find the positions where the number of targets in the FoV is at its max
     possible_tile_centres = np.where(n_targets_in_FOV == np.max(n_targets_in_FOV))[0]
@@ -89,8 +93,17 @@ def get_best_tile_centre_dengreedy(master_df, targets_df, outer_FOV_radius, inne
 
     # See which tile centres have the largest number of clashes __outside the central 0.1*Radius of the field__. Julia says that the optics are poor here.
 
-    n_targets_in_FOV_all = _calc_clashes(grid_coords, np.column_stack((RA_all, Dec_all)), proximity=outer_FOV_radius * 3600.0).sum(axis=1) - _calc_clashes(grid_coords, np.column_stack((RA_all, Dec_all)), proximity=inner_FoV_radius * 3600.0).sum(axis=1)
-    n_targets_in_FOV_untiled = _calc_clashes(grid_coords, np.column_stack((RA_untiled, Dec_untiled)), proximity=outer_FOV_radius * 3600.0).sum(axis=1) - _calc_clashes(grid_coords, np.column_stack((RA_untiled, Dec_untiled)), proximity=inner_FoV_radius * 3600.0).sum(axis=1)
+    galaxies_in_FoV_all = np.zeros(len(grid_coords), len(RA_all), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV_all[i, :] = check_if_in_fov(master_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, outer_FOV_radius).values
+    
+    galaxies_in_FoV_untiled = np.zeros(len(grid_coords), len(RA_untiled), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV_untiled[i, :] = check_if_in_fov(targets_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, outer_FOV_radius).values
+
+
+    n_targets_in_FOV_all = galaxies_in_FoV_all.sum()
+    n_targets_in_FOV_untiled = galaxies_in_FoV_untiled.sum()
 
     ratio_of_targets = n_targets_in_FOV_untiled / n_targets_in_FOV_all
     ratio_of_targets[np.isnan(ratio_of_targets)] = 0.0
@@ -154,7 +167,12 @@ def check_if_in_fov(df, xcen, ycen, inner_radius, outer_radius):
     x = df.RA
     y = df.DEC
 
-    return (np.sqrt((x - xcen)**2 + (y - ycen)**2) < outer_radius) & (np.sqrt((x - xcen)**2 + (y - ycen)**2) > inner_radius)
+    cos_dec_correction = np.cos(np.radians(np.abs(ycen)))
+
+    if inner_radius == 0:
+        return (np.sqrt( (x - xcen)**2 / cos_dec_correction**2 + (y - ycen)**2 ) < outer_radius).values
+    else:
+        return ((np.sqrt( (x - xcen)**2 / cos_dec_correction**2 + (y - ycen)**2 ) < outer_radius) & (np.sqrt( (x - xcen)**2 / cos_dec_correction**2 + (y - ycen)**2 ) > inner_radius)).values
 
 
 def find_clashes(df1, df2, proximity):
@@ -178,12 +196,26 @@ def find_clashes(df1, df2, proximity):
 
     return clashes
 
+def find_great_circle_distance(uu, vv):
+
+    """
+    The great circle distance between vectors uu=[RA, Dec] and vv=[RA, Dec]
+    Note that RA and Dec *must* be in degrees. We then convert them to radians, calcualte the distance and return that distance in degrees. 
+    """
+    uu = np.radians(uu)
+    vv = np.radians(vv)
+
+    theta = np.arccos(np.sin(uu[1])*np.sin(vv[1])+np.cos(uu[1])*np.cos(vv[1])*np.cos(uu[0]-vv[0]))
+
+    return np.degrees(theta)
 
 def _calc_clashes(XA, XB, proximity):
     """
     Given two lists of coordinates, return a boolean mask highlighting only those which clash within some minimum proximity. Note that we ignore self clashes by ignoring clashes with a distance = 0.0
+    Note that we use the great-circle distance between two points to find their separation, not just a simple Euclidean 
+    distance. This is to make sure that things still work at low declination. 
     """
-    distance_matrix = dist.cdist(XA, XB)
+    distance_matrix = dist.cdist(XA, XB, find_great_circle_distance)
     clashes = (distance_matrix > 0.0) & (distance_matrix < proximity / 3600.0)
 
     return clashes
