@@ -28,14 +28,18 @@ def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, 
     grid_coords = _get_grid(RA, Dec, n_xx_yy)
 
     # These are True/False masks for each galaxy if a tile was placed at each grid coord. They're shapes (n_grid_coords x number of galaxies left to tile)
-    galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
-    galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
+    galaxies_in_FoV = np.zeros((len(grid_coords), len(targets_df)), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV[i, :] = check_if_in_fov(targets_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, outer_FOV_radius)
 
-    n_targets_in_FOV = (galaxies_in_outer_FoV * np.array(priorities)[None, :]).sum(axis=1) - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)
+    #galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)
+    #galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)
+
+    n_targets_in_FOV = (galaxies_in_FoV * np.array(priorities)[None, :]).sum(axis=1)# - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)
 
     # Find the positions where the number of targets in the FoV is at its max
     possible_tile_centres = np.where(n_targets_in_FOV == np.max(n_targets_in_FOV))[0]
-    targets_in_best_tiles_mask = (galaxies_in_outer_FoV & ~galaxies_in_inner_FoV)[possible_tile_centres]
+    targets_in_best_tiles_mask = (galaxies_in_FoV)[possible_tile_centres]
 
     # If we have more than one possible centre, choose a random centre
     # However, weight this choice by how far each target in the FoV is from the centre of the tile
@@ -89,8 +93,17 @@ def get_best_tile_centre_dengreedy(master_df, targets_df, outer_FOV_radius, inne
 
     # See which tile centres have the largest number of clashes __outside the central 0.1*Radius of the field__. Julia says that the optics are poor here.
 
-    n_targets_in_FOV_all = _calc_clashes(grid_coords, np.column_stack((RA_all, Dec_all)), proximity=outer_FOV_radius * 3600.0).sum(axis=1) - _calc_clashes(grid_coords, np.column_stack((RA_all, Dec_all)), proximity=inner_FoV_radius * 3600.0).sum(axis=1)
-    n_targets_in_FOV_untiled = _calc_clashes(grid_coords, np.column_stack((RA_untiled, Dec_untiled)), proximity=outer_FOV_radius * 3600.0).sum(axis=1) - _calc_clashes(grid_coords, np.column_stack((RA_untiled, Dec_untiled)), proximity=inner_FoV_radius * 3600.0).sum(axis=1)
+    galaxies_in_FoV_all = np.zeros(len(grid_coords), len(RA_all), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV_all[i, :] = check_if_in_fov(master_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, outer_FOV_radius)
+    
+    galaxies_in_FoV_untiled = np.zeros(len(grid_coords), len(RA_untiled), dtype=bool)
+    for i, coord in enumerate(grid_coords):
+        galaxies_in_FoV_untiled[i, :] = check_if_in_fov(targets_df, grid_coords[i, 0], grid_coords[i, 1], inner_FoV_radius, outer_FOV_radius)
+
+
+    n_targets_in_FOV_all = galaxies_in_FoV_all.sum()
+    n_targets_in_FOV_untiled = galaxies_in_FoV_untiled.sum()
 
     ratio_of_targets = n_targets_in_FOV_untiled / n_targets_in_FOV_all
     ratio_of_targets[np.isnan(ratio_of_targets)] = 0.0
@@ -154,7 +167,13 @@ def check_if_in_fov(df, xcen, ycen, inner_radius, outer_radius):
     x = df.RA
     y = df.DEC
 
-    return (np.sqrt((x - xcen)**2 + (y - ycen)**2) < outer_radius) & (np.sqrt((x - xcen)**2 + (y - ycen)**2) > inner_radius)
+    cos_dec_correction = np.cos(np.radians(np.abs(ycen)))
+
+    ## MULTIPLY by the cos(dec) correction here!
+    if inner_radius == 0:
+        return (np.sqrt( (x - xcen)**2 * cos_dec_correction**2 + (y - ycen)**2 ) < outer_radius).values
+    else:
+        return ((np.sqrt( (x - xcen)**2 * cos_dec_correction**2 + (y - ycen)**2 ) < outer_radius) & (np.sqrt( (x - xcen)**2 * cos_dec_correction**2 + (y - ycen)**2 ) > inner_radius)).values
 
 
 def find_clashes(df1, df2, proximity):
@@ -178,13 +197,31 @@ def find_clashes(df1, df2, proximity):
 
     return clashes
 
+def find_great_circle_distance(uu, vv):
 
-def _calc_clashes(XA, XB, proximity):
+    """
+    The great circle distance between vectors uu=[RA, Dec] and vv=[RA, Dec]
+    Note that RA and Dec *must* be in degrees. We then convert them to radians, calcualte the distance and return that distance in degrees. 
+    """
+    uu = np.radians(uu)
+    vv = np.radians(vv)
+
+    if np.all(uu == vv):
+        return 0.0
+    else:
+        theta = np.arccos(np.sin(uu[1])*np.sin(vv[1])+np.cos(uu[1])*np.cos(vv[1])*np.cos(uu[0]-vv[0]))
+        return np.degrees(theta)
+
+def _calc_clashes(XA, XB, proximity, tol=1e-5):
     """
     Given two lists of coordinates, return a boolean mask highlighting only those which clash within some minimum proximity. Note that we ignore self clashes by ignoring clashes with a distance = 0.0
+    Note that we use the great-circle distance between two points to find their separation, not just a simple Euclidean 
+    distance. This is to make sure that things still work at low declination. 
+
+    tol is the minimum distance two objects can be apart before we say that they are clashing. I've added this in because sometimes the find_great_circle_distance function gives a distance of ~1e-6 or ~1e-7 for a galaxy from itself. I assume that this is just a numerical stability issue. 
     """
-    distance_matrix = dist.cdist(XA, XB)
-    clashes = (distance_matrix > 0.0) & (distance_matrix < proximity / 3600.0)
+    distance_matrix = dist.cdist(XA, XB, find_great_circle_distance)
+    clashes = (distance_matrix > tol) & (distance_matrix < proximity / 3600.0)
 
     return clashes
 
@@ -323,13 +360,13 @@ def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='
             # We check to see whether everything in the Field of View clashes with anything which has already been tiled.
             # NOTE that this a quick-fix way of doing things- for example, if two things are in a close pair, using this method they will never be added to the tile as a repeat, since they will always clash with each other. The correct thing to do would be to add in things to repeat one by one, as in the method above
             # Also need to fix things to pick 'high priority' targets to repeat preferentially
-            clashes = find_clashes(tile_df.append(already_tiled_in_FOV), already_tiled_in_FOV, proximity)
+            clashes = find_clashes(pd.concat((tile_df, already_tiled_in_FOV)), already_tiled_in_FOV, proximity)
             n_clashes = clashes.sum(axis=0)
             if len(already_tiled_in_FOV) > 0 & (np.any(n_clashes == 0)):
                 unclashing_repeats = np.where(n_clashes == 0)[0]
                 N_to_append = min(Nsel - len(tile_df), len(unclashing_repeats))
                 repeats_to_fill_hexabundles = np.random.choice(unclashing_repeats, N_to_append, replace=False)
-                tile_df = tile_df.append(already_tiled_in_FOV.iloc[repeats_to_fill_hexabundles])
+                tile_df = pd.concat((tile_df, already_tiled_in_FOV.iloc[repeats_to_fill_hexabundles]))
                 tile_df.loc[tile_df.COMPLETED == True, 'isel'] = 1.0
                 isel_values.extend([1.0] * len(repeats_to_fill_hexabundles))
 
@@ -341,7 +378,7 @@ def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='
                 message = f"Can only select {len(targets)} new targets for this field. Can't select any repeats. Tile length is only {len(tile_df)}!!!"
 
             
-            logger.info(message)
+            logger.warning(message)
 
     # # # If we don't fill a tile, append already observed galaxies till we get to the right number
     # # # These are set an isel value of 1.
@@ -379,7 +416,9 @@ def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='
             n_clashes = clashes.sum(axis=1)
             message = f"Can't select {Nsel} targets for this field. Info: {len(all_targets_df)} in FOV; {len(tile_df)} in tile; {len(targets_not_already_in_tile)} are in FOV but not tiled, of which each one clashes {n_clashes} times"    
         
-        logger.info(message)
+        logger.warning(message)
+
+        #import ipdb; ipdb.set_trace()
 
     # Check if we clash with ourself- this should never happen
     clashes = find_clashes(tile_df, tile_df, proximity)
@@ -689,7 +728,7 @@ def save_tile_text_file(outfolder, out_name, tile_df, standard_stars_for_tile, t
     # combined_stars_targets_df = tile_df[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']].append(standard_stars_for_tile[['ID', 'RA', 'DEC', 'mag', 'type', 'isel']])
     if not 'MagnetX_noDC' in columns_in_order:
         columns_in_order.extend(['priority', 'MagnetX_noDC', 'MagnetY_noDC', 'type'])
-    combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[columns_in_order]
+    combined_stars_targets_df = pd.concat((tile_df, standard_stars_for_tile), sort=True)[columns_in_order]
     # combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[['ID', 'RA', 'DEC', 'Re', 'Mstar', 'z', 'GAL_MAG_G', 'GAL_MAG_I', 'GAL_MU_0_G', 'GAL_MU_0_I', 'GAL_MU_0_R', 'GAL_MU_0_U',
     #    'GAL_MU_0_Z', 'GAL_MU_E_G', 'GAL_MU_E_I', 'GAL_MU_E_R', 'GAL_MU_E_U',
     #    'GAL_MU_E_Z', 'GAL_MU_R_at_2Re', 'GAL_MU_R_at_3Re', 'Dingoflag', 'Ellipticity_r',

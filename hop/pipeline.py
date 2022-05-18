@@ -388,9 +388,9 @@ class HectorPipe:
             tile_df['tile_centre_DEC'] = tile_Dec
             tile_df['Filler_Galaxy'] = False
             tile_df.loc[repeated_targets, 'Filler_Galaxy'] = True
-            self.tile_database = self.tile_database.append(tile_df, ignore_index=True)
+            self.tile_database = pd.concat((self.tile_database, tile_df), ignore_index=True)
             #self.tile_database.set_index("tile_number", inplace=True)
-
+            self.logger.info(f"\tTile contains {len(tile_df)} galaxies, of which {tile_df['Filler_Galaxy'].sum()} are repeats")
             self.logger.info(f"FINISHED TILE {current_tile}\n\n")
 
             # Save the overall database in its current form

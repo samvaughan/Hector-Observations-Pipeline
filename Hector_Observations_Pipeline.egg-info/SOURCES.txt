@@ -11,7 +11,6 @@ Hector_Observations_Pipeline.egg-info/top_level.txt
 hop/.DS_Store
 hop/__init__.py
 hop/pipeline.py
-hop/radialOffset_standaloneFunction_includeMetrologyCalibration.py
 hop/.hypothesis/examples/09dcddbb45b65624/247dc700f59e2c8b
 hop/.hypothesis/examples/09dcddbb45b65624/42ee6575d48474a9
 hop/.hypothesis/examples/09dcddbb45b65624/6f1cedaa63f34afc
@@ -315,6 +314,7 @@ hop/__pycache__/__init__.cpython-38.pyc
 hop/__pycache__/__init__.cpython-39.pyc
 hop/__pycache__/pipeline.cpython-37.pyc
 hop/__pycache__/pipeline.cpython-38.pyc
+hop/__pycache__/pipeline.cpython-39.pyc
 hop/__pycache__/radialOffset_standaloneFunction_includeMetrologyCalibration.cpython-39.pyc
 hop/configuration/.Rhistory
 hop/configuration/HECTOR_ClusterFieldsTest.R
@@ -325,12 +325,19 @@ hop/distortion_correction/.DS_Store
 hop/distortion_correction/__init__.py
 hop/distortion_correction/HectorTranslationSoftware/.DS_Store
 hop/distortion_correction/HectorTranslationSoftware/DataFiles/.DS_Store
-hop/distortion_correction/HectorTranslationSoftware/DataFiles/README.txt
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/HectorDistortion.sds
 hop/distortion_correction/HectorTranslationSoftware/DataFiles/HectorLinear.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/README.txt
 hop/distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv
-hop/distortion_correction/HectorTranslationSoftware/DataFiles/tdFdistortion0.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b.txt
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-neg/HectorDistortion.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-neg/HectorLinear.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorDistortion.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorLinear.sds
 hop/distortion_correction/HectorTranslationSoftware/DataFiles/old_2df_models/.DS_Store
-hop/distortion_correction/HectorTranslationSoftware/DataFiles/old_2df_models/tdFlinear0.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/old_2df_models/PreDecember2021/tdFlinear0.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/old_2df_models/PreFeb2022/HectorLinear.sds
+hop/distortion_correction/HectorTranslationSoftware/DataFiles/old_2df_models/PreFeb2022/tdFdistortion0.sds
 hop/distortion_correction/HectorTranslationSoftware/HectorConfigUtility/.DS_Store
 hop/distortion_correction/HectorTranslationSoftware/HectorConfigUtility/.mid
 hop/distortion_correction/HectorTranslationSoftware/HectorConfigUtility/ChangeLog
@@ -1737,4 +1744,5 @@ hop/tiling/__pycache__/tiling_functions.cpython-39.pyc
 tests/__init__.py
 tests/test_offsets.py
 tests/test_pipeline.py
+tests/test_probe.py
 tests/test_radial_offset_function.py

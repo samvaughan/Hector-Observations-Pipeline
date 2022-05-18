@@ -40,8 +40,9 @@ fbr <<- 45 #Fibre bend radius
 
 #Galaxy and standard star bundle dimensions:
 tip_w <<- 14.5/sqrt(2)  
-tip_l <<- 14.5/sqrt(2)   
-probe_w <<- 14.5 
+tip_l <<- 14.5/sqrt(2) 
+# Testing- make this 18.5 from 14.5
+probe_w <<- 18.5 
 probe_l <<- 45 
 cable_w <<- 8.5 
 cable_l <<- 38 
@@ -66,7 +67,7 @@ gexcl_radius <<- sqrt(2.*((gtip_w/2)^2))
 #Setting timeout time (in cpu seconds, I think) for how long each attempt lasts before moving on. 
 #The code will try for at most 15 times that before starting to swap a probe.
 #timeout<<-180 #180 seconds x 15 is about half an hour and is about right. Less than about 90 seconds led to problems in highly conflicted field..
-timeout<<-60 #Increased to account for longer conflict calculation time due to rounded heads so code still has enough time time try enough angles variations.
+timeout<<-600 #Increased to account for longer conflict calculation time due to rounded heads so code still has enough time time try enough angles variations.
 timeout_behaviour = 'error'
 
 #angle step going around the head to approximate circle as a polygon. The smaller angles are more precice but lead to longer configuration time.
@@ -945,7 +946,7 @@ cleanconflictedguides <- function(angs,pos=pos, guidepos=pos_master$guidepos){
     }
     }
     gui=gui+1
-    print(c('oclguidepos is length', length(oclguidepos[,1])))
+    #print(c('oclguidepos is length', length(oclguidepos[,1])))
   }
   #print(c("OCLguidepos has ", nrow(oclguidepos), "rows"))
   colnames(oclguidepos)=c('x','y')
@@ -1129,7 +1130,7 @@ configure_stdstars <- function(pos, angs, cegs, stdpos){
       #print(tempos)
       #print(tempangs)
       #print(tempconflicts)
-      withTimeout(expr=assign('tempangs',MinimizeConflicts(pos=tempos, angs=tempangs, cegs=tempcegs, probe_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+      try(withTimeout(expr=assign('tempangs',MinimizeConflicts(pos=tempos, angs=tempangs, cegs=tempcegs, probe_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour))
 
       draw_all(x=pos_master$pos[,'x'],y=pos_master$pos[,'y'],xs=clstdpos[,'x'],ys=clstdpos[,'y'],xg=pos_master$guidepos[,'x'],yg=pos_master$guidepos[,'y'], interactive=visualise)
       temprobes = defineprobe(x=tempos[,'x'],y=tempos[,'y'],angs=tempangs, interactive=visualise)
@@ -1171,7 +1172,7 @@ configure_guidestars <- function(pos, angs, cegs, guidepos){ #In this case, pos 
   
   #* Added by Sam- this seems to fix the case where cleanconflictedguides returns a list with NAs in it
   clguidepos=clguidepos[!is.na(clguidepos)[,1],]
-  if (lengths(clguidepos)[1] < 3) {
+  if (lengths(clguidepos)[1] < 6) {
     print(paste('**Seem to only have ', lengths(clguidepos)[1], ' un-clashing guide stars in this field! Exiting and trying again...', sep=''))
     stdflag='GuideFail'
     #* Added by Sam so we can catch when we error and when we just can't configure
@@ -1182,7 +1183,7 @@ configure_guidestars <- function(pos, angs, cegs, guidepos){ #In this case, pos 
   draw_all(x=pos_master$pos[,'x'],y=pos_master$pos[,'y'],xs=pos_master$stdpos[,'x'],ys=pos_master$stdpos[,'y'],xg=clguidepos[,'x'],yg=clguidepos[,'y'], interactive=visualise)
   probes=defineprobe(x=pos[,'x'],y=pos[,'y'],angs=angs, interactive=visualise)
   
-  #Adding 3-6 guides probes:
+  #Adding 6 guides probes:
   cg=0 #This will keep track of the number of configured guides so far.
   sel_guides=c() #This keeps track of selectec guide star probe numbers.
   gui=1 #This will cycle through all available guide stars.
@@ -1210,7 +1211,7 @@ configure_guidestars <- function(pos, angs, cegs, guidepos){ #In this case, pos 
     
     if (nconflicts > 0) {
       newgangs=tempgangs
-      withTimeout(expr=assign('newgangs',MinimizeGuideConflicts(pos=pos, angs=angs, cegs=cegs, gpos=tempgpos, gangs=tempgangs, gcegs=gcegs, guide_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour)
+      try(withTimeout(expr=assign('newgangs',MinimizeGuideConflicts(pos=pos, angs=angs, cegs=cegs, gpos=tempgpos, gangs=tempgangs, gcegs=gcegs, guide_conflicts=tempconflicts)), timeout=timeout, onTimeout=timeout_behaviour))
       tempgprobes=defineguideprobe(gxs=tempgpos[,'x'],gys=tempgpos[,'y'],gangs=newgangs, interactive=visualise)
       tempconflicts=find_guide_conflicts(probes=probes, pos=pos, angs=angs, gprobes=tempgprobes, gpos=tempgpos, gangs=newgangs)
       nconflicts=dim(tempconflicts)[1]
@@ -1231,8 +1232,8 @@ configure_guidestars <- function(pos, angs, cegs, guidepos){ #In this case, pos 
     }
     gui = gui+1
   }
-  
-  if (cg < 3) {
+  print(paste('Configured ',as.character(cg), ' guide stars in this field'), sep='')
+  if (cg < 6) {
     print(paste('**Could only configure ',as.character(cg), ' guide stars in this field. Boo! :-('), sep='')
     stdflag='GuideFail'
   }
@@ -1336,7 +1337,7 @@ configure_HECTOR <- function(pos_master=pos_master){
   angs=withstdstars$angs
   stdflag=withstdstars$stdflag
   cegs=withstdstars$cegs
-  print('19 galaxy probes and 2 standard probes are in! Let\'s put some standard guide probes!')
+  print('19 galaxy probes and 2 standard probes are in! Let\'s put some guide probes!')
   
   #Configure 3-6 guide stars.
   guides=configure_guidestars(pos=pos, angs=angs, cegs=cegs, guidepos=pos_master$guidepos)

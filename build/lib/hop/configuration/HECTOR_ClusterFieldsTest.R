@@ -59,11 +59,11 @@ parser$add_argument('--run_local', default=FALSE, action="store_true",
 #             '--plot_filename', '/Users/samvaughan/Science/Hector/Targets/Commissioning/HandMade/results/TilingOutputs/060_m22/Plots/060_m22_guides_central.pdf',
 #             '--plot', '--run_local')
 
-tmp_args=c('/Users/samvaughan/Science/Hector/Targets/Commissioning/BlankSkyField/results/TilingOutputs/Blank_Sky_Field/DistortionCorrected/DC_060_m22_blank_sky_field.csv',
-           '/Users/samvaughan/Science/Hector/Targets/Commissioning/BlankSkyField/results/TilingOutputs/Blank_Sky_Field/DistortionCorrected/guide_DC_060_m22_blank_sky_field.csv',
-           '/Users/samvaughan/Desktop/blank_sky_CONFIGURED.csv',
-           '/Users/samvaughan/Desktop/guide_blank_sky_CONFIGURED.csv',
-           '--plot_filename', '/Users/samvaughan/Desktop/blank_sky.pdf',
+tmp_args=c('/Users/samvaughan/Science/Hector/Targets/Commissioning/Feb2022/HandMade_Feb2022/results/TilingOutputs/150_m22/DistortionCorrected/DC_150_m22_reference_stars_iteration_3.csv',
+           '/Users/samvaughan/Science/Hector/Targets/Commissioning/Feb2022/HandMade_Feb2022/results/TilingOutputs/150_m22/DistortionCorrected/guide_DC_150_m22_reference_stars_iteration_3.csv',
+           '/Users/samvaughan/Desktop/testing_ref_stars_3_CONFIGURED_Updated.csv',
+           '/Users/samvaughan/Desktop/guide_testing_ref_stars_3_CONFIGURED_Updated.csv',
+           '--plot_filename', '/Users/samvaughan/Desktop/testing_ref_stars_3_Updated.pdf',
            '--plot', '--run_local')
 
 args <- parser$parse_args(tmp_args)
@@ -184,8 +184,8 @@ ID=IDs[match(rownames(pos),rownames(fdata)),]
 # This gets the rest of the columns from the tile too for us to save
 subset_of_IDs_for_saving = (tile_data$ID %in% ID)
 # Don't keep the ID column as otherwise this gets duplicated
-selected_objects = tile_data[subset_of_IDs_for_saving, -which(names(tile_data) == "ID")]
-
+#selected_objects = tile_data[subset_of_IDs_for_saving, -which(names(tile_data) == "ID")]
+selected_objects = tile_data[subset_of_IDs_for_saving,]
 # Now make the skyfibre rows
 sky_fibre_data = tile_data[(tile_data$ID %in% sky_fibre_IDs),]
 sky_fibre_IDs = sky_fibre_data$ID
@@ -194,7 +194,9 @@ sky_fibre_filler_list = rep(-99, nrow(sky_fibre_data))
 
 # Now make the tables- one for the hexabundles ("target_table") and one for the sky fibres
 # I've added NA values for the sky fibre columns which don't make sense (rads, angs, etc)
-target_table = cbind(probe=c(1:length(angs)),ID,pos,rads,angs,azAngs,angs_azAng,selected_objects)
+new_properties = data.frame(cbind(probe=c(1:length(angs)),ID,pos,rads,angs,azAngs,angs_azAng))
+target_table = merge(new_properties, selected_objects, by='ID', sort=FALSE)
+
 sky_fibre_table = cbind(probe=sky_fibre_filler_list, 
                         ID=sky_fibre_IDs, 
                         x=sky_fibre_data$MagnetX / 1000.0, 
@@ -208,11 +210,16 @@ sky_fibre_table = cbind(probe=sky_fibre_filler_list,
 final_table = rbind(target_table, sky_fibre_table)
 
 #* Get the IDs of guide stars which have been chosen:
-guide_IDs = gdata[chosen_guides, 'ID']
+guide_IDs = fdata[match(rownames(gpos),rownames(fdata)), 'ID']
+#all_guide_data = fdata[chosen_guides,]
+#guide_IDs = gdata[chosen_guides, 'ID']
 #* And get the columns from the input file
-all_guide_data = gdata[gdata$ID %in% guide_IDs, ]
+all_guide_data = gdata[match(guide_IDs, gdata$ID), ]
 #* And now add on the other rows that we need 
-final_guide_table = cbind(all_guide_data,x=gpos$x, y=gpos$y, rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
+new_guide_properties = data.frame(x=gpos$x, y=gpos$y, rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
+final_guide_table = cbind(all_guide_data, new_guide_properties)
+#final_guide_table = subset(merged_guides,select=-c(Row.names))
+#final_guide_table = cbind(all_guide_data,x=gpos$x, y=gpos$y, rads=grads,angs=gangs,azAngs=gazAngs,angs_azAng=gangs_gazAng)
 
 #Writing output files:
 #* I've added the ability to save things to a specified output directory

@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 from hypothesis import given, strategies as st
 
-from hop import radialOffset_standaloneFunction_includeMetrologyCalibration as radial
+from scripts import radialOffset_standaloneFunction_includeMetrologyCalibration as radial
 """
 Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 """
