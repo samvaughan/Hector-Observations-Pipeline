@@ -267,8 +267,9 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
 
     tile_df, non_clashing_stars, _ = noclash(tile_df, star_df, proximity)
 
-    # Make sure the non clasing stars also don't clash with themselves
-    _, non_clashing_stars, _ = noclash(non_clashing_stars, non_clashing_stars, proximity)
+    # Make sure the non clashing stars also don't clash with themselves
+    # Don't need to do this, since Caro's code does it for us
+    #_, non_clashing_stars, _ = noclash(non_clashing_stars, non_clashing_stars, proximity)
     
     # There's a bug here where noclash doesn't count a tile with identical entries as clashing. So here we drop the duplicated rows to fix this
     non_clashing_stars = non_clashing_stars.drop_duplicates()
@@ -277,7 +278,7 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
         Nsel = len(non_clashing_stars)
 
     #assert len(non_clashing_stars) == len(np.unique(non_clashing_stars.ID)), "We seem to have a repeated star?"
-
+    #import ipdb; ipdb.set_trace()
     return non_clashing_stars.iloc[:Nsel]
 
 
