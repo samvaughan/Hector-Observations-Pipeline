@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import warnings
 from pathlib import Path
 
-def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, verbose=True):
+def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True):
     
     """
     Apply a number of corrections to the magnet positions in a Hector Robot file. The corrections are:
@@ -41,7 +41,9 @@ def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_con
         apply_metrology_calibration (bool, True):
             Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
         apply_roll_correction (bool, True):
-            Whether or not to apply the robot roll correction. Should always be True. Default is True. 
+            Whether or not to apply the robot roll correction. Should always be True. Default is True.
+        apply_rotation_correction (bool, True):
+            Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. 
         verbose (bool, True):
             Print information about the corrections to the screen. Default is True. 
     Outputs:
@@ -103,6 +105,16 @@ def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_con
             roll_correction_offset = roll_correction(row['Center_x'], row['Center_y'], row['Magnet'])
             df.at[index, 'Center_x'] = row['Center_x'] + roll_correction_offset
 
+    #Apply the correction for the unaligned centres of rotation for the pickup arm vs the cylinder
+    if apply_rotation_correction:
+        if verbose:
+            print("Applying the offset-rotation-axis correction")
+        for index, row in df.iterrows():
+            new_x, new_y = pick_up_arm_rotation_correction(row['Center_x'], row['Center_y'], rot_platePlacing=row['rot_platePlacing'])
+            df.at[index, 'Center_x'] = new_x
+            df.at[index, 'Center_y'] = new_y
+
+
     # Write the output file with the expected file ending
     fname = Path(filename)
     outputFile = fname.parent / (fname.stem + '_radialOffsetAdjusted.csv')
@@ -120,6 +132,22 @@ def radialOffset_standaloneFunction(filename, offset=0.0, T_observed=None, T_con
         print(f'Output file: {outputFile}')
     return df
 
+
+def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePlacing):
+    """
+    Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm. 
+
+    First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022
+    """
+    
+    d = 24*0.001 # distance from center of pick up arm to center of rotation in [mm]
+    ang0 = 20 # when the robot is at 0deg, it is actually 20 deg from the +x axis. The rotation direction is clockwise
+    theta = np.radians(rot_platePlacing - ang0)
+
+    robot_centre_x_new = robot_centre_x - d * np.cos(theta)
+    robot_centre_y_new = robot_centre_y + d * np.sin(theta)
+
+    return robot_centre_x_new, robot_centre_y_new
 
 def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_correction=True, verbose=True):
     """

@@ -240,3 +240,44 @@ class Test_radial_offset_file_saving_loading:
         ]
 
         assert set(header_keys) == set(specimen_header_keys)
+
+
+class Test_rotation_correction_code:
+
+    @pytest.mark.parametrize("centre, angle, result", [
+        ((10, 10), 30,  (9.976364613927707, 10.004167556264006))
+        ])
+    def test_rotation_cor_gives_correct_result(self,  centre, angle, result):
+
+        robot_magnet_x, robot_magnet_y = centre
+
+        new_x, new_y = radial.pick_up_arm_rotation_correction(robot_magnet_x, robot_magnet_y, angle)
+
+        assert np.allclose(np.array([new_x, new_y]), result)
+
+    @given(angle=st.floats(min_value=0, max_value=360.0))
+    def test_rotation_cor_gives_correct_offset_direction_in_each_quadrant(self, angle):
+        # From Julia and I going through this during the June commissioning run
+        # See her email on May 24th 2022- "Fw: diagrams"
+
+        robot_x, robot_y = (10, 10)
+
+        new_x, new_y = radial.pick_up_arm_rotation_correction(robot_x, robot_y, angle)
+
+        delta_x = new_x - robot_x
+        delta_y = new_y - robot_y
+
+        if (angle <= 20) or ((angle > 290) & (angle <= 360)):
+            # Quadrant 1- everything negative
+            assert (delta_x <= 0) & (delta_y <= 0)
+        elif (angle > 20) & (angle <= 110):
+            # Quadrant 2- x negative, y positive
+            assert (delta_x <= 0) & (delta_y >= 0)
+        elif (angle > 110) & (angle <= 200):
+            # Quadrant 3- both positive
+            assert (delta_x >= 0) & (delta_y >= 0)
+        elif (angle > 200) & (angle <=290):
+            # Quadrant 4- x positive, y negative
+            assert (delta_x >=0) & (delta_y <=0)
+        else:
+            raise ValueError(f"Angle of {angle} isn't tested")
