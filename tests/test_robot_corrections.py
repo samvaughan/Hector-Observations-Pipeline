@@ -5,9 +5,9 @@ from pathlib import Path
 from hypothesis import given, strategies as st
 import filecmp
 
-from ..hop.scripts import robot_corrections as corrections
-from ..hop.scripts import robot_file_input_output as file_functions
-from ..hop.scripts import prepare_files_for_robot as prepare
+from hop.scripts import robot_corrections as corrections
+from hop.scripts import robot_file_input_output as file_functions
+from hop.scripts import prepare_files_for_robot as prepare
 """
 Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 """
