@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("robot_filename", type=str, help='The full path of the robot file to apply corrections to')
-    parser.add_argument("parking_positions_filename", type=str, help='The full path of the parking positions file to apply corrections to')
+    #parser.add_argument("parking_positions_filename", type=str, help='The full path of the parking positions file to apply corrections to')
     parser.add_argument("robot_shifts_file", type=str, help='Filename of the robot metrology measurements')
     parser.add_argument("--offset", default=0, type=float, help='Radial offset to apply in mm. +ve is outward, -ve is inwards')
     parser.add_argument("--T_observed", default=None, type=float, help='Temperature at which the plate will be observed')
@@ -188,6 +188,7 @@ if __name__ == "__main__":
     T_configured = args.T_configured
     verbose = not args.silent
 
+    parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
 
     robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose)
     parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose)

@@ -16,18 +16,18 @@ import pip , os
 installation_location = os.path.split(os.path.split(pip.__file__)[0])[0]
 print(f"installation_location: {installation_location}")
 
-class CustomBuild(build):
+# class CustomBuild(build):
 
-  def run(self):
-        # run original build code
-        build.run(self)
+#   def run(self):
+#         # run original build code
+#         build.run(self)
 
 
-        def compile():
-          subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
-          subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
+#         def compile():
+#           subprocess.call(['make', 'all_clean', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
+#           subprocess.call(['make', '-C', 'hop/distortion_correction/HectorTranslationSoftware/Code'])
 
-        self.execute(compile, [], 'Compiling Distortion Correction binary')
+#         self.execute(compile, [], 'Compiling Distortion Correction binary')
 
 
 
@@ -47,7 +47,7 @@ README = (HERE / "README.md").read_text()
 #       ]
 
 setup(name='Hector-Observations-Pipeline',
-      version='0.4',
+      version='1.0.1',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -64,7 +64,7 @@ setup(name='Hector-Observations-Pipeline',
   'hop.distortion_correction.HectorTranslationSoftware': ['*'],
 },
       python_requires='>=3',
-      cmdclass={'build': CustomBuild},
-      scripts=['hop/scripts/check_magnet_counts_between_tiles', 'hop/scripts/plot_plate_configuration', 'hop/scripts/show_sky_fibre_changes_between_plates']
+      #cmdclass={'build': CustomBuild},
+      scripts=['hop/scripts/check_magnet_counts_between_tiles', 'hop/scripts/plot_plate_configuration', 'hop/scripts/show_sky_fibre_changes_between_plates', 'hop/scripts/prepare_files_for_robot']
      )
 

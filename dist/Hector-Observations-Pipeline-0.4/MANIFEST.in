@@ -1,3 +1,0 @@
-graft hop
-graft ConfigFiles
-include hop/distortion_correction/HectorTranslationSoftware/*
