@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     robot_filename = args.robot_filename
-    parking_positions_filename = args.parking_positions_filename
+    #parking_positions_filename = args.parking_positions_filename
     robot_shifts_file = args.robot_shifts_file
 
     #Optional Arguments

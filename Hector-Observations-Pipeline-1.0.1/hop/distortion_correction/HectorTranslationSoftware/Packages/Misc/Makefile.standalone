@@ -1,0 +1,41 @@
+
+SDS_DIR = ../sds
+ERS_DIR = ../DramaErs
+DRAMA_DIR = $(SDS_DIR)/Standalone
+SLALIB_DIR = ../slalib_o
+INC = -I $(SDS_DIR) -I $(DRAMA_DIR) -I $(ERS_DIR) -I $(SLALIB_DIR)
+
+CC = gcc
+CCC = g++
+CFLAGS = -O -Wall -pedantic
+CCFLAGS = -O -std=c++11 -Wall -pedantic
+
+OBJECTS = tdfxy.o ArrayManager.o TcsUtil.o gen_qfmed.o CommandHandler.o \
+                                                ReadFilename.o Wildcard.o
+
+All : $(OBJECTS)
+
+tdfxy.o : tdfxy.c tdfxy.h tdfxy_err.h \
+                 $(DRAMA_DIR)/status.h $(SDS_DIR)/sds.h $(ERS_DIR)/Ers.h
+	$(CC) $(CFLAGS) $(INC) -c -o tdfxy.o tdfxy.c
+
+ArrayManager.o : ArrayManager.cpp ArrayManager.h
+	$(CCC) $(CCFLAGS) -c -o ArrayManager.o ArrayManager.cpp
+
+CommandHandler.o : CommandHandler.cpp CommandHandler.h
+	$(CCC) $(CCFLAGS) -c -o CommandHandler.o CommandHandler.cpp
+
+ReadFilename.o : ReadFilename.cpp ReadFilename.h
+	$(CCC) $(CCFLAGS) -c -o ReadFilename.o ReadFilename.cpp
+
+TcsUtil.o : TcsUtil.cpp TcsUtil.h
+	$(CCC) $(CCFLAGS) -c -o TcsUtil.o TcsUtil.cpp
+
+Wildcard.o : Wildcard.cpp Wildcard.h
+	$(CCC) $(CCFLAGS) -c -o Wildcard.o Wildcard.cpp
+
+gen_qfmed.o :
+	$(CC) $(CFLAGS) -c -o gen_qfmed.o gen_qfmed.c
+
+clean ::
+	$(RM) *.o

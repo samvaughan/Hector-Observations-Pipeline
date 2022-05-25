@@ -1,0 +1,9 @@
+
+06:-0.015526954 +/- 0.0054589458 (significant) Extra Rotation, Degrees        (           0)
+07:  0.99978105 +/- 9.790062e-05 (significant) Extra Scale   ,                (           1)
+
+15:   1986.5966 +/-    953.44245 (significant) Dist P5 (X0)  , microns        (   -1086.368)
+16:   3824.0083 +/-    754.69302 (significant) Dist P6 (Y0)  , microns        (   1926.0718)
+
+rms =   53.07 microns,  0.82 arcseconds
+

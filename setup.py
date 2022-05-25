@@ -47,7 +47,7 @@ README = (HERE / "README.md").read_text()
 #       ]
 
 setup(name='Hector-Observations-Pipeline',
-      version='1.0.1',
+      version='1.0.2',
       description='Hector Galaxy Survey Observations pipeline',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -65,6 +65,6 @@ setup(name='Hector-Observations-Pipeline',
 },
       python_requires='>=3',
       #cmdclass={'build': CustomBuild},
-      scripts=['hop/scripts/check_magnet_counts_between_tiles', 'hop/scripts/plot_plate_configuration', 'hop/scripts/show_sky_fibre_changes_between_plates', 'hop/scripts/prepare_files_for_robot']
+      scripts=['hop/scripts/check_magnet_counts_between_tiles', 'hop/scripts/plot_plate_configuration', 'hop/scripts/show_sky_fibre_changes_between_plates', 'hop/scripts/prepare_files_for_robot.py']
      )
 

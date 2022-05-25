@@ -1,0 +1,77 @@
+#
+# - - - - -
+#  s l o b
+# - - - - -
+#
+# Produce obfuscated SLALIB/C release.
+#
+# P.T.Wallace   23 May 2009
+#
+
+# Delete everything but the present script file.
+foreach f ($HOME/slalib_o/*)
+  if ${f:t} != slob rm $f
+end
+
+# Copy the non-C part of the SLALIB release.
+cp $HOME/slalib/makefile .
+cp $HOME/slalib/*.h .
+
+# List the permanent identifiers.
+echo CIpars > names.lis
+echo pmt >> names.lis
+echo eb >> names.lis
+echo ehn >> names.lis
+echo gr2e >> names.lis
+echo abv >> names.lis
+echo ab1 >> names.lis
+echo bpn >> names.lis
+echo IOpars >> names.lis
+echo along >> names.lis
+echo phi >> names.lis
+echo hm >> names.lis
+echo xpl >> names.lis
+echo ypl >> names.lis
+echo sphi >> names.lis
+echo cphi >> names.lis
+echo diurab >> names.lis
+echo p >> names.lis
+echo tk >> names.lis
+echo rh >> names.lis
+echo tlr >> names.lis
+echo wl >> names.lis
+echo refa >> names.lis
+echo refb >> names.lis
+echo eral >> names.lis
+cat *.h | perl -ne '@a = split(/\s|\(/); \
+  print $a[1],"\n" if $a[1]=~/sla/' >> names.lis
+grep \#define *.h | awk '{print $2}' | \
+  perl -ne 'chomp; @a=split(/\(/); print $a[0],"\n"' >> names.lis
+
+# Produce the obfuscated code.
+foreach f ($HOME/slalib/*.c)
+  echo ${f:t}
+  cobfusc $f -a -c random -d -e -i random -m -r names.lis -w 60 -o temp.c
+  cat <<END >${f:t}
+/*
+** Copyright (C) 2009 P.T.Wallace.
+** Use for profit prohibited - enquiries to ptw@tpsoft.demon.co.uk.
+*/
+END
+  cat temp.c >>${f:t}
+end
+
+# Make a less obfuscated testbed.
+foreach f ($HOME/slalib/slatest.c)
+  echo ${f:t}
+  cobfusc $f -m -o temp.c
+  cat <<END >${f:t}
+/* Copyright (C) 2009 P.T.Wallace. */
+END
+  cat temp.c >>${f:t}
+end
+rm temp.c
+rm names.lis
+
+# Finished.
+exit

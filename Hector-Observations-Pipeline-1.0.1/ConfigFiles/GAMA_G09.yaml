@@ -1,0 +1,100 @@
+# This is an example configuration file to the full Hector Survey simulator.
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Target selection options
+
+# This is the master catalogue
+input_master_catalogue_filename : ~/Science/Hector/Simulations/HectorSim/Tables/AllGAMAsersic_Stellarmasses_matchzLT0.15someCOLS3.csv
+
+
+BoundaryType: /Users/samvaughan/Science/Hector/HectorObservationPipeline/SelectionFunctions/custom_selection_function.yaml
+zlimit : 0.1
+MstarMin : 8
+MstarMax : 12
+SparseFunction : 1
+MSparseCut1 :  10.0
+minRe : 1.5
+
+# Name of the input source catalogue - mainly for plotting 
+SourceCat : 'GAMA_G9'
+
+# This is the selection we do on the pandas table
+selection: (table.iloc[:,10]>0) & (table.iloc[:,22]>0) & (table.iloc[:,44]>0) & (table.iloc[:, 1] > 127) & (table.iloc[:, 1] < 142)
+
+# Here we say which columns in the master catalogue correspond to which variables the survey simulator expects. Use None (no quotes) if they don't exist
+Columns: 
+    CATID  : 0
+    RA  : 1
+    DEC  : 2
+    Re  : 26
+    z  : 72
+    Mstar  : 83
+    GAL_MAG_G : 10
+    GAL_MAG_I : 44
+    GAL_MAG_R : 22
+    GAL_MU_E_U : 8
+    GAL_MU_0_U : 7
+    GAL_MU_E_G : 13
+    GAL_MU_0_G : 12
+    GAL_MU_E_R : 24
+    GAL_MU_0_R : 23
+    GAL_MU_E_I : 46
+    GAL_MU_0_I : 45
+    GAL_MU_E_Z : 51
+    GAL_MU_0_Z : 50
+    Ellipticity_r  : 34
+    SersicIndex_r  : 33
+    MassHIpred : None
+    WALLABYflag : None
+    Dingoflag : None
+
+total_area : 48
+
+final_catalogue_name : ~/Science/Hector/full_simulations/Hector_Catalogues/Hector_sampled_G9.fits
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Tiling options
+
+guide_star_filename: ~/Science/Hector/Tiling/TestingInputCatalogues/Tables/fake_guides_TEST_GAMA_input.fits
+standard_star_filename: ~/Science/Hector/Tiling/TestingInputCatalogues/Tables/fake_standards_TEST_GAMA_input.fits
+
+# Stem to attach to all the tile files we'll make. Will have an underscore after it
+output_filename_stem: GAMA_G09
+
+# Where to collect all the output files. In here, we'll make folders called 'Configuration', 'Plots', 'Tiles' and 'Logs'
+# This folder is made if it doesn't exist
+output_folder: Outputs/GAMA/G09
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Parameters used in the code
+
+fresh_start : True
+MAX_TRIES: 999
+configure_field : True
+
+tiling_type : greedy
+allocation_type : random
+proximity : 220 # This is  14.5*15.008
+Nsel : 19
+N_targets_per_Hector_field : 19
+Nsel_guides : 100
+Nsel_standards : 100
+
+TwoDF_FOV_radius : 1.0
+exclusion_zone : 220  # This is 14.5mm in arcseconds: 14.5 * 15.008
+Hector_FOV_outer_radius : 0.9318
+Hector_FOV_inner_radius : 0.0
+
+
+fraction_to_reobserve : 0.0
+
+#Do we want to use the 'hybrid' approach to rescale the proximity value if the configuration code is struggling?
+Rescale_proximity: True
+
+fill_spares_with_repeats: True
+
+columns_for_target_tile_saving : ['ID', 'RA', 'DEC', 'Re', 'z', 'Mstar','GAL_MAG_G', "r_mag", 'GAL_MAG_I']
+
+columns_for_guide_tile_saving : ['ID', 'RA', 'DEC', 'r_mag']

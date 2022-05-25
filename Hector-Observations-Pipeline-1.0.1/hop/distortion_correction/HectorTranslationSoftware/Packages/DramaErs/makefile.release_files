@@ -1,0 +1,17 @@
+#
+# This file is included by the TexDocs, ManPages and HtmlSupport pages.  
+# It defines sets of files used by all there and other things common to 
+# running wflman for each set of documentation.
+#
+#     @(#) $Id: ACMM:DramaErs/makefile.release_files,v 3.19 09-Dec-2020 17:17:02+11 ks $
+#
+#
+
+
+
+WFLMAN=wflman
+
+
+
+ERS_SOURCE = ers.c erssprintf.c ersvsprintf.c
+RELEASE = $(ERS_SOURCE) Ers.h Ers_Err.msg dmakefile ers_dramastart.com 
