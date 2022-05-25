@@ -1741,6 +1741,14 @@ hop/tiling/__pycache__/tiling.cpython-37.pyc
 hop/tiling/__pycache__/tiling_functions.cpython-37.pyc
 hop/tiling/__pycache__/tiling_functions.cpython-38.pyc
 hop/tiling/__pycache__/tiling_functions.cpython-39.pyc
+scripts/__init__.py
+scripts/check_magnet_counts_between_tiles
+scripts/plot_plate_configuration
+scripts/prepare_files_for_robot.py
+scripts/radialOffset_standaloneFunction.py
+scripts/robot_corrections.py
+scripts/robot_file_input_output.py
+scripts/show_sky_fibre_changes_between_plates
 tests/__init__.py
 tests/test_offsets.py
 tests/test_pipeline.py

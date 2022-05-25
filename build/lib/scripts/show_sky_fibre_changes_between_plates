@@ -1,0 +1,27 @@
+#! /usr/bin/env python3
+
+import argparse
+from hop.hexabundle_allocation.problem_operations.fibres import show_sky_fibre_changes
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("Tile_1", help="A Hector tile file for the field currently on the telescope")
+parser.add_argument("Tile_2", help='The Hector tile file for the field you want to change to')
+parser.add_argument("--save", help='A filename to save the plot to')
+args = parser.parse_args()
+
+
+plt.style.use('default')
+fig, ax = show_sky_fibre_changes(args.Tile_1, args.Tile_2)
+
+ax.set_xlim(-350, 350)
+ax.set_ylim(-350, 350)
+fig.set_size_inches(6, 6)
+ax.axis('off')
+ax.set_title(f"{Path(args.Tile_1).stem} -->\n{Path(args.Tile_2).stem}", fontsize=8)
+
+if args.save:
+    fig.savefig(Path(args.save))
+
+plt.show()

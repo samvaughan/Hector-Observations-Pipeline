@@ -5,9 +5,9 @@ from pathlib import Path
 from hypothesis import given, strategies as st
 import filecmp
 
-from scripts import robot_corrections as corrections
-from scripts import robot_file_input_output as file_functions
-from scripts import prepare_files_for_robot as prepare
+from ..hop.scripts import robot_corrections as corrections
+from ..hop.scripts import robot_file_input_output as file_functions
+from ..hop.scripts import prepare_files_for_robot as prepare
 """
 Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 """
@@ -17,7 +17,7 @@ Test the radialOffset_standaloneFunction_includeMetrologyCalibration code
 # Share global variables between tests
 @pytest.fixture(scope="module")
 def config():
-    return dict(robot_centre = [324.470,297.834], robot_shifts_file="tests/data/radial_offset_function_files/robot_shifts_abs_220222120000.csv", example_robot_file="tests/data/radial_offset_function_files/Robot_file_for_testing.csv", example_parking_positions_file="tests/data/radial_offset_function_files/ParkingPosns_211116-z25.7_final.csv")
+    return dict(robot_centre = [324.470,297.834], robot_shifts_file="tests/data/robot_corrections_files/robot_shifts_abs_220222120000.csv", example_robot_file="tests/data/robot_corrections_files/Robot_file_for_testing.csv", example_parking_positions_file="tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv")
 
 @pytest.fixture()
 def robot_dataframe(config):
@@ -28,7 +28,7 @@ def robot_dataframe(config):
 
 @pytest.fixture()
 def example_metrology_results():
-    yield pd.read_csv("tests/data/radial_offset_function_files/metrology_fitting_results_for_robot_shifts_file.csv")
+    yield pd.read_csv("tests/data/robot_corrections_files/metrology_fitting_results_for_robot_shifts_file.csv")
 
 @pytest.fixture()
 def metrology_fit(robot_dataframe, config):
@@ -52,7 +52,7 @@ def output_file(config):
 
     df = prepare.correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, verbose=False)
     input_file = Path(config['example_robot_file'])
-    output_file = input_file.parent / (input_file.stem + "_radialOffsetAdjusted.csv")
+    output_file = input_file.parent / (input_file.stem + "_CorrectionsApplied.csv")
 
     yield output_file
 
@@ -66,7 +66,7 @@ def output_parking_positions_file(config):
 
     df = prepare.correct_parking_positions_file(filename, robot_shifts_file=robot_shifts_file)
     input_file = Path(config['example_parking_positions_file'])
-    output_file = input_file.parent / (input_file.stem + "_radialOffsetAdjusted.csv")
+    output_file = input_file.parent / (input_file.stem + "_220222120000.csv")
 
     yield output_file
 
@@ -307,8 +307,10 @@ class Test_parking_positions_file_writing:
         filename = config['example_parking_positions_file']
         robot_shifts_file = config['robot_shifts_file']
 
-        df = prepare.correct_parking_positions_file(filename, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=False, apply_metrology_calibration=False, apply_roll_correction=False, apply_rotation_correction=False)
+        df = prepare.correct_parking_positions_file(filename, robot_shifts_file=robot_shifts_file, apply_metrology_calibration=False, apply_roll_correction=False)
         input_file = Path(config['example_parking_positions_file'])
-        output_file = input_file.parent / (input_file.stem + "_radialOffsetAdjusted.csv")
+        output_file = input_file.parent / (input_file.stem + "_220222120000.csv")
 
         filecmp.cmp(input_file, output_file)
+
+        output_file.unlink()

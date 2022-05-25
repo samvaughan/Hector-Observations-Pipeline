@@ -46,8 +46,6 @@ README = (HERE / "README.md").read_text()
 #       (f'/{installation_location}/hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o', glob('hop/distortion_correction/HectorTranslationSoftware/Packages/slalib_o/*.o'))
 #       ]
 
-
-
 setup(name='Hector-Observations-Pipeline',
       version='0.4',
       description='Hector Galaxy Survey Observations pipeline',
@@ -66,6 +64,7 @@ setup(name='Hector-Observations-Pipeline',
   'hop.distortion_correction.HectorTranslationSoftware': ['*'],
 },
       python_requires='>=3',
-      cmdclass={'build': CustomBuild}
+      cmdclass={'build': CustomBuild},
+      scripts=['scripts/check_magnet_counts_between_tiles', 'scripts/plot_plate_configuration', 'scripts/show_sky_fibre_changes_between_plates']
      )
 

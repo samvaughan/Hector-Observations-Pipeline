@@ -1,0 +1,111 @@
+#!python
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import string
+from pathlib import Path
+import matplotlib.colors as colors
+from matplotlib.patches import Circle, Rectangle
+import matplotlib.lines as mlines
+from matplotlib.transforms import Affine2D
+from hop.hexabundle_allocation.hector import constants
+
+# base_folder = Path("/Users/samvaughan/Science/Hector/Targets/Commissioning/Feb2022/HandMade_Feb2022/results/TilingOutputs/150_m22/FinalOutputs/Reference_Stars_iteration_2/")
+
+# robot = pd.read_csv(base_folder / "Robot_FinalFormat_tile_150_m22_reference_stars_iteration_2_CONFIGURED_correct_header.csv", skiprows=6)
+# tile = pd.read_csv(base_folder / "Tile_FinalFormat_tile_150_m22_reference_stars_iteration_2_CONFIGURED_correct_header.csv", skiprows=11)
+
+"""
+Plot a plate configuration from a robot tile file
+"""
+
+
+import argparse
+
+parser = argparse.ArgumentParser(prog="Plot_Hector_Plate", description="Plot the layout of circular and rectangular magnets on a Hector plate")
+parser.add_argument("robot_filename", help="Full path of a robot file to plot. Will start with Robot_FinalFormat_...")
+parser.add_argument("--save", help="The filename to save a plot to")
+args = parser.parse_args()
+
+fname = args.robot_filename
+output_save_name = args.save
+if output_save_name is not None:
+    # Deal with file names with a ~
+    output_save_name = Path(output_save_name).expanduser()
+
+# Load the file
+filename = Path(fname)
+robot = pd.read_csv(filename, skiprows=6)
+plot_title = filename.stem
+
+# Magnet and plate dimensions
+# Rectangular magnet
+rm_length = constants.rectangle_magnet_length
+rm_breadth = constants.rectangle_magnet_width
+circular_magnet_radius = constants.circular_magnet_radius
+robot_centre_in_mm = [constants.robot_center_x, constants.robot_center_y]
+plate_radius = constants.HECTOR_plate_radius
+
+# Each of the hexabundles to plot
+Hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
+
+# Make a plot
+fig, ax = plt.subplots(figsize=(8,8))
+ax.set_aspect(1)
+ax.scatter(robot.Center_y, robot.Center_x, c='k', s=5)
+ax.scatter(robot_centre_in_mm[1], robot_centre_in_mm[0], marker='x', c='r', s=30)
+
+# Add the plate
+plate_circle = Circle(xy=(robot_centre_in_mm[1], robot_centre_in_mm[0]), radius=plate_radius, facecolor='None', edgecolor='k', linewidth=3.0)
+ax.add_patch(plate_circle)
+
+# Loop through the hexabundles
+for i, Hexabundle in enumerate(Hexabundles):
+
+    # For each hexabundle, get its circular and rectangular magnet
+    cm = robot.loc[(robot['Hexabundle'] == Hexabundle) & (robot['#Magnet'] == 'circular_magnet')]
+    rm = robot.loc[(robot['Hexabundle'] == Hexabundle) & (robot['#Magnet'] == 'rectangular_magnet')]
+
+    # Get the centres of each magnet
+    # Note that as you look at the plate, the robot axes are: poitive x is TOWARDS you and positive y is to the RIGHT
+    # To plot this such that the plot is the same as the configured field, we flip the x and y axes. 
+    # Note we also swap the trig functions below- so sin goes to cos an vice versa
+    # This makes this code confusing and there's probably a better way to do this. 
+    cm_x = cm.Center_y
+    cm_y = cm.Center_x
+    rm_x = rm.Center_y
+    rm_y = rm.Center_x
+
+
+    # The angle of the rectangular magnet- 270 minus the robot holding angle minus the robot placing angle
+    rm_angle = np.radians(270 - rm.rot_holdingPosition - rm.rot_platePlacing)
+
+    # Plot a straight line from the centre of the rectangular magnet. This should go through the centre of the circular magnet UNLESS THE METROLOGY/ROBOT CORRECTIONS HAVE BEEN APPLIED TO THE ROBOT FILE. If so, this line will not go through the centre of the circular magnet (by design)
+    ax.plot([rm_x - 27.2 * np.sin(rm_angle), rm_x + 27.2 * np.sin(rm_angle)], [rm_y - 27.2 * np.cos(rm_angle), rm_y + 27.2 * np.cos(rm_angle)], c='b')
+    
+    # Plot the angle of the circular magnet
+    # This line will always point towards the centre of the plate UNLESS THE METROLOGY/ROBOT CORRECTIONS HAVE BEEN APPLIED TO THE ROBOT FILE. If so, this line will be off (again by design)
+    cm_angle = np.radians(270 - cm.rot_holdingPosition - cm.rot_platePlacing)
+    ax.plot([cm_x, cm_x + 15 * np.sin(cm_angle)], [cm_y, cm_y + 15 * np.cos(cm_angle)], c='b', alpha=0.5)
+
+    # Plot the circular magnet
+    c = Circle(xy=(cm_x, cm_y), radius=circular_magnet_radius, facecolor='0.8', edgecolor='k', alpha=0.5)
+    ax.add_patch(c)
+
+    # Plot the rectangular magnet
+    r = Rectangle(xy=(rm_x - rm_length/2, rm_y - rm_breadth/2), width=rm_length, height=rm_breadth, transform=Affine2D().rotate_deg_around(*(rm_x, rm_y), 90 - np.degrees(rm_angle))+ax.transData, facecolor='0.8', edgecolor='k', alpha=0.5)
+    ax.add_patch(r)
+
+    # Add the hexabundle name, rotated to match the angle of the hexabundle    
+    text_rotation_angle = ((np.degrees(rm_angle) - 90).values[0]) %90
+    ax.annotate(xy=(rm_x, rm_y), text=f"{Hexabundle}", xytext=(0, 0), textcoords='offset points', bbox=dict(boxstyle='round', fc="w", ec="k", alpha=0.8), fontsize=8, rotation=text_rotation_angle, ha='center', va='center')
+
+
+ax.invert_yaxis()
+ax.set_ylabel("Robot $x$ coordinate")
+ax.set_xlabel("Robot $y$ coordinate")
+ax.set_title(plot_title)
+if output_save_name is not None:
+    fig.savefig(output_save_name, bbox_inches='tight')
+plt.show()
