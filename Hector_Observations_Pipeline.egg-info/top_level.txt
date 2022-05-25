@@ -1,3 +1,2 @@
 hop
-scripts
 tests

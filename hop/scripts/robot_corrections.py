@@ -108,7 +108,8 @@ def calculate_radial_offset(circular_magnet, radial_offset, robot_centre, apply_
     y = (circular_magnet['Center_y'] - robot_centre[1]).values[0]
 
     # If x and y are already at the plate centre, return them as they are since we don't know the direction to move them in (their radial offset direction isn't known)
-    if (x == 0.0) & (y == 0.0):
+    # Change this to be less than 1e-100 since values like 1e-162 were failing this check
+    if (np.abs(x) <= 1e-150) & (np.abs(y) <=1e-150):
         return 0, 0
 
     if apply_telecentricity_correction:

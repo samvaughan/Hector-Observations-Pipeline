@@ -38,36 +38,13 @@ class probe:
             if self.circular_magnet_center[1] == 0:
                 self.circular_magnet_orientation = 0.0
             elif self.circular_magnet_center[1] > 0:
-                self.circular_magnet_orientation = 90
+                self.circular_magnet_orientation = np.radians(90)
             else:
-                self.circular_magnet_orientation = 270
+                self.circular_magnet_orientation = np.radians(270)
         else:
             self.circular_magnet_orientation = np.arctan2(self.circular_magnet_center[1], self.circular_magnet_center[0])
-            # if self.circular_magnet_center[0] >= 0 and self.circular_magnet_center[1] >= 0:
-
-            #     self.circular_magnet_orientation = \
-            #     atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
-
-            # elif self.circular_magnet_center[0] < 0 and self.circular_magnet_center[1] >= 0:
-
-            #     self.circular_magnet_orientation = pi - \
-            #     atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
-
-            # elif self.circular_magnet_center[0] < 0 and self.circular_magnet_center[1] < 0:
-
-            #     self.circular_magnet_orientation = \
-            #     pi + atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
-
-            # elif self.circular_magnet_center[0] >= 0 and self.circular_magnet_center[1] < 0:
-
-            #     self.circular_magnet_orientation = \
-            #     2 * pi - atan(np.abs(self.circular_magnet_center[1] / self.circular_magnet_center[0]))
-
-
         # converting orientation form from radians to degrees
         self.circular_magnet_orientation = np.degrees(self.circular_magnet_orientation)
-
-
 
         return self.circular_magnet_orientation
 

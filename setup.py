@@ -65,6 +65,6 @@ setup(name='Hector-Observations-Pipeline',
 },
       python_requires='>=3',
       cmdclass={'build': CustomBuild},
-      scripts=['scripts/check_magnet_counts_between_tiles', 'scripts/plot_plate_configuration', 'scripts/show_sky_fibre_changes_between_plates']
+      scripts=['hop/scripts/check_magnet_counts_between_tiles', 'hop/scripts/plot_plate_configuration', 'hop/scripts/show_sky_fibre_changes_between_plates']
      )
 

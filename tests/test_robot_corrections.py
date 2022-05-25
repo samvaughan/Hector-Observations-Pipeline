@@ -118,7 +118,7 @@ class Test_radial_offset_file_numerical_values:
         assert np.allclose(a=[new_x - result[0], new_y - result[1]], b=[0, 0])
 
 
-    @given(centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0.0, max_value=1000.0)), offset=st.floats(min_value=-1000, max_value=1000))
+    @given(centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0, max_value=1000.0)), offset=st.floats(min_value=-1000, max_value=1000))
     def test_radial_offset_has_correct_magnitude(self, centre, offset):
 
         circular_magnet = pd.DataFrame(dict(Center_x=centre[0], Center_y=centre[1]), index=[0])
@@ -127,7 +127,7 @@ class Test_radial_offset_file_numerical_values:
         offset_length = np.sqrt((circular_magnet.Center_x - new_x)**2 + (circular_magnet.Center_y - new_y)**2)
 
         # Make an exception to test for a magnet at the plate centre where the offset will be 0
-        if (centre[0] == 0.0) & (centre[1] == 0.0):
+        if (np.abs(centre[0]) <= 1e-150) & (np.abs(centre[1]) <= 1e-150):
             offset = 0
         assert np.isclose(np.abs(offset_length), np.abs(offset))
 
@@ -167,11 +167,11 @@ class Test_radial_offset_file_numerical_values:
 
         assert np.isclose(offset_magnitude, correction_magnitude)
 
-    @given(circular_magnet_centre=st.tuples(st.floats(min_value=0, max_value=1000.0), st.floats(min_value=0, max_value=1000.0)), telecentricity_colour=st.sampled_from(['Blu', 'Gre', 'Yel', 'Mag']))
+    @given(circular_magnet_centre=st.tuples(st.floats(min_value=1, max_value=1000.0), st.floats(min_value=1, max_value=1000.0)), telecentricity_colour=st.sampled_from(['Blu', 'Gre', 'Yel', 'Mag']))
     def test_telecentricity_correction_is_radially_inwards(self, circular_magnet_centre, telecentricity_colour):
 
         magnet = pd.DataFrame(dict(Center_x=circular_magnet_centre[0], Center_y=circular_magnet_centre[1], Label=telecentricity_colour), index=[0])
-        offset_x, offset_y = corrections.calculate_telecentricity_correction(magnet, [0, 0], verbose=False)
+        offset_x, offset_y = corrections.calculate_telecentricity_correction(magnet, robot_centre = [0, 0], verbose=False)
 
         new_x = magnet.Center_x.values + offset_x
         new_y = magnet.Center_y.values + offset_y
