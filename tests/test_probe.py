@@ -33,7 +33,7 @@ class Test_probe_functions:
 
         # Work out the true value using np.arctan2
         # Change the angle of a magnet at (0.0, -0.0) to be 0 rather than 180
-        true_value = np.degrees(np.arctan2(magnet_centre[1], magnet_centre[0]))
+        true_value = (np.degrees(np.arctan2(magnet_centre[1], magnet_centre[0]))) % 360
         if (magnet_centre[1] == 0.0) & (magnet_centre[0] == -0.0):
             true_value = 0.0
         print(f"Magnet Centre is {magnet_centre}, code value is {circular_magnet_orientation}, true value is {true_value}")
