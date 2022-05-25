@@ -62,23 +62,23 @@ def write_standard_parking_positions_file(df, output_file):
     """
 
     with open(output_file, 'w') as f:
-        f.write("Rectangular Magnets, , , , \n")
+        f.write("Rectangular Magnets, , , , ")
         df.loc[df.MagnetName == "RectangularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
 
         # Now the Blue circular magnets
-        f.write('Round Blue Magnets, , , , \n')
+        f.write('Round Blue Magnets, , , , ')
         df.loc[df.MagnetName == "BlueCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
 
         # Round Green
-        f.write("Round Green Magnets, , , , \n")
+        f.write("Round Green Magnets, , , , ")
         df.loc[df.MagnetName == "GreenCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
 
         # Round Yellow
-        f.write("Round Yellow Magnets, , , , \n")
+        f.write("Round Yellow Magnets, , , , ")
         df.loc[df.MagnetName == "YellowCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
 
         # Round Magenta
-        f.write("Round Magneta Magnets, , , , \n")
+        f.write("Round Magneta Magnets, , , , ")
         df.loc[df.MagnetName == "MagnetaCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
 
     return df

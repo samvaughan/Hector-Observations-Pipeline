@@ -1718,7 +1718,7 @@ hop/misc/__pycache__/plotting_tools.cpython-39.pyc
 hop/scripts/__init__.py
 hop/scripts/check_magnet_counts_between_tiles
 hop/scripts/plot_plate_configuration
-hop/scripts/prepare_files_for_robot
+hop/scripts/prepare_files_for_robot.py
 hop/scripts/radialOffset_standaloneFunction.py
 hop/scripts/robot_corrections.py
 hop/scripts/robot_file_input_output.py

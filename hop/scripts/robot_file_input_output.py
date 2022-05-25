@@ -63,23 +63,23 @@ def write_standard_parking_positions_file(df, output_file):
 
     with open(output_file, 'w') as f:
         f.write("Rectangular Magnets, , , , \n")
-        df.loc[df.MagnetName == "RectangularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
+        df.loc[df.MagnetName == "RectangularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False, line_terminator='\n')
 
         # Now the Blue circular magnets
         f.write('Round Blue Magnets, , , , \n')
-        df.loc[df.MagnetName == "BlueCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
+        df.loc[df.MagnetName == "BlueCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False, line_terminator='\n')
 
         # Round Green
         f.write("Round Green Magnets, , , , \n")
-        df.loc[df.MagnetName == "GreenCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
+        df.loc[df.MagnetName == "GreenCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False, line_terminator='\n')
 
         # Round Yellow
         f.write("Round Yellow Magnets, , , , \n")
-        df.loc[df.MagnetName == "YellowCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
+        df.loc[df.MagnetName == "YellowCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False, line_terminator='\n')
 
         # Round Magenta
         f.write("Round Magneta Magnets, , , , \n")
-        df.loc[df.MagnetName == "MagnetaCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False)
+        df.loc[df.MagnetName == "MagnetaCircularMagnet"].to_csv(f, index=False, sep=',', mode='a', columns=['MagnetNumber','Center_x','Center_y','z','zero'], header=False, line_terminator='\n')
 
     return df
 
