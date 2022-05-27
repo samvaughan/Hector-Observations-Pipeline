@@ -54,6 +54,9 @@ def read_parking_positions_file(filename):
 
         df = pd.concat((df, magnet_df))
 
+    #This line is very important! Otherwise in the for loop in the main file gets the rows all wrong
+    df = df.reset_index(drop=True)
+    
     return df
 
 def write_standard_parking_positions_file(df, output_file):

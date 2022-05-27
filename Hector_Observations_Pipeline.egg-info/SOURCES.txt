@@ -1715,6 +1715,7 @@ hop/misc/__pycache__/pandas_tools.cpython-39.pyc
 hop/misc/__pycache__/plotting_tools.cpython-37.pyc
 hop/misc/__pycache__/plotting_tools.cpython-38.pyc
 hop/misc/__pycache__/plotting_tools.cpython-39.pyc
+hop/scripts/Hector_Offsets
 hop/scripts/__init__.py
 hop/scripts/check_magnet_counts_between_tiles
 hop/scripts/plot_plate_configuration

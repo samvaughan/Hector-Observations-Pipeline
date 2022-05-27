@@ -22,8 +22,8 @@ def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePla
     ang0 = 20 # when the robot is at 0deg, it is actually 20 deg from the +x axis. The rotation direction is clockwise
     theta = np.radians(rot_platePlacing - ang0)
 
-    robot_centre_x_new = robot_centre_x - d * np.cos(theta)
-    robot_centre_y_new = robot_centre_y + d * np.sin(theta)
+    robot_centre_x_new = 1 * (robot_centre_x - d * np.cos(theta))
+    robot_centre_y_new = 1 * (robot_centre_y + d * np.sin(theta))
 
     return robot_centre_x_new, robot_centre_y_new
 
@@ -162,8 +162,8 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     popt, pcov = curve_fit(fitting_fun, metr_wanted_coords.reshape((8)), metr_in_coords.reshape((8)), p0=p0)
 
     # # For DEBUG: Measure residuals for the marker measurements
-    # corrected_data = apply_cal(metr_in_coords, popt)
-    # all_resids = corrected_data - metr_wanted_coords
+    corrected_data = apply_cal(metr_wanted_coords, popt)
+    all_resids = corrected_data - metr_in_coords
 
     # For backwards compatability reasons, the input coordinates are supplied based on best-known plate centre
     # (given by the 'robot_centre' parameter). Here, we instead want to use the actual measured value of
