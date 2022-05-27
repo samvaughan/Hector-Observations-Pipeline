@@ -5,3 +5,5 @@ Outputs/*
 *.pdf
 *.fits
 *.fits.gz
+*.DS_store
+.idea
