@@ -142,7 +142,7 @@ def calculate_rectangular_magnet_centre_coordinates(x, y, rm_angle):
     return rectangular_magnet_centre
 
 
-def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file, verbose=True):
+def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file, verbose=True, permagnet_theta_corr=True):
     """
     Apply a correction based on the measured metrology of the robot. Written by Barnaby Norris. 
     """
@@ -177,7 +177,21 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
 
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
-    theta_d = popt[2]
+    if permagnet_theta_corr:
+        npts = input_coords_centred.shape[0]
+        all_theta_ds = np.zeros(npts)
+        for k in range(npts):
+            dx1 = x0 - input_coords_centred[k, 0]
+            dy1 = y0 - input_coords_centred[k, 1]
+            phi_old = np.arctan(dy1 / dx1)
+            dx2 = x0 - metr_calibrated_coords[k, 0]
+            dy2 = y0 - metr_calibrated_coords[k, 1]
+            phi_new = np.arctan(dy2 / dx2)
+            cur_theta_d = (phi_new - phi_old) / np.pi * 180
+            all_theta_ds[k] = cur_theta_d
+        theta_d = all_theta_ds
+    else:
+        theta_d = popt[2]
     output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
     if verbose:
