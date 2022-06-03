@@ -1,0 +1,37 @@
+﻿hop.pipeline.HectorPipe
+=======================
+
+.. currentmodule:: hop.pipeline
+
+.. autoclass:: HectorPipe
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HectorPipe.__init__
+      ~HectorPipe.add_fibre_type_column
+      ~HectorPipe.allocate_hexabundles_for_all_tiles
+      ~HectorPipe.allocate_hexabundles_for_single_tile
+      ~HectorPipe.apply_config_code_to_tile
+      ~HectorPipe.apply_distortion_correction
+      ~HectorPipe.find_premade_tiles
+      ~HectorPipe.get_remaining_targets
+      ~HectorPipe.load_input_catalogue
+      ~HectorPipe.make_header_dictionary
+      ~HectorPipe.make_output_file_for_Tony
+      ~HectorPipe.read_header_dictionary_from_file
+      ~HectorPipe.run_configuration_code
+      ~HectorPipe.run_target_selection
+      ~HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli
+      ~HectorPipe.tile_field
+   
+   
+
+   
+   
+   

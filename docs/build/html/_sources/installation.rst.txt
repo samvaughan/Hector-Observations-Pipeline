@@ -1,0 +1,10 @@
+
+
+Installation
+============
+
+The Hector Observation Pipeline is already installed on the data reduction PC at the AAT. To install it on your own laptop, use pip:
+
+.. code-block:: console
+
+   (.venv) $ pip install Hector-Observations-Pipeline

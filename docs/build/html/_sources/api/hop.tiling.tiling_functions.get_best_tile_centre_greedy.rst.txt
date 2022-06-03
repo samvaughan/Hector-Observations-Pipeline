@@ -1,0 +1,6 @@
+get_best_tile_centre_greedy
+===========================
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: get_best_tile_centre_greedy

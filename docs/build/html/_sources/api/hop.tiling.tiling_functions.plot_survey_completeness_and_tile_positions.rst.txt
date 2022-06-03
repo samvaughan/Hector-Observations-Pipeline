@@ -1,0 +1,6 @@
+plot_survey_completeness_and_tile_positions
+===========================================
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: plot_survey_completeness_and_tile_positions

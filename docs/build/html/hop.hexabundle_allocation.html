@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.hexabundle_allocation package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.hexabundle_allocation package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation">hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation module</a></li>
+<li><a class="reference internal" href="#hop-hexabundle-allocation-allocate-hexabundles-module">hop.hexabundle_allocation.allocate_hexabundles module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.collision_hexabundle_main">hop.hexabundle_allocation.collision_hexabundle_main module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.hexabundle_allocation.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-hexabundle-allocation-package">
+<h1>hop.hexabundle_allocation package<a class="headerlink" href="#hop-hexabundle-allocation-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html">hop.hexabundle_allocation.general_operations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html">hop.hexabundle_allocation.general_operations.geometry_intersections package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#module-hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_rectangle">hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_rectangle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#module-hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment">hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#module-hop.hexabundle_allocation.general_operations.geometry_intersections.rectangle_with_rectangle">hop.hexabundle_allocation.general_operations.geometry_intersections.rectangle_with_rectangle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#module-hop.hexabundle_allocation.general_operations.geometry_intersections.segment_with_segment">hop.hexabundle_allocation.general_operations.geometry_intersections.segment_with_segment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_intersections.html#module-hop.hexabundle_allocation.general_operations.geometry_intersections">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html">hop.hexabundle_allocation.general_operations.geometry_shapes package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html#module-hop.hexabundle_allocation.general_operations.geometry_shapes.circle">hop.hexabundle_allocation.general_operations.geometry_shapes.circle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html#module-hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle">hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html#module-hop.hexabundle_allocation.general_operations.geometry_shapes.segment">hop.hexabundle_allocation.general_operations.geometry_shapes.segment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.geometry_shapes.html#module-hop.hexabundle_allocation.general_operations.geometry_shapes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#module-hop.hexabundle_allocation.general_operations.trigonometry">hop.hexabundle_allocation.general_operations.trigonometry module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#module-hop.hexabundle_allocation.general_operations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.hexabundle_allocation.hector.html">hop.hexabundle_allocation.hector package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html">hop.hexabundle_allocation.hector.magnets package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#module-hop.hexabundle_allocation.hector.magnets.circular">hop.hexabundle_allocation.hector.magnets.circular module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#module-hop.hexabundle_allocation.hector.magnets.magnet_pair">hop.hexabundle_allocation.hector.magnets.magnet_pair module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#module-hop.hexabundle_allocation.hector.magnets.pickup_areas">hop.hexabundle_allocation.hector.magnets.pickup_areas module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#module-hop.hexabundle_allocation.hector.magnets.rectangular">hop.hexabundle_allocation.hector.magnets.rectangular module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.magnets.html#module-hop.hexabundle_allocation.hector.magnets">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.constants">hop.hexabundle_allocation.hector.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.plate">hop.hexabundle_allocation.hector.plate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.probe">hop.hexabundle_allocation.hector.probe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html">hop.hexabundle_allocation.problem_operations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html">hop.hexabundle_allocation.problem_operations.conflicts package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.functions">hop.hexabundle_allocation.problem_operations.conflicts.functions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.extract_data">hop.hexabundle_allocation.problem_operations.extract_data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.fibres">hop.hexabundle_allocation.problem_operations.fibres module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.file_arranging">hop.hexabundle_allocation.problem_operations.file_arranging module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.hexabundle">hop.hexabundle_allocation.problem_operations.hexabundle module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.offsets">hop.hexabundle_allocation.problem_operations.offsets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.plots">hop.hexabundle_allocation.problem_operations.plots module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.position_ordering">hop.hexabundle_allocation.problem_operations.position_ordering module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.robot_parameters">hop.hexabundle_allocation.problem_operations.robot_parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation">
+<span id="hop-hexabundle-allocation-ayoanpc-main-hexabundleallocation-module"></span><h2>hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation module<a class="headerlink" href="#module-hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="hop-hexabundle-allocation-allocate-hexabundles-module">
+<h2>hop.hexabundle_allocation.allocate_hexabundles module<a class="headerlink" href="#hop-hexabundle-allocation-allocate-hexabundles-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation.collision_hexabundle_main">
+<span id="hop-hexabundle-allocation-collision-hexabundle-main-module"></span><h2>hop.hexabundle_allocation.collision_hexabundle_main module<a class="headerlink" href="#module-hop.hexabundle_allocation.collision_hexabundle_main" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.hexabundle_allocation" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

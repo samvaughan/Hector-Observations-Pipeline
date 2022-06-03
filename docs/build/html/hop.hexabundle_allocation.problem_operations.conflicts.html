@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.hexabundle_allocation.problem_operations.conflicts package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.hexabundle_allocation.problem_operations.conflicts package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.functions">hop.hexabundle_allocation.problem_operations.conflicts.functions module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.conflicts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.hexabundle_allocation.problem_operations.conflicts.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-hexabundle-allocation-problem-operations-conflicts-package">
+<h1>hop.hexabundle_allocation.problem_operations.conflicts package<a class="headerlink" href="#hop-hexabundle-allocation-problem-operations-conflicts-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet">
+<span id="hop-hexabundle-allocation-problem-operations-conflicts-blocked-magnet-module"></span><h2>hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.circular_magnet_is_fully_blocked">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.</span></span><span class="sig-name descname"><span class="pre">circular_magnet_is_fully_blocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_blocked_pickup_areas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/blocked_magnet.html#circular_magnet_is_fully_blocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.circular_magnet_is_fully_blocked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.</span></span><span class="sig-name descname"><span class="pre">conflicted_magnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocking_magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocked_magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocked_pickup_area</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/blocked_magnet.html#conflicted_magnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet.remove_blocked_pickup_areas_from_list_available_pickup">
+<span class="sig-name descname"><span class="pre">remove_blocked_pickup_areas_from_list_available_pickup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/blocked_magnet.html#conflicted_magnet.remove_blocked_pickup_areas_from_list_available_pickup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet.remove_blocked_pickup_areas_from_list_available_pickup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.print_fully_blocked_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.</span></span><span class="sig-name descname"><span class="pre">print_fully_blocked_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fully_blocked_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflictsRecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/blocked_magnet.html#print_fully_blocked_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.print_fully_blocked_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.rectangular_magnet_is_fully_blocked">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.</span></span><span class="sig-name descname"><span class="pre">rectangular_magnet_is_fully_blocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_blocked_pickup_areas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/blocked_magnet.html#rectangular_magnet_is_fully_blocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.rectangular_magnet_is_fully_blocked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet">
+<span id="hop-hexabundle-allocation-problem-operations-conflicts-circular-magnet-with-circular-magnet-module"></span><h2>hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet.check_conflict_circle_circle_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet.</span></span><span class="sig-name descname"><span class="pre">check_conflict_circle_circle_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet_pair</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/circular_magnet_with_circular_magnet.html#check_conflict_circle_circle_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet.check_conflict_circle_circle_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet">
+<span id="hop-hexabundle-allocation-problem-operations-conflicts-circular-magnet-with-rectangular-magnet-module"></span><h2>hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.check_conflict_circle_rectangle_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.</span></span><span class="sig-name descname"><span class="pre">check_conflict_circle_rectangle_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet_pair</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/circular_magnet_with_rectangular_magnet.html#check_conflict_circle_rectangle_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.check_conflict_circle_rectangle_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.circle_blocking_rectangle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.</span></span><span class="sig-name descname"><span class="pre">circle_blocking_rectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rectangle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/circular_magnet_with_rectangular_magnet.html#circle_blocking_rectangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.circle_blocking_rectangle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.rectangle_blocking_circle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.</span></span><span class="sig-name descname"><span class="pre">rectangle_blocking_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rectangle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/circular_magnet_with_rectangular_magnet.html#rectangle_blocking_circle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet.rectangle_blocking_circle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts.functions">
+<span id="hop-hexabundle-allocation-problem-operations-conflicts-functions-module"></span><h2>hop.hexabundle_allocation.problem_operations.conflicts.functions module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.functions" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.all_blocking_magnets_are_fully_blocked">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">all_blocking_magnets_are_fully_blocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_blocking_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_fully_blocked_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#all_blocking_magnets_are_fully_blocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.all_blocking_magnets_are_fully_blocked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnet_is_fully_blocked">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">blocking_magnet_is_fully_blocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocking_magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_fully_blocked_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#blocking_magnet_is_fully_blocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnet_is_fully_blocked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnets_for_fully_blocked_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">blocking_magnets_for_fully_blocked_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_blocked_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#blocking_magnets_for_fully_blocked_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnets_for_fully_blocked_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.calculate_magnet_to_magnet_distance">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">calculate_magnet_to_magnet_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnet2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#calculate_magnet_to_magnet_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.calculate_magnet_to_magnet_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_magnets_in_close_proximity">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">create_list_magnets_in_close_proximity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#create_list_magnets_in_close_proximity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_magnets_in_close_proximity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocked_pickup_areas">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">create_list_of_blocked_pickup_areas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflicted_magnet_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#create_list_of_blocked_pickup_areas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocked_pickup_areas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocking_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">create_list_of_blocking_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_conflicts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocked_magnet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#create_list_of_blocking_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocking_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_fully_blocked_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">create_list_of_fully_blocked_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_blocked_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#create_list_of_fully_blocked_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_fully_blocked_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.find_all_blocked_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">find_all_blocked_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#find_all_blocked_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.find_all_blocked_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.find_conflicts_between_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">find_conflicts_between_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pair</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#find_conflicts_between_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.find_conflicts_between_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.highlight_closed_magnets_on_plot">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">highlight_closed_magnets_on_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closed_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#highlight_closed_magnets_on_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.highlight_closed_magnets_on_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.is_magnet_fully_blocked">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">is_magnet_fully_blocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocked_pickup_areas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#is_magnet_fully_blocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.is_magnet_fully_blocked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.minimum_magnet_proximity">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">minimum_magnet_proximity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#minimum_magnet_proximity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.minimum_magnet_proximity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.functions.remove_multiple_occurrences_in_list">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.functions.</span></span><span class="sig-name descname"><span class="pre">remove_multiple_occurrences_in_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/functions.html#remove_multiple_occurrences_in_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.functions.remove_multiple_occurrences_in_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet">
+<span id="hop-hexabundle-allocation-problem-operations-conflicts-rectangular-magnet-and-rectangular-magnet-module"></span><h2>hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet.check_conflict_rectangle_rectangle_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet.</span></span><span class="sig-name descname"><span class="pre">check_conflict_rectangle_rectangle_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet_pair</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/conflicts/rectangular_magnet_and_rectangular_magnet.html#check_conflict_rectangle_rectangle_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet.check_conflict_rectangle_rectangle_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.conflicts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.conflicts" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

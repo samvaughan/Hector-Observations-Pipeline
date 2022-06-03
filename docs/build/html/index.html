@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to the Hector Observations Pipeline’s documentation! &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Calculating Offsets from one Hexabundle to another" href="calculating_offsets.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Welcome to the Hector Observations Pipeline’s documentation!</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#tools-for-observers">Tools for Observers</a></li>
+<li><a class="reference internal" href="#preparing-files-for-the-hector-robot">Preparing files for the Hector robot</a></li>
+<li><a class="reference internal" href="#issues-bugfixes-and-feedback">Issues, bugfixes and feedback</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#index">Index</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/index.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="welcome-to-the-hector-observations-pipeline-s-documentation">
+<h1>Welcome to the Hector Observations Pipeline’s documentation!<a class="headerlink" href="#welcome-to-the-hector-observations-pipeline-s-documentation" title="Permalink to this heading">¶</a></h1>
+<p>The Hector Observations Pipeline is a package to make Hector Galaxy tiles. It also contains useful scripts and tools for observers to run at the telescope. This documentation describes these tools for astronomers; questions about the tiling pipeline should be directed to Sam Vaughan.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<p>The Hector Observation Pipeline is already installed on the data reduction PC at the AAT. To install it on your own laptop, use pip:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install Hector-Observations-Pipeline
+</pre></div>
+</div>
+</section>
+<section id="tools-for-observers">
+<h2>Tools for Observers<a class="headerlink" href="#tools-for-observers" title="Permalink to this heading">¶</a></h2>
+<p>The package contains a number of scripts to help with observing. Each script runs on either a Hector “tile” file or a Hector “robot” file, which will be provided before the run and can probably be found in the <code class="docutils literal notranslate"><span class="pre">/instoft/hector_configs</span></code> directory on <code class="docutils literal notranslate"><span class="pre">aatlxe</span></code> or <code class="docutils literal notranslate"><span class="pre">aatliu</span></code>.  The scripts provide (hopefully!) helpful information if you call them from the commmand line with the <code class="docutils literal notranslate"><span class="pre">-h</span></code> option.</p>
+<p>We have scripts to help with the following tasks:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="calculating_offsets.html"><span class="doc">Calculating Offsets from one Hexabundle to another</span></a></p></li>
+<li><p><a class="reference internal" href="plot_plate_configuration.html"><span class="doc">Plotting a plate configuration</span></a></p></li>
+<li><p><a class="reference internal" href="show_sky_fibre_changes_between_plates.html"><span class="doc">Showing the Sky Fibre Changes between Plates</span></a></p></li>
+<li><p><a class="reference internal" href="check_magnet_counts_between_tiles.html"><span class="doc">Checking two plates can be observed after each other</span></a></p></li>
+</ul>
+</section>
+<section id="preparing-files-for-the-hector-robot">
+<h2>Preparing files for the Hector robot<a class="headerlink" href="#preparing-files-for-the-hector-robot" title="Permalink to this heading">¶</a></h2>
+<p>You’ll also find a script from this package installed on the Hector PC which is used to apply corrections to the magnet positions in a given Hector robot file. Full instructions on how and when to use this script can be found in the Hector robot manual. More details for the interested user can be found <a class="reference internal" href="prepare_files_for_robot.html#preparing-files-to-be-configured-by-the-robot"><span class="std std-ref">here</span></a>.</p>
+</section>
+<section id="issues-bugfixes-and-feedback">
+<h2>Issues, bugfixes and feedback<a class="headerlink" href="#issues-bugfixes-and-feedback" title="Permalink to this heading">¶</a></h2>
+<p>The best way to raise an issue with the code is to go to the project’s <a class="reference external" href="https://github.com/samvaughan/Hector-Observations-Pipeline">github page</a>. Click on the ‘issues’ tab followed by ‘new issue’ on the right. Pull requests to fix something or add a feature are also especially appreciated!</p>
+</section>
+<section id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this heading">¶</a></h2>
+<p>The Hector Observations Pipeline is written and maintained by Sam Vaughan. Caroline Foster, Keith Shortridge and Ayoan Sadman each made major and substantial contributions. Caro wrote the code to find the best layout of the magnets on the Hector field plate to avoid clashes and collisions. Keith wrote the code to turn an RA and Dec into a position on the plate, as well as applying the optical distortion model. Ayoan wrote the first version of the code to allocate hexabundles to each target and sorted out the order in which magnets are placed on the plate by the robot. Hector wouldn’t be possible without each of their contributions!</p>
+</section>
+</section>
+<section id="index">
+<h1>Index<a class="headerlink" href="#index" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="calculating_offsets.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calculating_offsets.html#details">Details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot_plate_configuration.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="check_magnet_counts_between_tiles.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prepare_files_for_robot.html#the-prepare-files-for-robot-py-script">The prepare_files_for_robot.py script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare_files_for_robot.html#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

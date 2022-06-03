@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.hexabundle_allocation.general_operations.geometry_shapes package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.hexabundle_allocation.general_operations.geometry_shapes package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.circle">hop.hexabundle_allocation.general_operations.geometry_shapes.circle module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle">hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.segment">hop.hexabundle_allocation.general_operations.geometry_shapes.segment module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.hexabundle_allocation.general_operations.geometry_shapes.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-hexabundle-allocation-general-operations-geometry-shapes-package">
+<h1>hop.hexabundle_allocation.general_operations.geometry_shapes package<a class="headerlink" href="#hop-hexabundle-allocation-general-operations-geometry-shapes-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation.general_operations.geometry_shapes.circle">
+<span id="hop-hexabundle-allocation-general-operations-geometry-shapes-circle-module"></span><h2>hop.hexabundle_allocation.general_operations.geometry_shapes.circle module<a class="headerlink" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.circle" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.general_operations.geometry_shapes.circle.</span></span><span class="sig-name descname"><span class="pre">circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/circle.html#circle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle.calculate_circle_all_coordinates">
+<span class="sig-name descname"><span class="pre">calculate_circle_all_coordinates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/circle.html#circle.calculate_circle_all_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle.calculate_circle_all_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle.draw_circle">
+<span class="sig-name descname"><span class="pre">draw_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/circle.html#circle.draw_circle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.circle.circle.draw_circle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle">
+<span id="hop-hexabundle-allocation-general-operations-geometry-shapes-rectangle-module"></span><h2>hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle module<a class="headerlink" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.</span></span><span class="sig-name descname"><span class="pre">rectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/rectangle.html#rectangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.calculate_4corners">
+<span class="sig-name descname"><span class="pre">calculate_4corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/rectangle.html#rectangle.calculate_4corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.calculate_4corners" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.draw_rectangle">
+<span class="sig-name descname"><span class="pre">draw_rectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figurenum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/rectangle.html#rectangle.draw_rectangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.draw_rectangle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.label_corners_on_plot">
+<span class="sig-name descname"><span class="pre">label_corners_on_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/rectangle.html#rectangle.label_corners_on_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.label_corners_on_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.plot_corners">
+<span class="sig-name descname"><span class="pre">plot_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/rectangle.html#rectangle.plot_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.rectangle.rectangle.plot_corners" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.general_operations.geometry_shapes.segment">
+<span id="hop-hexabundle-allocation-general-operations-geometry-shapes-segment-module"></span><h2>hop.hexabundle_allocation.general_operations.geometry_shapes.segment module<a class="headerlink" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes.segment" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.line">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.general_operations.geometry_shapes.segment.</span></span><span class="sig-name descname"><span class="pre">line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.line.calculate_y_from_x">
+<span class="sig-name descname"><span class="pre">calculate_y_from_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#line.calculate_y_from_x"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.line.calculate_y_from_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.general_operations.geometry_shapes.segment.</span></span><span class="sig-name descname"><span class="pre">segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.create_line_equation">
+<span class="sig-name descname"><span class="pre">create_line_equation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment.create_line_equation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.create_line_equation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.draw_segment">
+<span class="sig-name descname"><span class="pre">draw_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment.draw_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.draw_segment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.point_is_on_segment">
+<span class="sig-name descname"><span class="pre">point_is_on_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment.point_is_on_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.point_is_on_segment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.vector">
+<span class="sig-name descname"><span class="pre">vector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment.vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.vector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.vertical">
+<span class="sig-name descname"><span class="pre">vertical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/general_operations/geometry_shapes/segment.html#segment.vertical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.general_operations.geometry_shapes.segment.segment.vertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.general_operations.geometry_shapes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.hexabundle_allocation.general_operations.geometry_shapes" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

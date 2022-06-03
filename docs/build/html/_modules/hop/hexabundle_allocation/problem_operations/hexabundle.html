@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.problem_operations.hexabundle &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.problem_operations.hexabundle</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<div class="viewcode-block" id="overall_hexabundle_size_allocation_operation_version1"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version1">[docs]</a><span class="k">def</span> <span class="nf">overall_hexabundle_size_allocation_operation_version1</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">tileNum</span><span class="p">,</span> <span class="n">flagsFile</span><span class="p">):</span>
+
+    <span class="n">hexabundleIndexAAOmega</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexHector</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexRemaining</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">answer2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">answer3</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleRepeatwithsameID</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="s1">&#39;A127&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">:</span><span class="s1">&#39;A91&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;H&#39;</span><span class="p">:</span><span class="s1">&#39;A37&#39;</span><span class="p">,</span><span class="s1">&#39;I&#39;</span><span class="p">:</span><span class="s1">&#39;S91&#39;</span><span class="p">,</span><span class="s1">&#39;J&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;K&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;L&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;Q&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;T&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;U&#39;</span><span class="p">:</span><span class="s1">&#39;S37&#39;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">hexabundleLetter</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+        <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">])[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Creating magnet dictionary with all necessary parameters required for hexabundle allocation</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">create_Magnet_Dictionary</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+
+        <span class="c1">## Check for match of galaxies with same ID</span>
+        <span class="k">for</span> <span class="n">recordID</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">:</span>
+
+            <span class="c1"># searching each magnet ID in the records</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="o">==</span> <span class="n">recordID</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> \
+            <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;U&#39;</span> <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Galaxy ID match found with previous tiles !&#39;</span><span class="p">)</span>
+                <span class="c1"># print(recordID)</span>
+                <span class="c1"># print(galaxyIDrecord[recordID])</span>
+
+                <span class="c1"># Galaxy ID match found in the records</span>
+                <span class="k">if</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># storing hexabundle letter in the &#39;case&#39; variable</span>
+                    <span class="n">case</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+
+                    <span class="c1"># Allocating the next largest hexabundle when a repeat of same hexabundle allocation occurred</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="n">case</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                        <span class="c1"># AAOmega hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># Spector hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">elif</span> <span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># All AAOmega hexabundles allocated, so shifting to Spector and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;J&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All AAOmega  hexabundles allocated, so shifting to Spector. Cluster/Batch :&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,tile &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tileNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL AAOMEGA HAS BEEN ALLOCATED SO HECTOR WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># All Spector hexabundles allocated, so shifting to AAOmega and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexHector</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All Spector hexabundles allocated, so shifting to AAOmega. Cluster/Batch :&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,tile &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">tileNum</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL SPECTOR HAS BEEN ALLOCATED SO AAOMEGA WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># Move back to smallest AAOmega hexabundle in case of A and B both being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">elif</span>  <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;B&#39;</span>
+                        <span class="c1"># Move back to first Spector hexabundle in case of last one being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Record the exceptional case of an unresolved repeat as a flag</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;EXCEPTIONAL CASE OF UNRESOLVED REPEAT !!! </span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="k">break</span>
+
+                    <span class="c1"># Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">case</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span> <span class="n">case</span><span class="p">)</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Galaxy ID match not found in the records</span>
+                <span class="k">elif</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># Galaxy without ID repeat being allocated the same hexabundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">#print(hexabundleIndexHector)</span>
+                    <span class="c1">#print(MagnetDict[i.__class__.__name__+&#39; &#39;+str(int(i.index))][&#39;hexabundle&#39;])</span>
+
+
+        <span class="c1"># To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;nan&#39;</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">):</span>
+                <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1">#     # Arrays to store the respective parameters for visualizing the hexabundle allocation criteria for convenience</span>
+    <span class="c1">#     if i.__class__.__name__ == &#39;rectangular_magnet&#39; and i.galaxyORstar == 1 and (12 &gt; i.Re &gt; 5) and len(answer) &lt; 7 and i.mu_1re &lt; 23:</span>
+    <span class="c1">#         answer = answer + [i.mu_1re]</span>
+    <span class="c1">#     elif i.__class__.__name__ == &#39;rectangular_magnet&#39; and i.galaxyORstar == 1 and i.Mstar &lt; 9.5 and len(answer2) &lt; 12:</span>
+    <span class="c1">#         answer2 = answer2 + [i.Mstar]</span>
+    <span class="c1">#     elif i.__class__.__name__ == &#39;rectangular_magnet&#39; and i.galaxyORstar == 1 and len(answer3) &lt; (21 - len(answer) - len(answer2)):</span>
+    <span class="c1">#         answer3 = answer3 + [i.mu_1re]</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # sorted index of the arrays as per the respective parameters</span>
+    <span class="c1">#     mu_1re_INDEX = np.argsort(np.argsort(answer))</span>
+    <span class="c1">#     Mstar_INDEX = np.argsort(np.argsort(answer2))</span>
+    <span class="c1">#     mu_1re_INDEX_remaining = np.argsort(np.argsort(answer3))</span>
+    <span class="c1">#</span>
+    <span class="c1"># #print(answer)</span>
+    <span class="c1"># print(mu_1re_INDEX)</span>
+    <span class="c1"># print(Mstar_INDEX)</span>
+    <span class="c1"># print(mu_1re_INDEX_remaining)</span>
+    <span class="c1">#print(string.ascii_uppercase[25])</span>
+    <span class="c1">#print(MagnetDict.keys())</span>
+
+
+    <span class="c1"># allocation of &#39;I&#39; and &#39;U&#39; hexabundles to the stars</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="n">star_hexabundle_allocation</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span><span class="p">)</span>
+
+    <span class="c1"># getting a count of the probe types- hexa and guides</span>
+    <span class="n">GuidesCount</span><span class="p">,</span> <span class="n">HexaCount</span> <span class="o">=</span> <span class="n">get_probe_count</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1">#print(hexabundleDict)</span>
+    <span class="c1">#print(GuidesCount)</span>
+    <span class="c1">#print(HexaCount)</span>
+
+    <span class="n">Mu_1re_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">])</span>
+
+
+    <span class="c1">## FIRST CRITERIA FOR HEXABUNDLE ALLOCATION: AAOmega</span>
+
+    <span class="n">Re_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Re&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># largest Re at first</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+
+        <span class="c1"># allocating AAOmega hexabundles to rectangular magnets of Re within range 5-12 and mu_1re less than 23</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">12</span> <span class="o">&gt;</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Re&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">&lt;</span> <span class="mi">7</span> <span class="ow">and</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">23</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1"># removing the allocated hexabundle from the hexabundle dictionary</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1">#print(hexabundleDict)</span>
+    <span class="c1">#print(hexabundleIndexAAOmega)</span>
+
+    <span class="c1">## SECOND CRITERIA FOR HEXABUNDLE ALLOCATION: Spector</span>
+    <span class="n">Mstar_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>
+
+        <span class="c1"># allocating Spector hexabundles to rectangular magnets of Mstar less than 9.5</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">9.5</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">hexabundleIndexHector</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1"># removing the allocated hexabundle from the hexabundle dictionary</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1">#print(hexabundleDict)</span>
+    <span class="c1">#print(hexabundleIndexHector)</span>
+
+    <span class="c1"># THIRD CRITERIA FOR HEXABUNDLE ALLOCATION FOR REMAINING AAOMEGA AND SPECTOR</span>
+    <span class="n">hexabundleIndexThirdCriteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">HexaCount</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">-</span> <span class="n">hexabundleIndexHector</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+
+        <span class="c1"># allocating hexabundles larger than 61-cores to rectangular magnets based on larger Re values</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">hexabundleIndexRemaining</span> <span class="o">&lt;</span> <span class="n">hexabundleIndexThirdCriteria</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;61&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="n">hexabundleIndexRemaining</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1"># removing the allocated hexabundle from the hexabundle dictionary</span>
+            <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span><span class="c1">#del hexabundleDict[MagnetDict[magnet[0]][&#39;hexabundle&#39;]]</span>
+
+
+    <span class="c1"># print(hexabundleDict)</span>
+    <span class="c1"># print(hexabundleIndexRemaining)</span>
+    <span class="c1"># print(hexabundleIndexThirdCriteria)</span>
+    <span class="c1"># print(&#39;\n&#39;)</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>
+
+        <span class="c1"># allocating rest of 61-core hexabundles with lower Mstar value going to Spector</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">hexabundleIndexRemaining</span> <span class="o">&lt;</span> <span class="n">hexabundleIndexThirdCriteria</span><span class="p">:</span>
+
+            <span class="c1">#print(sorted(hexabundleDict.items(), key = lambda p: p[0][0],reverse=True))</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="c1">#print(item[0])</span>
+                <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="n">hexabundleIndexRemaining</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="n">hexabundleIndexRemaining</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1"># removing the allocated hexabundle from the hexabundle dictionary</span>
+            <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># del hexabundleDict[MagnetDict[magnet[0]][&#39;hexabundle&#39;]]</span>
+
+    <span class="c1">#print(hexabundleDict)</span>
+
+    <span class="c1"># I AND D hexabundles of 91 cores being checked and resolved to make hexabundle &#39;I&#39; have lower Mstar value</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">cores91_hexabundles_sortedByMstar</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># checking for repeats of hexabundle</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">check_for_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+    <span class="c1"># resolving repeats of hexabundle</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span> <span class="n">indexx</span> <span class="o">=</span> <span class="n">resolve_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> \
+                                                                                <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># checking for hexabundles not allocated initially</span>
+    <span class="n">unallocatedOnes</span> <span class="o">=</span> <span class="n">check_for_unallocated_hexabundle</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">HexaCount</span><span class="p">)</span>
+    <span class="c1"># resolving hexabundles not allocated initially</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">resolve_unallocated_hexabundle</span><span class="p">(</span><span class="n">unallocatedOnes</span><span class="p">,</span><span class="n">result</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">,</span><span class="n">indexx</span><span class="p">)</span>
+
+    <span class="c1"># recording hexabundle as per galaxy records; IDs in current tile have been recorded above</span>
+    <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">update_galaxyIDrecord_withHexabundle</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary</span>
+    <span class="n">guideIndex</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span> <span class="o">=</span> <span class="n">hexabundle_allocation_fromMagnetDict</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span><span class="p">)</span>
+
+    <span class="c1"># copying hexabundle titles from rectangular magnets to circular magnets</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">magnet2</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet2</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">):</span>
+                    <span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">hexabundle</span>
+
+    <span class="k">return</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span></div>
+
+<div class="viewcode-block" id="overall_hexabundle_size_allocation_operation_version3_largerBundlePriority"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version3_largerBundlePriority">[docs]</a><span class="k">def</span> <span class="nf">overall_hexabundle_size_allocation_operation_version3_largerBundlePriority</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">mu_1re_cutoff</span><span class="p">,</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">flagsFile</span><span class="p">):</span>
+
+    <span class="n">hexabundleIndexAAOmega</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexHector</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexRemaining</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">answer2</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleRepeatwithsameID</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="s1">&#39;A127&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">:</span><span class="s1">&#39;A91&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;H&#39;</span><span class="p">:</span><span class="s1">&#39;A37&#39;</span><span class="p">,</span><span class="s1">&#39;I&#39;</span><span class="p">:</span><span class="s1">&#39;S91&#39;</span><span class="p">,</span><span class="s1">&#39;J&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;K&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;L&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;Q&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;T&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;U&#39;</span><span class="p">:</span><span class="s1">&#39;S37&#39;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">hexabundleLetter</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+        <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">])[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Creating magnet dictionary with all necessary parameters required for hexabundle allocation</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">create_Magnet_Dictionary</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+
+        <span class="c1">## Check for match of galaxies with same ID</span>
+        <span class="k">for</span> <span class="n">recordID</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">:</span>
+
+            <span class="c1"># searching each magnet ID in the records</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="o">==</span> <span class="n">recordID</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> \
+            <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;U&#39;</span> <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Galaxy ID match found with previous tiles !&#39;</span><span class="p">)</span>
+                <span class="c1"># print(recordID)</span>
+                <span class="c1"># print(galaxyIDrecord[recordID])</span>
+
+                <span class="c1"># Galaxy ID match found in the records</span>
+                <span class="k">if</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># storing hexabundle letter in the &#39;case&#39; variable</span>
+                    <span class="n">case</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+
+                    <span class="c1"># Allocating the next largest hexabundle when a repeat of same hexabundle allocation occurred</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="n">case</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                        <span class="c1"># AAOmega hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># Spector hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">elif</span> <span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># All AAOmega hexabundles allocated, so shifting to Spector and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;J&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All AAOmega  hexabundles allocated, so shifting to Spector. Cluster/Batch :&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL AAOMEGA HAS BEEN ALLOCATED SO HECTOR WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># All Spector hexabundles allocated, so shifting to AAOmega and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexHector</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All Spector hexabundles allocated, so shifting to AAOmega. Cluster/Batch :&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL SPECTOR HAS BEEN ALLOCATED SO AAOMEGA WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># Move back to smallest AAOmega hexabundle in case of A and B both being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">elif</span>  <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;B&#39;</span>
+                        <span class="c1"># Move back to first Spector hexabundle in case of last one being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Record the exceptional case of an unresolved repeat as a flag</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;EXCEPTIONAL CASE OF UNRESOLVED REPEAT !!! </span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="k">break</span>
+
+                    <span class="c1"># Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">case</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span> <span class="n">case</span><span class="p">)</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Galaxy ID match not found in the records</span>
+                <span class="k">elif</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># Galaxy without ID repeat being allocated the same hexabundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">#print(hexabundleIndexHector)</span>
+                    <span class="c1">#print(MagnetDict[i.__class__.__name__+&#39; &#39;+str(int(i.index))][&#39;hexabundle&#39;])</span>
+
+
+        <span class="c1"># To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">):</span>
+                <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># Getting an array count of mu_1re greater and less than 22</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">Re</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">answer</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">Re</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">Re</span> <span class="o">&gt;=</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">answer2</span> <span class="o">=</span> <span class="n">answer2</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">Re</span><span class="p">]</span>
+
+        <span class="n">Re_lt12_INDEX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">answer</span><span class="p">))</span>
+        <span class="n">Re_gt12_INDEX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">answer2</span><span class="p">))</span>
+
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Re below and above 12:  &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">Re_lt12_INDEX</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">Re_gt12_INDEX</span><span class="p">)</span>
+
+    <span class="c1"># allocation of &#39;I&#39; and &#39;U&#39; hexabundles to the stars</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="n">star_hexabundle_allocation</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span><span class="p">)</span>
+
+    <span class="c1"># getting a count of the probe types- hexa and guides</span>
+    <span class="n">GuidesCount</span><span class="p">,</span> <span class="n">HexaCount</span> <span class="o">=</span> <span class="n">get_probe_count</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># print(hexabundleDict)</span>
+    <span class="c1"># print(GuidesCount)</span>
+    <span class="c1"># print(HexaCount)</span>
+
+    <span class="n">Re_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Re&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># largest Re at first</span>
+    <span class="n">Mstar_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Getting a count of hexabundles larger than 61</span>
+    <span class="n">large_bundle_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">61</span><span class="p">:</span>
+            <span class="n">large_bundle_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1">#print(large_bundle_count)</span>
+    <span class="n">large_bundle_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Allocating all hexabundles greater than 61 based on Re&lt;12</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">)</span> <span class="ow">and</span> <span class="n">large_bundle_index</span> <span class="o">&lt;</span> <span class="n">large_bundle_count</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">61</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="c1">#print(&#39;Larger hexabundles&#39;)</span>
+                    <span class="n">large_bundle_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># In case any larger hexabundles more than 61-cores have not been allocated yet</span>
+    <span class="c1"># (which is highly unlikely and might happen due to repeats)</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">large_bundle_index</span> <span class="o">&lt;</span> <span class="n">large_bundle_count</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">61</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Larger hexabundles but with more than Re=12&#39;</span><span class="p">)</span>
+                    <span class="n">large_bundle_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                        <span class="n">writeToFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;RARE case of larger hexabundles greater than 61-cores left for allocation after Re&lt;12: Cluster/Batch </span><span class="si">{</span><span class="n">clusterNum</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span><span class="si">}</span><span class="s1">,  hexabundle: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">hexabundle</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># I AND D hexabundles of 91 cores being checked and resolved to make hexabundle &#39;I&#39; have lower Mstar value</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">cores91_hexabundles_sortedByMstar</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1">#print(&#39;\nLarger hexabundles more than 61 have been allocated.\n&#39;)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">mu_1re_cutoff</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mu_1re cutoff, X = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+    <span class="c1"># Allocating all 61 hexabundles based on mu_1Re &lt; X</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>  <span class="c1"># Spector</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">X</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hexabundleIndexHector</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span> <span class="ow">and</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mu_1re&lt;X: 61 hexabundles to Spector&#39;</span><span class="p">)</span>
+                    <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>  <span class="c1"># AAOmega</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">X</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span> <span class="ow">and</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mu_1re&lt;X: 61 hexabundles to AAOmega&#39;</span><span class="p">)</span>
+                    <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">61-core hexabundles based with mu_1Re&lt;X have been allocated </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Allocating rest of 61 hexabundles based on mu_1Re &gt; X</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>  <span class="c1"># Spector</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">X</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hexabundleIndexHector</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span> <span class="ow">and</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mu_1re&gt;X: 61 hexabundles to Spector&#39;</span><span class="p">)</span>
+                    <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>  <span class="c1"># AAOmega</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">X</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span> <span class="ow">and</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>  <span class="c1"># check for larger hexabundles</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mu_1re&gt;X: 61 hexabundles to AAOmega&#39;</span><span class="p">)</span>
+                    <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">All 61 hexabundles have been allocated as well.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="c1">#print(hexabundleDict)</span>
+
+    <span class="c1"># checking for repeats of hexabundle</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">check_for_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+    <span class="c1"># resolving repeats of hexabundle</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span> <span class="n">indexx</span> <span class="o">=</span> <span class="n">resolve_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> \
+                                                                                <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># checking for hexabundles not allocated initially</span>
+    <span class="n">unallocatedOnes</span> <span class="o">=</span> <span class="n">check_for_unallocated_hexabundle</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">HexaCount</span><span class="p">)</span>
+    <span class="c1"># resolving hexabundles not allocated initially</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">resolve_unallocated_hexabundle</span><span class="p">(</span><span class="n">unallocatedOnes</span><span class="p">,</span><span class="n">result</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">,</span><span class="n">indexx</span><span class="p">)</span>
+
+    <span class="c1"># recording hexabundle as per galaxy records; IDs in current tile have been recorded above</span>
+    <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">update_galaxyIDrecord_withHexabundle</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary</span>
+    <span class="n">guideIndex</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span> <span class="o">=</span> <span class="n">hexabundle_allocation_fromMagnetDict</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span><span class="p">)</span>
+
+    <span class="c1"># copying hexabundle titles from rectangular magnets to circular magnets</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">magnet2</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet2</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">):</span>
+                    <span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">hexabundle</span>
+
+    <span class="k">return</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span></div>
+
+<div class="viewcode-block" id="overall_hexabundle_size_allocation_operation_version2_median"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version2_median">[docs]</a><span class="k">def</span> <span class="nf">overall_hexabundle_size_allocation_operation_version2_median</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">tileNum</span><span class="p">,</span> <span class="n">flagsFile</span><span class="p">):</span>
+
+    <span class="n">hexabundleIndexAAOmega</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexHector</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hexabundleIndexRemaining</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">answer2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">answer3</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleRepeatwithsameID</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="s1">&#39;A169&#39;</span><span class="p">,</span><span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="s1">&#39;A127&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">:</span><span class="s1">&#39;A91&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;F&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">:</span><span class="s1">&#39;A61&#39;</span><span class="p">,</span><span class="s1">&#39;H&#39;</span><span class="p">:</span><span class="s1">&#39;A37&#39;</span><span class="p">,</span><span class="s1">&#39;I&#39;</span><span class="p">:</span><span class="s1">&#39;S91&#39;</span><span class="p">,</span><span class="s1">&#39;J&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;K&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;L&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;Q&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;T&#39;</span><span class="p">:</span><span class="s1">&#39;S61&#39;</span><span class="p">,</span><span class="s1">&#39;U&#39;</span><span class="p">:</span><span class="s1">&#39;S37&#39;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">hexabundleLetter</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+        <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundleLetter</span><span class="p">])[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Creating magnet dictionary with all necessary parameters required for hexabundle allocation</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">create_Magnet_Dictionary</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+
+        <span class="c1">## Check for match of galaxies with same ID</span>
+        <span class="k">for</span> <span class="n">recordID</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">:</span>
+
+            <span class="c1"># searching each magnet ID in the records</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="o">==</span> <span class="n">recordID</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> \
+            <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;U&#39;</span> <span class="ow">and</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Galaxy ID match found with previous tiles !&#39;</span><span class="p">)</span>
+                <span class="c1"># print(recordID)</span>
+                <span class="c1"># print(galaxyIDrecord[recordID])</span>
+
+                <span class="c1"># Galaxy ID match found in the records</span>
+                <span class="k">if</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># storing hexabundle letter in the &#39;case&#39; variable</span>
+                    <span class="n">case</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+
+                    <span class="c1"># Allocating the next largest hexabundle when a repeat of same hexabundle allocation occurred</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="n">case</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                        <span class="c1"># AAOmega hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># Spector hexabundle repeat- shifting to next largest same type of bundle</span>
+                        <span class="k">elif</span> <span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">case</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># All AAOmega hexabundles allocated, so shifting to Spector and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;J&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All AAOmega  hexabundles allocated, so shifting to Spector. Cluster/Batch :&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,tile &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tileNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL AAOMEGA HAS BEEN ALLOCATED SO HECTOR WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># All Spector hexabundles allocated, so shifting to AAOmega and recording as flag</span>
+                        <span class="k">elif</span> <span class="n">hexabundleIndexHector</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;ID CHECK. All Spector hexabundles allocated, so shifting to AAOmega. Cluster/Batch :&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,tile &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">tileNum</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;; &#39;</span> \
+                                              <span class="o">+</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;, galaxy ID:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recordID</span><span class="p">)</span> \
+                                              <span class="o">+</span> <span class="s1">&#39;, hexabundle: &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ALL SPECTOR HAS BEEN ALLOCATED SO AAOMEGA WILL BE SELECTED NOW&#39;</span><span class="p">)</span>
+                        <span class="c1"># Move back to smallest AAOmega hexabundle in case of A and B both being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">elif</span>  <span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">):</span>
+                                <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;B&#39;</span>
+                        <span class="c1"># Move back to first Spector hexabundle in case of last one being in records already</span>
+                        <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                            <span class="n">case</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Record the exceptional case of an unresolved repeat as a flag</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flagsFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                                <span class="n">writeToFile</span> <span class="o">=</span> <span class="s1">&#39;EXCEPTIONAL CASE OF UNRESOLVED REPEAT !!! </span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writeToFile</span><span class="p">)</span>
+                            <span class="k">break</span>
+
+                    <span class="c1"># Galaxy with ID repeat being allocated the same hexabundle or nearest size bundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">case</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span> <span class="n">case</span><span class="p">)</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">case</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Galaxy ID match not found in the records</span>
+                <span class="k">elif</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">:</span>
+
+                    <span class="c1"># Galaxy without ID repeat being allocated the same hexabundle and recorded</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span>
+                    <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">])</span>
+                    <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+
+                    <span class="c1"># Respective hexabundle being taken out of hexabundle dictionary as it&#39;s allocated already</span>
+                    <span class="n">hexabundleDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># Index being updated with hexabundle allocation</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;G&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;I&#39;</span> <span class="o">&lt;=</span> <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">#print(hexabundleIndexHector)</span>
+                    <span class="c1">#print(MagnetDict[i.__class__.__name__+&#39; &#39;+str(int(i.index))][&#39;hexabundle&#39;])</span>
+
+
+        <span class="c1"># To avoid multiple recording of galaxy ID, recording only the ones not available in galaxy ID records</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">):</span>
+                <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">IDs</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># Getting an array count of mu_1re greater and less than 22</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">mu_1re</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">answer</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">mu_1re</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">mu_1re</span> <span class="o">&gt;=</span> <span class="mi">22</span><span class="p">:</span>
+            <span class="n">answer2</span> <span class="o">=</span> <span class="n">answer2</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">mu_1re</span><span class="p">]</span>
+
+        <span class="n">mu_1re_lt22_INDEX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">answer</span><span class="p">))</span>
+        <span class="n">mu_1re_gt22_INDEX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">answer2</span><span class="p">))</span>
+
+    <span class="c1"># print(answer)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">mu_1re above and below 22:  &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mu_1re_gt22_INDEX</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mu_1re_lt22_INDEX</span><span class="p">)</span>
+
+    <span class="c1"># allocation of &#39;I&#39; and &#39;U&#39; hexabundles to the stars</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span> <span class="o">=</span> <span class="n">star_hexabundle_allocation</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleDict</span><span class="p">)</span>
+
+    <span class="c1"># getting a count of the probe types- hexa and guides</span>
+    <span class="n">GuidesCount</span><span class="p">,</span> <span class="n">HexaCount</span> <span class="o">=</span> <span class="n">get_probe_count</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1">#print(hexabundleDict)</span>
+    <span class="c1">#print(GuidesCount)</span>
+    <span class="c1">#print(HexaCount)</span>
+
+    <span class="n">Re_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Re&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># largest Re at first</span>
+    <span class="n">Mstar_Sort</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">MagnetDict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">])</span>
+
+    <span class="n">lowMstar_spector_number</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="mi">12</span> <span class="o">/</span> <span class="mi">19</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">mu_1re_lt22_INDEX</span><span class="p">))</span>
+    <span class="c1">#print(lowMstar_spector_number)</span>
+    <span class="n">Mstar_median_lowerhalf</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">Mstar_median_higherhalf</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">Mstar_Sort_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Mstar_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">Mstar_Sort_count</span> <span class="o">&lt;</span> <span class="n">lowMstar_spector_number</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">Mstar_median_lowerhalf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">Mstar_Sort_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">HexaCount</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">Mstar_Sort_count</span> <span class="o">&gt;=</span> <span class="n">lowMstar_spector_number</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">Mstar_median_higherhalf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">Mstar_Sort_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># print(Mstar_median_lowerhalf)</span>
+    <span class="c1"># print(Mstar_median_higherhalf)</span>
+    <span class="c1"># print(len(Mstar_median_lowerhalf))</span>
+    <span class="c1"># print(len(Mstar_median_higherhalf))</span>
+    <span class="c1"># print(&#39;\nMedian based sorting&#39;)</span>
+    <span class="c1"># print(lowMstar_spector_number)</span>
+
+    <span class="n">lowMstar_Sort_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">highMstar_Sort_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Lower mass galaxies with mu_1Re &lt; 22 go to Spector</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">magnet_2nd</span> <span class="ow">in</span> <span class="n">Mstar_median_lowerhalf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet_2nd</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">hexabundleIndexHector</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MATCH&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>  <span class="c1"># check for first Spector</span>
+                            <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                            <span class="c1">#print(magnet)</span>
+                            <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="n">lowMstar_Sort_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">break</span>
+                    <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Higher mass with mu_1Re &lt; 22 go to AAOmega</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">magnet_2nd</span> <span class="ow">in</span> <span class="n">Mstar_median_higherhalf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet_2nd</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">hexabundleIndexAAOmega</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MATCH2&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>  <span class="c1"># check for first AAOmega</span>
+                            <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                            <span class="c1">#print(magnet)</span>
+                            <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="n">highMstar_Sort_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">break</span>
+                    <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Remaining galaxies with mu_1re&lt;22 placed on remaining bundles based on largest â€œRe&quot; placed on the largest bundles</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">22</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">61</span><span class="p">:</span>  <span class="c1"># check for greater hexabundle</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c1"># highMstar_Sort_count += 1</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="c1">#print(magnet)</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c1"># highMstar_Sort_count += 1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># print(hexabundleIndexAAOmega)</span>
+    <span class="c1"># print(hexabundleIndexHector)</span>
+
+    <span class="c1"># print(lowMstar_Sort_count)</span>
+    <span class="c1"># print(highMstar_Sort_count)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Galaxies with less than Mu_1re=22 allocated</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Remaining galaxies with mu_1re&gt;22 placed on remaining bundles based on largest â€œRe&quot; placed on the largest bundles</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">Re_Sort</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">magnet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mu_1re&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">22</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">61</span><span class="p">:</span>  <span class="c1"># check for greater hexabundle</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c1"># highMstar_Sort_count += 1</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">61</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">magnet</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexAAOmega</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                        <span class="n">hexabundleIndexHector</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c1"># highMstar_Sort_count += 1</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Galaxies with more than Mu_1re=22 allocated</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># print(hexabundleDict)</span>
+
+    <span class="c1"># I AND D hexabundles of 91 cores being checked and resolved to make hexabundle &#39;I&#39; have lower Mstar value</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">cores91_hexabundles_sortedByMstar</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># checking for repeats of hexabundle</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">check_for_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">)</span>
+    <span class="c1"># resolving repeats of hexabundle</span>
+    <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span> <span class="n">indexx</span> <span class="o">=</span> <span class="n">resolve_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> \
+                                                                                <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># checking for hexabundles not allocated initially</span>
+    <span class="n">unallocatedOnes</span> <span class="o">=</span> <span class="n">check_for_unallocated_hexabundle</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">HexaCount</span><span class="p">)</span>
+    <span class="c1"># resolving hexabundles not allocated initially</span>
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">resolve_unallocated_hexabundle</span><span class="p">(</span><span class="n">unallocatedOnes</span><span class="p">,</span><span class="n">result</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">,</span><span class="n">indexx</span><span class="p">)</span>
+
+
+    <span class="c1"># recording hexabundle as per galaxy records; IDs in current tile have been recorded above</span>
+    <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">update_galaxyIDrecord_withHexabundle</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">)</span>
+
+    <span class="c1"># assigning allocated hexabundles to respective magnet as stored in Magnet Dictionary</span>
+    <span class="n">guideIndex</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span> <span class="o">=</span> <span class="n">hexabundle_allocation_fromMagnetDict</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span><span class="p">)</span>
+
+    <span class="c1"># copying hexabundle titles from rectangular magnets to circular magnets</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">magnet2</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet2</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">):</span>
+                    <span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="n">magnet2</span><span class="o">.</span><span class="n">hexabundle</span>
+
+    <span class="k">return</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span></div>
+
+
+<div class="viewcode-block" id="create_Magnet_Dictionary"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.create_Magnet_Dictionary">[docs]</a><span class="k">def</span> <span class="nf">create_Magnet_Dictionary</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">):</span>
+
+    <span class="n">MagnetDict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># storing all respective parameters to create a magnet dictionary</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+        <span class="n">MagnetDict</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">))]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                    <span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">galaxyORstar</span><span class="p">,</span>
+                    <span class="s1">&#39;Re&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">Re</span><span class="p">,</span>
+                    <span class="s1">&#39;mu_1re&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">mu_1re</span><span class="p">,</span>
+                    <span class="s1">&#39;Mstar&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">Mstar</span><span class="p">,</span>
+                    <span class="s1">&#39;hexabundle&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;IDs&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">IDs</span>
+                <span class="p">}</span>
+    <span class="k">return</span> <span class="n">MagnetDict</span></div>
+
+<div class="viewcode-block" id="get_probe_count"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.get_probe_count">[docs]</a><span class="k">def</span> <span class="nf">get_probe_count</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">):</span>
+
+    <span class="n">GuidesCount</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">HexaCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># getting count of probe type- hexa or guide- based on galaxyorStar parameter</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">MagnetDict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">HexaCount</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">GuidesCount</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">GuidesCount</span><span class="p">,</span> <span class="n">HexaCount</span></div>
+
+<div class="viewcode-block" id="star_hexabundle_allocation"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.star_hexabundle_allocation">[docs]</a><span class="k">def</span> <span class="nf">star_hexabundle_allocation</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span><span class="n">hexabundleDict</span><span class="p">):</span>
+
+    <span class="c1"># identifying stars and allocating the 37-core bundles H and U</span>
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">MagnetDict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">magnet</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">hexabundleDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">hexabundle</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;37&#39;</span><span class="p">:</span>
+                    <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hexabundle</span>
+                    <span class="k">break</span>
+            <span class="k">del</span> <span class="n">hexabundleDict</span><span class="p">[</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">MagnetDict</span><span class="p">,</span><span class="n">hexabundleDict</span></div>
+
+<span class="c1">## I AND D hexabundles of 91 cores being checked and resolved to make hexabundle I have lower Mstar value</span>
+<div class="viewcode-block" id="cores91_hexabundles_sortedByMstar"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.cores91_hexabundles_sortedByMstar">[docs]</a><span class="k">def</span> <span class="nf">cores91_hexabundles_sortedByMstar</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">):</span>
+
+    <span class="n">countD</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">countI</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">I_mstar_91Core</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">D_mstar_91Core</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">MagnetDict</span><span class="p">:</span>
+        <span class="c1"># print(str(MagnetDict[magnet][&#39;index&#39;])+&#39; &#39;+str(MagnetDict[magnet][&#39;hexabundle&#39;]))</span>
+
+        <span class="c1"># storing Mstar values and magnet labels of I and D hexabundles of 91 cores</span>
+        <span class="k">if</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
+            <span class="n">I_mstar_91Core</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">]</span>
+            <span class="n">magnet_I</span> <span class="o">=</span> <span class="n">magnet</span>
+            <span class="n">countI</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span>
+            <span class="n">D_mstar_91core</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;Mstar&#39;</span><span class="p">]</span>
+            <span class="n">magnet_D</span> <span class="o">=</span> <span class="n">magnet</span>
+            <span class="n">countD</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="c1"># Ensuring I and D hexabundles of 91 cores have been allocated based on Mstar value, with lower one going to I</span>
+    <span class="k">if</span> <span class="n">countI</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">countD</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">I_mstar_91Core</span> <span class="o">&gt;</span> <span class="n">D_mstar_91Core</span><span class="p">:</span>
+        <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet_I</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;D&#39;</span>
+        <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet_D</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I AND D SWAPPED&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MagnetDict</span></div>
+
+<div class="viewcode-block" id="resolve_hexabundle_allocation_repeats"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.resolve_hexabundle_allocation_repeats">[docs]</a><span class="k">def</span> <span class="nf">resolve_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">):</span>
+
+    <span class="n">indexx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Allocation WRONG WRONG WRONG WRONG WRONG!&#39;</span><span class="p">)</span>
+        <span class="n">hexabundleRepeatwithsameID</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">)</span>
+        <span class="n">hexabundleRepeatwithsameID</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexabundleRepeatwithsameID</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1">#print(hexabundleRepeatwithsameID)</span>
+        <span class="n">sourcelist</span> <span class="o">=</span> <span class="s1">&#39;ABCDEFGIJKLMNOPQRST&#39;</span>
+        <span class="k">for</span> <span class="n">repeatOnes</span> <span class="ow">in</span> <span class="n">sourcelist</span><span class="p">:</span>
+            <span class="n">checkForRepeat</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">MagnetDict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">repeatOnes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">checkForRepeat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">indexx</span><span class="p">]</span>
+                        <span class="n">indexx</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="c1">#rint(&#39;HERE&#39;)</span>
+                        <span class="c1">#print(MagnetDict[magnet][&#39;hexabundle&#39;])</span>
+                    <span class="n">checkForRepeat</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># print(MagnetDict[magnet][&#39;hexabundle&#39;])</span>
+        <span class="k">if</span> <span class="n">checkForRepeat</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">indexx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;WRONG ALLOCATION FOUND!&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No repeats in allocation.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MagnetDict</span><span class="p">,</span> <span class="n">hexabundleRepeatwithsameID</span><span class="p">,</span><span class="n">indexx</span></div>
+
+<div class="viewcode-block" id="resolve_unallocated_hexabundle"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.resolve_unallocated_hexabundle">[docs]</a><span class="k">def</span> <span class="nf">resolve_unallocated_hexabundle</span><span class="p">(</span><span class="n">unallocatedOnes</span><span class="p">,</span><span class="n">result</span><span class="p">,</span><span class="n">MagnetDict</span><span class="p">,</span><span class="n">indexx</span><span class="p">):</span>
+    
+    
+    <span class="k">if</span> <span class="n">unallocatedOnes</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NOT ALL ARE ALLOCATED&#39;</span><span class="p">)</span>
+        <span class="n">MagnetDict</span><span class="p">[</span><span class="n">unallocatedOnes</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">indexx</span><span class="p">]</span>
+        <span class="n">indexx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">[</span><span class="n">unallocatedOnes</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;has been allocated as it was found unallocated.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All Hexabundles are  ALLOCATED!&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MagnetDict</span></div>
+
+
+<div class="viewcode-block" id="check_for_hexabundle_allocation_repeats"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.check_for_hexabundle_allocation_repeats">[docs]</a><span class="k">def</span> <span class="nf">check_for_hexabundle_allocation_repeats</span><span class="p">(</span><span class="n">nested_dictionary</span><span class="p">):</span>
+    <span class="n">setOfElems</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">repeatLetter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">setOfElems</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">nested_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key1</span> <span class="o">==</span> <span class="s1">&#39;hexabundle&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">setOfElems</span><span class="p">:</span>
+                        <span class="n">repeatLetter</span> <span class="o">=</span> <span class="n">value1</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">repeatLetter</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">value1</span> <span class="o">!=</span> <span class="s1">&#39;NA&#39;</span><span class="p">:</span>
+                        <span class="n">setOfElems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value1</span><span class="p">)</span>
+
+    <span class="n">sourcelist</span> <span class="o">=</span> <span class="s1">&#39;ABCDEFGIJKLMNOPQRST&#39;</span>
+    <span class="n">missingLetter</span> <span class="o">=</span> <span class="p">[</span><span class="n">letter</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">sourcelist</span> <span class="k">if</span> <span class="n">letter</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">setOfElems</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">missingLetter</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">repeatLetter</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">missingLetter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">missingLetter</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="check_for_unallocated_hexabundle"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.check_for_unallocated_hexabundle">[docs]</a><span class="k">def</span> <span class="nf">check_for_unallocated_hexabundle</span><span class="p">(</span><span class="n">nested_dictionary</span><span class="p">,</span> <span class="n">HexaCount</span><span class="p">):</span>
+    <span class="n">setOfElems</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">setOfElems</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">nested_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">key1</span> <span class="o">==</span> <span class="s1">&#39;hexabundle&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">value1</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;rectangular_magnet&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="n">nested_dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">nested_dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;galaxyOrStar&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="c1">#(0 &lt; nested_dictionary[key][&#39;index&#39;] &lt;= HexaCount):</span>
+                        <span class="k">return</span> <span class="n">key</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="update_galaxyIDrecord_withHexabundle"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.update_galaxyIDrecord_withHexabundle">[docs]</a><span class="k">def</span> <span class="nf">update_galaxyIDrecord_withHexabundle</span><span class="p">(</span><span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">recordID</span> <span class="ow">in</span> <span class="n">galaxyIDrecord</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">MagnetDict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">recordID</span> <span class="o">==</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;IDs&#39;</span><span class="p">]:</span>
+                <span class="n">galaxyIDrecord</span><span class="p">[</span><span class="n">recordID</span><span class="p">]</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="p">][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span></div>
+
+<div class="viewcode-block" id="hexabundle_allocation_fromMagnetDict"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.hexabundle.hexabundle_allocation_fromMagnetDict">[docs]</a><span class="k">def</span> <span class="nf">hexabundle_allocation_fromMagnetDict</span><span class="p">(</span><span class="n">MagnetDict</span><span class="p">,</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span><span class="p">):</span>
+    <span class="c1"># copying allocated hexabundle from Magnet Dictionary</span>
+    <span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="n">MagnetDict</span><span class="p">[</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))][</span><span class="s1">&#39;hexabundle&#39;</span><span class="p">]</span>
+
+    <span class="c1"># allocating hexabundle to guide probes in order GS1,2..</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">==</span> <span class="s1">&#39;NA&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">):</span>
+        <span class="n">magnet</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="s1">&#39;GS&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">guideIndex</span><span class="p">)</span>
+        <span class="n">guideIndex</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">guideIndex</span></div>
+
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

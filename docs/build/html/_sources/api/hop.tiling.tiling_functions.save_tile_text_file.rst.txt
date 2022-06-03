@@ -1,0 +1,6 @@
+save_tile_text_file
+===================
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: save_tile_text_file

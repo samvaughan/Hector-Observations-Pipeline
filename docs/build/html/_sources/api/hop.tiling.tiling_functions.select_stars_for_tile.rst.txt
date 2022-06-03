@@ -1,0 +1,6 @@
+select_stars_for_tile
+=====================
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: select_stars_for_tile

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.hector.magnets.circular &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.hector.magnets.circular</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">...general_operations.geometry_shapes.circle</span> <span class="kn">import</span> <span class="n">circle</span>
+<span class="kn">from</span> <span class="nn">...hector.constants</span> <span class="kn">import</span> <span class="n">circular_magnet_radius</span><span class="p">,</span><span class="n">robot_arm_width</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">pi</span>
+<span class="kn">from</span> <span class="nn">...hector.magnets.pickup_areas</span> <span class="kn">import</span> <span class="n">tangential_right</span><span class="p">,</span><span class="n">tangential_left</span><span class="p">,</span><span class="n">radial_inward</span><span class="p">,</span><span class="n">radial_outward</span>
+
+<div class="viewcode-block" id="circular_magnet"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet">[docs]</a><span class="k">class</span> <span class="nc">circular_magnet</span><span class="p">(</span><span class="n">circle</span><span class="p">):</span>
+
+    <span class="c1"># initializing a circular magnet with all respective parameters</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">center</span><span class="p">,</span><span class="n">orientation</span><span class="p">,</span><span class="n">index</span><span class="p">,</span><span class="n">galaxyORstar</span><span class="p">,</span><span class="n">Re</span><span class="p">,</span><span class="n">mu_1re</span><span class="p">,</span><span class="n">Mstar</span><span class="p">,</span><span class="n">magnet_label</span><span class="p">,</span><span class="n">hexabundle</span><span class="p">,</span><span class="n">rads</span><span class="p">,</span><span class="n">rotation_pickup</span><span class="p">,</span><span class="n">rotation_putdown</span><span class="p">,</span><span class="n">azAngs</span><span class="p">,</span><span class="n">rectangular_magnet_input_orientation</span><span class="p">,</span><span class="n">IDs</span><span class="p">):</span>
+
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">circular_magnet_radius</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span><span class="n">radius</span><span class="p">,</span><span class="n">orientation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">placement_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">galaxyORstar</span> <span class="o">=</span> <span class="n">galaxyORstar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Re</span> <span class="o">=</span> <span class="n">Re</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_1re</span> <span class="o">=</span> <span class="n">mu_1re</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mstar</span> <span class="o">=</span> <span class="n">Mstar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="n">magnet_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hexabundle</span> <span class="o">=</span> <span class="n">hexabundle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rads</span> <span class="o">=</span> <span class="n">rads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="n">rotation_pickup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="n">rotation_putdown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">azAngs</span> <span class="o">=</span> <span class="n">azAngs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rectangular_magnet_input_orientation</span> <span class="o">=</span> <span class="n">rectangular_magnet_input_orientation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IDs</span> <span class="o">=</span> <span class="n">IDs</span>
+
+    <span class="c1"># calculating the distance between magnet center to pickup area center</span>
+<div class="viewcode-block" id="circular_magnet.calculate_center_magnet_to_center_pickup_area_length"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.calculate_center_magnet_to_center_pickup_area_length">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">center_magnet_to_center_pickup_area_length</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">robot_arm_width</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">center_magnet_to_center_pickup_area_length</span></div>
+
+    <span class="c1"># calculating the center coordinate of pickup area- Tangential Right</span>
+<div class="viewcode-block" id="circular_magnet.calculate_center_coordinate_tangential_right_pickuparea"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.calculate_center_coordinate_tangential_right_pickuparea">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_coordinate_tangential_right_pickuparea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">center_coordinates</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">sin</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)),</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">cos</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="n">center_coordinates</span></div>
+
+    <span class="c1"># calculating the center coordinate of pickup area- Tangential Left</span>
+<div class="viewcode-block" id="circular_magnet.calculate_center_coordinate_tangential_left_pickuparea"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.calculate_center_coordinate_tangential_left_pickuparea">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_coordinate_tangential_left_pickuparea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">center_coordinates</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">sin</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)),</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">cos</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="n">center_coordinates</span></div>
+
+    <span class="c1"># calculating the center coordinate of pickup area- Radial Inward</span>
+<div class="viewcode-block" id="circular_magnet.calculate_center_coordinates_radial_inward_pickuparea"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.calculate_center_coordinates_radial_inward_pickuparea">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_coordinates_radial_inward_pickuparea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">center_coordinates</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">sin</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)),</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">cos</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="n">center_coordinates</span></div>
+
+    <span class="c1"># calculating the center coordinate of pickup area- Radial Outward</span>
+<div class="viewcode-block" id="circular_magnet.calculate_center_coordinates_radial_outwards_pickuparea"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.calculate_center_coordinates_radial_outwards_pickuparea">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_coordinates_radial_outwards_pickuparea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">center_coordinates</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">sin</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)),</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_magnet_to_center_pickup_area_length</span><span class="p">()</span> <span class="o">*</span> <span class="n">cos</span><span class="p">((</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="n">center_coordinates</span></div>
+
+    <span class="c1"># calculating pickup areas using their respective center coordinates</span>
+<div class="viewcode-block" id="circular_magnet.create_pickup_areas"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.circular_magnet.create_pickup_areas">[docs]</a>    <span class="k">def</span> <span class="nf">create_pickup_areas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pickup_areas</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="n">tangential_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_coordinate_tangential_right_pickuparea</span><span class="p">(),</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">),</span>
+             <span class="n">tangential_left</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_coordinate_tangential_left_pickuparea</span><span class="p">(),</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">),</span>
+             <span class="n">radial_inward</span><span class="p">(</span>   <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_coordinates_radial_inward_pickuparea</span><span class="p">(),</span>   <span class="mi">270</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">),</span> <span class="c1"># (270 -) added for adjustment of the 10mm RAW</span>
+             <span class="n">radial_outward</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_coordinates_radial_outwards_pickuparea</span><span class="p">(),</span> <span class="mi">270</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)]</span> <span class="c1"># (270 -) added for adjustment of the 10mm RAW</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickup_areas</span></div></div>
+
+<span class="c1"># check for the magnet being circular type</span>
+<div class="viewcode-block" id="is_circular_magnet"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.hector.magnets.html#hop.hexabundle_allocation.hector.magnets.circular.is_circular_magnet">[docs]</a><span class="k">def</span> <span class="nf">is_circular_magnet</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">circular_magnet</span><span class="p">)</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

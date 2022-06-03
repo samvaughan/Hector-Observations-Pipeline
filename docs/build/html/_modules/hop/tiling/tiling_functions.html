@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.tiling.tiling_functions &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.tiling.tiling_functions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.spatial.distance</span> <span class="k">as</span> <span class="nn">dist</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">..hexabundle_allocation.hector</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">hector_constants</span>
+
+<span class="c1"># Set up the logging</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_best_tile_centre_greedy"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.get_best_tile_centre_greedy">[docs]</a><span class="k">def</span> <span class="nf">get_best_tile_centre_greedy</span><span class="p">(</span><span class="n">targets_df</span><span class="p">,</span> <span class="n">outer_FOV_radius</span><span class="p">,</span> <span class="n">inner_FoV_radius</span><span class="p">,</span> <span class="n">priorities</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a set of x, y coordinates, find the position which would cover the most targets if we placed a field of view there.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don&#39;t make this too large...</span>
+<span class="sd">        Priorities (list): A priority value for each galaxy. If none is given, assume equal priorties for all targets</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RA</span> <span class="o">=</span> <span class="n">targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;RA&#39;</span><span class="p">]</span>
+    <span class="n">Dec</span> <span class="o">=</span> <span class="n">targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Make the grid</span>
+    <span class="n">grid_coords</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">RA</span><span class="p">,</span> <span class="n">Dec</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="p">)</span>
+
+    <span class="c1"># These are True/False masks for each galaxy if a tile was placed at each grid coord. They&#39;re shapes (n_grid_coords x number of galaxies left to tile)</span>
+    <span class="n">galaxies_in_FoV</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">targets_df</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">):</span>
+        <span class="n">galaxies_in_FoV</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">targets_df</span><span class="p">,</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">inner_FoV_radius</span><span class="p">,</span> <span class="n">outer_FOV_radius</span><span class="p">)</span>
+
+    <span class="c1">#galaxies_in_outer_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=outer_FOV_radius * 3600.0)</span>
+    <span class="c1">#galaxies_in_inner_FoV = _calc_clashes(grid_coords, np.column_stack((RA, Dec)), proximity=inner_FoV_radius * 3600.0)</span>
+
+    <span class="n">n_targets_in_FOV</span> <span class="o">=</span> <span class="p">(</span><span class="n">galaxies_in_FoV</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">priorities</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="c1"># - (galaxies_in_inner_FoV * np.array(priorities)[None, :]).sum(axis=1)</span>
+
+    <span class="c1"># Find the positions where the number of targets in the FoV is at its max</span>
+    <span class="n">possible_tile_centres</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">n_targets_in_FOV</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">n_targets_in_FOV</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">targets_in_best_tiles_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">galaxies_in_FoV</span><span class="p">)[</span><span class="n">possible_tile_centres</span><span class="p">]</span>
+
+    <span class="c1"># If we have more than one possible centre, choose a random centre</span>
+    <span class="c1"># However, weight this choice by how far each target in the FoV is from the centre of the tile</span>
+    <span class="c1"># This is to avoid tiles where every target is right at one edge</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_tile_centres</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">_decide_upon_best_tile_centre</span><span class="p">(</span><span class="n">n_targets_in_FOV</span><span class="p">,</span> <span class="n">possible_tile_centres</span><span class="p">,</span> <span class="n">grid_coords</span><span class="p">,</span> <span class="n">targets_in_best_tiles_mask</span><span class="p">,</span> <span class="n">RA</span><span class="p">,</span> <span class="n">Dec</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">n_targets_in_FOV</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_decide_upon_best_tile_centre</span><span class="p">(</span><span class="n">n_targets_in_FOV</span><span class="p">,</span> <span class="n">possible_tile_centres</span><span class="p">,</span> <span class="n">grid_coords</span><span class="p">,</span> <span class="n">targets_in_best_tiles_mask</span><span class="p">,</span> <span class="n">RA</span><span class="p">,</span> <span class="n">Dec</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If we have a few choices for which tile to pick, prefer to select the one which places targets near the centre. This is to avoid some of the funny tiles I&#39;ve seen where every galaxy is right at one edge.</span>
+<span class="sd">    To do this, I&#39;m making a random choice from all possible tile centres but weighting that choice by the sum of all the squared distances from the tile centre. Not sure that this is the best idea (could use a convex hull area, including the tile centre point, maybe? Not sure) but it&#39;s better than just making a totally random selection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This is a mask showing which galaxies would be selected in each of the &quot;best&quot; tiles</span>
+    <span class="c1"># It&#39;s shaped as (number_of_possible_tile_centres x number_of_galaxies_left)</span>
+    
+    <span class="n">distances_from_centre</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">possible_tile_centres</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">centre</span><span class="p">,</span> <span class="n">targets_mask</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">possible_tile_centres</span><span class="p">,</span> <span class="n">targets_in_best_tiles_mask</span><span class="p">)):</span>
+        <span class="n">distances_from_centre</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">RA</span><span class="p">[</span><span class="n">targets_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">centre</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">Dec</span><span class="p">[</span><span class="n">targets_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">centre</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Catch any values which are exactly 0 and give them a small buffer value</span>
+    <span class="n">distances_from_centre</span><span class="p">[</span><span class="n">distances_from_centre</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">distances_from_centre</span><span class="p">)</span>
+    <span class="n">norm_weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">n_targets_in_FOV</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">n_targets_in_FOV</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">norm_weights</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">index</span>
+
+
+<div class="viewcode-block" id="get_best_tile_centre_dengreedy"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.get_best_tile_centre_dengreedy">[docs]</a><span class="k">def</span> <span class="nf">get_best_tile_centre_dengreedy</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">targets_df</span><span class="p">,</span> <span class="n">outer_FOV_radius</span><span class="p">,</span> <span class="n">inner_FoV_radius</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a set of x, y coordinates, find the position to place the tile according to Aaron&#39;s Dengreedy algorithm</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        master_df (dataframe): A dataframe of *all* target galaxies, irrespective of whether they&#39;ve been tiled alread. Must have columns &#39;RA&#39;, &#39;DEC&#39;</span>
+<span class="sd">        targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns &#39;RA&#39;, &#39;DEC&#39;</span>
+<span class="sd">        n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don&#39;t make this too large...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RA_all</span> <span class="o">=</span> <span class="n">master_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;RA&#39;</span><span class="p">]</span>
+    <span class="n">Dec_all</span> <span class="o">=</span> <span class="n">master_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">]</span>
+
+    <span class="n">RA_untiled</span> <span class="o">=</span> <span class="n">targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;RA&#39;</span><span class="p">]</span>
+    <span class="n">Dec_untiled</span> <span class="o">=</span> <span class="n">targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">]</span>
+
+    <span class="n">grid_coords</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">RA_all</span><span class="p">,</span> <span class="n">Dec_all</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="p">)</span>
+
+    <span class="c1"># See which tile centres have the largest number of clashes __outside the central 0.1*Radius of the field__. Julia says that the optics are poor here.</span>
+
+    <span class="n">galaxies_in_FoV_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">RA_all</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">):</span>
+        <span class="n">galaxies_in_FoV_all</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">inner_FoV_radius</span><span class="p">,</span> <span class="n">outer_FOV_radius</span><span class="p">)</span>
+    
+    <span class="n">galaxies_in_FoV_untiled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">RA_untiled</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid_coords</span><span class="p">):</span>
+        <span class="n">galaxies_in_FoV_untiled</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">targets_df</span><span class="p">,</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">inner_FoV_radius</span><span class="p">,</span> <span class="n">outer_FOV_radius</span><span class="p">)</span>
+
+
+    <span class="n">n_targets_in_FOV_all</span> <span class="o">=</span> <span class="n">galaxies_in_FoV_all</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_targets_in_FOV_untiled</span> <span class="o">=</span> <span class="n">galaxies_in_FoV_untiled</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">ratio_of_targets</span> <span class="o">=</span> <span class="n">n_targets_in_FOV_untiled</span> <span class="o">/</span> <span class="n">n_targets_in_FOV_all</span>
+    <span class="n">ratio_of_targets</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ratio_of_targets</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># If there are many places we can put a tile, randomise the location</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ratio_of_targets</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ratio_of_targets</span><span class="p">)):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ratio_of_targets</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ratio_of_targets</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">ratio_of_targets</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_coords</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_grid</span><span class="p">(</span><span class="n">RA</span><span class="p">,</span> <span class="n">Dec</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make a grid of points which encloses a set of given RAs and Decs</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        RA (array): A list of RA values of targets</span>
+<span class="sd">        Dec (array): A list of Dec values of targets</span>
+<span class="sd">        n_xx_yy (int): Number of grid points along **one** axis. Final grid has n_xx_yy^2 points!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">RA</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">RA</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="p">)</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">Dec</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">Dec</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="p">)</span>
+
+    <span class="c1"># This is a bit sad. array(list(generator)).</span>
+    <span class="n">grid_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">grid_coords</span>
+
+
+<div class="viewcode-block" id="find_nearest"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.find_nearest">[docs]</a><span class="k">def</span> <span class="nf">find_nearest</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">grid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the nearest grid point to each target (at coordinates (x, y))</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (array_like): A list of target x coordinates</span>
+<span class="sd">        y (array_like): A list of target y coordinates</span>
+<span class="sd">        grid (2D array): A two dimensional array of grid coordinates to test against. Columns are x (grid[:, 0]) and y (grid[:, 1])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x and y must be the same length: Currently </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;grid must have two dimensions&quot;</span><span class="p">)</span>
+
+    <span class="n">nearest_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)):</span>
+        <span class="n">nearest_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">grid</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">grid</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nearest_points</span></div>
+
+
+<div class="viewcode-block" id="check_if_in_fov"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.check_if_in_fov">[docs]</a><span class="k">def</span> <span class="nf">check_if_in_fov</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xcen</span><span class="p">,</span> <span class="n">ycen</span><span class="p">,</span> <span class="n">inner_radius</span><span class="p">,</span> <span class="n">outer_radius</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a binary mask if points are within a circular field of view of radius R</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (dataframe): A dataframe of targets. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        xcen (float): x (or RA) coordinate of centre</span>
+<span class="sd">        ycen (float): y (or DEC) coordinate of centre</span>
+<span class="sd">        radius (float): radius of circle in degrees</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">RA</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DEC</span>
+
+    <span class="n">cos_dec_correction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ycen</span><span class="p">)))</span>
+
+    <span class="c1">## MULTIPLY by the cos(dec) correction here!</span>
+    <span class="k">if</span> <span class="n">inner_radius</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xcen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_dec_correction</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ycen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="n">outer_radius</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xcen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_dec_correction</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ycen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="n">outer_radius</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xcen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_dec_correction</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ycen</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="n">inner_radius</span><span class="p">))</span><span class="o">.</span><span class="n">values</span></div>
+
+
+<div class="viewcode-block" id="find_clashes"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.find_clashes">[docs]</a><span class="k">def</span> <span class="nf">find_clashes</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">proximity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given some proximity, find objects in two dataframes which will clash</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df1 (dataframe): Dataframe of targets. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        df2 (dataframe): Dataframe of targets. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">proximity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Proximity must be positive&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Make sure that both the input coordinate lists are 2D</span>
+    <span class="n">XA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">df1</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">XB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="n">clashes</span> <span class="o">=</span> <span class="n">_calc_clashes</span><span class="p">(</span><span class="n">XA</span><span class="p">,</span> <span class="n">XB</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">clashes</span></div>
+
+<div class="viewcode-block" id="find_great_circle_distance"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.find_great_circle_distance">[docs]</a><span class="k">def</span> <span class="nf">find_great_circle_distance</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The great circle distance between vectors uu=[RA, Dec] and vv=[RA, Dec]</span>
+<span class="sd">    Note that RA and Dec *must* be in degrees. We then convert them to radians, calcualte the distance and return that distance in degrees. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+    <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">uu</span> <span class="o">==</span> <span class="n">vv</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">uu</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">vv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">uu</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">vv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">uu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">vv</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_calc_clashes</span><span class="p">(</span><span class="n">XA</span><span class="p">,</span> <span class="n">XB</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given two lists of coordinates, return a boolean mask highlighting only those which clash within some minimum proximity. Note that we ignore self clashes by ignoring clashes with a distance = 0.0</span>
+<span class="sd">    Note that we use the great-circle distance between two points to find their separation, not just a simple Euclidean </span>
+<span class="sd">    distance. This is to make sure that things still work at low declination. </span>
+
+<span class="sd">    tol is the minimum distance two objects can be apart before we say that they are clashing. I&#39;ve added this in because sometimes the find_great_circle_distance function gives a distance of ~1e-6 or ~1e-7 for a galaxy from itself. I assume that this is just a numerical stability issue. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">cdist</span><span class="p">(</span><span class="n">XA</span><span class="p">,</span> <span class="n">XB</span><span class="p">,</span> <span class="n">find_great_circle_distance</span><span class="p">)</span>
+    <span class="n">clashes</span> <span class="o">=</span> <span class="p">(</span><span class="n">distance_matrix</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">distance_matrix</span> <span class="o">&lt;</span> <span class="n">proximity</span> <span class="o">/</span> <span class="mf">3600.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">clashes</span>
+
+
+<div class="viewcode-block" id="noclash"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.noclash">[docs]</a><span class="k">def</span> <span class="nf">noclash</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">proximity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take two dataframes, find those which are within some proximity of each other and then return the first dataframe as is, the SECOND dataframe without the clashing elements, and the number of elements which clash. Useful for selecting guide stars which don&#39;t clash with targets in a tile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df1 (dataframe): Dataframe of targets. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        df2 (dataframe): Dataframe of targets. Must have columns &#39;RA&#39; and &#39;DEC&#39;</span>
+<span class="sd">        proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">clashes</span> <span class="o">=</span> <span class="n">find_clashes</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+    <span class="n">ncollide</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">clashes</span><span class="p">)</span>
+
+    <span class="c1"># If a target has a clash with another, there&#39;ll be a true in its clashes row. Check for this and only pick things with no clash</span>
+    <span class="n">good_indices_1</span> <span class="o">=</span> <span class="n">clashes</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">ncollide</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">ncollide</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">good_indices_1</span><span class="p">],</span> <span class="n">ncollide</span></div>
+
+
+<div class="viewcode-block" id="select_stars_for_tile"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.select_stars_for_tile">[docs]</a><span class="k">def</span> <span class="nf">select_stars_for_tile</span><span class="p">(</span><span class="n">star_df</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">Nsel</span><span class="p">,</span> <span class="n">star_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a tile of targets, select Nsel worth of stars by selecting stars which don&#39;t clash with any of our targets. The returned stars are sorted by either their priority (for standard stars) or their R-band magnitude (for guide stars)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        star_df (dataframe): a dataframe of stars (guide or standard). Must have columns &quot;RA&quot;, &quot;DEC&quot; and either &quot;priority&quot; or &quot;r_mag&quot; (see below)</span>
+<span class="sd">        tile_df (dataframe): a dataframe containing Nsel targets, created from using &#39;unpick&#39;. Must have columns &quot;RA&quot; amd &quot;DEC&quot;</span>
+<span class="sd">        proximity (float): distance between two adjacent bundles, in arcseconds.</span>
+<span class="sd">        Nsel (int): Return this many stars for each tile.</span>
+<span class="sd">        star_type (string): One of either &quot;standards&quot; or &quot;guides&quot;. Selects whether we sort the star dataframe by &quot;priority&quot; (for standards) or &quot;r_mag&quot; (for guides)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">star_type</span> <span class="o">==</span> <span class="s1">&#39;standards&#39;</span><span class="p">:</span>
+        <span class="n">star_df</span> <span class="o">=</span> <span class="n">star_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">star_type</span> <span class="o">==</span> <span class="s1">&#39;guides&#39;</span><span class="p">:</span>
+        <span class="n">star_df</span> <span class="o">=</span> <span class="n">star_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;r_mag&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;star_type must be either &#39;standards&#39; or &#39;guides&#39;; currently </span><span class="si">{</span><span class="n">star_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">tile_df</span><span class="p">,</span> <span class="n">non_clashing_stars</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">noclash</span><span class="p">(</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">star_df</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+
+    <span class="c1"># Make sure the non clashing stars also don&#39;t clash with themselves</span>
+    <span class="c1"># Don&#39;t need to do this, since Caro&#39;s code does it for us</span>
+    <span class="c1">#_, non_clashing_stars, _ = noclash(non_clashing_stars, non_clashing_stars, proximity)</span>
+    
+    <span class="c1"># There&#39;s a bug here where noclash doesn&#39;t count a tile with identical entries as clashing. So here we drop the duplicated rows to fix this</span>
+    <span class="n">non_clashing_stars</span> <span class="o">=</span> <span class="n">non_clashing_stars</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">Nsel</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_clashing_stars</span><span class="p">):</span>
+        <span class="n">Nsel</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_clashing_stars</span><span class="p">)</span>
+
+    <span class="c1">#assert len(non_clashing_stars) == len(np.unique(non_clashing_stars.ID)), &quot;We seem to have a repeated star?&quot;</span>
+    <span class="c1">#import ipdb; ipdb.set_trace()</span>
+    <span class="k">return</span> <span class="n">non_clashing_stars</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">Nsel</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="select_targets"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.select_targets">[docs]</a><span class="k">def</span> <span class="nf">select_targets</span><span class="p">(</span><span class="n">all_targets_df</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">Nsel</span><span class="p">,</span> <span class="n">priorities</span><span class="p">,</span> <span class="n">selection_type</span><span class="o">=</span><span class="s1">&#39;most_clashing&#39;</span><span class="p">,</span> <span class="n">fill_spares_with_repeats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a dataframe of targets, select Nsel galaxies to observe. These can&#39;t be nearer to each other than &#39;proximity&#39;. Return a dataframe of just the new tile we&#39;ve made.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (dataframe): A dataframe of targets. Must have columns &quot;RA&quot;, &quot;DEC&quot;, &quot;PRIORITY&quot; (i.e. priority), &quot;COMPLETED&quot; (i.e. tiled before this current iteration).</span>
+<span class="sd">        proximity (float): Smallest distance between two targets (in arcseconds)</span>
+<span class="sd">        Nsel (int): Number of targets to select in each tile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Select things which haven&#39;t been already tiled or selected as a target in this iteration</span>
+    <span class="n">target_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">all_targets_df</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">all_targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target_mask</span><span class="p">]</span>
+    <span class="n">already_tiled_in_FOV</span> <span class="o">=</span> <span class="n">all_targets_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">target_mask</span><span class="p">]</span>
+
+    <span class="c1"># Find which of these targets clash with each other</span>
+    <span class="n">clashes</span> <span class="o">=</span> <span class="n">find_clashes</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+    <span class="c1"># n_clashes = clashes.sum(axis=0)</span>
+
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">isel_values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">untiled_galaxies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>  <span class="c1"># [sorted_by_pri_then_nclashes]</span>
+    <span class="c1"># priorities = priorities[sorted_by_pri_then_nclashes]</span>
+
+    <span class="c1"># Now go through and add the target which clashes with the most things to the tile.</span>
+    <span class="c1"># Keep doing this until we have selected &#39;Nsel&#39; things or we run out of targets</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Nsel</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">untiled_galaxies</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="c1"># Find any clashes in the targets</span>
+        <span class="n">n_clashes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">clashes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">untiled_galaxies</span><span class="p">]</span>
+        <span class="c1"># This is a dictionary of the priority of every target and then the number of things it clashes with</span>
+        <span class="n">clash_and_priority_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">untiled_galaxies</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">priorities</span><span class="p">[</span><span class="n">untiled_galaxies</span><span class="p">],</span> <span class="n">n_clashes</span><span class="p">)))</span>
+
+        <span class="c1"># Sort by priority then by number of clashes. Important that the tuples in clash_and_priority_dict are in the order (priority, n_clashes)</span>
+        <span class="n">galaxies_in_order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">clash_and_priority_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># If we have a clash...</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">n_clashes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># Now find the target to select</span>
+            <span class="k">if</span> <span class="n">selection_type</span> <span class="o">==</span> <span class="s1">&#39;most_clashing&#39;</span><span class="p">:</span>
+                <span class="n">selected_target</span> <span class="o">=</span> <span class="n">galaxies_in_order</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">selection_type</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+                <span class="n">random_choice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">galaxies_in_order</span><span class="p">))</span>
+                <span class="n">selected_target</span> <span class="o">=</span> <span class="n">galaxies_in_order</span><span class="p">[</span><span class="n">random_choice</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;Unknown selection type&#39;</span><span class="p">)</span>
+            <span class="c1"># And find the targets it clashes with</span>
+            <span class="n">things_it_clashes_with</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">clashes</span><span class="p">[</span><span class="n">selected_target</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Tile the most clashing target</span>
+            <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected_target</span><span class="p">)</span>
+
+            <span class="c1"># Add its &#39;isel&#39; value as its priority plus one, since it&#39;s a clashing target</span>
+            <span class="n">isel_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">priorities</span><span class="p">[</span><span class="n">selected_target</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># ... and remove the things this target clashes with from the list of targets in this tile</span>
+            <span class="n">untiled_galaxies</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">untiled_galaxies</span> <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">things_it_clashes_with</span><span class="p">]</span>
+            <span class="n">untiled_galaxies</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">selected_target</span><span class="p">)</span>
+
+        <span class="c1"># Else if there aren&#39;t any clashes remaining...</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Just add everything left</span>
+            <span class="n">N_to_append</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">Nsel</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">untiled_galaxies</span><span class="p">))</span>
+
+            <span class="n">unclashing_targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">galaxies_in_order</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_to_append</span><span class="p">)]</span>
+
+            <span class="n">targets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">unclashing_targets</span><span class="p">)</span>
+            <span class="n">isel_values</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">priorities</span><span class="p">[</span><span class="n">unclashing_targets</span><span class="p">])</span>
+
+            <span class="c1"># Remove things we&#39;ve tiled</span>
+            <span class="n">untiled_galaxies</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">untiled_galaxies</span> <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
+
+    <span class="n">tile_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">targets</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">fill_spares_with_repeats</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Nsel</span><span class="p">:</span>
+            <span class="c1"># We now see if any things which have already been tiled can be repeated</span>
+            <span class="c1"># We check to see whether everything in the Field of View clashes with anything which has already been tiled.</span>
+            <span class="c1"># NOTE that this a quick-fix way of doing things- for example, if two things are in a close pair, using this method they will never be added to the tile as a repeat, since they will always clash with each other. The correct thing to do would be to add in things to repeat one by one, as in the method above</span>
+            <span class="c1"># Also need to fix things to pick &#39;high priority&#39; targets to repeat preferentially</span>
+            <span class="n">clashes</span> <span class="o">=</span> <span class="n">find_clashes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">already_tiled_in_FOV</span><span class="p">)),</span> <span class="n">already_tiled_in_FOV</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+            <span class="n">n_clashes</span> <span class="o">=</span> <span class="n">clashes</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">already_tiled_in_FOV</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">n_clashes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="n">unclashing_repeats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">n_clashes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">N_to_append</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">Nsel</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">unclashing_repeats</span><span class="p">))</span>
+                <span class="n">repeats_to_fill_hexabundles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">unclashing_repeats</span><span class="p">,</span> <span class="n">N_to_append</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">tile_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">already_tiled_in_FOV</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">repeats_to_fill_hexabundles</span><span class="p">]))</span>
+                <span class="n">tile_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tile_df</span><span class="o">.</span><span class="n">COMPLETED</span> <span class="o">==</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;isel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">isel_values</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">repeats_to_fill_hexabundles</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Nsel</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can only select </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span><span class="si">}</span><span class="s2"> new targets for this field. Can only select </span><span class="si">{</span><span class="n">N_to_append</span><span class="si">}</span><span class="s2"> repeats. Tile length is only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2">!!!&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can only select </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span><span class="si">}</span><span class="s2"> new targets for this field. Select </span><span class="si">{</span><span class="n">N_to_append</span><span class="si">}</span><span class="s2"> repeats. Tile length is </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can only select </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span><span class="si">}</span><span class="s2"> new targets for this field. Can&#39;t select any repeats. Tile length is only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2">!!!&quot;</span>
+
+            
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="c1"># # # If we don&#39;t fill a tile, append already observed galaxies till we get to the right number</span>
+    <span class="c1"># # # These are set an isel value of 1.</span>
+    <span class="c1"># # However, check there are other things left to tile! Otherwise we add repeats of the same targets which breaks things</span>
+    <span class="c1"># if (len(tile_df) &lt; Nsel) &amp; (len(all_targets_df) &gt; len(tile_df)):</span>
+        
+    <span class="c1">#     N_missing = Nsel - len(tile_df)</span>
+        
+    <span class="c1">#     gals_added = 0</span>
+    <span class="c1">#     # Loop through and add targets, checking each time if they clash with the tile</span>
+    <span class="c1">#     # This is a bit slower than the proper way of doing things above (since we&#39;re calling find_clashes many times) but the tile should be small enough that it&#39;s not a big deal. </span>
+    <span class="c1">#     for i in range(N_missing):</span>
+
+    <span class="c1">#         # We&#39;re now finding clashes between the tile and *everything* in the field, not just things we haven&#39;t observed</span>
+    <span class="c1">#         targets_not_already_in_tile = all_targets_df[~all_targets_df.index.isin(tile_df.index)]</span>
+    <span class="c1">#         clashes = find_clashes(targets_not_already_in_tile, tile_df, proximity=proximity)</span>
+    <span class="c1">#         n_clashes = clashes.sum(axis=1)</span>
+    <span class="c1">#         if np.any(np.atleast_1d(n_clashes) == 0):</span>
+    <span class="c1">#             unclashing_index = np.random.choice(np.where(n_clashes == 0)[0])</span>
+    <span class="c1">#             gals_added += 1</span>
+    <span class="c1">#             tile_df = tile_df.append(all_targets_df.iloc[unclashing_index])</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             break</span>
+
+    <span class="c1">#     isel_values.extend([1] * gals_added)</span>
+    
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Nsel</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_targets_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can&#39;t select </span><span class="si">{</span><span class="n">Nsel</span><span class="si">}</span><span class="s2"> targets for this field. Info: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_targets_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> in FOV and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> in tile!&quot;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">targets_not_already_in_tile</span> <span class="o">=</span> <span class="n">all_targets_df</span><span class="p">[</span><span class="o">~</span><span class="n">all_targets_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tile_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+            <span class="n">clashes</span> <span class="o">=</span> <span class="n">find_clashes</span><span class="p">(</span><span class="n">targets_not_already_in_tile</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">proximity</span><span class="o">=</span><span class="n">proximity</span><span class="p">)</span>
+            <span class="n">n_clashes</span> <span class="o">=</span> <span class="n">clashes</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can&#39;t select </span><span class="si">{</span><span class="n">Nsel</span><span class="si">}</span><span class="s2"> targets for this field. Info: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_targets_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> in FOV; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> in tile; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">targets_not_already_in_tile</span><span class="p">)</span><span class="si">}</span><span class="s2"> are in FOV but not tiled, of which each one clashes </span><span class="si">{</span><span class="n">n_clashes</span><span class="si">}</span><span class="s2"> times&quot;</span>    
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="c1">#import ipdb; ipdb.set_trace()</span>
+
+    <span class="c1"># Check if we clash with ourself- this should never happen</span>
+    <span class="n">clashes</span> <span class="o">=</span> <span class="n">find_clashes</span><span class="p">(</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">proximity</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">clashes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Our tile seems to clash with itself... This should never happen!&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">isel_values</span></div>
+
+
+<div class="viewcode-block" id="make_best_tile"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.make_best_tile">[docs]</a><span class="k">def</span> <span class="nf">make_best_tile</span><span class="p">(</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">df_guide_stars</span><span class="p">,</span> <span class="n">df_standard_stars</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">tiling_type</span><span class="p">,</span> <span class="n">use_galaxy_priorities</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">selection_type</span><span class="o">=</span><span class="s1">&#39;most_clashing&#39;</span><span class="p">,</span> <span class="n">fill_spares_with_repeats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">df_skies</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Put all the above functions togther and make a tile. Note that this function __doesn&#39;t__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don&#39;t want to mark things as tiled if the config code needs to select backups.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df_targets (dataframe): A dataframe of galaxy targets. Must include columns &#39;RA&#39;, &#39;DEC&#39;, &quot;PRIORITY&quot; and &quot;TILED&quot;</span>
+<span class="sd">        df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns &#39;RA&#39;, &#39;DEC&#39; and &quot;r_mag&quot;</span>
+<span class="sd">        df_standard_stars (dataframe): A dataframe of standard stars. Must include columns &#39;RA&#39;, &#39;DEC&#39; and &#39;priority&#39;</span>
+<span class="sd">        tiling_parameters (dict): A dictionary containing the various parameters to do with the tiling. So far, necessary keys are &#39;Hector_FOV_radius&#39;, &#39;proximity&#39;, &#39;Nsel&#39;, &#39;Nsel_guides&#39; and &#39;Nsel_standards&#39;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">            * The original df_targets dataframe</span>
+<span class="sd">            * A dataframe containing the targets for this tile</span>
+<span class="sd">            * A dataframe containing the guides for this tile</span>
+<span class="sd">            * A dataframe containing the standard stars for this tile</span>
+<span class="sd">            * The tile RA</span>
+<span class="sd">            * The tile Dec</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Hector_FOV_outer_radius</span> <span class="o">=</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Hector_FOV_outer_radius&#39;</span><span class="p">]</span>
+    <span class="n">Hector_FOV_inner_radius</span> <span class="o">=</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Hector_FOV_inner_radius&#39;</span><span class="p">]</span>
+    <span class="n">Nsel</span> <span class="o">=</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Nsel&#39;</span><span class="p">]</span>
+    <span class="n">Nsel_guides</span> <span class="o">=</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Nsel_guides&#39;</span><span class="p">]</span>
+    <span class="n">Nsel_standards</span> <span class="o">=</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Nsel_standards&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Do some basic error checking</span>
+    <span class="k">if</span> <span class="n">Hector_FOV_inner_radius</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FoV Inner radius must be positive! Currently it&#39;s </span><span class="si">{</span><span class="n">Hector_FOV_inner_radius</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Hector_FOV_outer_radius</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FoV Outer radius must be positive! Currently it&#39;s </span><span class="si">{</span><span class="n">Hector_FOV_outer_radius</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Hector_FOV_outer_radius</span> <span class="o">&lt;</span> <span class="n">Hector_FOV_inner_radius</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Outer radius must be greater than inner radius! Currently O.R. is </span><span class="si">{</span><span class="n">Hector_FOV_outer_radius</span><span class="si">}</span><span class="s2"> and I.R. is </span><span class="si">{</span><span class="n">Hector_FOV_inner_radius</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">untiled</span> <span class="o">=</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span> <span class="c1"># &amp; (df_targets[&#39;PRIORITY&#39;] == 8)</span>
+
+    <span class="k">if</span> <span class="n">use_galaxy_priorities</span><span class="p">:</span>
+        <span class="n">priorities</span> <span class="o">=</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">priorities</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;priority&#39;</span><span class="p">)</span>
+
+    <span class="c1"># FIXME</span>
+    <span class="c1"># This will cause an issue if the separation of two grid points is larger than the FOV size</span>
+    <span class="n">n_xx_yy</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">untiled</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)),</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tiling_type</span> <span class="o">==</span> <span class="s1">&#39;greedy&#39;</span><span class="p">:</span>
+        <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">=</span> <span class="n">get_best_tile_centre_greedy</span><span class="p">(</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">untiled</span><span class="p">],</span> <span class="n">outer_FOV_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_FoV_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="o">=</span><span class="n">n_xx_yy</span><span class="p">,</span> <span class="n">priorities</span><span class="o">=</span><span class="n">priorities</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">untiled</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">tiling_type</span> <span class="o">==</span> <span class="s1">&#39;dengreedy&#39;</span><span class="p">:</span>
+        <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">=</span> <span class="n">get_best_tile_centre_dengreedy</span><span class="p">(</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">untiled</span><span class="p">],</span> <span class="n">outer_FOV_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_FoV_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">,</span> <span class="n">n_xx_yy</span><span class="o">=</span><span class="n">n_xx_yy</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s2">&quot;tiling_type must be one of &#39;greedy&#39; or &#39;dengreedy&#39;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Only select targets, guides and standards within the FoV</span>
+    <span class="c1"># check_if_in_FOV returns a boolean mask</span>
+    <span class="n">inner_targets</span> <span class="o">=</span> <span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">),</span> <span class="p">:]</span>
+    <span class="n">inner_guides</span> <span class="o">=</span> <span class="n">df_guide_stars</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">df_guide_stars</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">),</span> <span class="p">:]</span>
+    <span class="n">inner_standards</span> <span class="o">=</span> <span class="n">df_standard_stars</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">df_standard_stars</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">),</span> <span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">df_skies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inner_skies</span> <span class="o">=</span> <span class="n">df_skies</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">check_if_in_fov</span><span class="p">(</span><span class="n">df_skies</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="n">Hector_FOV_outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="n">Hector_FOV_inner_radius</span><span class="p">),</span> <span class="p">:]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inner_guides</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inner_standards</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No stars in the Field of View!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Select which targets to keep</span>
+    <span class="n">tile_members</span><span class="p">,</span> <span class="n">isel_values</span> <span class="o">=</span> <span class="n">select_targets</span><span class="p">(</span><span class="n">inner_targets</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">Nsel</span><span class="p">,</span> <span class="n">priorities</span><span class="o">=</span><span class="n">priorities</span><span class="p">,</span> <span class="n">selection_type</span><span class="o">=</span><span class="n">selection_type</span><span class="p">,</span> <span class="n">fill_spares_with_repeats</span><span class="o">=</span><span class="n">fill_spares_with_repeats</span><span class="p">)</span>
+
+    <span class="c1"># Add the &#39;isel&#39; values to the main dataframe</span>
+    <span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tile_members</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;isel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isel_values</span>
+    <span class="n">tile_members</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;isel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isel_values</span>
+
+    <span class="c1"># Now add in the guide stars and standard stars</span>
+    <span class="c1"># Make sure none clash with any of the targets in that tile</span>
+    <span class="n">guide_stars_for_tile</span> <span class="o">=</span> <span class="n">select_stars_for_tile</span><span class="p">(</span><span class="n">inner_guides</span><span class="p">,</span> <span class="n">tile_members</span><span class="p">,</span> <span class="n">proximity</span><span class="o">=</span><span class="n">proximity</span><span class="p">,</span> <span class="n">Nsel</span><span class="o">=</span><span class="n">Nsel_guides</span><span class="p">,</span> <span class="n">star_type</span><span class="o">=</span><span class="s1">&#39;guides&#39;</span><span class="p">)</span>
+    <span class="n">standard_stars_for_tile</span> <span class="o">=</span> <span class="n">select_stars_for_tile</span><span class="p">(</span><span class="n">inner_standards</span><span class="p">,</span> <span class="n">tile_members</span><span class="p">,</span> <span class="n">proximity</span><span class="o">=</span><span class="n">proximity</span><span class="p">,</span> <span class="n">Nsel</span><span class="o">=</span><span class="n">Nsel_standards</span><span class="p">,</span> <span class="n">star_type</span><span class="o">=</span><span class="s1">&#39;standards&#39;</span><span class="p">)</span>
+
+    <span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;isel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">10</span>
+
+    <span class="k">if</span> <span class="n">df_skies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">skies_for_tile</span> <span class="o">=</span> <span class="n">select_sky_fibres_for_tile</span>
+
+    <span class="k">return</span> <span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_members</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span></div>
+
+
+<div class="viewcode-block" id="save_tile_outputs"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.save_tile_outputs">[docs]</a><span class="k">def</span> <span class="nf">save_tile_outputs</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">tile_number</span><span class="p">,</span> <span class="n">columns_in_order</span><span class="p">,</span> <span class="n">guide_columns_in_order</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tile_out_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">guide_out_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the outputs from a single tile. These are:</span>
+<span class="sd">        * A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns ID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!</span>
+<span class="sd">        * A text file called guide_tile_{i}.fld, which contains guide stars (observed with the Hector guide bundles). This has columns RA, DEC, mag</span>
+<span class="sd">        * A plot of the field with the Nsel best targets selected by this code. Note that this may not resemble the final tile selected by the configuration code!</span>
+<span class="sd">    Note that we also make two new columns called &quot;MagnetX_noDC&quot; and &quot;MagnetY_noDC&quot; which correspond to the xy positions of the galaxies on the Hector plate in microns from the centre. These have *NOT* been corrected for the optical distortions- that&#39;s done by the &quot;DistortionCorrection&quot; code, which happens after each time has been saved.</span>
+<span class="sd">    These outputs will be bundled together in a single folder, which contains subfolders &#39;Tiles&#39; and &#39;Plots&#39;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        outfolder (str): Location for the output files</span>
+<span class="sd">        df_targets (dataframe): Dataframe of all targets. This is used for plotting</span>
+<span class="sd">        tile_df (dataframe): Dataframe of targets for a single tile</span>
+<span class="sd">        guide_stars_for_tile (dataframe): Dataframe of guide stars for a single tile</span>
+<span class="sd">        standard_stars_for_tile (dataframe): Dataframe of standard stars for a single tile</span>
+<span class="sd">        tile_RA (float): RA of tile centre</span>
+<span class="sd">        tile_DEC (float): DEC of tile centre</span>
+<span class="sd">        tiling parameters (dict): Dictionary of tiling parameters</span>
+<span class="sd">        tile_number (int): Number of the tile</span>
+<span class="sd">        plot (bool, optional): Whether to save a plot of the tile. Default is True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">tile_out_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tile_out_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tile_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span>
+    <span class="k">if</span> <span class="n">guide_out_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">guide_out_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;guide_tile_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span>
+
+    <span class="c1"># Add in the MagnetX and MagnetY values, using the Hector plate radius from the constants file</span>
+    <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;MagnetX_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_RA</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+    <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;MagnetY_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;DEC&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_Dec</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+    <span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;MagnetX_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_RA</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+    <span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;MagnetY_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;DEC&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_Dec</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+    <span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;MagnetX_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_RA</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+    <span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;MagnetY_noDC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;DEC&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tile_Dec</span><span class="p">)</span> <span class="o">*</span> <span class="n">hector_constants</span><span class="o">.</span><span class="n">HECTOR_plate_radius</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+    <span class="n">save_tile_text_file</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="n">tile_out_name</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">columns_in_order</span><span class="p">)</span>
+    <span class="n">save_guide_text_file</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="n">guide_out_name</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">guide_columns_in_order</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s1">/Plots&#39;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s1">/Plots&#39;</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_tile</span><span class="p">(</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Hector_FOV_outer_radius&#39;</span><span class="p">],</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Hector_FOV_inner_radius&#39;</span><span class="p">],</span> <span class="n">tile_number</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s1">/Plots/tile_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="plot_survey_completeness_and_tile_positions"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.plot_survey_completeness_and_tile_positions">[docs]</a><span class="k">def</span> <span class="nf">plot_survey_completeness_and_tile_positions</span><span class="p">(</span><span class="n">tile_positions</span><span class="p">,</span> <span class="n">df_targets</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">completion_fraction_to_calculate</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make an overall plot of the survey completeness and the positions of each tile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tile_positions (list): A two component list. First element is a list of RA values of the tile centres, second component is a list of Dec values of the tile centres.</span>
+<span class="sd">        tiling_parameters (dict): A dictionary of tiling parameters. Must have  a &#39;Hector_FOV_radius&#39; key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tile_RAs</span><span class="p">,</span> <span class="n">tile_DECs</span> <span class="o">=</span> <span class="n">tile_positions</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    
+    <span class="n">tiles</span> <span class="o">=</span> <span class="n">df_targets</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Tile_number&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span>
+
+    <span class="k">for</span> <span class="n">tile_number</span> <span class="ow">in</span> <span class="n">tiles</span><span class="p">:</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tiles</span><span class="p">[</span><span class="n">tile_number</span><span class="p">]]</span> <span class="c1"># This selects by index, NOT integer position.</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">members</span><span class="o">.</span><span class="n">DEC</span><span class="p">)</span> 
+        <span class="n">tile_footprint</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">tile_RAs</span><span class="p">[</span><span class="n">tile_number</span><span class="p">],</span> <span class="n">tile_DECs</span><span class="p">[</span><span class="n">tile_number</span><span class="p">]),</span> <span class="n">radius</span><span class="o">=</span><span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;Hector_FOV_outer_radius&#39;</span><span class="p">],</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">tile_footprint</span><span class="p">)</span>
+
+    
+    <span class="n">completeness</span><span class="p">,</span> <span class="n">completion_fraction_to_calculate</span><span class="p">,</span> <span class="n">used_tiles_to_get_to_x</span><span class="p">,</span> <span class="n">minimum_number_of_tiles_for_x</span><span class="p">,</span> <span class="n">efficiency_xpc</span><span class="p">,</span> <span class="n">efficiency</span> <span class="o">=</span> <span class="n">calculate_completeness_stats</span><span class="p">(</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;N_targets_per_Hector_field&#39;</span><span class="p">],</span> <span class="n">completion_fraction_to_calculate</span><span class="o">=</span><span class="n">completion_fraction_to_calculate</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># Plot the completeness as a function of tile number</span>
+    <span class="n">N_galaxy_observations</span> <span class="o">=</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;N_observations_to_complete&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">completeness</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;N_targets_per_Hector_field&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">N_galaxy_observations</span> <span class="o">*</span> <span class="n">xx</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">completeness</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">completion_fraction_to_calculate</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">used_tiles_to_get_to_x</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">minimum_number_of_tiles_for_x</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$N_{\rm</span><span class="si">{tiles}</span><span class="s1">}$&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Completeness&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span></div>
+
+
+<span class="k">def</span> <span class="nf">_calc_completeness</span><span class="p">(</span><span class="n">df_targets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a tiling dataframe, work out the fractional completeness of the tiling after each tile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df_targets (dataframe): a dataframe with a row for each target. Must have a column &#39;Tile_number&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">completeness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;Tile_number&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_targets</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;Tile_number&#39;</span><span class="p">])])</span>
+
+    <span class="k">return</span> <span class="n">completeness</span>
+
+
+<div class="viewcode-block" id="calculate_completeness_stats"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.calculate_completeness_stats">[docs]</a><span class="k">def</span> <span class="nf">calculate_completeness_stats</span><span class="p">(</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">N_targets_per_Hector_field</span><span class="p">,</span> <span class="n">completion_fraction_to_calculate</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a set of tiles, calculate some stats about the efficiency to get to a given completeness fraction</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df_targets (dataframe): a dataframe with a row for each target. Must have a column &#39;Tile_number&#39;</span>
+<span class="sd">        N_targets_per_Hector_field (dict): The numnber of hexabundles we can place on galaxy targets</span>
+<span class="sd">        completeness_fraction_to_calculate (float, default=0.95): calculate the efficiency to reach this completeness fraction. This is defined as actual number of tiles used / minimum number of tiles possible) </span>
+<span class="sd">        verbose (bool, default=True): print efficiency stats or not.  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">completion_fraction_to_calculate</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">completion_fraction_to_calculate</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;completion_fraction_to_calculate must be between 0 and 1: currently </span><span class="si">{</span><span class="n">completion_fraction_to_calculate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">N_galaxy_observations</span> <span class="o">=</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;N_observations_to_complete&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># Work out the completeness after each tile</span>
+    <span class="n">completeness</span> <span class="o">=</span> <span class="n">_calc_completeness</span><span class="p">(</span><span class="n">df_targets</span><span class="p">)</span>
+
+    <span class="n">used_tiles</span> <span class="o">=</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;Tile_number&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># Since we start indexing from 0</span>
+    <span class="n">minimum_number_of_tiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">N_galaxy_observations</span> <span class="o">/</span> <span class="n">N_targets_per_Hector_field</span><span class="p">)</span>
+    <span class="n">efficiency</span> <span class="o">=</span> <span class="n">minimum_number_of_tiles</span> <span class="o">/</span> <span class="n">used_tiles</span>
+
+    <span class="n">used_tiles_to_get_to_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">completeness</span> <span class="o">&gt;</span> <span class="n">completion_fraction_to_calculate</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">minimum_number_of_tiles_for_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">completion_fraction_to_calculate</span> <span class="o">*</span> <span class="n">N_galaxy_observations</span> <span class="o">/</span> <span class="n">N_targets_per_Hector_field</span><span class="p">)</span>
+    <span class="n">efficiency_xpc</span> <span class="o">=</span> <span class="n">minimum_number_of_tiles_for_x</span> <span class="o">/</span> <span class="n">used_tiles_to_get_to_x</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Efficiency for completion=</span><span class="si">{</span><span class="n">completion_fraction_to_calculate</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">efficiency_xpc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Efficiency for completion=1: </span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">efficiency</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">completeness</span><span class="p">,</span> <span class="n">completion_fraction_to_calculate</span><span class="p">,</span> <span class="n">used_tiles_to_get_to_x</span><span class="p">,</span> <span class="n">minimum_number_of_tiles_for_x</span><span class="p">,</span> <span class="n">efficiency_xpc</span><span class="p">,</span> <span class="n">efficiency</span></div>
+
+
+<div class="viewcode-block" id="plot_tile"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.plot_tile">[docs]</a><span class="k">def</span> <span class="nf">plot_tile</span><span class="p">(</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_df</span><span class="p">,</span> <span class="n">standards_df</span><span class="p">,</span> <span class="n">catalogue_df</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tile_outer_radius</span><span class="p">,</span> <span class="n">tile_inner_radius</span><span class="p">,</span> <span class="n">tile_number</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make a plot of an individual tile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tile_df (dataframe): Dataframe of a tile to plot</span>
+<span class="sd">        guide_df (dataframe): Dataframe of guide stars from this tile</span>
+<span class="sd">        standards_df (dataframe): Dataframe of standard stars from this tile</span>
+<span class="sd">        catalogue_df (dataframe): Dataframe of the entire field, to plot as background</span>
+<span class="sd">        tile_RA (float): RA of the centre of this tile</span>
+<span class="sd">        tile_Dec (float): Dec of the centre of this tile</span>
+<span class="sd">        tile_outer_radius (float): Outer Radius of the FoV (in degrees)</span>
+<span class="sd">        tile_inner_radius (float): Inner Radius of the FoV (in degrees)</span>
+<span class="sd">        tile_number (int): Number of the tile</span>
+<span class="sd">        proximity (float): Radius of the tile</span>
+<span class="sd">        fig, ax (optional): An exisiting Figure/Axis object to plot on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">top_target_mask</span> <span class="o">=</span> <span class="n">catalogue_df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">])</span> 
+
+    <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">catalogue_df</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">catalogue_df</span><span class="o">.</span><span class="n">DEC</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tile_df</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">tile_df</span><span class="o">.</span><span class="n">DEC</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;All Targets&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">catalogue_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">top_target_mask</span><span class="p">,</span> <span class="s1">&#39;RA&#39;</span><span class="p">],</span> <span class="n">catalogue_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">top_target_mask</span><span class="p">,</span> <span class="s1">&#39;DEC&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Top Targets&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">standards_df</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">standards_df</span><span class="o">.</span><span class="n">DEC</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Standards&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">guide_df</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">guide_df</span><span class="o">.</span><span class="n">DEC</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Guides&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Tile Centre&#39;</span><span class="p">)</span>
+
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tile_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+        <span class="n">circle</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">RA</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">DEC</span><span class="p">),</span> <span class="n">radius</span><span class="o">=</span><span class="n">proximity</span> <span class="o">/</span> <span class="mf">3600.0</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tile_RA</span> <span class="o">-</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">tile_outer_radius</span><span class="p">,</span> <span class="n">tile_RA</span> <span class="o">+</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">tile_outer_radius</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">tile_Dec</span> <span class="o">-</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">tile_outer_radius</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">+</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">tile_outer_radius</span><span class="p">)</span>
+
+    <span class="n">circle</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">),</span> <span class="n">tile_outer_radius</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+    <span class="c1"># Add the total 2DF field of view in black</span>
+    <span class="n">circle</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+
+    <span class="c1"># Add the central region which we&#39;re ignoring</span>
+    <span class="n">circle</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">),</span> <span class="n">tile_inner_radius</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;0.1&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;0.1&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+
+
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Right Ascension&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Declination&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Tile </span><span class="si">{</span><span class="n">tile_number</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="save_tile_text_file"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.save_tile_text_file">[docs]</a><span class="k">def</span> <span class="nf">save_tile_text_file</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">columns_in_order</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save a text file of things to be observed with Hector science bundles (i.e. targets and standards). The second line of this text file __must__ be the tile RA and DEC seperated by a space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles&quot;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Make sure the tile_df is sorted by priority</span>
+    <span class="n">tile_df</span> <span class="o">=</span> <span class="n">tile_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Rename the column headings so things match</span>
+    <span class="c1">#targets_renamer = dict(CATAID=&quot;ID&quot;)</span>
+    <span class="c1">#tile_df = tile_df.rename(columns=targets_renamer)</span>
+    <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1">#standards_renamer = dict(CoADD_ID=&#39;ID&#39;)</span>
+    <span class="c1">#standard_stars_for_tile = standard_stars_for_tile.rename(columns=standards_renamer)</span>
+    <span class="n">standard_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># combined_stars_targets_df = tile_df[[&#39;ID&#39;, &#39;RA&#39;, &#39;DEC&#39;, &#39;mag&#39;, &#39;type&#39;, &#39;isel&#39;]].append(standard_stars_for_tile[[&#39;ID&#39;, &#39;RA&#39;, &#39;DEC&#39;, &#39;mag&#39;, &#39;type&#39;, &#39;isel&#39;]])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;MagnetX_noDC&#39;</span> <span class="ow">in</span> <span class="n">columns_in_order</span><span class="p">:</span>
+        <span class="n">columns_in_order</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="s1">&#39;MagnetX_noDC&#39;</span><span class="p">,</span> <span class="s1">&#39;MagnetY_noDC&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">])</span>
+    <span class="n">combined_stars_targets_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">tile_df</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">columns_in_order</span><span class="p">]</span>
+    <span class="c1"># combined_stars_targets_df = tile_df.append(standard_stars_for_tile, sort=True)[[&#39;ID&#39;, &#39;RA&#39;, &#39;DEC&#39;, &#39;Re&#39;, &#39;Mstar&#39;, &#39;z&#39;, &#39;GAL_MAG_G&#39;, &#39;GAL_MAG_I&#39;, &#39;GAL_MU_0_G&#39;, &#39;GAL_MU_0_I&#39;, &#39;GAL_MU_0_R&#39;, &#39;GAL_MU_0_U&#39;,</span>
+    <span class="c1">#    &#39;GAL_MU_0_Z&#39;, &#39;GAL_MU_E_G&#39;, &#39;GAL_MU_E_I&#39;, &#39;GAL_MU_E_R&#39;, &#39;GAL_MU_E_U&#39;,</span>
+    <span class="c1">#    &#39;GAL_MU_E_Z&#39;, &#39;GAL_MU_R_at_2Re&#39;, &#39;GAL_MU_R_at_3Re&#39;, &#39;Dingoflag&#39;, &#39;Ellipticity_r&#39;,</span>
+    <span class="c1">#    &#39;IFU_diam_2Re&#39;, &#39;MassHIpred&#39;,  &#39;PRIORITY&#39;,</span>
+    <span class="c1">#    &#39;SersicIndex_r&#39;, &#39;WALLABYflag&#39;, &#39;g_m_i&#39;, &#39;isel&#39;, &#39;mag&#39;,</span>
+    <span class="c1">#    &#39;priority&#39;, &#39;remaining_observations&#39;, &#39;Tile_number&#39;, &#39;COMPLETED&#39;, &#39;type&#39;, &#39;MagnetX_noDC&#39;, &#39;MagnetY_noDC&#39;]]</span>
+
+    <span class="c1"># Write a CSV file with the header we want</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles/</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# Target and Standard Star file from Sam&#39;s tiling code</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">tile_RA</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">tile_Dec</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Proximity Value: </span><span class="si">{</span><span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">combined_stars_targets_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles/</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="save_guide_text_file"><a class="viewcode-back" href="../../../hop.tiling.html#hop.tiling.tiling_functions.save_guide_text_file">[docs]</a><span class="k">def</span> <span class="nf">save_guide_text_file</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="p">,</span> <span class="n">guide_columns_in_order</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save a text file of things to be observed with Hector guide bundles (i.e. guides). The second line of this text file __must__ be the tile RA and DEC seperated by a space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles&quot;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Make sure the tile_df is sorted by R band magnitude</span>
+    <span class="n">guide_stars_for_tile</span> <span class="o">=</span> <span class="n">guide_stars_for_tile</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;r_mag&#39;</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1">#guide_stars_for_tile = guide_stars_for_tile.rename(columns=guides_renamer)</span>
+    <span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># Write a CSV file with the header we want</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles/</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# Guide Star file from Sam&#39;s tiling code</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">tile_RA</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">tile_Dec</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Proximity Value: </span><span class="si">{</span><span class="n">tiling_parameters</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add in [&#39;MagnetX_noDC&#39;, &#39;MagnetY_noDC&#39;]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;MagnetX_noDC&#39;</span> <span class="ow">in</span> <span class="n">guide_columns_in_order</span><span class="p">:</span>
+        <span class="n">guide_columns_in_order</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;MagnetX_noDC&#39;</span><span class="p">,</span> <span class="s1">&#39;MagnetY_noDC&#39;</span><span class="p">])</span>
+    <span class="n">guide_stars_for_tile</span><span class="p">[</span><span class="n">guide_columns_in_order</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfolder</span><span class="si">}</span><span class="s2">/Tiles/</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+<span class="c1">############################################################################################################</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

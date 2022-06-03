@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.problem_operations.robot_parameters &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.problem_operations.robot_parameters</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">..general_operations.trigonometry</span> <span class="kn">import</span> <span class="n">convert_radians_to_degrees</span>
+
+
+<span class="c1"># assigning magnet labels based on type</span>
+<div class="viewcode-block" id="assign_magnet_labels"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.assign_magnet_labels">[docs]</a><span class="k">def</span> <span class="nf">assign_magnet_labels</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">index1</span><span class="p">):</span>
+
+    <span class="c1"># adding labels for rectangular magnet</span>
+    <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">:</span>
+        <span class="n">magnet</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="s1">&#39;R</span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">index1</span><span class="p">)</span>
+        <span class="n">index1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># adding labels for circular magnet</span>
+    <span class="k">elif</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rads</span> <span class="o">&lt;</span> <span class="mf">92.71721</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="s1">&#39;Blu&#39;</span>
+        <span class="k">elif</span> <span class="mf">0.396</span> <span class="o">&lt;=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rads</span> <span class="o">&lt;</span> <span class="mf">147.91658</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="s1">&#39;Gre&#39;</span>
+        <span class="k">elif</span> <span class="mf">0.627</span> <span class="o">&lt;=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rads</span> <span class="o">&lt;</span> <span class="mf">196.05124</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="s1">&#39;Yel&#39;</span>
+        <span class="k">elif</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rads</span> <span class="o">&gt;=</span> <span class="mf">196.05124</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">magnet_label</span> <span class="o">=</span> <span class="s1">&#39;Mag&#39;</span>
+
+    <span class="k">return</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">index1</span></div>
+
+
+<span class="c1"># flagging unresolvable conflicts by recording them in file and assigning &#39;0&#39; placement order to them</span>
+<div class="viewcode-block" id="check_for_unresolvable_conflict"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_unresolvable_conflict">[docs]</a><span class="k">def</span> <span class="nf">check_for_unresolvable_conflict</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">conflictFile</span><span class="p">,</span> <span class="n">max_order</span><span class="p">,</span> <span class="n">clusterNum</span><span class="p">,</span> <span class="n">tileName</span><span class="p">):</span>
+
+    <span class="c1"># placement index checking and assigning placement order accordingly</span>
+    <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="n">placement_index</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conflictFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">conflict</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; is an unresolvable conflict,&#39;</span> <span class="o">+</span> \
+                       <span class="s1">&#39; detected in Cluster &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">clusterNum</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, tile &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tileName</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">conflict</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">increment</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="n">placement_index</span> <span class="o">==</span> <span class="n">max_order</span> <span class="o">-</span> <span class="n">increment</span><span class="p">:</span>
+                <span class="n">order</span> <span class="o">+=</span> <span class="n">increment</span>
+
+    <span class="k">return</span> <span class="n">order</span></div>
+
+
+<span class="c1"># when having more than 1 placement orders, the magnets with 1st placement order are to be assigned any pickup direction</span>
+<div class="viewcode-block" id="add_pickupDirection"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.add_pickupDirection">[docs]</a><span class="k">def</span> <span class="nf">add_pickupDirection</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">available_pickup</span><span class="p">):</span>
+
+    <span class="c1"># magnets with placement order of 1 are placed at first so can be placed from any pickup direction</span>
+    <span class="k">if</span> <span class="n">available_pickup</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">:</span>
+            <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;TR&#39;</span><span class="p">,</span> <span class="s1">&#39;TL&#39;</span><span class="p">,</span> <span class="s1">&#39;RI&#39;</span><span class="p">,</span> <span class="s1">&#39;RO&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">:</span>
+            <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">magnet</span><span class="p">,</span> <span class="n">available_pickup</span></div>
+
+
+<span class="c1"># prioritization of pickup directions when more than one option is available for a magnet</span>
+<div class="viewcode-block" id="assign_preferable_pickupDirection"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.assign_preferable_pickupDirection">[docs]</a><span class="k">def</span> <span class="nf">assign_preferable_pickupDirection</span><span class="p">(</span><span class="n">available_pickup</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="s1">&#39;TR&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;TR&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;TL&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;TL&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;RO&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;RO&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;RI&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;RI&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;O&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>  <span class="c1">### REMEMBER TO CHANGE Inwards to Toward and Outwards to Away ###</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">available_pickup</span> <span class="o">=</span> <span class="s1">&#39;O&#39;</span>
+
+    <span class="k">return</span> <span class="n">available_pickup</span></div>
+
+
+<span class="c1"># angles required by the robotic arm to pick up and then put down the magnet in correct position</span>
+<div class="viewcode-block" id="calculate_pickup_putdown_angles"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.calculate_pickup_putdown_angles">[docs]</a><span class="k">def</span> <span class="nf">calculate_pickup_putdown_angles</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">available_pickup</span><span class="p">):</span>
+
+    <span class="c1">#import ipdb; ipdb.set_trace()</span>
+    <span class="n">azAngs</span> <span class="o">=</span> <span class="n">convert_radians_to_degrees</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">azAngs</span><span class="p">)</span>
+
+    <span class="c1"># rotation for pickup and putdown of circular magnets</span>
+    <span class="k">if</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;TR&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="mi">90</span>
+            <span class="k">if</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">90</span> <span class="o">-</span> <span class="n">azAngs</span>
+            <span class="k">elif</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">+</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="n">azAngs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;TL&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="mi">270</span>
+            <span class="k">if</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">270</span> <span class="o">-</span> <span class="n">azAngs</span>
+            <span class="k">elif</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">270</span> <span class="o">-</span> <span class="n">azAngs</span>
+        <span class="k">elif</span> <span class="s1">&#39;RO&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="mi">180</span>
+            <span class="k">if</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">180</span> <span class="o">-</span> <span class="n">azAngs</span>
+            <span class="k">elif</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">180</span> <span class="o">-</span> <span class="n">azAngs</span>
+        <span class="k">elif</span> <span class="s1">&#39;RI&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">azAngs</span>
+            <span class="k">elif</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">azAngs</span>
+
+    <span class="c1"># rotation for pickup and putdown of rectangular magnets</span>
+    <span class="k">elif</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">:</span>
+        <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_pickup</span> <span class="o">=</span> <span class="mi">180</span>
+
+        <span class="n">ang_azAngs</span> <span class="o">=</span> <span class="n">convert_radians_to_degrees</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">rectangular_magnet_input_orientation</span><span class="p">)</span> <span class="o">+</span> <span class="mi">270</span>
+        <span class="c1">#import ipdb; ipdb.set_trace()</span>
+        <span class="k">if</span> <span class="n">ang_azAngs</span> <span class="o">&lt;</span> <span class="mi">180</span> <span class="ow">and</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="n">azAngs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">180</span> <span class="o">-</span> <span class="n">ang_azAngs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">+</span> <span class="mi">180</span>
+        <span class="k">elif</span> <span class="n">ang_azAngs</span> <span class="o">&lt;</span> <span class="mi">180</span> <span class="ow">and</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="p">(</span><span class="mi">450</span> <span class="o">-</span> <span class="n">azAngs</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">180</span> <span class="o">+</span> <span class="n">ang_azAngs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">+</span> <span class="mi">180</span>
+        <span class="k">elif</span> <span class="n">ang_azAngs</span> <span class="o">&gt;</span> <span class="mi">180</span> <span class="ow">and</span> <span class="n">azAngs</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="n">azAngs</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">ang_azAngs</span> <span class="o">-</span> <span class="mi">180</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">-</span> <span class="mi">180</span>
+        <span class="k">elif</span> <span class="n">ang_azAngs</span> <span class="o">&gt;</span> <span class="mi">180</span> <span class="ow">and</span> <span class="n">azAngs</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">:</span>
+            <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="p">(</span><span class="mi">450</span> <span class="o">-</span> <span class="n">azAngs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">180</span> <span class="o">-</span> <span class="n">ang_azAngs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">available_pickup</span><span class="p">:</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">rotation_putdown</span> <span class="o">-</span> <span class="mi">180</span>
+    <span class="c1">#print(magnet.rotation_putdown)</span>
+    <span class="k">return</span> <span class="n">magnet</span></div>
+
+
+<span class="c1"># checking angle to make sure it is within the range of 0 to 360</span>
+<div class="viewcode-block" id="check_for_negative_twopi_angle"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_negative_twopi_angle">[docs]</a><span class="k">def</span> <span class="nf">check_for_negative_twopi_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+
+    <span class="c1"># if angle &lt; 0:</span>
+    <span class="c1">#     angle = 360 + angle</span>
+    <span class="c1"># elif angle &gt; 360:</span>
+    <span class="c1">#     angle = angle - 360</span>
+
+    <span class="k">return</span> <span class="n">angle</span> <span class="o">%</span> <span class="mi">360</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

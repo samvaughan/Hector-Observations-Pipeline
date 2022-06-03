@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.tiling.tiling_functions &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Calculating Offsets from one Hexabundle to another" href="../calculating_offsets.html" />
+    <link rel="prev" title="hop.pipeline.HectorPipe" href="hop.pipeline.HectorPipe.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.tiling.tiling_functions</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="hop.pipeline.HectorPipe.html" title="Previous Chapter: hop.pipeline.HectorPipe"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; hop.pipeline....</span>
+    </a>
+  </li>
+  <li>
+    <a href="../calculating_offsets.html" title="Next Chapter: Calculating Offsets from one Hexabundle to another"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Calculating O... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hop.tiling.tiling_functions.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="module-hop.tiling.tiling_functions">
+<span id="hop-tiling-tiling-functions"></span><h1>hop.tiling.tiling_functions<a class="headerlink" href="#module-hop.tiling.tiling_functions" title="Permalink to this heading">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_completeness_stats</span></code>(df_targets, ...)</p></td>
+<td><p>Given a set of tiles, calculate some stats about the efficiency to get to a given completeness fraction Inputs:     df_targets (dataframe): a dataframe with a row for each target. Must have a column 'Tile_number'     N_targets_per_Hector_field (dict): The numnber of hexabundles we can place on galaxy targets     completeness_fraction_to_calculate (float, default=0.95): calculate the efficiency to reach this completeness fraction. This is defined as actual number of tiles used / minimum number of tiles possible)      verbose (bool, default=True): print efficiency stats or not. .</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_if_in_fov</span></code>(df, xcen, ycen, ...)</p></td>
+<td><p>Return a binary mask if points are within a circular field of view of radius R Inputs:     df (dataframe): A dataframe of targets. Must have columns 'RA' and 'DEC'     xcen (float): x (or RA) coordinate of centre     ycen (float): y (or DEC) coordinate of centre     radius (float): radius of circle in degrees.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_clashes</span></code>(df1, df2, proximity)</p></td>
+<td><p>Given some proximity, find objects in two dataframes which will clash Inputs:     df1 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'     df2 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'     proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_great_circle_distance</span></code>(uu, vv)</p></td>
+<td><p>The great circle distance between vectors uu=[RA, Dec] and vv=[RA, Dec] Note that RA and Dec <em>must</em> be in degrees.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_nearest</span></code>(x, y, grid)</p></td>
+<td><p>Find the nearest grid point to each target (at coordinates (x, y)) Inputs:     x (array_like): A list of target x coordinates     y (array_like): A list of target y coordinates     grid (2D array): A two dimensional array of grid coordinates to test against. Columns are x (grid[:, 0]) and y (grid[:, 1]).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_tile_centre_dengreedy</span></code>(master_df, ...)</p></td>
+<td><p>Given a set of x, y coordinates, find the position to place the tile according to Aaron's Dengreedy algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_tile_centre_greedy</span></code>(targets_df, ...)</p></td>
+<td><p>Given a set of x, y coordinates, find the position which would cover the most targets if we placed a field of view there. Inputs:     targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns 'RA' and 'DEC'     n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don't make this too large... Priorities: A priority value for each galaxy. If none is given, assume equal priorties for all targets.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_best_tile</span></code>(df_targets, df_guide_stars, ...)</p></td>
+<td><p>Put all the above functions togther and make a tile. Note that this function __doesn'<a href="#id1"><span class="problematic" id="id2">t__</span></a> update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups. Inputs:     df_targets (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC', &quot;PRIORITY&quot; and &quot;TILED&quot;     df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC' and &quot;r_mag&quot;     df_standard_stars (dataframe): A dataframe of standard stars. Must include columns 'RA', 'DEC' and 'priority'     tiling_parameters (dict): A dictionary containing the various parameters to do with the tiling. So far, necessary keys are 'Hector_FOV_radius', 'proximity', 'Nsel', 'Nsel_guides' and 'Nsel_standards' Returns:     A tuple of:         * The original df_targets dataframe         * A dataframe containing the targets for this tile         * A dataframe containing the guides for this tile         * A dataframe containing the standard stars for this tile         * The tile RA         * The tile Dec.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">noclash</span></code>(df1, df2, proximity)</p></td>
+<td><p>Take two dataframes, find those which are within some proximity of each other and then return the first dataframe as is, the SECOND dataframe without the clashing elements, and the number of elements which clash. Useful for selecting guide stars which don't clash with targets in a tile. Inputs:     df1 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'     df2 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'     proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_survey_completeness_and_tile_positions</span></code>(...)</p></td>
+<td><p>Make an overall plot of the survey completeness and the positions of each tile. Inputs:     tile_positions (list): A two component list. First element is a list of RA values of the tile centres, second component is a list of Dec values of the tile centres. tiling_parameters (dict): A dictionary of tiling parameters. Must have  a 'Hector_FOV_radius' key.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tile</span></code>(tile_df, guide_df, standards_df, ...)</p></td>
+<td><p>Make a plot of an individual tile. Inputs:     tile_df (dataframe): Dataframe of a tile to plot     guide_df (dataframe): Dataframe of guide stars from this tile     standards_df (dataframe): Dataframe of standard stars from this tile     catalogue_df (dataframe): Dataframe of the entire field, to plot as background     tile_RA (float): RA of the centre of this tile     tile_Dec (float): Dec of the centre of this tile     tile_outer_radius (float): Outer Radius of the FoV (in degrees)     tile_inner_radius (float): Inner Radius of the FoV (in degrees)     tile_number (int): Number of the tile     proximity (float): Radius of the tile     fig, ax (optional): An exisiting Figure/Axis object to plot on.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_guide_text_file</span></code>(outfolder, out_name, ...)</p></td>
+<td><p>Save a text file of things to be observed with Hector guide bundles (i.e.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_tile_outputs</span></code>(outfolder, df_targets, ...)</p></td>
+<td><p>Save the outputs from a single tile. These are:</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_tile_text_file</span></code>(outfolder, out_name, ...)</p></td>
+<td><p>Save a text file of things to be observed with Hector science bundles (i.e.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_stars_for_tile</span></code>(star_df, tile_df, ...)</p></td>
+<td><p>Given a tile of targets, select Nsel worth of stars by selecting stars which don't clash with any of our targets.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_targets</span></code>(all_targets_df, proximity, ...)</p></td>
+<td><p>Given a dataframe of targets, select Nsel galaxies to observe. These can't be nearer to each other than 'proximity'. Return a dataframe of just the new tile we've made. Inputs:     df (dataframe): A dataframe of targets. Must have columns &quot;RA&quot;, &quot;DEC&quot;, &quot;PRIORITY&quot; (i.e. priority), &quot;COMPLETED&quot; (i.e. tiled before this current iteration). proximity (float): Smallest distance between two targets (in arcseconds)     Nsel (int): Number of targets to select in each tile.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

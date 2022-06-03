@@ -1,0 +1,6 @@
+make_best_tile
+==============
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: make_best_tile

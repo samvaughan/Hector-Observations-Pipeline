@@ -1,0 +1,6 @@
+plot_tile
+=========
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: plot_tile

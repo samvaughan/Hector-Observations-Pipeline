@@ -1,0 +1,6 @@
+find_clashes
+============
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: find_clashes

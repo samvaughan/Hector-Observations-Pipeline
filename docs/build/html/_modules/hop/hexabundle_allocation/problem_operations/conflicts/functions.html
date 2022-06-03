@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.problem_operations.conflicts.functions &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.problem_operations.conflicts.functions</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">...hector.magnets.magnet_pair</span> <span class="kn">import</span> <span class="n">circle_and_circle_magnets</span><span class="p">,</span> <span class="n">circle_rectangle_magnets</span><span class="p">,</span> <span class="n">rectangle_rectangle_magnets</span>
+<span class="kn">from</span> <span class="nn">.circular_magnet_with_circular_magnet</span> <span class="kn">import</span> <span class="n">check_conflict_circle_circle_magnets</span>
+<span class="kn">from</span> <span class="nn">.circular_magnet_with_rectangular_magnet</span> <span class="kn">import</span> <span class="n">check_conflict_circle_rectangle_magnets</span>
+<span class="kn">from</span> <span class="nn">.rectangular_magnet_and_rectangular_magnet</span> <span class="kn">import</span> <span class="n">check_conflict_rectangle_rectangle_magnets</span>
+<span class="kn">from</span> <span class="nn">.blocked_magnet</span> <span class="kn">import</span> <span class="n">circular_magnet_is_fully_blocked</span><span class="p">,</span><span class="n">rectangular_magnet_is_fully_blocked</span>
+<span class="kn">from</span> <span class="nn">...hector.constants</span> <span class="kn">import</span> <span class="n">rectangle_magnet_length</span><span class="p">,</span> <span class="n">robot_arm_width</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">...hector.magnets.rectangular</span> <span class="kn">import</span> <span class="n">rectangular_magnet</span><span class="p">,</span> <span class="n">is_rectangular_magnet</span>
+<span class="kn">from</span> <span class="nn">...hector.magnets.circular</span> <span class="kn">import</span> <span class="n">circular_magnet</span><span class="p">,</span> <span class="n">is_circular_magnet</span>
+
+<span class="c1">## The function names with no comments have self-defining names</span>
+
+<div class="viewcode-block" id="minimum_magnet_proximity"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.minimum_magnet_proximity">[docs]</a><span class="k">def</span> <span class="nf">minimum_magnet_proximity</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">rectangle_magnet_length</span> <span class="o">+</span> <span class="n">robot_arm_width</span></div>
+
+<div class="viewcode-block" id="calculate_magnet_to_magnet_distance"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.calculate_magnet_to_magnet_distance">[docs]</a><span class="k">def</span> <span class="nf">calculate_magnet_to_magnet_distance</span><span class="p">(</span><span class="n">magnet1</span><span class="p">,</span> <span class="n">magnet2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">magnet2</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">magnet1</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">magnet2</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">magnet1</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_list_magnets_in_close_proximity"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_magnets_in_close_proximity">[docs]</a><span class="k">def</span> <span class="nf">create_list_magnets_in_close_proximity</span><span class="p">(</span><span class="n">list_magnets</span><span class="p">):</span>
+
+    <span class="n">magnets_in_close_proximity</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># checking each magnet with all the other ones iteratively through the magnets list</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_magnets</span><span class="p">)):</span>
+        <span class="n">magnet_i</span> <span class="o">=</span> <span class="n">list_magnets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_magnets</span><span class="p">)):</span>
+            <span class="n">magnet_j</span> <span class="o">=</span> <span class="n">list_magnets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="c1"># adding to list if distance between selected magnets are less than the specified minimum proximity</span>
+            <span class="k">if</span> <span class="n">calculate_magnet_to_magnet_distance</span><span class="p">(</span><span class="n">magnet_i</span><span class="p">,</span> <span class="n">magnet_j</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">minimum_magnet_proximity</span><span class="p">():</span>
+                <span class="n">magnets_in_close_proximity</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">magnet_i</span><span class="p">,</span> <span class="n">magnet_j</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">magnets_in_close_proximity</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="highlight_closed_magnets_on_plot"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.highlight_closed_magnets_on_plot">[docs]</a><span class="k">def</span> <span class="nf">highlight_closed_magnets_on_plot</span><span class="p">(</span><span class="n">closed_magnets</span><span class="p">,</span> <span class="n">colour</span><span class="p">):</span>
+
+    <span class="c1"># iterating through magnet pairs identified as closed magnets</span>
+    <span class="k">for</span> <span class="n">magnet_pair</span> <span class="ow">in</span> <span class="n">closed_magnets</span><span class="p">:</span>
+
+        <span class="c1"># iterating through each magnet of the selected pair</span>
+        <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">magnet_pair</span><span class="p">:</span>
+
+            <span class="c1"># highlighting the respective rectangular magnet with provided input colour</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">rectangular_magnet</span><span class="p">):</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">draw_rectangle</span><span class="p">(</span><span class="n">colour</span><span class="p">)</span>
+
+            <span class="c1"># highlighting the respective circular magnet with provided input colour</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">circular_magnet</span><span class="p">):</span>
+                <span class="n">magnet</span><span class="o">.</span><span class="n">draw_circle</span><span class="p">(</span><span class="n">colour</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="find_conflicts_between_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.find_conflicts_between_magnets">[docs]</a><span class="k">def</span> <span class="nf">find_conflicts_between_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
+
+    <span class="n">all_blocked_pickup_areas</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># checking if the magnet pair consists of both circular ones</span>
+    <span class="k">if</span> <span class="n">circle_and_circle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
+
+        <span class="c1"># check for conflict between circular magnets</span>
+        <span class="n">magnet_conflict</span> <span class="o">=</span> <span class="n">check_conflict_circle_circle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+
+        <span class="c1"># record the identified conflicts as blocked pickup areas</span>
+        <span class="k">if</span> <span class="n">magnet_conflict</span><span class="p">:</span>
+            <span class="n">all_blocked_pickup_areas</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">magnet_conflict</span><span class="p">)</span>
+
+    <span class="c1"># checking if the magnet pair consists of one circular and one rectangular</span>
+    <span class="k">elif</span> <span class="n">circle_rectangle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
+
+        <span class="c1"># check for conflict between circular and rectangular magnets</span>
+        <span class="n">magnet_conflict</span> <span class="o">=</span> <span class="n">check_conflict_circle_rectangle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+
+        <span class="c1"># record the identified conflicts as blocked pickup areas</span>
+        <span class="k">if</span> <span class="n">magnet_conflict</span><span class="p">:</span>
+            <span class="n">all_blocked_pickup_areas</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">magnet_conflict</span><span class="p">)</span>
+
+    <span class="c1"># checking if the magnet pair consists of both rectangular ones</span>
+    <span class="k">elif</span> <span class="n">rectangle_rectangle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
+
+        <span class="c1"># check for conflict between rectangular magnets</span>
+        <span class="n">magnet_conflict</span> <span class="o">=</span> <span class="n">check_conflict_rectangle_rectangle_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+
+        <span class="c1"># record the identified conflicts as blocked pickup areas</span>
+        <span class="k">if</span> <span class="n">magnet_conflict</span><span class="p">:</span>
+            <span class="n">all_blocked_pickup_areas</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">magnet_conflict</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_blocked_pickup_areas</span></div>
+
+<div class="viewcode-block" id="find_all_blocked_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.find_all_blocked_magnets">[docs]</a><span class="k">def</span> <span class="nf">find_all_blocked_magnets</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">):</span>
+
+    <span class="c1"># create magnet pairs from magnets list which have specified close proximity</span>
+    <span class="n">magnet_pairs</span> <span class="o">=</span> <span class="n">create_list_magnets_in_close_proximity</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+    <span class="n">blocked_areas</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">magnet_pairs</span><span class="p">:</span>
+
+        <span class="c1"># check for conflict between the magnet pairs in specified close proximity</span>
+        <span class="n">magnet_conflict</span> <span class="o">=</span> <span class="n">find_conflicts_between_magnets</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+
+        <span class="c1"># check if magnet conflicts exist</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">magnet_conflict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># add the magnet conflicted area to the blocked areas</span>
+            <span class="n">blocked_areas</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">magnet_conflict</span><span class="p">)</span>
+
+            <span class="c1"># remove the blocked pickup areas from list of available pickup by iterating through conflicts</span>
+            <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">magnet_conflict</span><span class="p">:</span>
+                <span class="n">conflict</span><span class="o">.</span><span class="n">remove_blocked_pickup_areas_from_list_available_pickup</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">blocked_areas</span></div>
+
+<div class="viewcode-block" id="is_magnet_fully_blocked"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.is_magnet_fully_blocked">[docs]</a><span class="k">def</span> <span class="nf">is_magnet_fully_blocked</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span><span class="n">blocked_pickup_areas</span><span class="p">):</span>
+
+    <span class="c1"># check for circular magnet being fully blocked</span>
+    <span class="k">if</span> <span class="n">is_circular_magnet</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
+        <span class="n">magnet_is_fully_blocked</span> <span class="o">=</span> <span class="n">circular_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">blocked_pickup_areas</span><span class="p">)</span>
+
+    <span class="c1"># check for rectangular magnet being fully blocked</span>
+    <span class="k">elif</span> <span class="n">is_rectangular_magnet</span><span class="p">(</span><span class="n">magnet</span><span class="p">):</span>
+        <span class="n">magnet_is_fully_blocked</span> <span class="o">=</span> <span class="n">rectangular_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">blocked_pickup_areas</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">magnet_is_fully_blocked</span></div>
+
+<div class="viewcode-block" id="create_list_of_blocked_pickup_areas"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocked_pickup_areas">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_blocked_pickup_areas</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">conflicted_magnet_list</span><span class="p">):</span>
+
+    <span class="n">blocked_pickup_areas</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">conflicted_magnet_list</span><span class="p">:</span>
+
+        <span class="c1"># identify and add the blocked pickup areas from the conflicts by checking against the blocked magnets</span>
+        <span class="k">if</span> <span class="n">magnet</span> <span class="o">==</span> <span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">:</span>
+            <span class="n">blocked_pickup_areas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_pickup_area</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">blocked_pickup_areas</span></div>
+
+<div class="viewcode-block" id="remove_multiple_occurrences_in_list"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.remove_multiple_occurrences_in_list">[docs]</a><span class="k">def</span> <span class="nf">remove_multiple_occurrences_in_list</span><span class="p">(</span><span class="n">object_list</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">object_list</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="create_list_of_fully_blocked_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_fully_blocked_magnets">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_fully_blocked_magnets</span><span class="p">(</span><span class="n">list_of_blocked_magnets</span><span class="p">):</span>
+
+    <span class="n">fully_blocked_magnets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">list_of_blocked_magnets</span><span class="p">:</span>
+
+        <span class="c1"># creating list of blocked pickup areas by checking each blocked magnet against blocked magnets list</span>
+        <span class="n">blocked_pickup_areas</span> <span class="o">=</span> <span class="n">create_list_of_blocked_pickup_areas</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">,</span> <span class="n">list_of_blocked_magnets</span><span class="p">)</span>
+
+        <span class="c1"># identify and add fully blocked magnets by checking them against blocked pickup areas</span>
+        <span class="k">if</span> <span class="n">is_magnet_fully_blocked</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">,</span><span class="n">blocked_pickup_areas</span><span class="p">):</span>
+            <span class="n">fully_blocked_magnets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">remove_multiple_occurrences_in_list</span><span class="p">(</span><span class="n">fully_blocked_magnets</span><span class="p">)</span></div>
+
+<span class="c1"># identifying the magnets which are responsible for blocking each of the fully blocked magnets</span>
+<div class="viewcode-block" id="blocking_magnets_for_fully_blocked_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnets_for_fully_blocked_magnets">[docs]</a><span class="k">def</span> <span class="nf">blocking_magnets_for_fully_blocked_magnets</span><span class="p">(</span><span class="n">list_of_blocked_magnets</span><span class="p">):</span>
+
+    <span class="n">fully_blocked_magnets_dictionary</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">list_of_blocked_magnets</span><span class="p">:</span>
+
+        <span class="n">blocked_pickup_areas</span> <span class="o">=</span> <span class="n">create_list_of_blocked_pickup_areas</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">,</span> <span class="n">list_of_blocked_magnets</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_magnet_fully_blocked</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="p">,</span> <span class="n">blocked_pickup_areas</span><span class="p">):</span>
+
+            <span class="c1"># magnet conflicts stated out with each fully blocked magnet and its list of blocking magnets</span>
+            <span class="n">conflict_magnet</span> <span class="o">=</span> <span class="s1">&#39;For &#39;</span> <span class="o">+</span> <span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> \
+                            <span class="n">conflict</span><span class="o">.</span><span class="n">blocking_magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocking_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+            <span class="c1">## TEST PRINT</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">conflict_magnet</span><span class="p">)</span>
+
+            <span class="c1"># blocked magnet stored as key and the blocking magnets as values in the fully blocked magnets dictionary</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">conflict</span><span class="o">.</span><span class="n">blocking_magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocking_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+
+            <span class="c1"># store the values by creating the keys if necessary and adding multiple values to same key if required</span>
+            <span class="n">fully_blocked_magnets_dictionary</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fully_blocked_magnets_dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="n">fully_blocked_magnets_dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c1">## TEST PRINT</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fully_blocked_magnets_dictionary</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fully_blocked_magnets_dictionary</span></div>
+
+<div class="viewcode-block" id="create_list_of_blocking_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.create_list_of_blocking_magnets">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_blocking_magnets</span><span class="p">(</span><span class="n">list_of_conflicts</span><span class="p">,</span> <span class="n">blocked_magnet</span><span class="p">):</span>
+
+    <span class="n">blocking_magnets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">list_of_conflicts</span><span class="p">:</span>
+
+        <span class="c1"># check for the blocked magnet in list of conflicts and add the respective blocking magnets</span>
+        <span class="k">if</span> <span class="n">conflict</span><span class="o">.</span><span class="n">blocked_magnet</span> <span class="o">==</span> <span class="n">blocked_magnet</span><span class="p">:</span>
+            <span class="n">blocking_magnets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conflict</span><span class="o">.</span><span class="n">blocking_magnet</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">remove_multiple_occurrences_in_list</span><span class="p">(</span><span class="n">blocking_magnets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="blocking_magnet_is_fully_blocked"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.blocking_magnet_is_fully_blocked">[docs]</a><span class="k">def</span> <span class="nf">blocking_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">blocking_magnet</span><span class="p">,</span> <span class="n">list_of_fully_blocked_magnets</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">blocking_magnet</span> <span class="ow">in</span> <span class="n">list_of_fully_blocked_magnets</span></div>
+
+<div class="viewcode-block" id="all_blocking_magnets_are_fully_blocked"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.functions.all_blocking_magnets_are_fully_blocked">[docs]</a><span class="k">def</span> <span class="nf">all_blocking_magnets_are_fully_blocked</span><span class="p">(</span><span class="n">list_of_blocking_magnets</span><span class="p">,</span><span class="n">list_of_fully_blocked_magnets</span><span class="p">):</span>
+
+    <span class="n">all_blocking_magnets_are_fully_blocked</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># check against each blocking magnet whether all the blocking magnets are fully blocked</span>
+    <span class="k">for</span> <span class="n">blocking_magnet</span> <span class="ow">in</span> <span class="n">list_of_blocking_magnets</span><span class="p">:</span>
+        <span class="n">all_blocking_magnets_are_fully_blocked</span> <span class="o">*=</span> <span class="n">blocking_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">blocking_magnet</span><span class="p">,</span> <span class="n">list_of_fully_blocked_magnets</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_blocking_magnets_are_fully_blocked</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

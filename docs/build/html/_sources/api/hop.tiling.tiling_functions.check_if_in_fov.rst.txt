@@ -1,0 +1,6 @@
+check_if_in_fov
+===============
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: check_if_in_fov

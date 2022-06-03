@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">...hector.magnets.pickup_areas</span> <span class="kn">import</span> <span class="n">tangential_right</span><span class="p">,</span> <span class="n">tangential_left</span><span class="p">,</span> <span class="n">radial_inward</span><span class="p">,</span><span class="n">radial_outward</span><span class="p">,</span><span class="n">inward</span><span class="p">,</span><span class="n">outward</span>
+
+<div class="viewcode-block" id="conflicted_magnet"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet">[docs]</a><span class="k">class</span> <span class="nc">conflicted_magnet</span><span class="p">:</span>
+
+    <span class="c1"># initializing class of magnets with conflicts</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">blocking_magnet</span><span class="p">,</span><span class="n">blocked_magnet</span><span class="p">,</span><span class="n">blocked_pickup_area</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocking_magnet</span>     <span class="o">=</span> <span class="n">blocking_magnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocked_magnet</span>      <span class="o">=</span> <span class="n">blocked_magnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocked_pickup_area</span> <span class="o">=</span> <span class="n">blocked_pickup_area</span>
+
+    <span class="c1"># removing the pickup areas which are blocked from the list of pickup areas</span>
+<div class="viewcode-block" id="conflicted_magnet.remove_blocked_pickup_areas_from_list_available_pickup"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.conflicted_magnet.remove_blocked_pickup_areas_from_list_available_pickup">[docs]</a>    <span class="k">def</span> <span class="nf">remove_blocked_pickup_areas_from_list_available_pickup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocked_pickup_area</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="n">pickup_areas</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="n">pickup_areas</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocked_pickup_area</span><span class="p">)</span></div></div>
+
+<span class="c1"># checking if circular magnet is fully blocked by its pickup directions</span>
+<div class="viewcode-block" id="circular_magnet_is_fully_blocked"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.circular_magnet_is_fully_blocked">[docs]</a><span class="k">def</span> <span class="nf">circular_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">list_of_blocked_pickup_areas</span><span class="p">):</span>
+
+    <span class="c1"># initializing all pickup directions being blocked as false</span>
+    <span class="p">[</span><span class="n">blocked_tangential_right</span><span class="p">,</span>\
+     <span class="n">blocked_tangential_left</span><span class="p">,</span>\
+     <span class="n">blocked_radial_inward</span><span class="p">,</span>\
+     <span class="n">blocked_radial_outward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+
+    <span class="c1"># checking for each pickup direction to see if it&#39;s blocked</span>
+    <span class="k">for</span> <span class="n">blocked_pickup_area</span> <span class="ow">in</span> <span class="n">list_of_blocked_pickup_areas</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocked_pickup_area</span><span class="p">,</span><span class="n">tangential_right</span><span class="p">):</span>
+            <span class="n">blocked_tangential_right</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocked_pickup_area</span><span class="p">,</span><span class="n">tangential_left</span><span class="p">):</span>
+            <span class="n">blocked_tangential_left</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocked_pickup_area</span><span class="p">,</span><span class="n">radial_inward</span><span class="p">):</span>
+            <span class="n">blocked_radial_inward</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocked_pickup_area</span><span class="p">,</span><span class="n">radial_outward</span><span class="p">):</span>
+            <span class="n">blocked_radial_outward</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># if all pickup directions are blocked, function returns True for magnet being fully blocked or else False</span>
+    <span class="k">if</span> <span class="n">blocked_tangential_right</span> <span class="ow">and</span> <span class="n">blocked_tangential_left</span> <span class="ow">and</span> <span class="n">blocked_radial_inward</span> <span class="ow">and</span> <span class="n">blocked_radial_outward</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<span class="c1"># checking if rectangular magnet is fully blocked by its pickup directions</span>
+<div class="viewcode-block" id="rectangular_magnet_is_fully_blocked"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.rectangular_magnet_is_fully_blocked">[docs]</a><span class="k">def</span> <span class="nf">rectangular_magnet_is_fully_blocked</span><span class="p">(</span><span class="n">list_of_blocked_pickup_areas</span><span class="p">):</span>
+
+    <span class="c1"># initializing all pickup directions being blocked as false</span>
+    <span class="p">[</span><span class="n">blocked_inward</span><span class="p">,</span> <span class="n">blocked_outward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+
+    <span class="c1"># checking for each pickup direction to see if it&#39;s blocked</span>
+    <span class="k">for</span> <span class="n">pickup_area</span> <span class="ow">in</span> <span class="n">list_of_blocked_pickup_areas</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pickup_area</span><span class="p">,</span><span class="n">inward</span><span class="p">):</span>
+            <span class="n">blocked_inward</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pickup_area</span><span class="p">,</span><span class="n">outward</span><span class="p">):</span>
+            <span class="n">blocked_outward</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># if all pickup directions are blocked, function returns True for magnet being fully blocked or else False</span>
+    <span class="k">if</span> <span class="n">blocked_inward</span> <span class="ow">and</span> <span class="n">blocked_outward</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<span class="c1"># print out the fully blocked magnets list on terminal, and write them in the conflicts record file</span>
+<div class="viewcode-block" id="print_fully_blocked_magnets"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.problem_operations.conflicts.html#hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet.print_fully_blocked_magnets">[docs]</a><span class="k">def</span> <span class="nf">print_fully_blocked_magnets</span><span class="p">(</span><span class="n">fully_blocked_magnets</span><span class="p">,</span> <span class="n">conflictsRecord</span><span class="p">,</span> <span class="n">fileNameHexa</span><span class="p">):</span>
+
+    <span class="c1"># Check if fully_blocked_magnets has any elements</span>
+    <span class="k">if</span> <span class="n">fully_blocked_magnets</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">SOME MAGNETS ARE FULLY BLOCKED</span><span class="se">\n\n</span><span class="s1">Fully blocked magnets:&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">fully_blocked_magnets</span><span class="p">:</span>
+
+            <span class="c1"># print fully blocked magnets on terminal</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+
+            <span class="c1"># write fully blocked magnets on file</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conflictsRecord</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">conflict</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">magnet</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">fileNameHexa</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">conflict</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Some Magnets are blocked! Go back and change the configuration&quot;</span><span class="p">)</span>
+
+    <span class="c1"># if none of the magnets are fully blocked then print &#39;None&#39;</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">No magnets are fully blocked!&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

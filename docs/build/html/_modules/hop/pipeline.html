@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.pipeline &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.pipeline</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+
+<span class="kn">from</span> <span class="nn">.misc</span> <span class="kn">import</span> <span class="n">misc_tools</span>
+<span class="kn">from</span> <span class="nn">.misc</span> <span class="kn">import</span> <span class="n">pandas_tools</span> <span class="k">as</span> <span class="n">P</span>
+<span class="kn">from</span> <span class="nn">.misc</span> <span class="kn">import</span> <span class="n">plotting_tools</span> 
+<span class="kn">from</span> <span class="nn">.tiling</span> <span class="kn">import</span> <span class="n">tiling_functions</span> <span class="k">as</span> <span class="n">tiling</span>
+<span class="kn">from</span> <span class="nn">.hexabundle_allocation.problem_operations</span> <span class="kn">import</span> <span class="n">extract_data</span><span class="p">,</span> <span class="n">file_arranging</span><span class="p">,</span> <span class="n">hexabundle</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">plots</span><span class="p">,</span> <span class="n">position_ordering</span><span class="p">,</span> <span class="n">robot_parameters</span><span class="p">,</span> <span class="n">conflicts</span><span class="p">,</span> <span class="n">fibres</span>
+<span class="kn">from</span> <span class="nn">.target_selection</span> <span class="kn">import</span> <span class="n">HectorSim</span>
+
+<span class="kn">from</span> <span class="nn">.hexabundle_allocation.hector.plate</span> <span class="kn">import</span> <span class="n">HECTOR_plate</span>
+
+<div class="viewcode-block" id="HectorPipe"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe">[docs]</a><span class="k">class</span> <span class="nc">HectorPipe</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Hector Observations pipeline. This class has methods to:</span>
+
+<span class="sd">        * Use the Survey Simulator to create an input catalogue from a larger master catalogue</span>
+<span class="sd">        * Tile an input catalogue using the Hector tiling code</span>
+<span class="sd">        * Apply distortion correction to each tile</span>
+<span class="sd">        * Configure each tile</span>
+<span class="sd">        * Run the HexabundleAllocation code</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Profit_files_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_dictionary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">P_and_Q_offset_filename</span><span class="o">=</span><span class="s2">&quot;Hexa_final_prism_gluing_PQ_table.xlsx&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.</span>
+
+<span class="sd">        Optional Arguments: Location of the Profit files. If None, default location is $hop_package_location/distortion_correction/HectorTranslationSoftware/DataFiles</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Firstly, set the directory of the &#39;hop&#39; folder as a bash environment variable, so that we can access it in R</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HECTOROBSPIPELINE_LOC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">config_filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">config_dictionary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;You must provide one of config_filename or config_dictionary&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config_dictionary</span>
+        <span class="k">if</span> <span class="n">config_dictionary</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">config_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;You must provide one of config_filename or config_dictionary&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_filename</span> <span class="o">=</span> <span class="n">config_filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">_load_config</span><span class="p">(</span><span class="n">config_filename</span><span class="p">)</span>
+
+
+        <span class="c1"># Lists for the tile RAs and DECs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_RAs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_Decs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Set up the header for this tile we&#39;ll append to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_header_dictionary</span><span class="p">()</span>
+
+        <span class="c1"># Set up the output folders</span>
+        <span class="n">subfolders_to_be_made</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Logs&#39;</span><span class="p">,</span> <span class="s1">&#39;Configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;Tiles&#39;</span><span class="p">,</span> <span class="s1">&#39;Plots&#39;</span><span class="p">,</span> <span class="s1">&#39;DistortionCorrected&#39;</span><span class="p">,</span> <span class="s2">&quot;DistortionCorrected/Plots&quot;</span><span class="p">,</span> <span class="s2">&quot;Allocation&quot;</span><span class="p">,</span> <span class="s2">&quot;Allocation/tile_outputs&quot;</span><span class="p">,</span> <span class="s2">&quot;Allocation/robot_outputs&quot;</span><span class="p">,</span> <span class="s2">&quot;Fibres&quot;</span><span class="p">,</span> <span class="s2">&quot;FinalOutputs&quot;</span><span class="p">]</span>
+        <span class="n">folders</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">create_output_directories</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">],</span> <span class="n">subfolders_to_be_made</span><span class="p">)</span>
+
+        <span class="c1"># Add these as class attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logfile_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Logs&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Configuration&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tile_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Tiles&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Plots&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_tile_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;DistortionCorrected&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_plot_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;DistortionCorrected/Plots&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_base</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Allocation&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Allocation/tile_outputs&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_robot</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;Allocation/robot_outputs&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_tiles_correct_format_location</span> <span class="o">=</span> <span class="n">folders</span><span class="p">[</span><span class="s1">&#39;FinalOutputs&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Set up the log files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger_R_code</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">set_up_loggers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># The galaxy ID dictionary for the hexabundle allocation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">galaxyIDrecord</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Get the location of the distortion correction executable and the R code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DistortionCorrection_binary_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;distortion_correction/HectorTranslationSoftware/HectorConfigUtility/HectorConfigUtil&quot;</span><span class="p">)</span>
+        <span class="c1"># if not self.DistortionCorrection_binary_location.exists():</span>
+        <span class="c1">#     raise NameError(&quot;The Distortion Correction binary seems to not exist&quot;)</span>
+
+        <span class="c1"># Locations of all the Hector Config code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hector_distortion_file_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorDistortion.sds&quot;</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hector_linearity_file_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;distortion_correction/HectorTranslationSoftware/DataFiles/fit2-b-pos/HectorLinear.sds&quot;</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hector_sky_fibre_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;distortion_correction/HectorTranslationSoftware/DataFiles/SkyFibres.csv&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">Profit_files_location</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Profit_files_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;distortion_correction/HectorTranslationSoftware/DataFiles&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Profit_files_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Profit_files_location</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hector_distortion_file_location</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The Hector distortion file HectorDistortion.sds seems to not exist&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HECTOR_DISTORTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hector_distortion_file_location</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hector_linearity_file_location</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The Hector linearity file HectorLinear.sds seems to not exist&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HECTOR_LINEARITY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Hector_linearity_file_location</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ConfigurationCode_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;configuration/HECTOR_ClusterFieldsTest.R&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ConfigurationCode_location</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The Configuration Code seems to not exist&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Files used in the hexabundle allocation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">excel_files_for_allocation_location</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;hexabundle_allocation&quot;</span><span class="p">)</span>
+        <span class="c1"># Location of the P and Q offset file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offsetFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">excel_files_for_allocation_location</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">P_and_Q_offset_filename</span><span class="p">)</span>
+        <span class="c1"># Location of the Fibre Slit Info file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fibre_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">excel_files_for_allocation_location</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;Fibre_slitInfo_final.csv&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">offsetFile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The P and Q offset file seems to not exist&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fibre_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The Fibre slit info file seems to not exist&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_targets_catalogue</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_standard_star_catalogue</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_guide_star_catalogue</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="HectorPipe.make_header_dictionary"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.make_header_dictionary">[docs]</a>    <span class="k">def</span> <span class="nf">make_header_dictionary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">header_dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;#PROXIMITY&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> # tiling proximity value in arcseconds&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;#TILING_DATE&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y %m </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> # Date the tile was created/configured&quot;</span>
+                            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">header_dictionary</span></div>
+
+<div class="viewcode-block" id="HectorPipe.read_header_dictionary_from_file"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.read_header_dictionary_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_header_dictionary_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        
+        <span class="n">header_dict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_get_header</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">header_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">header_dict</span></div>
+
+<div class="viewcode-block" id="HectorPipe.load_input_catalogue"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.load_input_catalogue">[docs]</a>    <span class="k">def</span> <span class="nf">load_input_catalogue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load an input target catalogue, guide star catalogue and standard star catalogue</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">_read_table</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;final_catalogue_name&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_guide_stars</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">_read_table</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;guide_star_filename&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_standard_stars</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">_read_table</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;standard_star_filename&#39;</span><span class="p">]))</span>
+
+        <span class="c1"># Add some attributes to check that we have the correct catalogues</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_targets_catalogue</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_guide_star_catalogue</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">have_standard_star_catalogue</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_columns_to_catalogues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Add the empty columns which we&#39;ll update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;Tile_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">999</span>
+
+        <span class="c1"># Add the columns about how many observations we need to complete for each galaxy</span>
+        <span class="c1"># The remaining obsverations column will count down to 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;N_observations_to_complete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;remaining_observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;N_observations_to_complete&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;remaining_observations&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Adding extra columns to the target dataframe&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rename a few columns to make sure things align. TODO: FixMe so this isn&#39;t needed!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># # Rename columns to match the ones the code expects</span>
+        <span class="c1"># # This will be removed in future</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">GAL_MAG_R</span><span class="o">=</span><span class="s1">&#39;r_mag&#39;</span><span class="p">,</span> <span class="n">CATID</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_guide_stars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_guide_stars</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">ROWID</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">R_MAG_AUTO</span><span class="o">=</span><span class="s1">&#39;r_mag&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_standard_stars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_standard_stars</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">ROWID</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">R_MAG_AUTO</span><span class="o">=</span><span class="s1">&#39;r_mag&#39;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="HectorPipe.find_premade_tiles"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.find_premade_tiles">[docs]</a>    <span class="k">def</span> <span class="nf">find_premade_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find any tiles which have already been configured in the output folders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_location</span><span class="si">}</span><span class="s2">/in_progress_targets_dataframe.csv&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No &#39;in_progress_targets_dataframe.csv&#39; file found, so no pre-made tiles will be loaded&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">pre_made_and_configured_files</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Hexa_*.txt&quot;</span><span class="p">))</span>
+        <span class="n">pre_made_tiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_location</span><span class="si">}</span><span class="s2">/tile_*.fld&quot;</span><span class="p">)))</span>
+
+        <span class="n">starting_tile</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">configuration_file</span><span class="p">,</span> <span class="n">tile_file</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pre_made_and_configured_files</span><span class="p">,</span> <span class="n">pre_made_tiles</span><span class="p">):</span>
+            <span class="c1">#tile_number = int(configuration_file.split(&#39;_&#39;)[-1].split(&#39;.&#39;)[0])</span>
+            <span class="c1">#tile_members = pd.read_csv(configuration_file, delim_whitespace=True)</span>
+            <span class="n">starting_tile</span> <span class="o">+=</span><span class="mi">1</span>
+
+            <span class="c1"># Now get the centres of the tile</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tile_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_RAs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_Decs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">starting_tile</span><span class="si">}</span><span class="s2"> pre-made tiles from a previous run&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">starting_tile</span></div>
+
+
+<div class="viewcode-block" id="HectorPipe.get_remaining_targets"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.get_remaining_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_remaining_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_targets</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of targets remaining in the field to tile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">remaining_targets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_targets</span><span class="p">)</span> <span class="o">-</span> <span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">remaining_targets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">remaining_targets</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="HectorPipe.add_fibre_type_column"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.add_fibre_type_column">[docs]</a>    <span class="k">def</span> <span class="nf">add_fibre_type_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_filename</span><span class="p">):</span>
+
+        <span class="c1"># Get the dataframe, skipping the header</span>
+        <span class="n">tile</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">tile_filename</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+
+        <span class="n">tile</span><span class="p">[</span><span class="s1">&#39;fibre_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+        <span class="c1"># Galaixes and standard stars have type = 1</span>
+        <span class="n">tile</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">type</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;fibre_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;P&#39;</span>
+        <span class="c1"># Standards also have type &quot;G&quot;</span>
+        <span class="n">tile</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;fibre_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;P&#39;</span>
+        <span class="c1"># Guides have type &quot;G&quot;</span>
+        <span class="n">tile</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;fibre_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+        <span class="c1"># Sky fibres have type &quot;S&quot;</span>
+        <span class="n">tile</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">tile</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="s1">&#39;fibre_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
+
+        <span class="k">return</span> <span class="n">tile</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_run_tiling_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proximity</span><span class="p">,</span> <span class="n">current_tile</span><span class="p">,</span> <span class="n">use_galaxy_priorities</span><span class="p">,</span> <span class="n">tile_out_fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">guide_out_fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        
+        <span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">=</span> <span class="n">tiling</span><span class="o">.</span><span class="n">make_best_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_guide_stars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_standard_stars</span><span class="p">,</span> <span class="n">proximity</span><span class="o">=</span><span class="n">proximity</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">tiling_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tiling_type&#39;</span><span class="p">],</span> <span class="n">selection_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;allocation_type&#39;</span><span class="p">],</span> <span class="n">fill_spares_with_repeats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;fill_spares_with_repeats&#39;</span><span class="p">],</span> <span class="n">use_galaxy_priorities</span><span class="o">=</span><span class="n">use_galaxy_priorities</span><span class="p">)</span>
+
+        <span class="n">tiling</span><span class="o">.</span><span class="n">save_tile_outputs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">standard_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">tiling_parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">tile_number</span><span class="o">=</span><span class="n">current_tile</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">columns_in_order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;columns_for_target_tile_saving&#39;</span><span class="p">],</span> <span class="n">guide_columns_in_order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;columns_for_guide_tile_saving&#39;</span><span class="p">],</span> <span class="n">tile_out_name</span><span class="o">=</span><span class="n">tile_out_fname</span><span class="p">,</span> <span class="n">guide_out_name</span><span class="o">=</span><span class="n">guide_out_fname</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span>
+
+
+
+<div class="viewcode-block" id="HectorPipe.tile_field"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.tile_field">[docs]</a>    <span class="k">def</span> <span class="nf">tile_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configure_tiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">apply_distortion_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">config_timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_galaxy_priorities</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">robot_temperature</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">obs_temperature</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;a test_label&quot;</span><span class="p">,</span> <span class="n">plateID</span><span class="o">=</span><span class="s2">&quot;a test_plateID&quot;</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y %m </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">check_sky_fibres</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Robot Temperature: </span><span class="si">{</span><span class="n">robot_temperature</span><span class="si">}</span><span class="s2"> C, Obs Temperature: </span><span class="si">{</span><span class="n">obs_temperature</span><span class="si">}</span><span class="s2"> C. date=</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot_temperature</span> <span class="o">=</span> <span class="n">robot_temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_temperature</span> <span class="o">=</span> <span class="n">obs_temperature</span>
+
+        <span class="c1"># Make an empty data frame to store the properties of each tile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tile_database</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="c1"># Check that we have our three input catalogues</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_targets_catalogue</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_standard_star_catalogue</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_guide_star_catalogue</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;We must have a targets, guide star and standard star catalogue! Did you forget to load them?&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add the empty columns to our dataframes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_columns_to_catalogues</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rename_columns</span><span class="p">()</span> <span class="c1">## ToDo: FixMe so this isn&#39;t necessary</span>
+
+        <span class="n">starting_tile</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;fresh_start&#39;</span><span class="p">]:</span>
+            <span class="n">starting_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_premade_tiles</span><span class="p">()</span>
+        
+        <span class="c1"># Now do the tiling</span>
+        <span class="n">remaining_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_remaining_targets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Targets in field to tile: </span><span class="si">{</span><span class="n">remaining_targets</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">():</span>
+
+            <span class="n">remaining_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_remaining_targets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">remaining_targets</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">current_tile</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="n">starting_tile</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tile </span><span class="si">{</span><span class="n">current_tile</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Remaining Targets: </span><span class="si">{</span><span class="n">remaining_targets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Set up the tile filenames</span>
+            <span class="n">tile_out_fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_location</span><span class="si">}</span><span class="s2">/tile_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+            <span class="n">guide_tile_out_fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_location</span><span class="si">}</span><span class="s2">/guide_tile_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+            <span class="n">tile_out_fname_after_DC</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_tile_location</span><span class="si">}</span><span class="s2">/DC_tile_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+            <span class="n">guide_tile_out_fname_after_DC</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_tile_location</span><span class="si">}</span><span class="s2">/guide_DC_tile_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+            <span class="n">configuration_output_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Hexa_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+            <span class="n">configuration_guide_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Guides_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+            <span class="n">configuration_plot_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Plot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.pdf&quot;</span><span class="p">)</span>
+
+            <span class="c1"># filename for a plot which compares the tile before/after distortion correction</span>
+            <span class="n">DC_correction_comparison_plot_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_plot_location</span><span class="si">}</span><span class="s2">/Tile_</span><span class="si">{</span><span class="n">current_tile</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">_comparison.pdf&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Make sure that the configuration code is looking at the correct file, whether or not we&#39;re applying the distortion correction</span>
+            <span class="k">if</span> <span class="n">configure_tiles</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">apply_distortion_correction</span><span class="p">:</span>
+                    <span class="n">tile_file_for_configuration</span> <span class="o">=</span> <span class="n">tile_out_fname_after_DC</span>
+                    <span class="n">guide_tile_for_configuration</span> <span class="o">=</span> <span class="n">guide_tile_out_fname_after_DC</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tile_file_for_configuration</span> <span class="o">=</span> <span class="n">tile_out_fname</span>
+                    <span class="n">guide_tile_for_configuration</span> <span class="o">=</span> <span class="n">guide_tile_out_fname</span>
+
+            <span class="c1"># Run the tiling</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_tiling_code</span><span class="p">(</span><span class="n">proximity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">],</span> <span class="n">current_tile</span><span class="o">=</span><span class="n">current_tile</span><span class="p">,</span> <span class="n">use_galaxy_priorities</span><span class="o">=</span><span class="n">use_galaxy_priorities</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_RAs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tile_RA</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_Decs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tile_Dec</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">apply_distortion_correction</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Run the distortion correction</span>
+                <span class="n">DC_corrected_output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_distortion_correction</span><span class="p">(</span><span class="n">tile_out_fname</span><span class="p">,</span> <span class="n">guide_tile_out_fname</span><span class="p">,</span> <span class="n">tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">guide_tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">plot_save_filename</span><span class="o">=</span><span class="n">DC_correction_comparison_plot_filename</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">robot_temp</span><span class="o">=</span><span class="n">robot_temperature</span><span class="p">,</span> <span class="n">obs_temp</span><span class="o">=</span><span class="n">obs_temperature</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SourceCat&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> Tile </span><span class="si">{</span><span class="n">count</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">plateID</span><span class="o">=</span><span class="n">plateID</span><span class="p">,</span> <span class="n">distortion_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_distortion_file_location</span><span class="p">,</span> <span class="n">linearity_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_linearity_file_location</span><span class="p">,</span> <span class="n">sky_fibre_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_sky_fibre_location</span><span class="p">,</span> <span class="n">profit_file_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Profit_files_location</span><span class="p">,</span> <span class="n">check_sky_fibres</span><span class="o">=</span><span class="n">check_sky_fibres</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Distortion-corrected tile saved at </span><span class="si">{</span><span class="n">tile_out_fname_after_DC</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+
+            <span class="k">if</span> <span class="n">configure_tiles</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Place holder variable to see if the configuration code has completed</span>
+                <span class="n">configured</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_TRIES&#39;</span><span class="p">]):</span>
+
+                    <span class="c1"># If we&#39;re having trouble with a tile, rescale the proximity by 10 % for every five tiles we&#39;ve tried</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;Rescale_proximity&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">proximity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;proximity&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">//</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
+
+                    <span class="c1"># Set up the filenames of the configureation</span>
+                    <span class="n">return_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_configuration_code</span><span class="p">(</span><span class="n">tile_file_for_configuration</span><span class="p">,</span> <span class="n">guide_tile_for_configuration</span><span class="p">,</span> <span class="n">configuration_output_filename</span><span class="p">,</span> <span class="n">configuration_guide_filename</span><span class="p">,</span> <span class="n">configuration_plot_filename</span><span class="p">,</span> <span class="n">config_timeout</span><span class="p">)</span>
+                        
+                        
+                    <span class="c1"># If we&#39;ve done the tile, break out of the inner &#39;Max tries&#39; loop</span>
+                    <span class="k">if</span> <span class="n">return_code</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                    <span class="k">elif</span> <span class="n">return_code</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">timeout_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">**Tiling code couldn&#39;t configure and timed out... Trying again with a new input tile.**</span><span class="se">\n\t</span><span class="s2">**Proximity value is currently </span><span class="si">{</span><span class="n">proximity</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">remaining_targets</span><span class="si">}</span><span class="s2"> targets remaining**&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">timeout_message</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger_R_code</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">timeout_message</span><span class="p">)</span>
+
+                        
+
+                    <span class="c1"># If we get here, it means the configuration code hasn&#39;t managed to configure. So we&#39;ll give it another tile. </span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_tiling_code</span><span class="p">(</span><span class="n">proximity</span><span class="o">=</span><span class="n">proximity</span><span class="p">,</span> <span class="n">current_tile</span><span class="o">=</span><span class="n">current_tile</span><span class="p">,</span> <span class="n">use_galaxy_priorities</span><span class="o">=</span><span class="n">use_galaxy_priorities</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">apply_distortion_correction</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">DC_corrected_output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_distortion_correction</span><span class="p">(</span><span class="n">tile_out_fname</span><span class="p">,</span> <span class="n">guide_tile_out_fname</span><span class="p">,</span> <span class="n">tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">guide_tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">plot_save_filename</span><span class="o">=</span><span class="n">DC_correction_comparison_plot_filename</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">robot_temp</span><span class="o">=</span><span class="n">robot_temperature</span><span class="p">,</span> <span class="n">obs_temp</span><span class="o">=</span><span class="n">obs_temperature</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">plateID</span><span class="o">=</span><span class="n">plateID</span><span class="p">,</span> <span class="n">distortion_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_distortion_file_location</span><span class="p">,</span> <span class="n">linearity_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_linearity_file_location</span><span class="p">,</span> <span class="n">sky_fibre_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Hector_sky_fibre_location</span><span class="p">,</span> <span class="n">profit_file_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Profit_files_location</span><span class="p">,</span> <span class="n">check_sky_fibres</span><span class="o">=</span><span class="n">check_sky_fibres</span><span class="p">)</span>
+
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">configured</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Couldn&#39;t configure this tile after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_TRIES&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> attempts.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Update the header of the files from the config code</span>
+            <span class="k">if</span> <span class="n">configure_tiles</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">update_header</span><span class="p">(</span><span class="n">configuration_output_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span> <span class="o">=</span> <span class="n">misc_tools</span><span class="o">.</span><span class="n">update_header</span><span class="p">(</span><span class="n">configuration_guide_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span><span class="p">)</span>
+
+            <span class="c1"># Now find which targets have been selected in this tile</span>
+            <span class="n">selected_targets_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">])</span>
+            <span class="c1"># Find which targets are being tiled and haven&#39;t been completed</span>
+            <span class="n">new_targets</span> <span class="o">=</span> <span class="p">(</span><span class="n">selected_targets_mask</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Find the targets which have been completed and are just filling out the numbers</span>
+            <span class="n">repeated_targets</span> <span class="o">=</span> <span class="p">(</span><span class="n">selected_targets_mask</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Subtract one from the remaining observations for everything</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_targets</span><span class="p">,</span> <span class="s1">&#39;remaining_observations&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="c1"># Change the TILED flag for targets we&#39;ve finished</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_targets</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_targets</span><span class="p">,</span> <span class="s1">&#39;remaining_observations&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># And include the tile number for each target</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_targets</span><span class="p">,</span> <span class="s1">&#39;Tile_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_tile</span>
+
+            <span class="c1"># Now update the tile database</span>
+
+            <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;tile_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_tile</span>
+            <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;tile_centre_RA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tile_RA</span>
+            <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;tile_centre_DEC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tile_Dec</span>
+            <span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;Filler_Galaxy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">tile_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">repeated_targets</span><span class="p">,</span> <span class="s1">&#39;Filler_Galaxy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tile_database</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_database</span><span class="p">,</span> <span class="n">tile_df</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1">#self.tile_database.set_index(&quot;tile_number&quot;, inplace=True)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Tile contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tile_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> galaxies, of which </span><span class="si">{</span><span class="n">tile_df</span><span class="p">[</span><span class="s1">&#39;Filler_Galaxy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2"> are repeats&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FINISHED TILE </span><span class="si">{</span><span class="n">current_tile</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Save the overall database in its current form</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/Tiles/in_progress_targets_dataframe.csv&quot;</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">tile_database</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/Tiles/tiles_dataframe.csv&quot;</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tile_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">best_tile_RAs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_tile_Decs</span><span class="p">])</span>
+        
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">tiling</span><span class="o">.</span><span class="n">plot_survey_completeness_and_tile_positions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">completion_fraction_to_calculate</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/Plots/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_field_plot.pdf&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        
+        <span class="c1">#Save the overall dataframes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_targets</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_folder&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/Tiles/completed_targets_dataframe.csv&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">N_tiles</span> <span class="o">=</span> <span class="n">current_tile</span></div>
+
+
+<div class="viewcode-block" id="HectorPipe.apply_distortion_correction"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.apply_distortion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">apply_distortion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_out_fname</span><span class="p">,</span> <span class="n">guide_tile_out_fname</span><span class="p">,</span> <span class="n">tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">guide_tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">tile_RA</span><span class="p">,</span> <span class="n">tile_Dec</span><span class="p">,</span> <span class="n">guide_stars_for_tile</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot_save_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">robot_temp</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">obs_temp</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;test_label&quot;</span><span class="p">,</span> <span class="n">plateID</span><span class="o">=</span><span class="s2">&quot;test_plateID&quot;</span><span class="p">,</span> <span class="n">distortion_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">linearity_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sky_fibre_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">profit_file_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">check_sky_fibres</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">turn_off_linearity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rot_matrix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">apply_PM_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug_levels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take a tile file from the tiling process and apply Keith&#39;s distortion correction code. Then turn his one output file into the two output files which Caro&#39;s configuration code expects. We also need to do some work to edit the headers/etc.</span>
+
+<span class="sd">        If plot_save_filename is not None, save an image of the tile before/after the correction is applied</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Touch the output file so it already exists</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">tile_out_fname_after_DC</span><span class="p">)</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+        <span class="c1"># Now call Keith&#39;s code</span>
+        <span class="n">DC_bash_code</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DistortionCorrection_binary_location</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_out_fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">guide_tile_out_fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_out_fname_after_DC</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">plateID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obs_temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">distortion_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">linearity_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sky_fibre_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">profit_file_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Turn off the sky fibre checking if check_sky_fibres is False</span>
+        <span class="k">if</span> <span class="n">rot_matrix</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">DC_bash_code</span> <span class="o">+=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;xymatrix=</span><span class="si">{</span><span class="n">rot_matrix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_sky_fibres</span><span class="p">:</span>
+            <span class="n">DC_bash_code</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-nosky&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">apply_PM_corr</span><span class="p">:</span>
+            <span class="n">DC_bash_code</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-nopm&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">debug_levels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">DC_bash_code</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-debug&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">debug_levels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">turn_off_linearity</span><span class="p">:</span>
+            <span class="n">DC_bash_code</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-nolin&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DC_bash_code</span><span class="p">))</span>
+
+        <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">DC_bash_code</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bash command: </span><span class="si">{</span><span class="n">shlex</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DC_bash_code</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+
+        <span class="c1"># Now take Keith&#39;s code and separate the one output file which contains galaxies, standard stars and guides into two: one which has galaxies and standard stars and one which just has the guides. This is a bit messy, but reflects the way that Caro&#39;s code reads things in. It&#39;s easier to do it in Python, where I know exactly which rows are guides/galaxies/standards, rather than guessing in R using the naming convention </span>
+
+        <span class="c1"># First, add the fibre_type column</span>
+        <span class="n">DC_corrected_output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_fibre_type_column</span><span class="p">(</span><span class="n">tile_out_fname_after_DC</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tile_out_fname_after_DC</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">fi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                    <span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span>
+
+        <span class="c1">#Keith&#39;s code spits out the header in the reverse order to the one we want, so fix that here:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+
+        <span class="c1"># Convert the header list to a header dictionary</span>
+        <span class="c1"># The extra argument to split is &quot;maxsplits&quot;, i.e. we only want to split on the first occurence</span>
+        <span class="n">header_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]</span>
+        <span class="n">header_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]</span>
+
+        <span class="n">new_header_values</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">header_keys</span><span class="p">,</span> <span class="n">header_values</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_header_values</span><span class="p">)</span>
+        <span class="c1">#self.header_dictionary.update(zip([&quot;#CONFIGTEMP&quot;, &quot;#OBSTEMP&quot;], [robot_temp, obs_temp]))</span>
+
+
+        <span class="n">guide_rows</span> <span class="o">=</span> <span class="n">DC_corrected_output_file</span><span class="o">.</span><span class="n">ID</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">guide_stars_for_tile</span><span class="o">.</span><span class="n">ID</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">guide_tile_out_fname_after_DC</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span>
+            <span class="n">DC_corrected_output_file</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">guide_rows</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tile_out_fname_after_DC</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span>
+            <span class="n">DC_corrected_output_file</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">guide_rows</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot_save_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plotting_tools</span><span class="o">.</span><span class="n">plot_distortion_correction_before_after</span><span class="p">(</span><span class="n">tile_out_fname_after_DC</span><span class="p">,</span> <span class="n">title_text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_out_fname_after_DC</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">plot_save_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DC_corrected_output_file</span></div>
+
+<div class="viewcode-block" id="HectorPipe.apply_config_code_to_tile"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.apply_config_code_to_tile">[docs]</a>    <span class="k">def</span> <span class="nf">apply_config_code_to_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_number</span><span class="p">,</span> <span class="n">config_timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">tile_file_for_configuration</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_tile_location</span><span class="si">}</span><span class="s2">/DC_tile_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+        <span class="n">guide_tile_for_configuration</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_corrected_tile_location</span><span class="si">}</span><span class="s2">/guide_DC_tile_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.fld&quot;</span><span class="p">)</span>
+        <span class="n">configuration_output_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Hexa_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+        <span class="n">configuration_guide_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Guides_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+        <span class="n">configuration_plot_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Plot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tile_number</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">.pdf&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Running Configuration code on Tile </span><span class="si">{</span><span class="n">tile_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Saving to </span><span class="si">{</span><span class="n">configuration_output_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config_timeout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Timeout is </span><span class="si">{</span><span class="n">config_timeout</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+
+        <span class="n">return_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_configuration_code</span><span class="p">(</span><span class="n">tile_file_for_configuration</span><span class="p">,</span> <span class="n">guide_tile_for_configuration</span><span class="p">,</span> <span class="n">configuration_output_filename</span><span class="p">,</span> <span class="n">configuration_guide_filename</span><span class="p">,</span> <span class="n">configuration_plot_filename</span><span class="p">,</span> <span class="n">config_timeout</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">print_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_code</span></div>
+
+<div class="viewcode-block" id="HectorPipe.run_configuration_code"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.run_configuration_code">[docs]</a>    <span class="k">def</span> <span class="nf">run_configuration_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_file_for_configuration</span><span class="p">,</span> <span class="n">guide_tile_for_configuration</span><span class="p">,</span> <span class="n">configuration_output_filename</span><span class="p">,</span> <span class="n">configuration_guide_filename</span><span class="p">,</span> <span class="n">configuration_plot_filename</span><span class="p">,</span> <span class="n">config_timeout</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># Now call Caro&#39;s code</span>
+        <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">Running Configuration code on file </span><span class="si">{</span><span class="n">tile_file_for_configuration</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">Configuration_bash_code</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Rscript&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ConfigurationCode_location</span><span class="p">,</span> <span class="n">tile_file_for_configuration</span><span class="p">,</span> <span class="n">guide_tile_for_configuration</span><span class="p">,</span> <span class="n">configuration_output_filename</span><span class="p">,</span> <span class="n">configuration_guide_filename</span><span class="p">,</span> <span class="s1">&#39;--plot_filename&#39;</span><span class="p">,</span> <span class="n">configuration_plot_filename</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">Configuration_bash_code</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">config_timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger_R_code</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_output</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+            <span class="n">return_code</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="n">return_code</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="k">if</span> <span class="n">return_code</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">tiling_error_message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">***Error in the tiling code! Exiting to debug***</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger_R_code</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger_R_code</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">tiling_error_message</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">tiling_error_message</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">Configuration_bash_code</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">return_code</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_read_file_get_header</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Read in the output file and get the header, as well as the line numbers for the header&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">header_lines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">header_linenumbers</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">linenumber</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                    <span class="n">header_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">header_linenumbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">linenumber</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">header_lines</span><span class="p">,</span> <span class="n">header_linenumbers</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_file_with_header</span><span class="p">(</span><span class="n">outfilename</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Take a header and a pandas dataframe. Write the header to a file and then append the dataframe. There will be a # before the start of the column names&quot;&quot;&quot;</span>
+        <span class="c1"># Now write the correct output tile file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfilename</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Now write a comment character before the column names get written</span>
+            <span class="c1"># Tony requires us to do this </span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+            <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HectorPipe.make_output_file_for_Tony"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.make_output_file_for_Tony">[docs]</a>    <span class="k">def</span> <span class="nf">make_output_file_for_Tony</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_file</span><span class="p">,</span> <span class="n">robot_file</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Take our output files and make them into a format which Tony can read in.</span>
+<span class="sd">        This means:</span>
+<span class="sd">            * &#39;#&#39; is reserved for a comment. Header key/value pairs should not start with a #, but the row names (which are only included for readability, Tony&#39;s code doesn&#39;t use them) should</span>
+<span class="sd">            * Missing values should be blank- i.e. na_rep=&#39;&#39;</span>
+<span class="sd">            * things which are specified as an integer must be made an integer, not a floating point number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tile_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">robot_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">filename_stem</span> <span class="o">=</span> <span class="n">tile_file</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;HECTOROutput_Hexas_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">outputTileFile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">final_tiles_correct_format_location</span><span class="si">}</span><span class="s2">/Tile_FinalFormat_</span><span class="si">{</span><span class="n">filename_stem</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+        <span class="n">outputRobotFile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">final_tiles_correct_format_location</span><span class="si">}</span><span class="s2">/Robot_FinalFormat_</span><span class="si">{</span><span class="n">filename_stem</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Clear the output files if they already exist</span>
+        <span class="k">if</span> <span class="n">outputTileFile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputTileFile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outputRobotFile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputRobotFile</span><span class="p">)</span>
+
+
+        <span class="c1">### The Tile File</span>
+
+        <span class="n">tile_header_lines</span><span class="p">,</span> <span class="n">tile_header_linenumbers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_get_header</span><span class="p">(</span><span class="n">tile_file</span><span class="p">)</span>
+
+        <span class="c1"># Get the contents of the file:</span>
+        <span class="n">output_tile_contents</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">tile_file</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+        <span class="c1"># Convert things which are nan values in integer columns to -99</span>
+        <span class="c1"># The integer columns are: probe, priority, type, SkyPosition, order, order_c</span>
+        <span class="n">integer_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;probe&#39;</span><span class="p">,</span> <span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;SkyPosition&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;order_C&#39;</span><span class="p">]</span>
+        <span class="c1"># Replace NAs with -99</span>
+        <span class="n">output_tile_contents</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">integer_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_tile_contents</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">integer_columns</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mi">99</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="c1"># Now change the types of these columns to be integers</span>
+        <span class="n">output_tile_contents</span> <span class="o">=</span> <span class="n">output_tile_contents</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">integer_columns</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;int64&#39;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">integer_columns</span><span class="p">))))</span>
+
+        <span class="c1"># Only select the required columns</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;probe&quot;</span><span class="p">,</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;rads&quot;</span><span class="p">,</span><span class="s2">&quot;angs&quot;</span><span class="p">,</span><span class="s2">&quot;azAngs&quot;</span><span class="p">,</span><span class="s2">&quot;angs_azAng&quot;</span><span class="p">,</span><span class="s2">&quot;RA&quot;</span><span class="p">,</span><span class="s2">&quot;DEC&quot;</span><span class="p">,</span><span class="s2">&quot;g_mag&quot;</span><span class="p">,</span><span class="s2">&quot;r_mag&quot;</span><span class="p">,</span><span class="s2">&quot;i_mag&quot;</span><span class="p">,</span><span class="s2">&quot;z_mag&quot;</span><span class="p">,</span><span class="s2">&quot;y_mag&quot;</span><span class="p">,</span><span class="s2">&quot;GAIA_g_mag&quot;</span><span class="p">,</span><span class="s2">&quot;GAIA_bp_mag&quot;</span><span class="p">,</span><span class="s2">&quot;GAIA_rp_mag&quot;</span><span class="p">,</span><span class="s2">&quot;Mstar&quot;</span><span class="p">,</span><span class="s2">&quot;Re&quot;</span><span class="p">,</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="s2">&quot;GAL_MU_E_R&quot;</span><span class="p">,</span><span class="s2">&quot;pmRA&quot;</span><span class="p">,</span><span class="s2">&quot;pmDEC&quot;</span><span class="p">,</span><span class="s2">&quot;priority&quot;</span><span class="p">,</span><span class="s2">&quot;MagnetX_noDC&quot;</span><span class="p">,</span><span class="s2">&quot;MagnetY_noDC&quot;</span><span class="p">,</span><span class="s2">&quot;type&quot;</span><span class="p">,</span><span class="s2">&quot;MagnetX&quot;</span><span class="p">,</span><span class="s2">&quot;MagnetY&quot;</span><span class="p">,</span><span class="s2">&quot;SkyPosition&quot;</span><span class="p">,</span><span class="s2">&quot;fibre_type&quot;</span><span class="p">,</span><span class="s2">&quot;Magnet&quot;</span><span class="p">,</span><span class="s2">&quot;Label&quot;</span><span class="p">,</span><span class="s2">&quot;order&quot;</span><span class="p">,</span><span class="s2">&quot;Pickup_option&quot;</span><span class="p">,</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span><span class="s2">&quot;Hexabundle&quot;</span><span class="p">,</span><span class="s2">&quot;probe_orientation&quot;</span><span class="p">,</span><span class="s2">&quot;rectMag_inputOrientation&quot;</span><span class="p">,</span><span class="s2">&quot;Magnet_C&quot;</span><span class="p">,</span><span class="s2">&quot;Label_C&quot;</span><span class="p">,</span><span class="s2">&quot;order_C&quot;</span><span class="p">,</span><span class="s2">&quot;Pickup_option_C&quot;</span><span class="p">,</span><span class="s2">&quot;offset_P&quot;</span><span class="p">,</span><span class="s2">&quot;offset_Q&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Make sure that our IDs aren&#39;t written in standard form</span>
+        <span class="k">def</span> <span class="nf">_fix_integer_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="c1"># This takes a value and makes sure it&#39;s an integer (e.g. 5.135143786217539e+18 becomes 5135143786217538560).</span>
+            <span class="c1"># The try/except clause is to not change the skyfibre IDs (which are strings, e.g Sky-H7-4)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+
+        <span class="n">output_tile_contents</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_tile_contents</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_fix_integer_value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_file_with_header</span><span class="p">(</span><span class="n">outfilename</span><span class="o">=</span><span class="n">outputTileFile</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">tile_header_lines</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="n">output_tile_contents</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">columns</span><span class="p">])</span>
+        
+
+        <span class="c1"># Now do the robot file</span>
+        <span class="n">robot_header_lines</span><span class="p">,</span> <span class="n">robot_header_linenumbers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_get_header</span><span class="p">(</span><span class="n">robot_file</span><span class="p">)</span>
+
+
+        <span class="n">output_robot_contents</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">robot_file</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_file_with_header</span><span class="p">(</span><span class="n">outfilename</span><span class="o">=</span><span class="n">outputRobotFile</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">robot_header_lines</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="n">output_robot_contents</span><span class="p">)</span></div>
+        
+
+
+<div class="viewcode-block" id="HectorPipe.allocate_hexabundles_for_single_tile"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.allocate_hexabundles_for_single_tile">[docs]</a>    <span class="k">def</span> <span class="nf">allocate_hexabundles_for_single_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileNameGuides</span><span class="p">,</span> <span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">robot_temperature</span><span class="p">,</span> <span class="n">obs_temperature</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1">### FIXME- add documentation here</span>
+
+
+
+        <span class="c1"># Input config files to be read from</span>
+        <span class="c1"># Input file 1</span>
+        <span class="c1"># fileNameGuides = f&quot;{self.configuration_location}/HECTORConfig_Guides_{self.config[&#39;output_filename_stem&#39;]}_{tile_number:03d}.txt&quot;</span>
+        <span class="c1"># # Input file 2</span>
+        <span class="c1"># fileNameHexa = f&quot;{self.configuration_location}/HECTORConfig_Hexa_{self.config[&#39;output_filename_stem&#39;]}_{tile_number:03d}.txt&quot;</span>
+        <span class="n">fileNameGuides</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fileNameGuides</span><span class="p">)</span>
+        <span class="n">fileNameHexa</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">)</span>
+
+        <span class="n">fileNameGuides_stem</span> <span class="o">=</span> <span class="n">fileNameGuides</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Guides_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">fileNameHexa_stem</span><span class="o">=</span> <span class="n">fileNameHexa</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Hexas_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">))</span>
+
+        <span class="c1"># Read in the tile file to get the header, if we don&#39;t have a &#39;LABEL&#39; keyword in it already</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">label_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_dictionary</span><span class="p">[</span><span class="s1">&#39;LABEL&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">header_dict</span><span class="o">=</span><span class="p">{}</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file_get_header</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">header_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">label_string</span> <span class="o">=</span> <span class="n">header_dict</span><span class="p">[</span><span class="s1">&#39;LABEL&#39;</span><span class="p">]</span>
+
+
+        <span class="c1"># files to be output to after arranging the guide and hexa probe data</span>
+        <span class="c1"># proxy output file</span>
+        <span class="n">plate_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_base</span><span class="si">}</span><span class="s2">/Hexa_and_Guides_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="c1"># Output file 1</span>
+        <span class="n">guide_outputFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/HECTOROutput_Guides_</span><span class="si">{</span><span class="n">fileNameGuides_stem</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+
+        <span class="c1"># Adding ID column and removing the header line of Guides cluster to add to the hexa cluster</span>
+        <span class="n">df_guideFile</span><span class="p">,</span> <span class="n">guideFileList</span> <span class="o">=</span> <span class="n">file_arranging</span><span class="o">.</span><span class="n">arrange_guidesFile</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">fileNameGuides</span><span class="p">,</span> <span class="n">guide_outputFile</span><span class="p">)</span>
+
+        <span class="c1"># Adding guides cluster txt file to hexa cluster txt file</span>
+        <span class="n">df_combined</span> <span class="o">=</span> <span class="n">file_arranging</span><span class="o">.</span><span class="n">merge_hexaAndGuides</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">df_guideFile</span><span class="p">,</span> <span class="n">plate_file</span><span class="p">)</span>
+
+        <span class="c1"># extracting all the magnets and making a list of them from the plate_file</span>
+        <span class="n">all_magnets</span> <span class="o">=</span> <span class="n">extract_data</span><span class="o">.</span><span class="n">create_list_of_all_magnets_from_file</span><span class="p">(</span><span class="n">extract_data</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">plate_file</span><span class="p">),</span> <span class="n">guideFileList</span><span class="p">)</span>
+
+
+        <span class="c1">## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)</span>
+        <span class="c1">## dependent on which annulus the circular magnet sits in</span>
+        <span class="c1"># Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole</span>
+        <span class="n">offset_circularAnnulus</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Blu&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Gre&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Yel&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Mag&#39;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">}</span>
+        <span class="n">all_magnets</span> <span class="o">=</span> <span class="n">offsets</span><span class="o">.</span><span class="n">magnetPair_radialPositionOffset_circularAnnulus</span><span class="p">(</span><span class="n">offset_circularAnnulus</span><span class="p">,</span> <span class="n">all_magnets</span><span class="p">)</span>
+
+        <span class="c1"># file to report flags regarding special cases of hexabundle allocation</span>
+        <span class="n">flagsFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_base</span><span class="si">}</span><span class="s1">/Flags.txt&#39;</span>
+
+        <span class="c1"># variable for the hexabundle allocation using version 3</span>
+        <span class="n">mu_1re_cutoff</span> <span class="o">=</span> <span class="mf">22.5</span>
+
+        <span class="c1"># carrying out the whole hexabundle allocation algorithm from hexabundles.py script</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">MagnetDict</span> <span class="o">=</span> <span class="n">hexabundle</span><span class="o">.</span><span class="n">overall_hexabundle_size_allocation_operation_version3_largerBundlePriority</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> \
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">galaxyIDrecord</span><span class="p">,</span> <span class="n">mu_1re_cutoff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">],</span> <span class="n">flagsFile</span><span class="p">)</span>
+
+        <span class="c1">#### Offset functions- still a work in progress- need to determine input source and add column to output file</span>
+        <span class="c1"># Input file 3 - offsets</span>
+        
+        <span class="n">all_magnets</span> <span class="o">=</span> <span class="n">offsets</span><span class="o">.</span><span class="n">hexaPositionOffset</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetFile</span><span class="p">)</span>
+
+        <span class="c1"># create magnet pickup areas for all the magnets</span>
+        <span class="n">plots</span><span class="o">.</span><span class="n">create_magnet_pickup_areas</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="c1">#************** # creating plots and drawing pickup areas</span>
+            <span class="n">fig_hexa</span><span class="p">,</span> <span class="n">ax_hexa</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">fig_robot</span><span class="p">,</span> <span class="n">ax_robot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1">#plt.figure(1)</span>
+            <span class="c1"># plt.clf()</span>
+            <span class="c1"># plt.close()</span>
+            <span class="n">HECTOR_plate</span><span class="p">()</span><span class="o">.</span><span class="n">draw_circle</span><span class="p">(</span><span class="n">colour</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">ax1</span><span class="o">=</span><span class="n">ax_hexa</span><span class="p">,</span> <span class="n">ax2</span><span class="o">=</span><span class="n">ax_robot</span><span class="p">)</span>
+            <span class="c1"># plots.draw_magnet_pickup_areas(all_magnets, &#39;--c&#39;)</span>
+            <span class="c1">#**************</span>
+
+
+        <span class="c1"># test for collision and detect magnets which have all pickup directions blocked</span>
+        <span class="n">conflicted_magnets</span> <span class="o">=</span> <span class="n">conflicts</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">find_all_blocked_magnets</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">)</span>
+
+        <span class="c1"># create a list of the fully blocked magnets</span>
+        <span class="n">fully_blocked_magnets</span> <span class="o">=</span> <span class="n">conflicts</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">create_list_of_fully_blocked_magnets</span><span class="p">(</span><span class="n">conflicted_magnets</span><span class="p">)</span>
+
+        <span class="n">fully_blocked_magnets_dictionary</span> <span class="o">=</span> <span class="n">conflicts</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">blocking_magnets_for_fully_blocked_magnets</span><span class="p">(</span><span class="n">conflicted_magnets</span><span class="p">)</span>
+
+        <span class="c1"># print the fully blocked magnets out in terminal and record in conflicts file</span>
+        <span class="n">conflictsRecord</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_base</span><span class="si">}</span><span class="s1">/Conflicts_Index.txt&#39;</span>
+        <span class="n">conflicts</span><span class="o">.</span><span class="n">blocked_magnet</span><span class="o">.</span><span class="n">print_fully_blocked_magnets</span><span class="p">(</span><span class="n">fully_blocked_magnets</span><span class="p">,</span><span class="n">conflictsRecord</span><span class="p">,</span> <span class="n">fileNameHexa</span><span class="p">)</span>
+
+        <span class="c1"># record the magnet and tile list in unresolvable conflicts file</span>
+        <span class="n">conflictFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_base</span><span class="si">}</span><span class="s1">/unresolvable_conflicts.txt&#39;</span>
+
+        <span class="c1">#***  Choose former method OR median method OR larger bundle prioritized method for hexabundle allocation  ***</span>
+        <span class="n">positioning_array</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxyIDrecord</span> <span class="o">=</span> <span class="n">position_ordering</span><span class="o">.</span><span class="n">create_position_ordering_array</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="n">fully_blocked_magnets</span><span class="p">,</span> \
+                                                                         <span class="n">conflicted_magnets</span><span class="p">,</span> <span class="n">MagnetDict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxyIDrecord</span><span class="p">,</span> \
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">],</span> <span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">conflictFile</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="c1"># draw all the magnets in the plots created earlier</span>
+            <span class="c1"># Output file- figure 1</span>
+            <span class="n">robot_figureFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/robotPlot_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+            <span class="c1"># Output file- figure 2</span>
+            <span class="n">hexabundle_figureFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/hexabundlePlot_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+            <span class="n">fig_hexa</span><span class="p">,</span> <span class="n">fig_robot</span> <span class="o">=</span> <span class="n">plots</span><span class="o">.</span><span class="n">draw_all_magnets</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">],</span> <span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">robot_figureFile</span><span class="p">,</span> <span class="n">hexabundle_figureFile</span><span class="p">,</span> <span class="n">fig_hexa</span><span class="p">,</span> <span class="n">ax_hexa</span><span class="p">,</span> <span class="n">fig_robot</span><span class="p">,</span> <span class="n">ax_robot</span><span class="p">)</span>
+
+            <span class="n">fig_hexa</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">hexabundle_figureFile</span><span class="p">)</span>
+            <span class="c1"># plt.savefig(&quot;image.png&quot;, dpi=100)</span>
+
+            <span class="c1">#plt.figure(2)</span>
+            <span class="n">fig_robot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">robot_figureFile</span><span class="p">)</span>  
+            <span class="c1">#***********</span>
+            
+        <span class="c1"># checking positioning_array prints out all desired parameters</span>
+        <span class="c1"># print(positioning_array)</span>
+
+        <span class="c1"># insert column heading and print only rectangular magnet rows in the csv file</span>
+        <span class="n">newrow</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Magnet&#39;</span><span class="p">,</span> <span class="s1">&#39;Label&#39;</span><span class="p">,</span> <span class="s1">&#39;Center_x&#39;</span><span class="p">,</span> <span class="s1">&#39;Center_y&#39;</span><span class="p">,</span> <span class="s1">&#39;rot_holdingPosition&#39;</span><span class="p">,</span> <span class="s1">&#39;rot_platePlacing&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;Pickup_option&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span><span class="s1">&#39;Index&#39;</span><span class="p">,</span> <span class="s1">&#39;Hexabundle&#39;</span><span class="p">,</span> <span class="s1">&#39;probe_orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;rectMag_inputOrientation&#39;</span><span class="p">]</span>
+        <span class="n">newrow_circular</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Magnet_C&#39;</span><span class="p">,</span> <span class="s1">&#39;Label_C&#39;</span><span class="p">,</span> <span class="s1">&#39;Center_x&#39;</span><span class="p">,</span> <span class="s1">&#39;Center_y&#39;</span><span class="p">,</span> <span class="s1">&#39;holding_position_ang&#39;</span><span class="p">,</span> <span class="s1">&#39;plate_placement_ang&#39;</span><span class="p">,</span> <span class="s1">&#39;order_C&#39;</span><span class="p">,</span> <span class="s1">&#39;Pickup_option_C&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Index&#39;</span><span class="p">,</span> <span class="s1">&#39;Hexabundle&#39;</span><span class="p">,</span> <span class="s1">&#39;probe_orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;rectMag_inputOrientation&#39;</span><span class="p">]</span>
+
+        <span class="c1"># final two output files</span>
+        <span class="c1"># Output file 2</span>
+        <span class="n">outputFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/HECTOROutput_Hexas_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="c1"># Output file 3</span>
+        <span class="n">robotFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_robot</span><span class="si">}</span><span class="s2">/Robot_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+
+        <span class="c1">## DUMMY VALUES TO BE REMOVED ##</span>
+        <span class="c1"># creating robotFile array and storing it in robot file</span>
+        <span class="n">positioning_array</span><span class="p">,</span> <span class="n">robotFilearray</span> <span class="o">=</span> <span class="n">file_arranging</span><span class="o">.</span><span class="n">create_robotFileArray</span><span class="p">(</span><span class="n">label_string</span><span class="p">,</span><span class="n">positioning_array</span><span class="p">,</span><span class="n">robotFile</span><span class="p">,</span><span class="n">newrow</span><span class="p">,</span><span class="n">fully_blocked_magnets_dictionary</span><span class="p">,</span> <span class="n">robot_temp</span><span class="o">=</span><span class="n">robot_temperature</span><span class="p">,</span> <span class="n">obs_temp</span><span class="o">=</span><span class="n">obs_temperature</span><span class="p">)</span>
+
+        <span class="c1"># adjusting the positioning array to merge only selected parameters to the output file</span>
+        <span class="n">positioning_array</span><span class="p">,</span> <span class="n">positioning_array_circular</span> <span class="o">=</span> <span class="n">file_arranging</span><span class="o">.</span><span class="n">positioningArray_adjust_and_mergetoFile</span><span class="p">(</span><span class="n">positioning_array</span><span class="p">,</span> <span class="n">plate_file</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">,</span> <span class="n">newrow</span><span class="p">,</span><span class="n">newrow_circular</span><span class="p">)</span>
+
+        <span class="c1"># produce final files with consistent layout and no extra commas</span>
+        <span class="n">file_arranging</span><span class="o">.</span><span class="n">finalFiles</span><span class="p">(</span><span class="n">all_magnets</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">,</span> <span class="n">fileNameHexa</span><span class="p">)</span>
+
+        <span class="c1"># fibre slit info output file</span>
+        <span class="n">output_fibreSlitInfo</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/Fibre_slitInfo_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+
+        <span class="c1"># Output files printed only once, not for each tile</span>
+        <span class="n">output_fibreAAOmega</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/Hector_fibres_AAOmega.txt&quot;</span>
+        <span class="n">output_fibreSpector</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/Hector_fibres_Spector.txt&quot;</span>
+
+        <span class="n">output_hexabundle_coordData</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allocation_files_location_tiles</span><span class="si">}</span><span class="s2">/Fibre_coordData_&quot;</span>
+        <span class="c1">#{self.config[&#39;output_filename_stem&#39;]}_tile_{tile_number:03d}.txt&quot;</span>
+
+        <span class="c1"># create fibre slit info file for each tile updating the skyfibres with position 0</span>
+        <span class="n">fibres</span><span class="o">.</span><span class="n">create_fibreSlit_info_file</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fibre_file</span><span class="p">,</span><span class="n">output_fibreSlitInfo</span><span class="p">)</span>
+
+        <span class="c1"># create the fibre spectrograph files for each of AAOmega and Spector</span>
+        <span class="n">new_arrayAAOmega</span><span class="p">,</span><span class="n">new_arraySpector</span> <span class="o">=</span> <span class="n">fibres</span><span class="o">.</span><span class="n">extract_fibreInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fibre_file</span><span class="p">,</span><span class="n">output_fibreAAOmega</span><span class="p">,</span><span class="n">output_fibreSpector</span><span class="p">)</span>
+
+        <span class="c1"># create the hexabundle fibre coordinate data files</span>
+        <span class="n">fibres</span><span class="o">.</span><span class="n">create_hexabundleFibre_coordData</span><span class="p">(</span><span class="n">output_hexabundle_coordData</span><span class="p">)</span>
+
+        <span class="c1"># Output file- figure 3 fibres</span>
+        <span class="n">fibreFigure_AAOmega</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/fibre_slitletAAOmega_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+        <span class="c1"># Output file- figure 4 fibres</span>
+        <span class="n">fibreFigure_Spector</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/fibre_slitletSpector_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+        <span class="c1"># create figure of slitlets</span>
+        <span class="n">fibres</span><span class="o">.</span><span class="n">create_slitletFigure</span><span class="p">(</span><span class="n">new_arrayAAOmega</span><span class="p">,</span><span class="n">new_arraySpector</span><span class="p">,</span><span class="n">fibreFigure_AAOmega</span><span class="p">,</span><span class="n">fibreFigure_Spector</span><span class="p">)</span>
+
+        <span class="c1"># Output file- figure 5 fibres</span>
+        <span class="n">skyFibre_AAOmegaFigure</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/skyfibre_slitletAAOmega_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+        <span class="c1"># Output file- figure 6 fibres</span>
+        <span class="n">skyFibre_SpectorFigure</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/skyfibre_slitletSpector_</span><span class="si">{</span><span class="n">fileNameHexa_stem</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+        <span class="c1"># create figure of magnified sky fibre positioning in slitlets</span>
+        <span class="n">fibres</span><span class="o">.</span><span class="n">create_skyFibreSlitlet_figure</span><span class="p">(</span><span class="n">fileNameHexa</span><span class="o">=</span><span class="n">fileNameHexa</span><span class="p">,</span> <span class="n">new_arrayAAOmega</span><span class="o">=</span><span class="n">new_arrayAAOmega</span><span class="p">,</span> <span class="n">new_arraySpector</span><span class="o">=</span><span class="n">new_arraySpector</span><span class="p">,</span> <span class="n">skyFibre_AAOmegaFigure</span><span class="o">=</span><span class="n">skyFibre_AAOmegaFigure</span><span class="p">,</span> <span class="n">skyFibre_SpectorFigure</span><span class="o">=</span><span class="n">skyFibre_SpectorFigure</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+        <span class="c1"># just to check each tile&#39;s whole operation time</span>
+        <span class="c1"># print(&quot;\t \t -----   %s seconds   -----&quot; % (time.time() - start_time))</span>
+
+
+
+<div class="viewcode-block" id="HectorPipe.allocate_hexabundles_for_all_tiles"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.allocate_hexabundles_for_all_tiles">[docs]</a>    <span class="k">def</span> <span class="nf">allocate_hexabundles_for_all_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">all_configured_tiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_location</span><span class="si">}</span><span class="s2">/HECTORConfig_Hexa_*.txt&quot;</span><span class="p">))</span>
+
+        <span class="n">tile_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">all_configured_tiles</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">tile_number</span> <span class="ow">in</span> <span class="n">tile_numbers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allocate_hexabundles_for_single_tile</span><span class="p">(</span><span class="n">tile_number</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">make_output_file_for_Tony</span><span class="p">(</span><span class="n">tile_number</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HectorPipe.run_target_selection"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.run_target_selection">[docs]</a>    <span class="k">def</span> <span class="nf">run_target_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+
+        <span class="n">full_catalogue_table</span> <span class="o">=</span> <span class="n">HectorSim</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">HectorSim_input_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BoundaryType&#39;</span><span class="p">,</span><span class="s1">&#39;zlimit&#39;</span><span class="p">,</span><span class="s1">&#39;MstarMin&#39;</span><span class="p">,</span><span class="s1">&#39;MstarMax&#39;</span><span class="p">,</span><span class="s1">&#39;SparseFunction&#39;</span><span class="p">,</span><span class="s1">&#39;MSparseCut1&#39;</span><span class="p">,</span><span class="s1">&#39;minRe&#39;</span><span class="p">,</span> <span class="s1">&#39;total_area&#39;</span><span class="p">,</span> <span class="s1">&#39;SourceCat&#39;</span><span class="p">]</span>
+        <span class="n">HectorSim_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">HectorSim_input_parameters</span><span class="p">}</span>
+        <span class="n">HectorSim_args</span><span class="p">[</span><span class="s1">&#39;entire_table&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_catalogue_table</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_selection</span> <span class="o">=</span> <span class="n">HectorSim</span><span class="o">.</span><span class="n">HectorSim</span><span class="p">(</span><span class="o">**</span><span class="n">HectorSim_args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+
+            <span class="n">final_catalogue_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;final_catalogue_name&#39;</span><span class="p">])</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">save_dataframe_as_FITS_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_selection</span><span class="o">.</span><span class="n">selection_function_sparsely_sampled</span><span class="p">,</span> <span class="n">final_catalogue_path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_target_selection_plot</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_target_selection_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;target_selection/HectorSim.mplstyle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">18.87</span><span class="p">,</span> <span class="mf">5.94</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_selection</span><span class="o">.</span><span class="n">make_Julias_plot</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.28</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span>
+
+<div class="viewcode-block" id="HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli"><a class="viewcode-back" href="../../hop.html#hop.pipeline.HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli">[docs]</a>    <span class="k">def</span> <span class="nf">show_skyfibreChanges_and_magnetCountPerAnnuli</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_fname_1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_fname_2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_1_guide</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_2_guide</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tileBatch_count</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tileBatch_skyFibreChange</span> <span class="o">=</span> <span class="s1">&#39;OFF&#39;</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39; FUNCTION TO SHOW CHANGES IN SKYFIBRE SUB-PLATE NUMBERS AND MAGNET COUNT CHECK PERFORMED BETWEEN TWO TILES</span>
+<span class="sd">            TWO OPTIONS TO RUN THIS FUNCTION</span>
+
+<span class="sd">        INPUTS FOR OPTION 1: &#39;tile_number_1&#39; and &#39;tile_number_2&#39;</span>
+<span class="sd">                             Produces the plots for the first tile and the second tile with changes in skyfibre sub-plate</span>
+<span class="sd">                             number of second tile compared to first tile being highlighted, and conducts magnet count</span>
+<span class="sd">                             check per annulus to record any warnings of magnet count in any annulus exceeding the</span>
+<span class="sd">                             available number of casings on text file.</span>
+
+<span class="sd">        INPUTS FOR OPTION 2: &#39;tile_batch&#39; and &#39;tileBatch_count&#39;</span>
+<span class="sd">                             &#39;tileBatch_skyFibreChange&#39; - set as &#39;ON&#39; to generate a full set of sky fibre change plots</span>
+<span class="sd">                             Carries out a magnet count check for each tile pair in a whole batch without any repeats</span>
+<span class="sd">                             and generates histogram plots for each annulus to show distribution of magnets count for</span>
+<span class="sd">                             each annulus in a batch. &#39;tileBatch_skyFibreChange&#39; is OFF by default, and if set to ON</span>
+<span class="sd">                             will also produce a full set of sky fibre change plots for each tile pair in batch.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># max magnet casings to be allowed per annuli</span>
+        <span class="n">annuli_count_magnetCasing</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Blu&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;Gre&#39;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="s1">&#39;Yel&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span> <span class="s1">&#39;Mag&#39;</span><span class="p">:</span> <span class="mi">21</span><span class="p">}</span>
+
+        <span class="n">annuliCount_batch</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Blu&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;Gre&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;Yel&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;Mag&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="n">pistonChange_countBatch</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">tile_fname_1</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tile_fname_2</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+
+            <span class="c1"># ### PRODUCING PLOT FOR THE SECOND TILE BASED ON CHANGES IN SKYFIBRE SUB-PLATE NUMBERS COMPARED TO FIRST TILE ###</span>
+            <span class="n">tile_1_fname_stem</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tile_fname_1</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;Hexas_&#39;</span><span class="p">)</span>
+            <span class="n">tile_2_fname_stem</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tile_fname_2</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;Hexas_&#39;</span><span class="p">)</span>
+
+            <span class="n">subplateSkyfibre_figureFile_tile1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot_</span><span class="si">{</span><span class="n">tile_1_fname_stem</span><span class="si">}</span><span class="s2">_previous.jpg&quot;</span>
+            <span class="n">subplateSkyfibre_figureFile_tile2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot_subPlate_changeSkyfibrePlot_</span><span class="si">{</span><span class="n">tile_2_fname_stem</span><span class="si">}</span><span class="s2">_current.jpg&quot;</span>
+            <span class="n">subplateSkyfibre_figureFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot__previous_</span><span class="si">{</span><span class="n">tile_1_fname_stem</span><span class="si">}</span><span class="s2">_new_</span><span class="si">{</span><span class="n">tile_2_fname_stem</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+            <span class="n">fibres</span><span class="o">.</span><span class="n">createskyfibreChanges_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_fname_1</span><span class="p">,</span> <span class="n">tile_fname_2</span><span class="p">,</span> <span class="n">subplateSkyfibre_figureFile_tile1</span><span class="p">,</span> <span class="n">subplateSkyfibre_figureFile_tile2</span><span class="p">,</span> <span class="n">subplateSkyfibre_figureFile</span><span class="p">)</span>
+
+            <span class="c1"># check for magnet count per annulus and record any warnings on text file</span>
+            <span class="c1">#fibres.check_magnetCount_perAnnulus(self, tile_fname_1, tile_fname_2, tile_1_guide, tile_2_guide, annuliCount_batch, annuli_count_magnetCasing)</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="n">tile_batch</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tileBatch_count</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+
+            <span class="c1"># nested for loops to test out each possible pair in a batch of tiles without any repeat</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tileBatch_count</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">tileBatch_count</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+
+                        <span class="n">annuliCount_batch</span> <span class="o">=</span> <span class="n">fibres</span><span class="o">.</span><span class="n">check_magnetCount_perAnnulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">annuliCount_batch</span><span class="p">,</span> <span class="n">annuli_count_magnetCasing</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">annuliCount_batch</span><span class="p">)</span>
+
+                        <span class="c1"># produce plots for sky fibre changes if input is provided as &#39;on&#39;</span>
+                        <span class="k">if</span> <span class="n">tileBatch_skyFibreChange</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                            <span class="n">subplateSkyfibre_figureFile_tile1</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_tile_</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_previous.jpg&quot;</span>
+                            <span class="n">subplateSkyfibre_figureFile_tile2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_tile_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_current.jpg&quot;</span>
+                            <span class="n">subplateSkyfibre_figureFile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_location</span><span class="si">}</span><span class="s2">/subPlate_changeSkyfibrePlot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;output_filename_stem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_tile_orginal-</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_new-</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">.jpg&quot;</span>
+                            <span class="c1"># pistonChange_count = fibres.createskyfibreChanges_plot(self, i, j, subplateSkyfibre_figureFile_tile1, subplateSkyfibre_figureFile_tile2, subplateSkyfibre_figureFile)</span>
+
+                            <span class="n">pistonChange_count</span> <span class="o">=</span> <span class="n">fibres</span><span class="o">.</span><span class="n">skyfibreChanges_pistonChange_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                            <span class="n">pistonChange_countBatch</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pistonChange_count</span><span class="p">]</span>
+
+            <span class="c1"># create histogram plot</span>
+            <span class="n">fibres</span><span class="o">.</span><span class="n">plotHist_annuliCount_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annuliCount_batch</span><span class="p">,</span> <span class="n">tile_batch</span><span class="p">,</span> <span class="n">tileBatch_count</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">tileBatch_skyFibreChange</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                <span class="n">fibres</span><span class="o">.</span><span class="n">plotHist_pistonChange_count_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pistonChange_countBatch</span><span class="p">,</span> <span class="n">tile_batch</span><span class="p">,</span> <span class="n">tileBatch_count</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">annuliCount_batch</span><span class="p">[</span><span class="s1">&#39;Blu&#39;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Either pass two tile numbers or a batch of tile in the format shown:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+                  <span class="s1">&#39;      HP.show_sky_fibre_changes(tile number 1,tile number 2)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>
+                  <span class="s1">&#39;                        OR                                  </span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>
+                  <span class="s1">&#39;      HP.show_sky_fibre_changes( None, None, tile batch) </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

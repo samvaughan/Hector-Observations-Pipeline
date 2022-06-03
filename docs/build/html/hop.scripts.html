@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.scripts package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.scripts package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.scripts.prepare_files_for_robot">hop.scripts.prepare_files_for_robot module</a></li>
+<li><a class="reference internal" href="#module-hop.scripts.robot_corrections">hop.scripts.robot_corrections module</a></li>
+<li><a class="reference internal" href="#module-hop.scripts.robot_file_input_output">hop.scripts.robot_file_input_output module</a></li>
+<li><a class="reference internal" href="#module-hop.scripts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.scripts.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-scripts-package">
+<h1>hop.scripts package<a class="headerlink" href="#hop-scripts-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.scripts.prepare_files_for_robot">
+<span id="hop-scripts-prepare-files-for-robot-module"></span><h2>hop.scripts.prepare_files_for_robot module<a class="headerlink" href="#module-hop.scripts.prepare_files_for_robot" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.prepare_files_for_robot.apply_corrections">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.prepare_files_for_robot.</span></span><span class="sig-name descname"><span class="pre">apply_corrections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_shifts_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_observed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_configured</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">226.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[324.47,</span> <span class="pre">297.834]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_telecentricity_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_metrology_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_roll_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_rotation_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permagnet_theta_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/prepare_files_for_robot.html#apply_corrections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.prepare_files_for_robot.apply_corrections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a number of corrections to the magnet positions. The corrections are:</p>
+<ul class="simple">
+<li><p>A radial shift inwards or outwards applied to all circular magnets to account for a difference in temperature between the plate at the time it was configured and the plate at the time it will be observed. Note that this offset can be entered in millimetres, or otherwise two temnperatures and a coefficient of thermal expansion can be given instead.</p></li>
+<li><p>A correction on the position of each circular magnet based on its radial position in one of four telecentricity annuli. The circular magnet is moved inwards to account for the fact the light is not truly plane-parallel across the plate.</p></li>
+<li><p>A correction on the position of all magnets based on accurate calibration of the position and rotation of the plate using the pre-defined metrology markers. This correction can be decomposed into a shift of the plate centre, a shear term and a rotation. The derived correction is fit to the measurements in the robot_shifts_file.</p></li>
+<li><p>A correction on North/South position of all magnets based on the roll of the robot arm as it places each object. The extension of the robot arm to the far corner of the plate induces a small torque which affects its ability to place a magnet accurately. This torque has been measured and fitted with quadratic function which depends on the y value (in robot coordinates) of the magnet and is applied to its x value.</p></li>
+</ul>
+<p>For corrections which are applied to only the circular magnets, we then calculate the position of the rectangular magnets again to ensure that the distance between them is always 27.2mm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – A Hector Robot file containing information about 27 circular and 27 rectnagular magnets to be placed on the plate.</p></li>
+<li><p><strong>offset</strong> (<em>float</em><em>, </em><em>optional</em>) – A radial offset (in mm) to be applied to all circular magnets. Negative values are towards the plate centre, positive values are away from the plate centre. The default is 0.0</p></li>
+<li><p><strong>T_observed</strong> (<em>float</em><em>, </em><em>optional</em>) – The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None.</p></li>
+<li><p><strong>T_configured</strong> (<em>float</em><em>, </em><em>optional</em>) – The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.</p></li>
+<li><p><strong>plate_radius</strong> (<em>float</em><em>, </em><em>optional</em>) – The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The coefficient of thermal expansion of invar. Default is 1.2e-6</p></li>
+<li><p><strong>robot_centre</strong> (<em>list</em><em>, </em><em>optional</em>) – A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn’t change this unless you have a very good reason! Default is [324.470,297.834]</p></li>
+<li><p><strong>robot_shifts_file</strong> (<em>str</em><em>, </em><em>optional</em>) – The location of the metrology measurements file. Default is ‘robot_shifts_abs.csv’</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param : The location of the metrology measurements file. Default is ‘robot_shifts_abs.csv’
+:type : str, optional
+:param apply_telecentricity_correction: Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True.
+:type apply_telecentricity_correction: bool, optional
+:param apply_metrology_calibration: Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
+:type apply_metrology_calibration: bool, True
+:param apply_roll_correction: Whether or not to apply the robot roll correction. Should always be True. Default is True.
+:type apply_roll_correction: bool, True
+:param apply_rotation_correction: Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True.
+:type apply_rotation_correction: bool, True
+:param verbose: Print information about the corrections to the screen. Default is True.
+:type verbose: bool, True</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.prepare_files_for_robot.correct_parking_positions_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.prepare_files_for_robot.</span></span><span class="sig-name descname"><span class="pre">correct_parking_positions_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_shifts_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_observed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_configured</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">226.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[324.47,</span> <span class="pre">297.834]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_metrology_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_roll_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/prepare_files_for_robot.html#correct_parking_positions_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.prepare_files_for_robot.correct_parking_positions_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the necessary corrections to the x and y <em>parking positions</em> of the Hector magnets. We then write this file out to a new one with the exact same format</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.prepare_files_for_robot.correct_robot_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.prepare_files_for_robot.</span></span><span class="sig-name descname"><span class="pre">correct_robot_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_observed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_configured</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">226.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[324.47,</span> <span class="pre">297.834]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_shifts_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./robot_shifts_abs.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_telecentricity_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_metrology_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_roll_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_rotation_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/prepare_files_for_robot.html#correct_robot_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.prepare_files_for_robot.correct_robot_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the necessary corrections to the x and y positions of magnets in a <em>Hector Robot file</em>. We also read in and update its header</p>
+</dd></dl>
+
+</section>
+<section id="module-hop.scripts.robot_corrections">
+<span id="hop-scripts-robot-corrections-module"></span><h2>hop.scripts.robot_corrections module<a class="headerlink" href="#module-hop.scripts.robot_corrections" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.apply_cal">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">apply_cal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#apply_cal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.apply_cal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.apply_offsets_to_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">apply_offsets_to_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_telecentricity_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#apply_offsets_to_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.apply_offsets_to_magnets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.calculate_radial_offset">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">calculate_radial_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circular_magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_telecentricity_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#calculate_radial_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.calculate_radial_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an x and y coordinate, calculate the total radial offsets to apply based on a temperature change and a fixed telecentricity correction</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.calculate_rectangular_magnet_centre_coordinates">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">calculate_rectangular_magnet_centre_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_angle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#calculate_rectangular_magnet_centre_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.calculate_rectangular_magnet_centre_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rectangular magnets always have to be 27.2 mm from their circular magnets, and at the appropriate angle</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.calculate_telecentricity_correction">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">calculate_telecentricity_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#calculate_telecentricity_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.calculate_telecentricity_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the required offset in the position of the circular magnets based on their telecentricity annulus</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.fitting_fun">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">fitting_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offsX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offsY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sclX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sclY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#fitting_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.fitting_fun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.perform_metrology_calibration">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">perform_metrology_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_theta_d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_shifts_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permagnet_theta_corr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#perform_metrology_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.perform_metrology_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a correction based on the measured metrology of the robot. Written by Barnaby Norris.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.pick_up_arm_rotation_correction">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">pick_up_arm_rotation_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_centre_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_centre_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot_platePlacing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#pick_up_arm_rotation_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.pick_up_arm_rotation_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm.</p>
+<p>First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_corrections.roll_correction">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_corrections.</span></span><span class="sig-name descname"><span class="pre">roll_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centre_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_corrections.html#roll_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_corrections.roll_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the offset which should be applied to the robot x coordinate to account for the roll of the robot arm.</p>
+</dd></dl>
+
+</section>
+<section id="module-hop.scripts.robot_file_input_output">
+<span id="hop-scripts-robot-file-input-output-module"></span><h2>hop.scripts.robot_file_input_output module<a class="headerlink" href="#module-hop.scripts.robot_file_input_output" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_file_input_output.read_parking_positions_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_file_input_output.</span></span><span class="sig-name descname"><span class="pre">read_parking_positions_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_file_input_output.html#read_parking_positions_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_file_input_output.read_parking_positions_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in the oddly formatted parking positions file. Be very sure to get the right lines here, or error if things aren’t as expected. Don’t just guess line numbers!</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_file_input_output.read_standard_robot_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_file_input_output.</span></span><span class="sig-name descname"><span class="pre">read_standard_robot_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_file_input_output.html#read_standard_robot_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_file_input_output.read_standard_robot_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a standard robot file and return a pandas dataframe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_file_input_output.write_standard_parking_positions_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_file_input_output.</span></span><span class="sig-name descname"><span class="pre">write_standard_parking_positions_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_file_input_output.html#write_standard_parking_positions_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_file_input_output.write_standard_parking_positions_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out the parking positions file in the silly format it needs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.scripts.robot_file_input_output.write_standard_robot_file">
+<span class="sig-prename descclassname"><span class="pre">hop.scripts.robot_file_input_output.</span></span><span class="sig-name descname"><span class="pre">write_standard_robot_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/scripts/robot_file_input_output.html#write_standard_robot_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.scripts.robot_file_input_output.write_standard_robot_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out the robot file in the expected format (with the header properly formatted)</p>
+</dd></dl>
+
+</section>
+<section id="module-hop.scripts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.scripts" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

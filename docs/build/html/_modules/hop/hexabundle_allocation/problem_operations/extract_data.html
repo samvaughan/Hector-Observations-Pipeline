@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.problem_operations.extract_data &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.problem_operations.extract_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">..hector.probe</span> <span class="kn">import</span> <span class="n">probe</span>
+<span class="c1"># from ..problem_operations. offsets import radialPositionOffset</span>
+<span class="kn">from</span> <span class="nn">..problem_operations.robot_parameters</span> <span class="kn">import</span> <span class="n">assign_magnet_labels</span>
+
+<span class="c1"># derive floats only and if the format is different then return 0 instead of a ValueError</span>
+<div class="viewcode-block" id="parse_col"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.parse_col">[docs]</a><span class="k">def</span> <span class="nf">parse_col</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="parse_col_string"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.parse_col_string">[docs]</a><span class="k">def</span> <span class="nf">parse_col_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="remove_apostrophes"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.remove_apostrophes">[docs]</a><span class="k">def</span> <span class="nf">remove_apostrophes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<span class="c1"># extracting the list of probes with all the respective parameters required from the file</span>
+<div class="viewcode-block" id="create_list_of_probes_from_file"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_probes_from_file">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_probes_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">guideFileList</span><span class="p">):</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+    <span class="c1"># print list of headers for the file</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">count_split</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;probe&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">28</span> <span class="p">:</span>
+            <span class="n">count_split</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Only get the galaxy and standard star hexas</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">df_1</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">df_2</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of new dataframes - </span><span class="si">{}</span><span class="s2"> , </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df_1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">df_2</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="n">probe_number</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;probe&#39;</span><span class="p">])</span>
+    <span class="n">probe_number</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">probe_number</span><span class="p">]</span>
+    <span class="n">probe_number</span> <span class="o">+=</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">IDs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">circular_magnet_center_x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">circular_magnet_center_y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">rads</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;rads&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">angs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;angs&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="n">azAngs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;azAngs&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">rectangle_magnet_input_orientation</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;angs_azAng&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+
+    <span class="n">galaxyORstar</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+    <span class="n">galaxyORstar</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">galaxyORstar</span><span class="p">]</span>
+    <span class="n">galaxyORstar</span> <span class="o">+=</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+
+    <span class="n">Re</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;Re&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+    <span class="n">mu_1re</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;GAL_MU_E_R&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">Mstar</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_1</span><span class="p">[</span><span class="s1">&#39;Mstar&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">guideFileList</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span>
+
+    <span class="c1"># PROBES list created</span>
+    <span class="n">list_of_probes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># creating rectangular magnet label</span>
+    <span class="n">magnet_label</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">probe_number</span><span class="p">)</span>
+
+    <span class="c1"># creating hexabundle array</span>
+    <span class="n">hexabundle</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">probe_number</span><span class="p">)</span>
+
+    <span class="c1"># creating rotation for pickup and putdown</span>
+    <span class="n">rotation_pickup</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">probe_number</span><span class="p">)</span>
+    <span class="n">rotation_putdown</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">probe_number</span><span class="p">)</span>
+
+    <span class="c1"># appending all the probes to the probes list</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">each_probe</span> <span class="ow">in</span> <span class="n">probe_number</span><span class="p">:</span>
+        <span class="n">list_of_probes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe</span><span class="p">(</span><span class="n">probe_index</span><span class="o">=</span><span class="n">probe_number</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                    <span class="n">circular_magnet_center</span><span class="o">=</span><span class="p">[</span><span class="n">circular_magnet_center_x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">circular_magnet_center_y</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                                     <span class="n">rectangular_magnet_input_orientation</span><span class="o">=</span><span class="n">rectangle_magnet_input_orientation</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">galaxyORstar</span><span class="o">=</span><span class="n">galaxyORstar</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">Re</span><span class="o">=</span><span class="n">Re</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">mu_1re</span><span class="o">=</span><span class="n">mu_1re</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">Mstar</span><span class="o">=</span><span class="n">Mstar</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">magnet_label</span><span class="o">=</span><span class="n">magnet_label</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">hexabundle</span><span class="o">=</span><span class="n">hexabundle</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">rads</span><span class="o">=</span><span class="n">rads</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">rotation_pickup</span><span class="o">=</span><span class="n">rotation_pickup</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">rotation_putdown</span><span class="o">=</span><span class="n">rotation_putdown</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">azAngs</span><span class="o">=</span><span class="n">azAngs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                     <span class="n">angs</span><span class="o">=</span><span class="n">angs</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">list_of_probes</span></div>
+
+<span class="c1"># creating a list of circular and rectangular magnets separately from the probes list</span>
+<div class="viewcode-block" id="create_list_of_circular_and_rectangular_magnets_from_file"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_circular_and_rectangular_magnets_from_file">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_circular_and_rectangular_magnets_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">guideFileList</span><span class="p">):</span>  <span class="c1">#,magnetPair_offset):</span>
+
+    <span class="c1"># creating probes list from file</span>
+    <span class="n">list_of_probes</span> <span class="o">=</span> <span class="n">create_list_of_probes_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">guideFileList</span><span class="p">)</span>
+
+    <span class="c1">## Created as a standalone function for the robot, so should not be required to implement in this pipeline</span>
+    <span class="c1"># adjusting the radial position offsets to the magnet pair due to thermal expansion</span>
+    <span class="c1"># list_of_probes = radialPositionOffset(list_of_probes, magnetPair_offset)</span>
+
+    <span class="c1"># circular magnet list created</span>
+    <span class="n">list_of_circular_magnet</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># extracting the circular magnet parameters respectively from the probes list</span>
+    <span class="k">for</span> <span class="n">each_probe</span> <span class="ow">in</span> <span class="n">list_of_probes</span><span class="p">:</span>
+        <span class="n">list_of_circular_magnet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">each_probe</span><span class="o">.</span><span class="n">extract_circular_magnet_parameters</span><span class="p">())</span>
+
+    <span class="c1"># rectangular magnet list created</span>
+    <span class="n">list_of_rectangular_magnet</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># extracting the rectangular magnet parameters respectively from the probes list</span>
+    <span class="k">for</span> <span class="n">each_probe</span> <span class="ow">in</span> <span class="n">list_of_probes</span><span class="p">:</span>
+        <span class="n">list_of_rectangular_magnet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">each_probe</span><span class="o">.</span><span class="n">extract_rectangular_magnet_parameters</span><span class="p">())</span>
+
+
+    <span class="k">return</span> <span class="n">list_of_circular_magnet</span><span class="p">,</span><span class="n">list_of_rectangular_magnet</span></div>
+
+<div class="viewcode-block" id="create_list_of_all_magnets_from_file"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_all_magnets_from_file">[docs]</a><span class="k">def</span> <span class="nf">create_list_of_all_magnets_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">guideFileList</span><span class="p">):</span>   <span class="c1">#,magnetPair_offset):</span>
+
+    <span class="c1"># extracting circular and rectangular magnets list from the list of probes which is first extracted from file</span>
+    <span class="p">[</span><span class="n">circular_magnets</span><span class="p">,</span> <span class="n">rectangular_magnets</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_list_of_circular_and_rectangular_magnets_from_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">guideFileList</span><span class="p">)</span>  <span class="c1">#,magnetPair_offset)</span>
+
+    <span class="n">all_magnets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">circular_magnets</span><span class="p">,</span> <span class="n">rectangular_magnets</span><span class="p">])</span>
+
+    <span class="c1"># magnet label index</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">magnet</span> <span class="ow">in</span> <span class="n">all_magnets</span><span class="p">:</span>
+
+        <span class="c1"># adding magnet labels of rectangular: R01.. ,and circular: Blu,Mag,Gre,Yel</span>
+        <span class="n">magnet</span><span class="p">,</span><span class="n">index</span> <span class="o">=</span> <span class="n">assign_magnet_labels</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_magnets</span><span class="c1">#np.concatenate([circular_magnets, rectangular_magnets])</span></div>
+
+<span class="c1"># quick function to read a filename</span>
+<div class="viewcode-block" id="get_file"><a class="viewcode-back" href="../../../../hop.hexabundle_allocation.problem_operations.html#hop.hexabundle_allocation.problem_operations.extract_data.get_file">[docs]</a><span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

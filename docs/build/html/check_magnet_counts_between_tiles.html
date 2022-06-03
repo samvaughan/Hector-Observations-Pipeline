@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Checking two plates can be observed after each other &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Preparing files to be configured by the robot" href="prepare_files_for_robot.html" />
+    <link rel="prev" title="Showing the Sky Fibre Changes between Plates" href="show_sky_fibre_changes_between_plates.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Checking two plates can be observed after each other</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/check_magnet_counts_between_tiles.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="checking-two-plates-can-be-observed-after-each-other">
+<h1>Checking two plates can be observed after each other<a class="headerlink" href="#checking-two-plates-can-be-observed-after-each-other" title="Permalink to this heading">¶</a></h1>
+<p>The Hector robot has a large but limited number of circular magnets corresponding to each telecentricity annulus:</p>
+<ul class="simple">
+<li><p>25 Blue magnets in the central telecentricity radius</p></li>
+<li><p>27 Green magnets in the second annulus</p></li>
+<li><p>31 Yellow magnets in the third annulus</p></li>
+<li><p>24 Magneta magnets in the outer annulus</p></li>
+</ul>
+<p>Very rarely, it may not be possible to have two plates configured at the same time if together they require more of a certain kind of magnet than we have available. This should have been flagged as an issue before the run, but if you’re making changes on-the-fly at the telescope it’s something to be mindful of.</p>
+<p>The script <code class="docutils literal notranslate"><span class="pre">check_magnet_counts_between_tiles</span></code> counts the number of circular magnets in each tile and makes sure we’re not going to run out of a specific colour.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>The code uses the robot files from each plate to make the comparison. From the command line, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>check_magnet_counts_between_tiles robot_file_1 robot_file_2
+</pre></div>
+</div>
+<p>An example output is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Telecentricity Annulus: Blue</span>
+<span class="go">        Tile 1 has 4, Tile 2 has 6</span>
+<span class="go">        Total used: 10 / 25</span>
+<span class="go">Telecentricity Annulus: Green</span>
+<span class="go">        Tile 1 has 7, Tile 2 has 6</span>
+<span class="go">        Total used: 13 / 27</span>
+<span class="go">Telecentricity Annulus: Yellow</span>
+<span class="go">        Tile 1 has 10, Tile 2 has 12</span>
+<span class="go">        Total used: 22 / 31</span>
+<span class="go">Telecentricity Annulus: Magenta</span>
+<span class="go">        Tile 1 has 6, Tile 2 has 3</span>
+<span class="go">        Total used: 9 / 24</span>
+</pre></div>
+</div>
+<p>So these two plates can be configured and observed one after the other. If two tiles cannot be configured at the same time, the script will raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> and exit.</p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.hexabundle_allocation.problem_operations package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.hexabundle_allocation.problem_operations package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.extract_data">hop.hexabundle_allocation.problem_operations.extract_data module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.fibres">hop.hexabundle_allocation.problem_operations.fibres module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.file_arranging">hop.hexabundle_allocation.problem_operations.file_arranging module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.hexabundle">hop.hexabundle_allocation.problem_operations.hexabundle module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.offsets">hop.hexabundle_allocation.problem_operations.offsets module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.plots">hop.hexabundle_allocation.problem_operations.plots module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.position_ordering">hop.hexabundle_allocation.problem_operations.position_ordering module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations.robot_parameters">hop.hexabundle_allocation.problem_operations.robot_parameters module</a></li>
+<li><a class="reference internal" href="#module-hop.hexabundle_allocation.problem_operations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.hexabundle_allocation.problem_operations.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-hexabundle-allocation-problem-operations-package">
+<h1>hop.hexabundle_allocation.problem_operations package<a class="headerlink" href="#hop-hexabundle-allocation-problem-operations-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html">hop.hexabundle_allocation.problem_operations.conflicts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet">hop.hexabundle_allocation.problem_operations.conflicts.blocked_magnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_circular_magnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.circular_magnet_with_rectangular_magnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.functions">hop.hexabundle_allocation.problem_operations.conflicts.functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet">hop.hexabundle_allocation.problem_operations.conflicts.rectangular_magnet_and_rectangular_magnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.conflicts.html#module-hop.hexabundle_allocation.problem_operations.conflicts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.extract_data">
+<span id="hop-hexabundle-allocation-problem-operations-extract-data-module"></span><h2>hop.hexabundle_allocation.problem_operations.extract_data module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.extract_data" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_all_magnets_from_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">create_list_of_all_magnets_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guideFileList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#create_list_of_all_magnets_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_all_magnets_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_circular_and_rectangular_magnets_from_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">create_list_of_circular_and_rectangular_magnets_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guideFileList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#create_list_of_circular_and_rectangular_magnets_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_circular_and_rectangular_magnets_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_probes_from_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">create_list_of_probes_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guideFileList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#create_list_of_probes_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.create_list_of_probes_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.get_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#get_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.get_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.parse_col">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">parse_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#parse_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.parse_col" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.parse_col_string">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">parse_col_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#parse_col_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.parse_col_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.extract_data.remove_apostrophes">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.extract_data.</span></span><span class="sig-name descname"><span class="pre">remove_apostrophes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/extract_data.html#remove_apostrophes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.extract_data.remove_apostrophes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.fibres">
+<span id="hop-hexabundle-allocation-problem-operations-fibres-module"></span><h2>hop.hexabundle_allocation.problem_operations.fibres module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.fibres" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.check_magnetCount_perAnnulus">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">check_magnetCount_perAnnulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_1_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_2_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_1_guide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_2_guide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annuliCount_batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#check_magnetCount_perAnnulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.check_magnetCount_perAnnulus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.check_tile_pair_magnet_counts">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">check_tile_pair_magnet_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_file_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_file_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#check_tile_pair_magnet_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.check_tile_pair_magnet_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.convert_rectangularMagnetOrientation">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">convert_rectangularMagnetOrientation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#convert_rectangularMagnetOrientation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.convert_rectangularMagnetOrientation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.createHexabundleFigure_withChangeShown">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">createHexabundleFigure_withChangeShown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplateSkyfibre_figureFile_tile1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplateSkyfibre_figureFile_tile2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#createHexabundleFigure_withChangeShown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.createHexabundleFigure_withChangeShown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.create_fibreSlit_info_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">create_fibreSlit_info_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fibre_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fibreSlitInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#create_fibreSlit_info_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.create_fibreSlit_info_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.create_hexabundleFibre_coordData">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">create_hexabundleFibre_coordData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_hexabundle_coordData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#create_hexabundleFibre_coordData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.create_hexabundleFibre_coordData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.create_skyFibreSlitlet_figure">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">create_skyFibreSlitlet_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_arrayAAOmega</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_arraySpector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skyFibre_AAOmegaFigure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skyFibre_SpectorFigure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#create_skyFibreSlitlet_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.create_skyFibreSlitlet_figure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.create_slitletFigure">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">create_slitletFigure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_arrayAAOmega</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_arraySpector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fibreFigure_AAOmega</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fibreFigure_Spector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#create_slitletFigure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.create_slitletFigure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.createskyfibreChanges_plot">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">createskyfibreChanges_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_1_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_2_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplateSkyfibre_figureFile_tile1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplateSkyfibre_figureFile_tile2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subplateSkyfibre_figureFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#createskyfibreChanges_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.createskyfibreChanges_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.extract_fibreInfo">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">extract_fibreInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fibre_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fibreAAOmega</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fibreSpector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#extract_fibreInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.extract_fibreInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.plotHist_annuliCount_batch">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">plotHist_annuliCount_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annuliCount_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileBatch_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#plotHist_annuliCount_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.plotHist_annuliCount_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.plotHist_pistonChange_count_batch">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">plotHist_pistonChange_count_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pistonChange_countBatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileBatch_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#plotHist_pistonChange_count_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.plotHist_pistonChange_count_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.plot_bar_from_dict">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">plot_bar_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#plot_bar_from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.plot_bar_from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>”
+This function creates a bar plot from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict</strong> – A dictionary with the item as the key
+and the frequency as the value</p></li>
+<li><p><strong>ax</strong> – an axis of matplotlib</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the axis wit the object in it</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.show_sky_fibre_changes">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">show_sky_fibre_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#show_sky_fibre_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.show_sky_fibre_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a plot to show the changes in sky fibres between two plates.
+Inputs:</p>
+<blockquote>
+<div><p>tile_1 (str): Filename of the Hector Tile File (called Tile_FinalFormat…) file for plate 1
+tile_2 (str): Filename of the Hector Tile File (called Tile_FinalFormat…) file for plate 2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Output:</dt><dd><p>(fig, ax)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.fibres.skyfibreChanges_pistonChange_count">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.fibres.</span></span><span class="sig-name descname"><span class="pre">skyfibreChanges_pistonChange_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/fibres.html#skyfibreChanges_pistonChange_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.fibres.skyfibreChanges_pistonChange_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.file_arranging">
+<span id="hop-hexabundle-allocation-problem-operations-file-arranging-module"></span><h2>hop.hexabundle_allocation.problem_operations.file_arranging module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.file_arranging" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.add_repositionCol_to_robotFile">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">add_repositionCol_to_robotFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positioning_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robotFilearray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fully_blocked_magnets_dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#add_repositionCol_to_robotFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.add_repositionCol_to_robotFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.arrange_guidesFile">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">arrange_guidesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileNameGuides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_outputFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#arrange_guidesFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.arrange_guidesFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.create_robotFileArray">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">create_robotFileArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positioning_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robotFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newrow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fully_blocked_magnets_dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">9999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">9999</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#create_robotFileArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.create_robotFileArray" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.finalFiles">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">finalFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#finalFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.finalFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.hasNumbers">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">hasNumbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputString</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#hasNumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.hasNumbers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.merge_hexaAndGuides">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">merge_hexaAndGuides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_guideFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#merge_hexaAndGuides"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.merge_hexaAndGuides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.file_arranging.positioningArray_adjust_and_mergetoFile">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.file_arranging.</span></span><span class="sig-name descname"><span class="pre">positioningArray_adjust_and_mergetoFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positioning_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plate_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newrow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newrow_circular</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/file_arranging.html#positioningArray_adjust_and_mergetoFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.file_arranging.positioningArray_adjust_and_mergetoFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.hexabundle">
+<span id="hop-hexabundle-allocation-problem-operations-hexabundle-module"></span><h2>hop.hexabundle_allocation.problem_operations.hexabundle module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.hexabundle" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.check_for_hexabundle_allocation_repeats">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">check_for_hexabundle_allocation_repeats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#check_for_hexabundle_allocation_repeats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.check_for_hexabundle_allocation_repeats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.check_for_unallocated_hexabundle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">check_for_unallocated_hexabundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HexaCount</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#check_for_unallocated_hexabundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.check_for_unallocated_hexabundle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.cores91_hexabundles_sortedByMstar">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">cores91_hexabundles_sortedByMstar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#cores91_hexabundles_sortedByMstar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.cores91_hexabundles_sortedByMstar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.create_Magnet_Dictionary">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">create_Magnet_Dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#create_Magnet_Dictionary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.create_Magnet_Dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.get_probe_count">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">get_probe_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#get_probe_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.get_probe_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.hexabundle_allocation_fromMagnetDict">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">hexabundle_allocation_fromMagnetDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guideIndex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#hexabundle_allocation_fromMagnetDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.hexabundle_allocation_fromMagnetDict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version1">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">overall_hexabundle_size_allocation_operation_version1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galaxyIDrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flagsFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#overall_hexabundle_size_allocation_operation_version1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version2_median">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">overall_hexabundle_size_allocation_operation_version2_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galaxyIDrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flagsFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#overall_hexabundle_size_allocation_operation_version2_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version2_median" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version3_largerBundlePriority">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">overall_hexabundle_size_allocation_operation_version3_largerBundlePriority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galaxyIDrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_1re_cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flagsFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#overall_hexabundle_size_allocation_operation_version3_largerBundlePriority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.overall_hexabundle_size_allocation_operation_version3_largerBundlePriority" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.resolve_hexabundle_allocation_repeats">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">resolve_hexabundle_allocation_repeats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexabundleRepeatwithsameID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#resolve_hexabundle_allocation_repeats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.resolve_hexabundle_allocation_repeats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.resolve_unallocated_hexabundle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">resolve_unallocated_hexabundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unallocatedOnes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#resolve_unallocated_hexabundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.resolve_unallocated_hexabundle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.star_hexabundle_allocation">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">star_hexabundle_allocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexabundleDict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#star_hexabundle_allocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.star_hexabundle_allocation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.hexabundle.update_galaxyIDrecord_withHexabundle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.hexabundle.</span></span><span class="sig-name descname"><span class="pre">update_galaxyIDrecord_withHexabundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">galaxyIDrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/hexabundle.html#update_galaxyIDrecord_withHexabundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.hexabundle.update_galaxyIDrecord_withHexabundle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.offsets">
+<span id="hop-hexabundle-allocation-problem-operations-offsets-module"></span><h2>hop.hexabundle_allocation.problem_operations.offsets module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.offsets" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.offsets.calculate_rectangular_magnet_center_coordinates">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.offsets.</span></span><span class="sig-name descname"><span class="pre">calculate_rectangular_magnet_center_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/offsets.html#calculate_rectangular_magnet_center_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.offsets.calculate_rectangular_magnet_center_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.offsets.calculate_rectangular_magnet_orientation">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.offsets.</span></span><span class="sig-name descname"><span class="pre">calculate_rectangular_magnet_orientation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/offsets.html#calculate_rectangular_magnet_orientation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.offsets.calculate_rectangular_magnet_orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the angle of the rectangular magnet into the correct frame (by subtracting pi)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.offsets.calculate_telecentricity_correction">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.offsets.</span></span><span class="sig-name descname"><span class="pre">calculate_telecentricity_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telecentricity_correction_dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/offsets.html#calculate_telecentricity_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.offsets.calculate_telecentricity_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the required offset in the posotion of the circular magnets based on their telecentricity annulus</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.offsets.hexaPositionOffset">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.offsets.</span></span><span class="sig-name descname"><span class="pre">hexaPositionOffset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offsetFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/offsets.html#hexaPositionOffset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.offsets.hexaPositionOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the P and Q offsets to the circular magnets and then move the rectangular magnets accordingly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.offsets.magnetPair_radialPositionOffset_circularAnnulus">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.offsets.</span></span><span class="sig-name descname"><span class="pre">magnetPair_radialPositionOffset_circularAnnulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_circularAnnulus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/offsets.html#magnetPair_radialPositionOffset_circularAnnulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.offsets.magnetPair_radialPositionOffset_circularAnnulus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust the posotion of a circular magnet based on its telecentrocity annulus. Note- apply this function either here or in the radial offset standalone function but not both!</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><dl class="simple">
+<dt>offset_circularAnnulus (dict):</dt><dd><p>A dictionary containing the amount each magnet moves depending on its telecentricity annulus. Must have keys ‘Blu’, ‘Yel’, ‘Gre’ and ‘Mag’</p>
+</dd>
+<dt>all_magnets (list):</dt><dd><p>list of all magnet objects</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.plots">
+<span id="hop-hexabundle-allocation-problem-operations-plots-module"></span><h2>hop.hexabundle_allocation.problem_operations.plots module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.plots" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.annotate_text_in_plot">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">annotate_text_in_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#annotate_text_in_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.annotate_text_in_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.coordinates_and_angle_of_skyFibres">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">coordinates_and_angle_of_skyFibres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radii</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#coordinates_and_angle_of_skyFibres"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.coordinates_and_angle_of_skyFibres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.create_magnet_pickup_areas">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">create_magnet_pickup_areas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#create_magnet_pickup_areas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.create_magnet_pickup_areas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.draw_all_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">draw_all_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_figureFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hexabundle_figureFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_hexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_robot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#draw_all_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.draw_all_magnets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the two main plots from this code- the hexabundle plot and the robot pickup plot. For historical reasons, these are plotted at the same time in this single function rather than separately…</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.draw_circularSegments">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">draw_circularSegments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#draw_circularSegments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.draw_circularSegments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.draw_circular_magnet">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">draw_circular_magnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#draw_circular_magnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.draw_circular_magnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw the circular magnets on the Hector field plate and label them</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.draw_magnet_pickup_areas">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">draw_magnet_pickup_areas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#draw_magnet_pickup_areas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.draw_magnet_pickup_areas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.draw_rectangular_magnet">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">draw_rectangular_magnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#draw_rectangular_magnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.draw_rectangular_magnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a rectangular magnet on the hector plate. Annotate it with its number</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.get_magnet_properties">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">get_magnet_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hexabundle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#get_magnet_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.get_magnet_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of useful properties for each magnet</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.plot_skyfibre_section">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">plot_skyfibre_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skyfibreDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_subplate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skyfibre_titles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_ang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#plot_skyfibre_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.plot_skyfibre_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw the positions of one of the three Hector skyfibre subplates.
+There are three sections or “subplates” of skyfibres in Hector. Each is made up of four “wedges”, labelled by the spectrograph they feed (“A” or “H”) and a number. This function plots one section, corresponding to 4 wedges.
+In each wedge, there are a number of fibres which can be in the position 0, 1, 2,  or 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> – A matplotlib figure object</p></li>
+<li><p><strong>ax</strong> – A matplotlib axis object</p></li>
+<li><p><strong>skyfibreDict</strong> (<em>dict</em>) – A dictionary of each skyfibre wedge and its fibres.</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – The angle of the entire subplate</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius at which to draw the subplates. Should be 270 mm.</p></li>
+<li><p><strong>angle_subplate</strong> (<em>list</em>) – The angle of each sky fibre with respect to the overall angle variable above. Should be [7,5,3,1,-1,-3,-5,-7]</p></li>
+<li><p><strong>skyfibre_titles</strong> (<em>list</em>) – A list of each wedge name</p></li>
+<li><p><strong>delta_ang</strong> (<em>float</em>) – The difference in angle between adjacent wedges.</p></li>
+<li><p><strong>colour_array</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of colours to plot each sky fibre as. Useful for plots showing the changes between two plates. If None, default to black for all fibres</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ax</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.read_sky_fibre_file">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">read_sky_fibre_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#read_sky_fibre_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.read_sky_fibre_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a sky fibre file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.plots.sky_fibre_annotations">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.plots.</span></span><span class="sig-name descname"><span class="pre">sky_fibre_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skyfibre_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/plots.html#sky_fibre_annotations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.plots.sky_fibre_annotations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.position_ordering">
+<span id="hop-hexabundle-allocation-problem-operations-position-ordering-module"></span><h2>hop.hexabundle_allocation.problem_operations.position_ordering module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.position_ordering" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.position_ordering.calculate_placement_ordering_of_all_blocked_magnets">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.position_ordering.</span></span><span class="sig-name descname"><span class="pre">calculate_placement_ordering_of_all_blocked_magnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_fully_blocked_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_conflicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/position_ordering.html#calculate_placement_ordering_of_all_blocked_magnets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.position_ordering.calculate_placement_ordering_of_all_blocked_magnets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.position_ordering.calculate_placement_ordering_of_blocked_magnet">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.position_ordering.</span></span><span class="sig-name descname"><span class="pre">calculate_placement_ordering_of_blocked_magnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocked_magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_conflicts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_fully_blocked_magnets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/position_ordering.html#calculate_placement_ordering_of_blocked_magnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.position_ordering.calculate_placement_ordering_of_blocked_magnet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.position_ordering.create_position_ordering_array">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.position_ordering.</span></span><span class="sig-name descname"><span class="pre">create_position_ordering_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fully_blocked_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflicted_magnets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MagnetDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galaxyIDrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflictFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/position_ordering.html#create_position_ordering_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.position_ordering.create_position_ordering_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations.robot_parameters">
+<span id="hop-hexabundle-allocation-problem-operations-robot-parameters-module"></span><h2>hop.hexabundle_allocation.problem_operations.robot_parameters module<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations.robot_parameters" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.add_pickupDirection">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">add_pickupDirection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_pickup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#add_pickupDirection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.add_pickupDirection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.assign_magnet_labels">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">assign_magnet_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#assign_magnet_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.assign_magnet_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.assign_preferable_pickupDirection">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">assign_preferable_pickupDirection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_pickup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#assign_preferable_pickupDirection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.assign_preferable_pickupDirection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.calculate_pickup_putdown_angles">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">calculate_pickup_putdown_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_pickup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#calculate_pickup_putdown_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.calculate_pickup_putdown_angles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_negative_twopi_angle">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">check_for_negative_twopi_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#check_for_negative_twopi_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_negative_twopi_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_unresolvable_conflict">
+<span class="sig-prename descclassname"><span class="pre">hop.hexabundle_allocation.problem_operations.robot_parameters.</span></span><span class="sig-name descname"><span class="pre">check_for_unresolvable_conflict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">magnet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflictFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusterNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/hexabundle_allocation/problem_operations/robot_parameters.html#check_for_unresolvable_conflict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.hexabundle_allocation.problem_operations.robot_parameters.check_for_unresolvable_conflict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-hop.hexabundle_allocation.problem_operations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.hexabundle_allocation.problem_operations" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

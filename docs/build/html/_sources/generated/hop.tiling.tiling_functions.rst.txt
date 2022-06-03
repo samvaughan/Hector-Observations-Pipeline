@@ -1,0 +1,44 @@
+﻿hop.tiling.tiling\_functions
+============================
+
+.. automodule:: hop.tiling.tiling_functions
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      calculate_completeness_stats
+      check_if_in_fov
+      find_clashes
+      find_great_circle_distance
+      find_nearest
+      get_best_tile_centre_dengreedy
+      get_best_tile_centre_greedy
+      make_best_tile
+      noclash
+      plot_survey_completeness_and_tile_positions
+      plot_tile
+      save_guide_text_file
+      save_tile_outputs
+      save_tile_text_file
+      select_stars_for_tile
+      select_targets
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

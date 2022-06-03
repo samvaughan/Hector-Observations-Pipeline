@@ -1,0 +1,7 @@
+API
+===
+
+In progress!
+
+.. automodapi:: hop.tiling.tiling_functions
+.. automodapi:: hop.hexabundle_allocation

@@ -1,0 +1,6 @@
+find_nearest
+============
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: find_nearest

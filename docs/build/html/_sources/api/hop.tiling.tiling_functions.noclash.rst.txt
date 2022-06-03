@@ -1,0 +1,6 @@
+noclash
+=======
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: noclash

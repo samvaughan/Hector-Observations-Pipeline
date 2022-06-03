@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.pipeline">hop.pipeline module</a></li>
+<li><a class="reference internal" href="#module-hop">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-package">
+<h1>hop package<a class="headerlink" href="#hop-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hop.distortion_correction.html">hop.distortion_correction package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.distortion_correction.html#module-hop.distortion_correction">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.hexabundle_allocation.html">hop.hexabundle_allocation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html">hop.hexabundle_allocation.general_operations package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#module-hop.hexabundle_allocation.general_operations.trigonometry">hop.hexabundle_allocation.general_operations.trigonometry module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.general_operations.html#module-hop.hexabundle_allocation.general_operations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.hector.html">hop.hexabundle_allocation.hector package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.constants">hop.hexabundle_allocation.hector.constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.plate">hop.hexabundle_allocation.hector.plate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector.probe">hop.hexabundle_allocation.hector.probe module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.hector.html#module-hop.hexabundle_allocation.hector">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html">hop.hexabundle_allocation.problem_operations package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.extract_data">hop.hexabundle_allocation.problem_operations.extract_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.fibres">hop.hexabundle_allocation.problem_operations.fibres module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.file_arranging">hop.hexabundle_allocation.problem_operations.file_arranging module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.hexabundle">hop.hexabundle_allocation.problem_operations.hexabundle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.offsets">hop.hexabundle_allocation.problem_operations.offsets module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.plots">hop.hexabundle_allocation.problem_operations.plots module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.position_ordering">hop.hexabundle_allocation.problem_operations.position_ordering module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations.robot_parameters">hop.hexabundle_allocation.problem_operations.robot_parameters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hop.hexabundle_allocation.problem_operations.html#module-hop.hexabundle_allocation.problem_operations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#module-hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation">hop.hexabundle_allocation.AyoanPC_main_hexabundleAllocation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#hop-hexabundle-allocation-allocate-hexabundles-module">hop.hexabundle_allocation.allocate_hexabundles module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#module-hop.hexabundle_allocation.collision_hexabundle_main">hop.hexabundle_allocation.collision_hexabundle_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.hexabundle_allocation.html#module-hop.hexabundle_allocation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.misc.html">hop.misc package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.misc.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.misc.html#module-hop.misc.misc_tools">hop.misc.misc_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.misc.html#module-hop.misc.pandas_tools">hop.misc.pandas_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.misc.html#module-hop.misc.plotting_tools">hop.misc.plotting_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.misc.html#module-hop.misc">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.scripts.html">hop.scripts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.scripts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.scripts.html#module-hop.scripts.prepare_files_for_robot">hop.scripts.prepare_files_for_robot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.scripts.html#module-hop.scripts.robot_corrections">hop.scripts.robot_corrections module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.scripts.html#module-hop.scripts.robot_file_input_output">hop.scripts.robot_file_input_output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.scripts.html#module-hop.scripts">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.target_selection.html">hop.target_selection package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.target_selection.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.target_selection.html#module-hop.target_selection.HectorSim">hop.target_selection.HectorSim module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.target_selection.html#module-hop.target_selection">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hop.tiling.html">hop.tiling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hop.tiling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.tiling.html#module-hop.tiling.tiling_functions">hop.tiling.tiling_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hop.tiling.html#module-hop.tiling">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.pipeline">
+<span id="hop-pipeline-module"></span><h2>hop.pipeline module<a class="headerlink" href="#module-hop.pipeline" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.pipeline.</span></span><span class="sig-name descname"><span class="pre">HectorPipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Profit_files_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dictionary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P_and_Q_offset_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Hexa_final_prism_gluing_PQ_table.xlsx'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Hector Observations pipeline. This class has methods to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Use the Survey Simulator to create an input catalogue from a larger master catalogue</p></li>
+<li><p>Tile an input catalogue using the Hector tiling code</p></li>
+<li><p>Apply distortion correction to each tile</p></li>
+<li><p>Configure each tile</p></li>
+<li><p>Run the HexabundleAllocation code</p></li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.add_fibre_type_column">
+<span class="sig-name descname"><span class="pre">add_fibre_type_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.add_fibre_type_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.add_fibre_type_column" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.allocate_hexabundles_for_all_tiles">
+<span class="sig-name descname"><span class="pre">allocate_hexabundles_for_all_tiles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.allocate_hexabundles_for_all_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.allocate_hexabundles_for_all_tiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.allocate_hexabundles_for_single_tile">
+<span class="sig-name descname"><span class="pre">allocate_hexabundles_for_single_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileNameGuides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileNameHexa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.allocate_hexabundles_for_single_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.allocate_hexabundles_for_single_tile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.apply_config_code_to_tile">
+<span class="sig-name descname"><span class="pre">apply_config_code_to_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.apply_config_code_to_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.apply_config_code_to_tile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.apply_distortion_correction">
+<span class="sig-name descname"><span class="pre">apply_distortion_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_out_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_tile_out_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_out_fname_after_DC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_tile_out_fname_after_DC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_RA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_Dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_stars_for_tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_save_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test_label'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plateID</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test_plateID'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearity_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_fibre_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profit_file_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_sky_fibres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turn_off_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_PM_corr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.apply_distortion_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.apply_distortion_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a tile file from the tiling process and apply Keith’s distortion correction code. Then turn his one output file into the two output files which Caro’s configuration code expects. We also need to do some work to edit the headers/etc.</p>
+<p>If plot_save_filename is not None, save an image of the tile before/after the correction is applied</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.find_premade_tiles">
+<span class="sig-name descname"><span class="pre">find_premade_tiles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.find_premade_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.find_premade_tiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find any tiles which have already been configured in the output folders.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.get_remaining_targets">
+<span class="sig-name descname"><span class="pre">get_remaining_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.get_remaining_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.get_remaining_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of targets remaining in the field to tile</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.load_input_catalogue">
+<span class="sig-name descname"><span class="pre">load_input_catalogue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.load_input_catalogue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.load_input_catalogue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load an input target catalogue, guide star catalogue and standard star catalogue</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.make_header_dictionary">
+<span class="sig-name descname"><span class="pre">make_header_dictionary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.make_header_dictionary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.make_header_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.make_output_file_for_Tony">
+<span class="sig-name descname"><span class="pre">make_output_file_for_Tony</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.make_output_file_for_Tony"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.make_output_file_for_Tony" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take our output files and make them into a format which Tony can read in.
+This means:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>‘#’ is reserved for a comment. Header key/value pairs should not start with a #, but the row names (which are only included for readability, Tony’s code doesn’t use them) should</p></li>
+<li><p>Missing values should be blank- i.e. na_rep=’’</p></li>
+<li><p>things which are specified as an integer must be made an integer, not a floating point number</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.read_header_dictionary_from_file">
+<span class="sig-name descname"><span class="pre">read_header_dictionary_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.read_header_dictionary_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.read_header_dictionary_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.run_configuration_code">
+<span class="sig-name descname"><span class="pre">run_configuration_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_file_for_configuration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_tile_for_configuration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration_output_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration_guide_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration_plot_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_timeout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.run_configuration_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.run_configuration_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.run_target_selection">
+<span class="sig-name descname"><span class="pre">run_target_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.run_target_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.run_target_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli">
+<span class="sig-name descname"><span class="pre">show_skyfibreChanges_and_magnetCountPerAnnuli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_fname_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_fname_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_1_guide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_2_guide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileBatch_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tileBatch_skyFibreChange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OFF'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.show_skyfibreChanges_and_magnetCountPerAnnuli" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>FUNCTION TO SHOW CHANGES IN SKYFIBRE SUB-PLATE NUMBERS AND MAGNET COUNT CHECK PERFORMED BETWEEN TWO TILES</dt><dd><p>TWO OPTIONS TO RUN THIS FUNCTION</p>
+</dd>
+<dt>INPUTS FOR OPTION 1: ‘tile_number_1’ and ‘tile_number_2’</dt><dd><p>Produces the plots for the first tile and the second tile with changes in skyfibre sub-plate
+number of second tile compared to first tile being highlighted, and conducts magnet count
+check per annulus to record any warnings of magnet count in any annulus exceeding the
+available number of casings on text file.</p>
+</dd>
+<dt>INPUTS FOR OPTION 2: ‘tile_batch’ and ‘tileBatch_count’</dt><dd><p>‘tileBatch_skyFibreChange’ - set as ‘ON’ to generate a full set of sky fibre change plots
+Carries out a magnet count check for each tile pair in a whole batch without any repeats
+and generates histogram plots for each annulus to show distribution of magnets count for
+each annulus in a batch. ‘tileBatch_skyFibreChange’ is OFF by default, and if set to ON
+will also produce a full set of sky fibre change plots for each tile pair in batch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.pipeline.HectorPipe.tile_field">
+<span class="sig-name descname"><span class="pre">tile_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configure_tiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_distortion_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_galaxy_priorities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'a</span> <span class="pre">test_label'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plateID</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'a</span> <span class="pre">test_plateID'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2022</span> <span class="pre">06</span> <span class="pre">03'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_sky_fibres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/pipeline.html#HectorPipe.tile_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.pipeline.HectorPipe.tile_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tile an entire input catalogue. Optionally apply distortion correction to go from RA/DEC to locations on the plate and optionally run the configuration code to arrange the hexabundles on the plate.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hop">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

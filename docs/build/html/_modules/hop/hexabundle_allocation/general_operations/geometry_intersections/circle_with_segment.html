@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="circle_line_intersection_equation"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation">[docs]</a><span class="k">class</span> <span class="nc">circle_line_intersection_equation</span><span class="p">():</span>
+
+    <span class="c1"># initializing the circle line intersection equation with the respective parameters</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">line_segment</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter_A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter_B</span> <span class="o">=</span> <span class="n">B</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter_C</span> <span class="o">=</span> <span class="n">C</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">segment</span> <span class="o">=</span> <span class="n">line_segment</span>
+
+    <span class="c1"># calculating determinant via: b^2 - 4ac</span>
+<div class="viewcode-block" id="circle_line_intersection_equation.calculate_determinant"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation.calculate_determinant">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">determinant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_B</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_A</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_C</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">determinant</span></div>
+
+    <span class="c1"># determining intersection by checking whether it&#39;s greater than or equal to zero</span>
+<div class="viewcode-block" id="circle_line_intersection_equation.intersection"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation.intersection">[docs]</a>    <span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_determinant</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="c1"># solving the intersection for roots using the quadratic formula</span>
+<div class="viewcode-block" id="circle_line_intersection_equation.solve_intersection_times"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation.solve_intersection_times">[docs]</a>    <span class="k">def</span> <span class="nf">solve_intersection_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersection</span><span class="p">():</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_B</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">determinant</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_A</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_B</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">determinant</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_A</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">t1</span><span class="p">,</span><span class="n">t2</span></div>
+
+    <span class="c1"># solving for intersection points by multiply roots with the vector then adding with start point</span>
+<div class="viewcode-block" id="circle_line_intersection_equation.solve_intersecting_points"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation.solve_intersecting_points">[docs]</a>    <span class="k">def</span> <span class="nf">solve_intersecting_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersection</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_intersection_times</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_intersection_times</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">1</span><span class="p">]],</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_intersection_times</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_intersection_times</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">1</span><span class="p">]]]</span></div>
+
+    <span class="c1"># solving for all the intersection points of segment with circle</span>
+<div class="viewcode-block" id="circle_line_intersection_equation.solve_segment_intersects_with_circle"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.circle_line_intersection_equation.solve_segment_intersects_with_circle">[docs]</a>    <span class="k">def</span> <span class="nf">solve_segment_intersects_with_circle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">circle_line_intersection_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_intersecting_points</span><span class="p">()</span>
+
+        <span class="n">circle_segment_intersection_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># adding all the circle segment intersection points in list</span>
+        <span class="k">if</span> <span class="n">circle_line_intersection_points</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">circle_line_intersection_points</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">point_is_on_segment</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="p">):</span>
+
+                    <span class="n">circle_segment_intersection_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">circle_segment_intersection_points</span></div></div>
+
+<span class="c1"># creating a circle segment equation by calculating the required parameters</span>
+<div class="viewcode-block" id="create_circle_segment_equation"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.create_circle_segment_equation">[docs]</a><span class="k">def</span> <span class="nf">create_circle_segment_equation</span><span class="p">(</span><span class="n">circle</span><span class="p">,</span><span class="n">segment</span><span class="p">):</span>
+
+    <span class="c1"># changes in x and y calculated</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">circle</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">circle</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">parameter_A</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">parameter_B</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">segment</span><span class="o">.</span><span class="n">vector</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span>
+    <span class="n">parameter_C</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">circle</span><span class="o">.</span><span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">circle_line_intersection_equation</span><span class="p">(</span><span class="n">parameter_A</span><span class="p">,</span><span class="n">parameter_B</span><span class="p">,</span><span class="n">parameter_C</span><span class="p">,</span><span class="n">segment</span><span class="p">)</span></div>
+
+<span class="c1"># checking whether point is on segment by the range of start point to end point coordinates</span>
+<div class="viewcode-block" id="point_is_on_segment"><a class="viewcode-back" href="../../../../../hop.hexabundle_allocation.general_operations.geometry_intersections.html#hop.hexabundle_allocation.general_operations.geometry_intersections.circle_with_segment.point_is_on_segment">[docs]</a><span class="k">def</span> <span class="nf">point_is_on_segment</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">segment</span><span class="o">.</span><span class="n">end_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">segment</span><span class="o">.</span><span class="n">end_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">segment</span><span class="o">.</span><span class="n">end_point</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">segment</span><span class="o">.</span><span class="n">end_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hop.scripts.robot_corrections &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hop.scripts.robot_corrections</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">chained_assignment</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># disabled warning about writes making it back to the original frame</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Various functions which correct the magnet x and y positions on the Hector Plate</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="pick_up_arm_rotation_correction"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.pick_up_arm_rotation_correction">[docs]</a><span class="k">def</span> <span class="nf">pick_up_arm_rotation_correction</span><span class="p">(</span><span class="n">robot_centre_x</span><span class="p">,</span> <span class="n">robot_centre_y</span><span class="p">,</span> <span class="n">rot_platePlacing</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm. </span>
+
+<span class="sd">    First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">24</span><span class="o">*</span><span class="mf">0.001</span> <span class="c1"># distance from center of pick up arm to center of rotation in [mm]</span>
+    <span class="n">ang0</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># when the robot is at 0deg, it is actually 20 deg from the +x axis. The rotation direction is clockwise</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_platePlacing</span> <span class="o">-</span> <span class="n">ang0</span><span class="p">)</span>
+
+    <span class="n">robot_centre_x_new</span> <span class="o">=</span> <span class="p">(</span><span class="n">robot_centre_x</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="n">robot_centre_y_new</span> <span class="o">=</span> <span class="p">(</span><span class="n">robot_centre_y</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">robot_centre_x_new</span><span class="p">,</span> <span class="n">robot_centre_y_new</span></div>
+
+<div class="viewcode-block" id="apply_offsets_to_magnets"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.apply_offsets_to_magnets">[docs]</a><span class="k">def</span> <span class="nf">apply_offsets_to_magnets</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">apply_telecentricity_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Applying an overall radial offset of </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s2">mm to all circular magnets&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Loop through the hexabundles</span>
+    <span class="n">all_hexabundles</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Magnet&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">,</span> <span class="s1">&#39;Hexabundle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">for</span> <span class="n">hexabundle</span> <span class="ow">in</span> <span class="n">all_hexabundles</span><span class="p">:</span>
+
+        <span class="n">circular_magnet</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hexabundle</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Magnet&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">)]</span>
+        <span class="n">rectangular_magnet</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hexabundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hexabundle</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Magnet&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">)]</span>
+        
+        <span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span> <span class="o">=</span> <span class="n">calculate_radial_offset</span><span class="p">(</span><span class="n">circular_magnet</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">apply_telecentricity_correction</span><span class="o">=</span><span class="n">apply_telecentricity_correction</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Hexabundle </span><span class="si">{</span><span class="n">hexabundle</span><span class="si">}</span><span class="s2">: </span><span class="se">\n\t</span><span class="s2">Circular magnet:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">original centre is (</span><span class="si">{</span><span class="n">circular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">circular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">new centre is (</span><span class="si">{</span><span class="n">new_x</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">new_y</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update the new centres of the circular magnets</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">circular_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Center_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_x</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">circular_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Center_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_y</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Now find the centres of the rectangular magnets</span>
+        <span class="n">angle_for_rectangular_magnet</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">270</span> <span class="o">-</span> <span class="n">rectangular_magnet</span><span class="p">[</span><span class="s1">&#39;rot_holdingPosition&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">rectangular_magnet</span><span class="p">[</span><span class="s1">&#39;rot_platePlacing&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">x_rect</span><span class="p">,</span><span class="n">y_rect</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_rectangular_magnet_centre_coordinates</span><span class="p">(</span><span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span><span class="p">,</span> <span class="n">angle_for_rectangular_magnet</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Rectangular magnet:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">original centre is (</span><span class="si">{</span><span class="n">rectangular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rectangular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">new centre is (</span><span class="si">{</span><span class="n">x_rect</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y_rect</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update the new centres of the rectangular magnets</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">rectangular_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Center_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_rect</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">rectangular_magnet</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Center_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_rect</span> <span class="o">+</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="calculate_telecentricity_correction"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.calculate_telecentricity_correction">[docs]</a><span class="k">def</span> <span class="nf">calculate_telecentricity_correction</span><span class="p">(</span><span class="n">magnet</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the required offset in the position of the circular magnets based on their telecentricity annulus</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Applying the telecentricity offset&quot;</span><span class="p">)</span>
+    <span class="n">robot_centre_x</span><span class="p">,</span> <span class="n">robot_centre_y</span> <span class="o">=</span> <span class="n">robot_centre</span>
+
+    <span class="n">centre_x</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">Center_x</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">centre_y</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">Center_y</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">telecentricity</span> <span class="o">=</span> <span class="n">magnet</span><span class="o">.</span><span class="n">Label</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">telecentricity</span> <span class="o">==</span> <span class="s1">&#39;Blu&#39;</span><span class="p">:</span>
+        <span class="n">radial_d</span> <span class="o">=</span> <span class="mf">20.7</span><span class="o">*</span><span class="mf">0.001</span> <span class="c1">#mm      </span>
+    <span class="k">elif</span> <span class="n">telecentricity</span> <span class="o">==</span> <span class="s1">&#39;Gre&#39;</span><span class="p">:</span>
+        <span class="n">radial_d</span> <span class="o">=</span> <span class="mf">42.0</span><span class="o">*</span><span class="mf">0.001</span>
+    <span class="k">elif</span> <span class="n">telecentricity</span> <span class="o">==</span> <span class="s1">&#39;Yel&#39;</span><span class="p">:</span>
+        <span class="n">radial_d</span> <span class="o">=</span> <span class="mf">61.2</span><span class="o">*</span><span class="mf">0.001</span>  
+    <span class="k">elif</span> <span class="n">telecentricity</span> <span class="o">==</span> <span class="s1">&#39;Mag&#39;</span><span class="p">:</span>
+        <span class="n">radial_d</span> <span class="o">=</span> <span class="mf">79.9</span><span class="o">*</span><span class="mf">0.001</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">robot_centre_x</span> <span class="o">-</span> <span class="n">centre_x</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">((</span><span class="n">robot_centre_y</span> <span class="o">-</span> <span class="n">centre_y</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">robot_centre_x</span> <span class="o">-</span> <span class="n">centre_x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">robot_centre_y</span> <span class="o">-</span> <span class="n">centre_y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">telentricity_offset_x</span> <span class="o">=</span> <span class="n">radial_d</span> <span class="o">*</span> <span class="p">(</span><span class="n">robot_centre_x</span> <span class="o">-</span> <span class="n">centre_x</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm</span>
+    <span class="n">telentricity_offset_y</span> <span class="o">=</span> <span class="n">radial_d</span> <span class="o">*</span> <span class="p">(</span><span class="n">robot_centre_y</span> <span class="o">-</span> <span class="n">centre_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm</span>
+
+    <span class="k">return</span> <span class="n">telentricity_offset_x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">telentricity_offset_y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="calculate_radial_offset"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.calculate_radial_offset">[docs]</a><span class="k">def</span> <span class="nf">calculate_radial_offset</span><span class="p">(</span><span class="n">circular_magnet</span><span class="p">,</span> <span class="n">radial_offset</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">apply_telecentricity_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given an x and y coordinate, calculate the total radial offsets to apply based on a temperature change and a fixed telecentricity correction </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">circular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_x&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">circular_magnet</span><span class="p">[</span><span class="s1">&#39;Center_y&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">robot_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># If x and y are already at the plate centre, return them as they are since we don&#39;t know the direction to move them in (their radial offset direction isn&#39;t known)</span>
+    <span class="c1"># Change this to be less than 1e-100 since values like 1e-162 were failing this check</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-150</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span><span class="mf">1e-150</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">apply_telecentricity_correction</span><span class="p">:</span>
+        <span class="n">telecentricity_x_corr</span><span class="p">,</span> <span class="n">telecentricity_y_corr</span> <span class="o">=</span> <span class="n">calculate_telecentricity_correction</span><span class="p">(</span><span class="n">circular_magnet</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">telecentricity_x_corr</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="n">telecentricity_y_corr</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Make a unit vector which points towards the origin</span>
+    <span class="c1"># The origin here is (0, 0) since we&#39;ve already removed the plate centre offset</span>
+    <span class="n">unit_vector</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> 
+    <span class="n">offset_vector</span> <span class="o">=</span> <span class="n">unit_vector</span> <span class="o">*</span> <span class="n">radial_offset</span>
+
+    <span class="n">delta_x</span> <span class="o">=</span> <span class="n">offset_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delta_y</span> <span class="o">=</span> <span class="n">offset_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">new_x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">delta_x</span> <span class="o">+</span> <span class="n">telecentricity_x_corr</span>
+    <span class="n">new_y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">delta_y</span> <span class="o">+</span> <span class="n">telecentricity_y_corr</span>
+
+    <span class="k">return</span> <span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span></div>
+
+
+<div class="viewcode-block" id="calculate_rectangular_magnet_centre_coordinates"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.calculate_rectangular_magnet_centre_coordinates">[docs]</a><span class="k">def</span> <span class="nf">calculate_rectangular_magnet_centre_coordinates</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">rm_angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The rectangular magnets always have to be 27.2 mm from their circular magnets, and at the appropriate angle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">circular_rectangle_magnet_centre_distance</span> <span class="o">=</span> <span class="mf">27.2</span>
+
+    <span class="n">rectangular_magnet_centre</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">circular_rectangle_magnet_centre_distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rm_angle</span><span class="p">),</span> <span class="n">y</span> <span class="o">+</span><span class="n">circular_rectangle_magnet_centre_distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rm_angle</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">rectangular_magnet_centre</span></div>
+
+
+<div class="viewcode-block" id="perform_metrology_calibration"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.perform_metrology_calibration">[docs]</a><span class="k">def</span> <span class="nf">perform_metrology_calibration</span><span class="p">(</span><span class="n">input_coords</span><span class="p">,</span> <span class="n">input_theta_d</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">robot_shifts_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">permagnet_theta_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a correction based on the measured metrology of the robot. Written by Barnaby Norris. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cent_wrt_origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">270.5</span><span class="p">,</span> <span class="mf">179.0</span><span class="p">])</span>  <span class="c1"># Manufactured offset between metrology origin and plate centre</span>
+
+    <span class="c1"># Calculate correction coefficients from metrology</span>
+    <span class="n">robot_shifts_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">robot_shifts_file</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">]</span> <span class="o">=</span> <span class="n">robot_shifts_abs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">metr_in_coords</span> <span class="o">=</span> <span class="n">robot_shifts_abs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">metr_wanted_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">])</span> <span class="o">+</span> <span class="n">robot_shifts_abs</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+    <span class="c1"># Solve for transformation coefficients.</span>
+    <span class="c1"># popt contains the optimised coefficients</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Covariance&quot;</span><span class="p">)</span>
+    <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">fitting_fun</span><span class="p">,</span> <span class="n">metr_wanted_coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">8</span><span class="p">)),</span> <span class="n">metr_in_coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">8</span><span class="p">)),</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
+
+    <span class="c1"># # For DEBUG: Measure residuals for the marker measurements</span>
+    <span class="n">corrected_data</span> <span class="o">=</span> <span class="n">apply_cal</span><span class="p">(</span><span class="n">metr_wanted_coords</span><span class="p">,</span> <span class="n">popt</span><span class="p">)</span>
+    <span class="n">all_resids</span> <span class="o">=</span> <span class="n">corrected_data</span> <span class="o">-</span> <span class="n">metr_in_coords</span>
+
+    <span class="c1"># For backwards compatability reasons, the input coordinates are supplied based on best-known plate centre</span>
+    <span class="c1"># (given by the &#39;robot_centre&#39; parameter). Here, we instead want to use the actual measured value of</span>
+    <span class="c1"># the metrology origin, along with true value (specified to manufacturer) of the offset between the</span>
+    <span class="c1"># metrology origin and plate centre.</span>
+    <span class="n">true_centre</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">])</span> <span class="o">+</span> <span class="n">cent_wrt_origin</span>
+    <span class="n">input_coords_centred</span> <span class="o">=</span> <span class="n">input_coords</span> <span class="o">-</span> <span class="n">robot_centre</span> <span class="o">+</span> <span class="n">true_centre</span>
+
+    <span class="c1"># Apply metrology-based correction</span>
+    <span class="n">metr_calibrated_coords</span> <span class="o">=</span> <span class="n">apply_cal</span><span class="p">(</span><span class="n">input_coords_centred</span><span class="p">,</span> <span class="n">popt</span><span class="p">)</span>
+
+    <span class="c1"># Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate</span>
+    <span class="c1"># rotation.</span>
+    <span class="k">if</span> <span class="n">permagnet_theta_corr</span><span class="p">:</span>
+        <span class="n">npts</span> <span class="o">=</span> <span class="n">input_coords_centred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">all_theta_ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+            <span class="n">dx1</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">input_coords_centred</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">dy1</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">-</span> <span class="n">input_coords_centred</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">phi_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">dy1</span> <span class="o">/</span> <span class="n">dx1</span><span class="p">)</span>
+            <span class="n">dx2</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">metr_calibrated_coords</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">dy2</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">-</span> <span class="n">metr_calibrated_coords</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">phi_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">dy2</span> <span class="o">/</span> <span class="n">dx2</span><span class="p">)</span>
+            <span class="n">cur_theta_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi_new</span> <span class="o">-</span> <span class="n">phi_old</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">180</span>
+            <span class="n">all_theta_ds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_theta_d</span>
+        <span class="n">theta_d</span> <span class="o">=</span> <span class="n">all_theta_ds</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">theta_d</span> <span class="o">=</span> <span class="n">popt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">output_theta_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_theta_d</span> <span class="o">-</span> <span class="n">theta_d</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span> <span class="c1">### SIGN ISSUE: If rotation direction is incorrect, change this + to -</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">permagnet_theta_corr</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Applied metrology-based calibration and a *per-magnet* theta correction, using the following fitted coefficients: </span><span class="si">{</span><span class="n">popt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Applied metrology-based calibration and a *global* theta correction, using the following fitted coefficients: </span><span class="si">{</span><span class="n">popt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metr_calibrated_coords</span><span class="p">,</span> <span class="n">output_theta_d</span></div>
+
+
+<div class="viewcode-block" id="apply_cal"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.apply_cal">[docs]</a><span class="k">def</span> <span class="nf">apply_cal</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="c1"># Applies the offset and transformation matrix</span>
+    <span class="n">thr</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">180</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">Rmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thr</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thr</span><span class="p">)],</span>
+                     <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thr</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thr</span><span class="p">)]])</span>
+    <span class="n">p</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span> <span class="c1"># With 2 shear terms matrix is underconstrained</span>
+    <span class="n">shmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">]],</span>
+                     <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">sclmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]]])</span>
+
+    <span class="n">out_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">invec</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">k</span><span class="p">,:]</span>
+        <span class="n">outvec</span> <span class="o">=</span> <span class="n">invec</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">outvec</span> <span class="o">=</span> <span class="n">Rmat</span> <span class="o">@</span> <span class="n">outvec</span>
+        <span class="n">outvec</span> <span class="o">=</span> <span class="n">shmat</span> <span class="o">@</span> <span class="n">outvec</span>
+        <span class="n">outvec</span> <span class="o">=</span> <span class="n">sclmat</span> <span class="o">@</span> <span class="n">outvec</span>
+        <span class="n">out_coords</span><span class="p">[</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">outvec</span>
+    <span class="k">return</span> <span class="n">out_coords</span></div>
+
+
+<div class="viewcode-block" id="fitting_fun"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.fitting_fun">[docs]</a><span class="k">def</span> <span class="nf">fitting_fun</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="n">offsX</span><span class="p">,</span> <span class="n">offsY</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">sclX</span><span class="p">,</span> <span class="n">sclY</span><span class="p">,</span> <span class="n">sh1</span><span class="p">,</span> <span class="n">sh2</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">offsX</span><span class="p">,</span> <span class="n">offsY</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">sclX</span><span class="p">,</span> <span class="n">sclY</span><span class="p">,</span> <span class="n">sh1</span><span class="p">,</span> <span class="n">sh2</span><span class="p">])</span>
+    <span class="n">in_coords</span> <span class="o">=</span> <span class="n">Xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">out_coords</span> <span class="o">=</span> <span class="n">apply_cal</span><span class="p">(</span><span class="n">in_coords</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out_coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">8</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="roll_correction"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.roll_correction">[docs]</a><span class="k">def</span> <span class="nf">roll_correction</span><span class="p">(</span><span class="n">centre_x</span><span class="p">,</span> <span class="n">centre_y</span><span class="p">,</span> <span class="n">magnet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the offset which should be applied to the robot x coordinate to account for the roll of the robot arm. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">magnet</span> <span class="o">==</span> <span class="s1">&#39;circular_magnet&#39;</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mf">3.313E-07</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4.507E-05</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mf">1.819E-02</span>
+    <span class="k">elif</span> <span class="n">magnet</span> <span class="o">==</span> <span class="s1">&#39;rectangular_magnet&#39;</span><span class="p">:</span>  
+        <span class="n">a</span> <span class="o">=</span> <span class="mf">4.133E-07</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4.151E-05</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mf">1.767E-02</span>
+
+    <span class="n">roll_offset_centre_x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">centre_y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">centre_y</span> <span class="o">+</span> <span class="n">c</span>  
+
+    <span class="k">return</span> <span class="n">roll_offset_centre_x</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+select_targets
+==============
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: select_targets

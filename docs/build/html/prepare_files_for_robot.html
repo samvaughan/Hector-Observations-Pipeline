@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Preparing files to be configured by the robot &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Checking two plates can be observed after each other" href="check_magnet_counts_between_tiles.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Preparing files to be configured by the robot</a><ul>
+<li><a class="reference internal" href="#the-prepare-files-for-robot-py-script">The prepare_files_for_robot.py script</a><ul>
+<li><a class="reference internal" href="#the-metrology-correction">The metrology Correction</a></li>
+<li><a class="reference internal" href="#the-roll-correction">The roll correction</a></li>
+<li><a class="reference internal" href="#the-telecentricity-correction">The telecentricity correction</a></li>
+<li><a class="reference internal" href="#the-robot-arm-miscentring-correction">The robot arm miscentring correction</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/prepare_files_for_robot.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="preparing-files-to-be-configured-by-the-robot">
+<h1>Preparing files to be configured by the robot<a class="headerlink" href="#preparing-files-to-be-configured-by-the-robot" title="Permalink to this heading">¶</a></h1>
+<p>The Hector files you’ll be provided with before the run contain the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> positions on the field plate which correspond to the RA and Dec positions of galaxies on the sky. In a perfect world, this would be enough for the robot to place the magnets at exactly the right positions every time- but in fact, you’ll need to run a script to correct these values depending on the conditions at the telescope on the night the tile will be observed.</p>
+<p>Step-bystep instructions on how to do this can be found in the Robot Manual (TODO: add link here). For completeness, some background information is also provided below. These corrections</p>
+<section id="the-prepare-files-for-robot-py-script">
+<h2>The prepare_files_for_robot.py script<a class="headerlink" href="#the-prepare-files-for-robot-py-script" title="Permalink to this heading">¶</a></h2>
+<p>You’ll find a script called <code class="docutils literal notranslate"><span class="pre">prepare_files_for_robot</span></code> in the <code class="docutils literal notranslate"><span class="pre">Z:\</span></code> folder on the Windows machine used to run the robot. This script updates the positions in the Hector robot file to account for things like the temperature of the dome at the time when the roboot is configuring the plate and a number of other small effects which can impact the positioning at the level of a few tens of microns. Most of these small corrections are caused the design of the robot itself, and require us to account for these imperfections when placing the magnets. In essence, we tell the robot to place the magnet at a slightly incorrect position in the knowledge that by doing so it will end up exactly where we want it.</p>
+<section id="the-metrology-correction">
+<h3>The metrology Correction<a class="headerlink" href="#the-metrology-correction" title="Permalink to this heading">¶</a></h3>
+<p>The largest change to the plate positions come from something we’re calling the “metrology” correction. There is a script in Labview which tells the robot to go and find a number of tiny holes in each corner of the bench. These “metrology markers” have been drilled to sub-micron precision, and by seeing how far the robot thinks it has to drive in order to centre above each one, we can account for things like the thermal expansion of the robot’s components due to changes in temperature and the slight mis-alignment between the robot gantry and the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coorrdinates of the field plate.</p>
+<p>You can run a metrology calibration from Labview by following the instructions in the Robot Manual. This will create a file called ‘robot_shifts_YYYYMMDDHHMMSS.csv’ based on today’s date and time, which should be passed to the <code class="docutils literal notranslate"><span class="pre">prepare_files_for_robot.py</span></code> file</p>
+</section>
+<section id="the-roll-correction">
+<h3>The roll correction<a class="headerlink" href="#the-roll-correction" title="Permalink to this heading">¶</a></h3>
+<p>The torque on the robot arm is different when placing a magnet on the left-hand side of the plate compared to the right-hand side of the plate, since it is further from its gantry. We correct for this effect using a precisely fitted polynomial, derived from tests in the lab back in Sydny.</p>
+</section>
+<section id="the-telecentricity-correction">
+<h3>The telecentricity correction<a class="headerlink" href="#the-telecentricity-correction" title="Permalink to this heading">¶</a></h3>
+<p>The geometry of having light enter the hexabundle at an angle moves the apparent position of the galaxy with respect to the centre of the magnet. We therefore apply a radial correction to the circular magnet’s position to account for this, moving its corresponding rectangular magnet at the same time.</p>
+</section>
+<section id="the-robot-arm-miscentring-correction">
+<h3>The robot arm miscentring correction<a class="headerlink" href="#the-robot-arm-miscentring-correction" title="Permalink to this heading">¶</a></h3>
+<p>The axis of rotation of the robot arm is slightly offset from the centre of the pick-up arm. We apply a correction to account for this which depends on the rotation of the magnet when it is placed on the field plate.</p>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>From a powershell terminal on the Windows PC, run the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python prepare_files_for_robot.py robot_file_name metrology_calibration_file_name
+</pre></div>
+</div>
+<p>This will create a file with the same name as the input robot file with <code class="docutils literal notranslate"><span class="pre">_CorrectionsApplied.csv</span></code> appended to the end. This is the file which you should load into the Robot PC and use to configure a field.</p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

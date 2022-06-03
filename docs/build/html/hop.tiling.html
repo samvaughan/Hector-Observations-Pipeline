@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.tiling package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.tiling package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.tiling.tiling_functions">hop.tiling.tiling_functions module</a></li>
+<li><a class="reference internal" href="#module-hop.tiling">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.tiling.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-tiling-package">
+<h1>hop.tiling package<a class="headerlink" href="#hop-tiling-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.tiling.tiling_functions">
+<span id="hop-tiling-tiling-functions-module"></span><h2>hop.tiling.tiling_functions module<a class="headerlink" href="#module-hop.tiling.tiling_functions" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.calculate_completeness_stats">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">calculate_completeness_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N_targets_per_Hector_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completion_fraction_to_calculate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#calculate_completeness_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.calculate_completeness_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of tiles, calculate some stats about the efficiency to get to a given completeness fraction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_targets</strong> (<em>dataframe</em>) – a dataframe with a row for each target. Must have a column ‘Tile_number’</p></li>
+<li><p><strong>N_targets_per_Hector_field</strong> (<em>dict</em>) – The numnber of hexabundles we can place on galaxy targets</p></li>
+<li><p><strong>completeness_fraction_to_calculate</strong> (<em>float</em><em>, </em><em>default=0.95</em>) – calculate the efficiency to reach this completeness fraction. This is defined as actual number of tiles used / minimum number of tiles possible)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=True</em>) – print efficiency stats or not.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.check_if_in_fov">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">check_if_in_fov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xcen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_radius</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#check_if_in_fov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.check_if_in_fov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a binary mask if points are within a circular field of view of radius R</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>dataframe</em>) – A dataframe of targets. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>xcen</strong> (<em>float</em>) – x (or RA) coordinate of centre</p></li>
+<li><p><strong>ycen</strong> (<em>float</em>) – y (or DEC) coordinate of centre</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – radius of circle in degrees</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.find_clashes">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">find_clashes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#find_clashes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.find_clashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some proximity, find objects in two dataframes which will clash</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df1</strong> (<em>dataframe</em>) – Dataframe of targets. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>df2</strong> (<em>dataframe</em>) – Dataframe of targets. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>proximity</strong> (<em>float</em>) – Smallest distance which two objects can come before clashing. Measured in arcseconds</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.find_great_circle_distance">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">find_great_circle_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#find_great_circle_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.find_great_circle_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The great circle distance between vectors uu=[RA, Dec] and vv=[RA, Dec]
+Note that RA and Dec <em>must</em> be in degrees. We then convert them to radians, calcualte the distance and return that distance in degrees.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.find_nearest">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">find_nearest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#find_nearest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.find_nearest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the nearest grid point to each target (at coordinates (x, y))</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em>) – A list of target x coordinates</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – A list of target y coordinates</p></li>
+<li><p><strong>grid</strong> (<em>2D array</em>) – A two dimensional array of grid coordinates to test against. Columns are x (grid[:, 0]) and y (grid[:, 1])</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.get_best_tile_centre_dengreedy">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">get_best_tile_centre_dengreedy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_FOV_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_FoV_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_xx_yy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#get_best_tile_centre_dengreedy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.get_best_tile_centre_dengreedy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of x, y coordinates, find the position to place the tile according to Aaron’s Dengreedy algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_df</strong> (<em>dataframe</em>) – A dataframe of <em>all</em> target galaxies, irrespective of whether they’ve been tiled alread. Must have columns ‘RA’, ‘DEC’</p></li>
+<li><p><strong>targets_df</strong> (<em>dataframe</em>) – A dataframe of target galaxies which have not yet been tiled. Must have columns ‘RA’, ‘DEC’</p></li>
+<li><p><strong>n_xx_yy</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don’t make this too large…</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.get_best_tile_centre_greedy">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">get_best_tile_centre_greedy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_FOV_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_FoV_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priorities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_xx_yy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#get_best_tile_centre_greedy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.get_best_tile_centre_greedy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of x, y coordinates, find the position which would cover the most targets if we placed a field of view there.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets_df</strong> (<em>dataframe</em>) – A dataframe of target galaxies which have not yet been tiled. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>n_xx_yy</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don’t make this too large…</p></li>
+<li><p><strong>Priorities</strong> (<em>list</em>) – A priority value for each galaxy. If none is given, assume equal priorties for all targets</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.make_best_tile">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">make_best_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_guide_stars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_standard_stars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_galaxy_priorities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'most_clashing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_spares_with_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_skies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#make_best_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.make_best_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put all the above functions togther and make a tile. Note that this function __doesn’<a href="#id1"><span class="problematic" id="id2">t__</span></a> update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don’t want to mark things as tiled if the config code needs to select backups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_targets</strong> (<em>dataframe</em>) – A dataframe of galaxy targets. Must include columns ‘RA’, ‘DEC’, “PRIORITY” and “TILED”</p></li>
+<li><p><strong>df_guide_stars</strong> (<em>dataframe</em>) – A dataframe of galaxy targets. Must include columns ‘RA’, ‘DEC’ and “r_mag”</p></li>
+<li><p><strong>df_standard_stars</strong> (<em>dataframe</em>) – A dataframe of standard stars. Must include columns ‘RA’, ‘DEC’ and ‘priority’</p></li>
+<li><p><strong>tiling_parameters</strong> (<em>dict</em>) – A dictionary containing the various parameters to do with the tiling. So far, necessary keys are ‘Hector_FOV_radius’, ‘proximity’, ‘Nsel’, ‘Nsel_guides’ and ‘Nsel_standards’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The original df_targets dataframe</p></li>
+<li><p>A dataframe containing the targets for this tile</p></li>
+<li><p>A dataframe containing the guides for this tile</p></li>
+<li><p>A dataframe containing the standard stars for this tile</p></li>
+<li><p>The tile RA</p></li>
+<li><p>The tile Dec</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.noclash">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">noclash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#noclash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.noclash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take two dataframes, find those which are within some proximity of each other and then return the first dataframe as is, the SECOND dataframe without the clashing elements, and the number of elements which clash. Useful for selecting guide stars which don’t clash with targets in a tile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df1</strong> (<em>dataframe</em>) – Dataframe of targets. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>df2</strong> (<em>dataframe</em>) – Dataframe of targets. Must have columns ‘RA’ and ‘DEC’</p></li>
+<li><p><strong>proximity</strong> (<em>float</em>) – Smallest distance which two objects can come before clashing. Measured in arcseconds</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.plot_survey_completeness_and_tile_positions">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">plot_survey_completeness_and_tile_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completion_fraction_to_calculate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#plot_survey_completeness_and_tile_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.plot_survey_completeness_and_tile_positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make an overall plot of the survey completeness and the positions of each tile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_positions</strong> (<em>list</em>) – A two component list. First element is a list of RA values of the tile centres, second component is a list of Dec values of the tile centres.</p></li>
+<li><p><strong>tiling_parameters</strong> (<em>dict</em>) – A dictionary of tiling parameters. Must have  a ‘Hector_FOV_radius’ key</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.plot_tile">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">plot_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standards_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalogue_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_RA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_Dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_outer_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_inner_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#plot_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.plot_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a plot of an individual tile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_df</strong> (<em>dataframe</em>) – Dataframe of a tile to plot</p></li>
+<li><p><strong>guide_df</strong> (<em>dataframe</em>) – Dataframe of guide stars from this tile</p></li>
+<li><p><strong>standards_df</strong> (<em>dataframe</em>) – Dataframe of standard stars from this tile</p></li>
+<li><p><strong>catalogue_df</strong> (<em>dataframe</em>) – Dataframe of the entire field, to plot as background</p></li>
+<li><p><strong>tile_RA</strong> (<em>float</em>) – RA of the centre of this tile</p></li>
+<li><p><strong>tile_Dec</strong> (<em>float</em>) – Dec of the centre of this tile</p></li>
+<li><p><strong>tile_outer_radius</strong> (<em>float</em>) – Outer Radius of the FoV (in degrees)</p></li>
+<li><p><strong>tile_inner_radius</strong> (<em>float</em>) – Inner Radius of the FoV (in degrees)</p></li>
+<li><p><strong>tile_number</strong> (<em>int</em>) – Number of the tile</p></li>
+<li><p><strong>proximity</strong> (<em>float</em>) – Radius of the tile</p></li>
+<li><p><strong>fig</strong> (<em>optional</em>) – An exisiting Figure/Axis object to plot on</p></li>
+<li><p><strong>ax</strong> (<em>optional</em>) – An exisiting Figure/Axis object to plot on</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.save_guide_text_file">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">save_guide_text_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfolder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_stars_for_tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_RA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_Dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_columns_in_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#save_guide_text_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.save_guide_text_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a text file of things to be observed with Hector guide bundles (i.e. guides). The second line of this text file __must__ be the tile RA and DEC seperated by a space.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.save_tile_outputs">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">save_tile_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfolder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_stars_for_tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard_stars_for_tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_RA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_Dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_in_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_columns_in_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_out_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guide_out_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#save_tile_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.save_tile_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Save the outputs from a single tile. These are:</dt><dd><ul class="simple">
+<li><p>A text file called tile_{i}.fld, which contains things to be observed the Hector science bundles. This has columns ID, RA, DEC, mag, type (where type is 1 for a galaxy target and 0 for a standard star) and isel (which is a bit like the priority they should be targeted in). The targets are sorted by priority!</p></li>
+<li><p>A text file called guide_tile_{i}.fld, which contains guide stars (observed with the Hector guide bundles). This has columns RA, DEC, mag</p></li>
+<li><p>A plot of the field with the Nsel best targets selected by this code. Note that this may not resemble the final tile selected by the configuration code!</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note that we also make two new columns called “MagnetX_noDC” and “MagnetY_noDC” which correspond to the xy positions of the galaxies on the Hector plate in microns from the centre. These have <em>NOT</em> been corrected for the optical distortions- that’s done by the “DistortionCorrection” code, which happens after each time has been saved.
+These outputs will be bundled together in a single folder, which contains subfolders ‘Tiles’ and ‘Plots’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outfolder</strong> (<em>str</em>) – Location for the output files</p></li>
+<li><p><strong>df_targets</strong> (<em>dataframe</em>) – Dataframe of all targets. This is used for plotting</p></li>
+<li><p><strong>tile_df</strong> (<em>dataframe</em>) – Dataframe of targets for a single tile</p></li>
+<li><p><strong>guide_stars_for_tile</strong> (<em>dataframe</em>) – Dataframe of guide stars for a single tile</p></li>
+<li><p><strong>standard_stars_for_tile</strong> (<em>dataframe</em>) – Dataframe of standard stars for a single tile</p></li>
+<li><p><strong>tile_RA</strong> (<em>float</em>) – RA of tile centre</p></li>
+<li><p><strong>tile_DEC</strong> (<em>float</em>) – DEC of tile centre</p></li>
+<li><p><strong>parameters</strong> (<em>tiling</em>) – Dictionary of tiling parameters</p></li>
+<li><p><strong>tile_number</strong> (<em>int</em>) – Number of the tile</p></li>
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save a plot of the tile. Default is True</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.save_tile_text_file">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">save_tile_text_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfolder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard_stars_for_tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_RA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_Dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiling_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_in_order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#save_tile_text_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.save_tile_text_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a text file of things to be observed with Hector science bundles (i.e. targets and standards). The second line of this text file __must__ be the tile RA and DEC seperated by a space.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.select_stars_for_tile">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">select_stars_for_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">star_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#select_stars_for_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.select_stars_for_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a tile of targets, select Nsel worth of stars by selecting stars which don’t clash with any of our targets. The returned stars are sorted by either their priority (for standard stars) or their R-band magnitude (for guide stars)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>star_df</strong> (<em>dataframe</em>) – a dataframe of stars (guide or standard). Must have columns “RA”, “DEC” and either “priority” or “r_mag” (see below)</p></li>
+<li><p><strong>tile_df</strong> (<em>dataframe</em>) – a dataframe containing Nsel targets, created from using ‘unpick’. Must have columns “RA” amd “DEC”</p></li>
+<li><p><strong>proximity</strong> (<em>float</em>) – distance between two adjacent bundles, in arcseconds.</p></li>
+<li><p><strong>Nsel</strong> (<em>int</em>) – Return this many stars for each tile.</p></li>
+<li><p><strong>star_type</strong> (<em>string</em>) – One of either “standards” or “guides”. Selects whether we sort the star dataframe by “priority” (for standards) or “r_mag” (for guides)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.tiling.tiling_functions.select_targets">
+<span class="sig-prename descclassname"><span class="pre">hop.tiling.tiling_functions.</span></span><span class="sig-name descname"><span class="pre">select_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_targets_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priorities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'most_clashing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_spares_with_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/tiling/tiling_functions.html#select_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.tiling.tiling_functions.select_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a dataframe of targets, select Nsel galaxies to observe. These can’t be nearer to each other than ‘proximity’. Return a dataframe of just the new tile we’ve made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>dataframe</em>) – A dataframe of targets. Must have columns “RA”, “DEC”, “PRIORITY” (i.e. priority), “COMPLETED” (i.e. tiled before this current iteration).</p></li>
+<li><p><strong>proximity</strong> (<em>float</em>) – Smallest distance between two targets (in arcseconds)</p></li>
+<li><p><strong>Nsel</strong> (<em>int</em>) – Number of targets to select in each tile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hop.tiling">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.tiling" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

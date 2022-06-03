@@ -1,0 +1,6 @@
+calculate_completeness_stats
+============================
+
+.. currentmodule:: hop.tiling.tiling_functions
+
+.. autofunction:: calculate_completeness_stats

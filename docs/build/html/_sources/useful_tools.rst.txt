@@ -1,0 +1,10 @@
+Useful Tools
+=============
+
+The package contains a number of useful scripts
+
+.. toctree::
+
+	calculating_offsets
+	plot_plate_configuration
+	show_sky_fibre_changes_between_plates

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>hop.target_selection package &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Hector Observations Pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_plate_configuration.html">Plotting a plate configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hop.target_selection package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-hop.target_selection.HectorSim">hop.target_selection.HectorSim module</a></li>
+<li><a class="reference internal" href="#module-hop.target_selection">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/hop.target_selection.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hop-target-selection-package">
+<h1>hop.target_selection package<a class="headerlink" href="#hop-target-selection-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-hop.target_selection.HectorSim">
+<span id="hop-target-selection-hectorsim-module"></span><h2>hop.target_selection.HectorSim module<a class="headerlink" href="#module-hop.target_selection.HectorSim" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">HectorSim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entire_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BoundaryType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlimit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MstarMin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MstarMax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SparseFunction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SourceCat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MSparseCut1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minRe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dec_Min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dec_Max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to simulate obsverations for Hector.</p>
+<dl class="simple">
+<dt>We load in a catalogue, select the columns we want, then make plots with (in general) three samples:</dt><dd><ul class="simple">
+<li><p>all objects above some limiting surface brightness (plotted in RED)</p></li>
+<li><p>all objects given some selection function in mass  (plotted in BLUE)</p></li>
+<li><p>a subsample of the blue objects, given some sampling technique (plotted in MAGENTA)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.Taipan_Selection">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Taipan_Selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.Taipan_Selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.Taipan_Selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Taipan Selection cut. Lines 760-765</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.cumulative_fraction_sample_imaged_to_2Re">
+<span class="sig-name descname"><span class="pre">cumulative_fraction_sample_imaged_to_2Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.cumulative_fraction_sample_imaged_to_2Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.cumulative_fraction_sample_imaged_to_2Re" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lines 1435-1486</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.cumulative_percentage_galaxies_imaged_2Re">
+<span class="sig-name descname"><span class="pre">cumulative_percentage_galaxies_imaged_2Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.cumulative_percentage_galaxies_imaged_2Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.cumulative_percentage_galaxies_imaged_2Re" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lines 1716- 1798</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.general_selection">
+<span class="sig-name descname"><span class="pre">general_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.general_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.general_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.get_qz_pz">
+<span class="sig-name descname"><span class="pre">get_qz_pz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BoundaryType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.get_qz_pz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.get_qz_pz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.make_Julias_plot">
+<span class="sig-name descname"><span class="pre">make_Julias_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.make_Julias_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.make_Julias_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make an indetical plot to Julia’s Hector sim code</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_IFU_needed_for_2Re_hist">
+<span class="sig-name descname"><span class="pre">plot_IFU_needed_for_2Re_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_IFU_needed_for_2Re_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_IFU_needed_for_2Re_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_IFU_needed_for_2Re_kde">
+<span class="sig-name descname"><span class="pre">plot_IFU_needed_for_2Re_kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_IFU_needed_for_2Re_kde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_IFU_needed_for_2Re_kde" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_Mstar_z_gi_colour">
+<span class="sig-name descname"><span class="pre">plot_Mstar_z_gi_colour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_Mstar_z_gi_colour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_Mstar_z_gi_colour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a plot of M* vs z and colour by G-I colour</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_Re_hist">
+<span class="sig-name descname"><span class="pre">plot_Re_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_Re_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_Re_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_SB_Re">
+<span class="sig-name descname"><span class="pre">plot_SB_Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_SB_Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_SB_Re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_SB_hist">
+<span class="sig-name descname"><span class="pre">plot_SB_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_SB_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_SB_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot histograms of effective surface brightness within 1Re and surface brightness at 2 and 3Re.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_cumulative_fraction_imaged_vs_bundle_diameter">
+<span class="sig-name descname"><span class="pre">plot_cumulative_fraction_imaged_vs_bundle_diameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_cumulative_fraction_imaged_vs_bundle_diameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_cumulative_fraction_imaged_vs_bundle_diameter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_ellipticity_hist">
+<span class="sig-name descname"><span class="pre">plot_ellipticity_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_ellipticity_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_ellipticity_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_gmi_hist">
+<span class="sig-name descname"><span class="pre">plot_gmi_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_gmi_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_gmi_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_mass_hist">
+<span class="sig-name descname"><span class="pre">plot_mass_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_mass_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_mass_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_parent_sample">
+<span class="sig-name descname"><span class="pre">plot_parent_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_parent_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_parent_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a plot of the parent sample in M*-z coordinates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_percentage_galaxy_sample_imaged_2Re">
+<span class="sig-name descname"><span class="pre">plot_percentage_galaxy_sample_imaged_2Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_percentage_galaxy_sample_imaged_2Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_percentage_galaxy_sample_imaged_2Re" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lines 1597 - 1707</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_selected_sample_MZ">
+<span class="sig-name descname"><span class="pre">plot_selected_sample_MZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_selected_sample_MZ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_selected_sample_MZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make another M*-Z plot, but this time mark on each sample. This is going to be a new function which doesn’t reusue _plot_M_z- I can’t see an easy way to do what I want with that function without changing everything!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_selected_sample_MZ_colour_Re">
+<span class="sig-name descname"><span class="pre">plot_selected_sample_MZ_colour_Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_selected_sample_MZ_colour_Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_selected_sample_MZ_colour_Re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_z_Re">
+<span class="sig-name descname"><span class="pre">plot_z_Re</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_z_Re"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_z_Re" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.plot_z_hist">
+<span class="sig-name descname"><span class="pre">plot_z_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.plot_z_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.plot_z_hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.qz_function">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qz_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.qz_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.qz_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.HectorSim.sami_stepfunc">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sami_stepfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#HectorSim.sami_stepfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.HectorSim.sami_stepfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the SAMI steps. Vectorised version of Lines 786-823.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.add_boxes_to_Mstar_z">
+<span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">add_boxes_to_Mstar_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#add_boxes_to_Mstar_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.add_boxes_to_Mstar_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Taken from original code, lines 1169 to 1204</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.calculate_SB_at_R">
+<span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">calculate_SB_at_R</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sersic_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mu_e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_of_Re</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#calculate_SB_at_R"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.calculate_SB_at_R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a galaxy’s surface brightness at a given multiple of Re from its surface brightness at Re</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.load_table">
+<span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">load_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#load_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.load_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in the table, apply the selection cuts and make our cut-down table</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.safe_div">
+<span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">safe_div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#safe_div"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.safe_div" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hop.target_selection.HectorSim.sparse_select_flat_in_Mass">
+<span class="sig-prename descclassname"><span class="pre">hop.target_selection.HectorSim.</span></span><span class="sig-name descname"><span class="pre">sparse_select_flat_in_Mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MStarSparseCutBin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hop/target_selection/HectorSim.html#sparse_select_flat_in_Mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hop.target_selection.HectorSim.sparse_select_flat_in_Mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a table of stellar masses and bin into 5 bins between MstarMin and
+MstarMax.
+Take the number in the MSparseCut1 bin (call it n) and then flatten all
+bins to have at most n galaxies in</p>
+</dd></dl>
+
+</section>
+<section id="module-hop.target_selection">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hop.target_selection" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, Sam Vaughan.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
