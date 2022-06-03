@@ -1,6 +1,6 @@
-matplotlib
+matplotlib >= 3
 numpy >= 1.17.0
-pandas
+pandas >= 1
 pytest
 scipy
 tqdm
@@ -13,3 +13,6 @@ openpyxl
 xlrd
 hypothesis
 mock
+sphinx
+sphinx-bootstrap-theme
+sphinxcontrib-napoleon

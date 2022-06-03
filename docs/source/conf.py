@@ -17,7 +17,7 @@ copyright = '2022, Sam Vaughan'
 author = 'Sam Vaughan'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1'
+release = '1.2'
 
 
 # -- General configuration ---------------------------------------------------

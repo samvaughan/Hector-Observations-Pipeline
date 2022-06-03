@@ -32,7 +32,7 @@ class HectorPipe:
         * Configure each tile
         * Run the HexabundleAllocation code
     """
-    def __init__(self, config_filename=None, Profit_files_location=None, config_dictionary=None):
+    def __init__(self, config_filename=None, Profit_files_location=None, config_dictionary=None, P_and_Q_offset_filename="Hexa_final_prism_gluing_PQ_table.xlsx"):
         """
         Must be initialised with a configuration dictionary. This can be made from a configuration file using the yaml library.
 
@@ -109,7 +109,7 @@ class HectorPipe:
         # Files used in the hexabundle allocation
         self.excel_files_for_allocation_location = Path(__file__).parent / Path("hexabundle_allocation")
         # Location of the P and Q offset file
-        self.offsetFile = self.excel_files_for_allocation_location / Path("Hexa_final_prism_gluing_PQ_table.xlsx")
+        self.offsetFile = self.excel_files_for_allocation_location / Path(P_and_Q_offset_filename)
         # Location of the Fibre Slit Info file
         self.fibre_file = self.excel_files_for_allocation_location / Path("Fibre_slitInfo_final.csv")
 
@@ -673,6 +673,7 @@ class HectorPipe:
         # extracting all the magnets and making a list of them from the plate_file
         all_magnets = extract_data.create_list_of_all_magnets_from_file(extract_data.get_file(plate_file), guideFileList)
 
+
         ## UPDATE: fixed radial shift of the circular magnets (with the rectangular magnets moving in tandem with them)
         ## dependent on which annulus the circular magnet sits in
         # Offset function: similar to the standalone thermal coefficient based movement of magnet pair as a whole
@@ -699,8 +700,8 @@ class HectorPipe:
 
         if plot:
             #************** # creating plots and drawing pickup areas
-            fig_hexa, ax_hexa = plt.subplots()
-            fig_robot, ax_robot = plt.subplots() 
+            fig_hexa, ax_hexa = plt.subplots(constrained_layout=True)
+            fig_robot, ax_robot = plt.subplots(constrained_layout=True)
             #plt.figure(1)
             # plt.clf()
             # plt.close()
@@ -735,7 +736,14 @@ class HectorPipe:
             robot_figureFile = f"{self.plot_location}/robotPlot_{fileNameHexa_stem}.pdf"
             # Output file- figure 2
             hexabundle_figureFile = f"{self.plot_location}/hexabundlePlot_{fileNameHexa_stem}.pdf"
-            plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile, fig_hexa, ax_hexa, fig_robot, ax_robot)  #***********
+            fig_hexa, fig_robot = plots.draw_all_magnets(all_magnets, self.config['output_filename_stem'], fileNameHexa, robot_figureFile, hexabundle_figureFile, fig_hexa, ax_hexa, fig_robot, ax_robot)
+
+            fig_hexa.savefig(hexabundle_figureFile)
+            # plt.savefig("image.png", dpi=100)
+
+            #plt.figure(2)
+            fig_robot.savefig(robot_figureFile)  
+            #***********
             
         # checking positioning_array prints out all desired parameters
         # print(positioning_array)
@@ -759,7 +767,6 @@ class HectorPipe:
 
         # produce final files with consistent layout and no extra commas
         file_arranging.finalFiles(all_magnets, outputFile, fileNameHexa)
-
 
         # fibre slit info output file
         output_fibreSlitInfo = f"{self.allocation_files_location_tiles}/Fibre_slitInfo_{fileNameHexa_stem}.csv"

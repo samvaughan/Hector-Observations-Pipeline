@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.transforms import Affine2D
 import matplotlib.cm as cm
 from ..hector.magnets.circular import is_circular_magnet
 from ..hector.magnets.rectangular import is_rectangular_magnet
@@ -10,6 +11,7 @@ from math import pi, cos, sin
 import pandas as pd
 from ..general_operations.trigonometry import rotational_matrix,convert_degrees_to_radians, convert_radians_to_degrees
 from pathlib import Path
+import string
 
 plt.rc('font', size=30)          # controls default text sizes
 plt.rc('axes', titlesize=30)     # fontsize of the axes title
@@ -23,7 +25,7 @@ plt.rc('figure', titlesize=30)   # fontsize of the figure title
 def annotate_text_in_plot(magnet, ax):
     rotation_matrix = rotational_matrix(convert_degrees_to_radians(magnet.plot_orientation))
     
-    #import ipdb; ipdb.set_trace()
+    
     if magnet.hexabundle == 'A' or magnet.hexabundle == 'B':
         corner_offset = 9
         width = 22.4
@@ -81,6 +83,8 @@ def annotate_text_in_plot(magnet, ax):
     magnet.text_center = (magnet.center[0] - rotation_matrix[1][0] * (magnet.length ) / 2, \
                     magnet.center[1] - rotation_matrix[1][1] * (magnet.length ) / 2)
 
+
+    import ipdb; ipdb.set_trace()
     if (magnet.hexabundle == 'H') or (magnet.hexabundle == 'U'):
         annotated_star = str('      ★')
         ax.annotate(annotated_star, (magnet.text_center[0], magnet.text_center[1]), color=label_color,rotation=abs(90 - magnet.plot_orientation), \
@@ -137,11 +141,7 @@ def read_sky_fibre_file(filename):
 
     j = 0
     for i in subplate_info:
-        # print(i[4:6])
-        # print(i[7])
-        # print(int(position[0]))
 
-        # skyfibreDict[i[4:5]] = {int(i[7]): int(position[j])}
         if (str(i[4:6])) not in skyfibreDict:
             skyfibreDict[str(i[4:6])] = []
         skyfibreDict[str(i[4:6])].append({int(i[7]): int(position[j])})
@@ -157,26 +157,18 @@ def plot_skyfibre_section(fig, ax, skyfibreDict, angle, radius, angle_subplate, 
     There are three sections or "subplates" of skyfibres in Hector. Each is made up of four "wedges", labelled by the spectrograph they feed ("A" or "H") and a number. This function plots one section, corresponding to 4 wedges. 
     In each wedge, there are a number of fibres which can be in the position 0, 1, 2,  or 3. 
 
-    Inputs:
-        fig, ax: 
-            matplotlib figure and axis objects
-        skyfibreDict (dict):
-            A dictionary of each skyfibre wedge and its fibres.
-        angle (float):
-            The angle of the entire subplate
-        radius (float):
-            The radius at which to draw the subplates. Should be 270 mm. 
-        angle_subplate (list):
-            The angle of each sky fibre with respect to the overall angle variable above. Should be [7,5,3,1,-1,-3,-5,-7]
-        skyfibre_titles (list):
-            A list of each wedge name
-        delta_ang (float):
-            The difference in angle between adjacent wedges.
-        colour_array (list, optional):
-            A list of colours to plot each sky fibre as. Useful for plots showing the changes between two plates. If None, default to black for all fibres
-    Outputs:
+    Args:
+        fig: A matplotlib figure object
+        ax: A matplotlib axis object
+        skyfibreDict (dict): A dictionary of each skyfibre wedge and its fibres.
+        angle (float): The angle of the entire subplate
+        radius (float): The radius at which to draw the subplates. Should be 270 mm. 
+        angle_subplate (list): The angle of each sky fibre with respect to the overall angle variable above. Should be [7,5,3,1,-1,-3,-5,-7]
+        skyfibre_titles (list): A list of each wedge name
+        delta_ang (float): The difference in angle between adjacent wedges.
+        colour_array (list, optional): A list of colours to plot each sky fibre as. Useful for plots showing the changes between two plates. If None, default to black for all fibres
+    Returns:
         ax
-
     """
     if colour_array is None:
         colour_array = [["black"] * len(skyfibreDict[s]) for s in skyfibre_titles]
@@ -329,74 +321,160 @@ def draw_circularSegments(ax):
     ax.add_artist(draw_circle3)
     return ax
 
+def draw_circular_magnet(magnet, ax):
+    """
+    Draw the circular magnets on the Hector field plate and label them
+    """
+
+    text_angle = (magnet.angs - 90) % 90
+
+    text = magnet.hexabundle
+    if "GS" in magnet.hexabundle:
+        text = text[-1:]
+    propdict = get_magnet_properties(magnet.hexabundle)
+    circular_magnet = patches.Circle((magnet.center[0], magnet.center[1]), radius=propdict['radius'], facecolor=propdict['patch_color'], edgecolor='k',linewidth=0.5, alpha=1,zorder=propdict['z_order'] + 1)
+    ax.add_patch(circular_magnet)
+    ax.annotate(text=text, xy=(magnet.center[0], magnet.center[1]), color=propdict['label_color'], rotation=text_angle, weight='bold', fontsize=6, ha='center', va='center', xytext=(0, 0), textcoords='offset points', zorder=propdict['z_order'] + 1)
+    return ax
+
+def get_magnet_properties(hexabundle):
+    """
+    Return a dictionary of useful properties for each magnet
+    """
+
+    if hexabundle == 'A' or hexabundle == 'B':
+        corner_offset = 9
+        width = 22.4
+        length = 54.4
+        radius = 14
+        z_order = 2
+    elif hexabundle == 'C':
+        corner_offset = 6
+        width = 19.4
+        length = 51.4
+        radius = 14
+        z_order = 2
+    elif hexabundle == 'H' or hexabundle == 'U':
+        corner_offset = 2
+        width = 17
+        length = 48.4
+        radius = 12
+        z_order = 3
+    else:
+        corner_offset = 3.5
+        width = 17
+        length = 48.4
+        radius = 12
+        z_order = 3
+
+    if hexabundle in (['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']):
+        label_color = 'yellow'# change back to 'yellow'
+        patch_color = 'black'
+    elif ('I'> hexabundle >='A'):
+        label_color = 'black'
+        patch_color = 'white'
+    elif (hexabundle >'H'):
+        label_color = 'white'# change back to 'white'
+        patch_color = 'black'
+
+    return dict(corner_offset=corner_offset, width=width, length=length, z_order=z_order, label_color=label_color, patch_color=patch_color, radius=radius)
+
+def draw_rectangular_magnet(magnet, ax):
+    """
+    Draw a rectangular magnet on the hector plate. Annotate it with its number
+    """
+    
+    propdict = get_magnet_properties(magnet.hexabundle)
+
+    centre = magnet.center
+    magnet_corner = (centre[0] - (propdict['width']) / 2, centre[1] - (propdict['length'] - 12) / 2)
+    
+    # Rotate the magnet around their centres
+    transform = Affine2D().rotate_deg_around(*(magnet.center), 180 - magnet.plot_orientation)+ax.transData
+    # Increase zorder of the smaller hexabundles over A and B and C- the largest ones
+    # ****** previousOne draw_fill = patches.Rectangle((magnet.corner[0], magnet.corner[1]), width, length, angle=abs(180 - magnet.plot_orientation),facecolor=patch_color,alpha=0.8,zorder=3)#,edgecolor='black',linewidth=0.5
+    r = patches.Rectangle(magnet_corner, propdict['width'], propdict['length']-12, facecolor=propdict['patch_color'], edgecolor='black', linewidth=0.5, alpha=1,zorder=propdict['z_order'], transform=transform)
+
+    ax.add_artist(r)
+
+    text = magnet.magnet_label[1:]
+    text_angle = (np.degrees(magnet.angs) - 90) % 90
+    fontsize = 6
+    if magnet.hexabundle in ['H', 'U']:
+        text = f"{text} ★"
+        text_angle = (np.degrees(magnet.angs) + 180)
+        fontsize -= 1
+    
+    ax.annotate(text, (magnet.center[0], magnet.center[1]), color=propdict['label_color'], rotation=text_angle, weight='bold', fontsize=fontsize, ha='center', va='center',zorder=4, xytext=(0, 0), textcoords='offset points', )
+
+    return magnet, ax
+
 def draw_all_magnets(magnets, clusterNum, fileNameHexa, robot_figureFile, hexabundle_figureFile, fig_hexa, ax_hexa, fig_robot, ax_robot):
-    # plt.figure(2)
-    # draw_magnet_pickup_areas(magnets, '--c')
+
+    """
+    Make the two main plots from this code- the hexabundle plot and the robot pickup plot. For historical reasons, these are plotted at the same time in this single function rather than separately...
+    """
 
     ax_hexa = draw_circularSegments(ax_hexa)
-
-    
     ax_hexa = sky_fibre_annotations(fig=fig_hexa, ax=ax_hexa, skyfibre_file=fileNameHexa)
 
-    # plt.figure(2)
-    # draw_magnet_pickup_areas(magnets, '--c')
+    # Get all the hexabundles
+    all_hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
 
+    # Make a dictionary of all the circular magnets and all the rectangular ones
+    circular_magnet_dict = {}
+    rectangular_magnet_dict = {}
+    for magnet in magnets:
+        hexabundle = magnet.hexabundle
+
+        if is_circular_magnet(magnet):
+            circular_magnet_dict[hexabundle] = magnet
+        elif is_rectangular_magnet(magnet):
+            rectangular_magnet_dict[hexabundle] = magnet
+        else:
+            raise TypeError("Not sure what type this magnet is!")
+
+    # Add the angs values to the circular magnets
+    for hexabundle in all_hexabundles:
+        circular_magnet_dict[hexabundle].angs = np.degrees(rectangular_magnet_dict[hexabundle].angs)
+
+    # Loop through the magnets and plot one by one
     for magnet in magnets:
 
         if is_circular_magnet(magnet):
-            #plt.figure(1)
-            magnet.draw_circle(colour='r', ax1=ax_hexa, ax2=ax_robot) ## The magnets being drawn
-###################################################
-            #plt.figure(2)
+
             for pickup_area in magnet.pickup_areas:
                 pickup_area.draw_rectangle(colour='--c', figurenum=2, ax=ax_robot)
             magnet.draw_circle(colour='r', ax1=ax_hexa, ax2=ax_robot)
 
-            #plt.text(magnet.center[0], magnet.center[1], str(int(magnet.index)), fontsize=12, rotation=abs(135-magnet.plot_orientation))
-###################################################
+            # Draw the circular magnets on the hexabundle plot
+            ax_hexa = draw_circular_magnet(magnet, ax_hexa)
+
         elif is_rectangular_magnet(magnet):
             
-            magnet.draw_rectangle('r',figurenum=1, ax=ax_hexa) ## The magnets being drawn
-            #plt.figure(1)
-            ax=annotate_text_in_plot(magnet, ax_hexa)
-            # plt.text(magnet.center[0], magnet.center[1], str(magnet.magnet_label), fontsize=9, rotation=abs(180-magnet.plot_orientation))  #+'\n'+str(magnet.hexabundle)
+            magnet, ax_hexa = draw_rectangular_magnet(magnet, ax_hexa)
 
             ax_hexa.set_xlabel('mm')
             ax_hexa.set_ylabel('mm')
-################################################################
-            #plt.figure(2)
+
             for pickup_area in magnet.pickup_areas:
                 pickup_area.draw_rectangle(colour='--c', figurenum=2, ax=ax_robot)
             magnet.draw_rectangle(colour='r', figurenum=2, ax=ax_robot)
-            ax_robot.text(robot_center_x + magnet.center[0], robot_center_y + magnet.center[1], str(magnet.magnet_label), fontsize=8, \
-                     rotation=abs(180 - magnet.plot_orientation),weight='bold')  # +'\n'+str(magnet.hexabundle)
+            ax_robot.text(robot_center_x + magnet.center[0], robot_center_y + magnet.center[1], str(magnet.magnet_label), fontsize=8, rotation=abs(180 - magnet.plot_orientation),weight='bold')  # +'\n'+str(magnet.hexabundle)
 
 
             ax_robot.set_xlabel('mm')
             ax_robot.set_ylabel('mm')
-################################################################
+    ################################################################
 
     #plt.figure(1)
     ax_hexa.axis('off')
-    #axes = plt.gca()
+
     ax_hexa.set_xlim([-350, 350])
     ax_hexa.set_ylim([-350, 350])
 
-    # plt.show()                ## for showing the figure of magnets with pickup area
+    return fig_hexa, fig_robot
 
-    fig_hexa.savefig(hexabundle_figureFile)
-    # plt.savefig("image.png", bbox_inches='tight', dpi=100)
-
-    #plt.figure(2)
-    fig_robot.savefig(robot_figureFile)
-
-    plt.close('all')
-    # f = plt.figure(1)
-    # f1 = plt.figure(2)
-    # f.clear()
-    # f1.clear()
-    # plt.close(f)
-    # plt.close(f1)
 
 def create_magnet_pickup_areas(magnets):
 

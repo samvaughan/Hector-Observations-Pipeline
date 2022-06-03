@@ -22,8 +22,8 @@ def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePla
     ang0 = 20 # when the robot is at 0deg, it is actually 20 deg from the +x axis. The rotation direction is clockwise
     theta = np.radians(rot_platePlacing - ang0)
 
-    robot_centre_x_new = 1 * (robot_centre_x - d * np.cos(theta))
-    robot_centre_y_new = 1 * (robot_centre_y + d * np.sin(theta))
+    robot_centre_x_new = (robot_centre_x - d * np.cos(theta))
+    robot_centre_y_new = (robot_centre_y + d * np.sin(theta))
 
     return robot_centre_x_new, robot_centre_y_new
 
@@ -195,7 +195,10 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
     if verbose:
-        print(f'\tApplied metrology-based calibration, using the following fitted coefficients: {popt}')
+        if permagnet_theta_corr:
+            print(f'\tApplied metrology-based calibration and a *per-magnet* theta correction, using the following fitted coefficients: {popt}')
+        else:
+            print(f'\tApplied metrology-based calibration and a *global* theta correction, using the following fitted coefficients: {popt}')
 
     return metr_calibrated_coords, output_theta_d
 

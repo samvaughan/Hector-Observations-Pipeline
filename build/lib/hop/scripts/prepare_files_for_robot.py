@@ -74,19 +74,19 @@ def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None,
 
     return df
 
-def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True):
+def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, permagnet_theta_correction=True):
     
     """
     Apply a number of corrections to the magnet positions. The corrections are:
 
-        * A radial shift inwards or outwards applied to all circular magnets to account for a difference in temperature between the plate at the time it was configured and the plate at the time it will be observed. Note that this offset can be entered in millimetres, or otherwise two temnperatures and a coefficient of thermal expansion can be given instead.
-        * A correction on the position of each circular magnet based on its radial position in one of four telecentricity annuli. The circular magnet is moved inwards to account for the fact the light is not truly plane-parallel across the plate. 
-        * A correction on the position of all magnets based on accurate calibration of the position and rotation of the plate using the pre-defined metrology markers. This correction can be decomposed into a shift of the plate centre, a shear term and a rotation. The derived correction is fit to the measurements in the robot_shifts_file.
-        * A correction on North/South position of all magnets based on the roll of the robot arm as it places each object. The extension of the robot arm to the far corner of the plate induces a small torque which affects its ability to place a magnet accurately. This torque has been measured and fitted with quadratic function which depends on the y value (in robot coordinates) of the magnet and is applied to its x value.
-    
+    * A radial shift inwards or outwards applied to all circular magnets to account for a difference in temperature between the plate at the time it was configured and the plate at the time it will be observed. Note that this offset can be entered in millimetres, or otherwise two temnperatures and a coefficient of thermal expansion can be given instead.
+    * A correction on the position of each circular magnet based on its radial position in one of four telecentricity annuli. The circular magnet is moved inwards to account for the fact the light is not truly plane-parallel across the plate. 
+    * A correction on the position of all magnets based on accurate calibration of the position and rotation of the plate using the pre-defined metrology markers. This correction can be decomposed into a shift of the plate centre, a shear term and a rotation. The derived correction is fit to the measurements in the robot_shifts_file.
+    * A correction on North/South position of all magnets based on the roll of the robot arm as it places each object. The extension of the robot arm to the far corner of the plate induces a small torque which affects its ability to place a magnet accurately. This torque has been measured and fitted with quadratic function which depends on the y value (in robot coordinates) of the magnet and is applied to its x value.
+
     For corrections which are applied to only the circular magnets, we then calculate the position of the rectangular magnets again to ensure that the distance between them is always 27.2mm. 
 
-    Inputs:
+    Args:
         filename (str):
             A Hector Robot file containing information about 27 circular and 27 rectnagular magnets to be placed on the plate.
         offset (float, optional):
@@ -113,8 +113,6 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
             Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. 
         verbose (bool, True):
             Print information about the corrections to the screen. Default is True. 
-    Outputs:
-        A file with offset value adjusted saved in same directory as input file, with extended name of '_radialOffsetAdjusted.csv' at the end. 
     """
 
     # Some basic argument checking
@@ -140,7 +138,7 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
         orig_coords = np.array([df['Center_x'], df['Center_y']]).T
         theta_d = df['rot_platePlacing']
         metr_calibrated_coords, calibd_theta_d = corrections.perform_metrology_calibration(orig_coords, theta_d,
-                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose)
+                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose, permagnet_theta_corr=permagnet_theta_correction)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
         df['rot_platePlacing'] = calibd_theta_d

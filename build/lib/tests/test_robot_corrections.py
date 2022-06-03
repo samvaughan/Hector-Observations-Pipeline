@@ -211,6 +211,7 @@ class Test_radial_offset_file_numerical_values:
 
 class Test_metrology_calibration:
 
+    @pytest.mark.skip(reason="Need a new example metrology result which has been tested at the telescope")
     def test_fitting_results_against_known_values_for_theta(self, example_metrology_results, metrology_fit):
 
         metr_calibrated_coords, calibd_theta_d = metrology_fit

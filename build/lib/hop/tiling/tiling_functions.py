@@ -15,10 +15,11 @@ logger = logging.getLogger(__name__)
 def get_best_tile_centre_greedy(targets_df, outer_FOV_radius, inner_FoV_radius, priorities, n_xx_yy=100):
     """
     Given a set of x, y coordinates, find the position which would cover the most targets if we placed a field of view there.
-    Inputs:
+
+    Args:
         targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns 'RA' and 'DEC'
         n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don't make this too large...
-        Priorities: A priority value for each galaxy. If none is given, assume equal priorties for all targets
+        Priorities (list): A priority value for each galaxy. If none is given, assume equal priorties for all targets
     """
 
     RA = targets_df.loc[:, 'RA']
@@ -77,7 +78,7 @@ def get_best_tile_centre_dengreedy(master_df, targets_df, outer_FOV_radius, inne
     """
     Given a set of x, y coordinates, find the position to place the tile according to Aaron's Dengreedy algorithm
 
-    Inputs:
+    Args:
         master_df (dataframe): A dataframe of *all* target galaxies, irrespective of whether they've been tiled alread. Must have columns 'RA', 'DEC'
         targets_df (dataframe): A dataframe of target galaxies which have not yet been tiled. Must have columns 'RA', 'DEC'
         n_xx_yy (int, optional): Number of grid points along each direction. The size of the grid is n_xx_yy**2, and needs to fit in memory in one go! So don't make this too large...
@@ -120,7 +121,8 @@ def get_best_tile_centre_dengreedy(master_df, targets_df, outer_FOV_radius, inne
 def _get_grid(RA, Dec, n_xx_yy):
     """
     Make a grid of points which encloses a set of given RAs and Decs
-    Inputs:
+
+    Args:
         RA (array): A list of RA values of targets
         Dec (array): A list of Dec values of targets
         n_xx_yy (int): Number of grid points along **one** axis. Final grid has n_xx_yy^2 points!
@@ -137,7 +139,8 @@ def _get_grid(RA, Dec, n_xx_yy):
 def find_nearest(x, y, grid):
     """
     Find the nearest grid point to each target (at coordinates (x, y))
-    Inputs:
+
+    Args:
         x (array_like): A list of target x coordinates
         y (array_like): A list of target y coordinates
         grid (2D array): A two dimensional array of grid coordinates to test against. Columns are x (grid[:, 0]) and y (grid[:, 1])
@@ -157,7 +160,8 @@ def find_nearest(x, y, grid):
 def check_if_in_fov(df, xcen, ycen, inner_radius, outer_radius):
     """
     Return a binary mask if points are within a circular field of view of radius R
-    Inputs:
+
+    Args:
         df (dataframe): A dataframe of targets. Must have columns 'RA' and 'DEC'
         xcen (float): x (or RA) coordinate of centre
         ycen (float): y (or DEC) coordinate of centre
@@ -179,7 +183,8 @@ def check_if_in_fov(df, xcen, ycen, inner_radius, outer_radius):
 def find_clashes(df1, df2, proximity):
     """
     Given some proximity, find objects in two dataframes which will clash
-    Inputs:
+
+    Args:
         df1 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'
         df2 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'
         proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds
@@ -229,7 +234,8 @@ def _calc_clashes(XA, XB, proximity, tol=1e-5):
 def noclash(df1, df2, proximity):
     """
     Take two dataframes, find those which are within some proximity of each other and then return the first dataframe as is, the SECOND dataframe without the clashing elements, and the number of elements which clash. Useful for selecting guide stars which don't clash with targets in a tile.
-    Inputs:
+
+    Args:
         df1 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'
         df2 (dataframe): Dataframe of targets. Must have columns 'RA' and 'DEC'
         proximity (float): Smallest distance which two objects can come before clashing. Measured in arcseconds
@@ -251,7 +257,7 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
     """
     Given a tile of targets, select Nsel worth of stars by selecting stars which don't clash with any of our targets. The returned stars are sorted by either their priority (for standard stars) or their R-band magnitude (for guide stars)
 
-    Inputs:
+    Args:
         star_df (dataframe): a dataframe of stars (guide or standard). Must have columns "RA", "DEC" and either "priority" or "r_mag" (see below)
         tile_df (dataframe): a dataframe containing Nsel targets, created from using 'unpick'. Must have columns "RA" amd "DEC"
         proximity (float): distance between two adjacent bundles, in arcseconds.
@@ -285,7 +291,8 @@ def select_stars_for_tile(star_df, tile_df, proximity, Nsel, star_type):
 def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='most_clashing', fill_spares_with_repeats=False):
     """
     Given a dataframe of targets, select Nsel galaxies to observe. These can't be nearer to each other than 'proximity'. Return a dataframe of just the new tile we've made.
-    Inputs:
+
+    Args:
         df (dataframe): A dataframe of targets. Must have columns "RA", "DEC", "PRIORITY" (i.e. priority), "COMPLETED" (i.e. tiled before this current iteration).
         proximity (float): Smallest distance between two targets (in arcseconds)
         Nsel (int): Number of targets to select in each tile
@@ -432,13 +439,13 @@ def select_targets(all_targets_df, proximity, Nsel, priorities, selection_type='
 def make_best_tile(df_targets, df_guide_stars, df_standard_stars, proximity, tiling_parameters, tiling_type, use_galaxy_priorities=True, selection_type='most_clashing', fill_spares_with_repeats=False, df_skies=None):
     """
     Put all the above functions togther and make a tile. Note that this function __doesn't__ update any tiling flags in the overall database. This should be done afterwards, so that we can integrate things with the Hector configuration code- the 19 best targets we pick might not actually be tile-able, so we don't want to mark things as tiled if the config code needs to select backups.
-    Inputs:
+
+    Args:
         df_targets (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC', "PRIORITY" and "TILED"
         df_guide_stars (dataframe): A dataframe of galaxy targets. Must include columns 'RA', 'DEC' and "r_mag"
         df_standard_stars (dataframe): A dataframe of standard stars. Must include columns 'RA', 'DEC' and 'priority'
         tiling_parameters (dict): A dictionary containing the various parameters to do with the tiling. So far, necessary keys are 'Hector_FOV_radius', 'proximity', 'Nsel', 'Nsel_guides' and 'Nsel_standards'
     Returns:
-        A tuple of:
             * The original df_targets dataframe
             * A dataframe containing the targets for this tile
             * A dataframe containing the guides for this tile
@@ -519,7 +526,8 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
         * A plot of the field with the Nsel best targets selected by this code. Note that this may not resemble the final tile selected by the configuration code!
     Note that we also make two new columns called "MagnetX_noDC" and "MagnetY_noDC" which correspond to the xy positions of the galaxies on the Hector plate in microns from the centre. These have *NOT* been corrected for the optical distortions- that's done by the "DistortionCorrection" code, which happens after each time has been saved.
     These outputs will be bundled together in a single folder, which contains subfolders 'Tiles' and 'Plots'
-    Inputs:
+
+    Args:
         outfolder (str): Location for the output files
         df_targets (dataframe): Dataframe of all targets. This is used for plotting
         tile_df (dataframe): Dataframe of targets for a single tile
@@ -564,7 +572,8 @@ def save_tile_outputs(outfolder, df_targets, tile_df, guide_stars_for_tile, stan
 def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tiling_parameters, fig=None, ax=None, completion_fraction_to_calculate=0.95, verbose=True):
     """
     Make an overall plot of the survey completeness and the positions of each tile.
-    Inputs:
+
+    Args:
         tile_positions (list): A two component list. First element is a list of RA values of the tile centres, second component is a list of Dec values of the tile centres.
         tiling_parameters (dict): A dictionary of tiling parameters. Must have  a 'Hector_FOV_radius' key
     """
@@ -605,7 +614,8 @@ def plot_survey_completeness_and_tile_positions(tile_positions, df_targets, tili
 def _calc_completeness(df_targets):
     """
     Given a tiling dataframe, work out the fractional completeness of the tiling after each tile.
-    Inputs:
+
+    Args:
         df_targets (dataframe): a dataframe with a row for each target. Must have a column 'Tile_number'
     """
     completeness = np.cumsum([np.sum((df_targets['Tile_number'] == i) & df_targets['COMPLETED'] == True) / len(df_targets) for i in np.unique(df_targets['Tile_number'])])
@@ -616,7 +626,8 @@ def _calc_completeness(df_targets):
 def calculate_completeness_stats(df_targets, N_targets_per_Hector_field, completion_fraction_to_calculate=0.95, verbose=True):
     """
     Given a set of tiles, calculate some stats about the efficiency to get to a given completeness fraction
-    Inputs:
+
+    Args:
         df_targets (dataframe): a dataframe with a row for each target. Must have a column 'Tile_number'
         N_targets_per_Hector_field (dict): The numnber of hexabundles we can place on galaxy targets
         completeness_fraction_to_calculate (float, default=0.95): calculate the efficiency to reach this completeness fraction. This is defined as actual number of tiles used / minimum number of tiles possible) 
@@ -649,7 +660,8 @@ def calculate_completeness_stats(df_targets, N_targets_per_Hector_field, complet
 def plot_tile(tile_df, guide_df, standards_df, catalogue_df, tile_RA, tile_Dec, tile_outer_radius, tile_inner_radius, tile_number, proximity, fig=None, ax=None):
     """
     Make a plot of an individual tile.
-    Inputs:
+
+    Args:
         tile_df (dataframe): Dataframe of a tile to plot
         guide_df (dataframe): Dataframe of guide stars from this tile
         standards_df (dataframe): Dataframe of standard stars from this tile

@@ -28,6 +28,7 @@ def hexaPositionOffset(all_magnets, offsetFile):
     # Get the P and Q offsets from the file
     df = pd.read_excel(offsetFile, usecols=['Name', 'P', 'Q'], engine='openpyxl')
 
+    import ipdb; ipdb.set_trace()
     # drop the rows with NA values in Q column
     df.dropna(subset=['Q'], inplace=True)
 
@@ -48,6 +49,9 @@ def hexaPositionOffset(all_magnets, offsetFile):
 
         P_offset =  P_Q_offsets_df.loc[magnet.hexabundle, 'P'] / 1000.0
         Q_offset =  P_Q_offsets_df.loc[magnet.hexabundle, 'Q'] / 1000.0
+
+
+        print(f"P_offset is {P_offset}, Q_offset is {Q_offset}")
 
         # rotation matrix required for the offset adjustments of the circular magnets
         rotation_matrix_circle = rotational_matrix(convert_degrees_to_radians(angle_adjusted))
