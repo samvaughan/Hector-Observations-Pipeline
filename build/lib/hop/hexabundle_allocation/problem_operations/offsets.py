@@ -28,7 +28,6 @@ def hexaPositionOffset(all_magnets, offsetFile):
     # Get the P and Q offsets from the file
     df = pd.read_excel(offsetFile, usecols=['Name', 'P', 'Q'], engine='openpyxl')
 
-    import ipdb; ipdb.set_trace()
     # drop the rows with NA values in Q column
     df.dropna(subset=['Q'], inplace=True)
 

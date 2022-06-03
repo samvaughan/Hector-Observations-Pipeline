@@ -83,8 +83,6 @@ def annotate_text_in_plot(magnet, ax):
     magnet.text_center = (magnet.center[0] - rotation_matrix[1][0] * (magnet.length ) / 2, \
                     magnet.center[1] - rotation_matrix[1][1] * (magnet.length ) / 2)
 
-
-    import ipdb; ipdb.set_trace()
     if (magnet.hexabundle == 'H') or (magnet.hexabundle == 'U'):
         annotated_star = str('      ★')
         ax.annotate(annotated_star, (magnet.text_center[0], magnet.text_center[1]), color=label_color,rotation=abs(90 - magnet.plot_orientation), \

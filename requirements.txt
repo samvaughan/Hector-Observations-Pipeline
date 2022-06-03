@@ -16,3 +16,4 @@ mock
 sphinx
 sphinx-bootstrap-theme
 sphinxcontrib-napoleon
+sphinx_automodapi.automodapi
