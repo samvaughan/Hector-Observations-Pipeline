@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Apply a number of corrections to the magnet x and y positions in a given Hector robot file, then write these updated positions in a file which can be read in by the Hector robot. 
+
+Example:
+    This script should be run as::
+
+        $ python prepare_files_for_robot.py /path/to/robot/file /path/to/robot/shifts/file 
+    
+The output is a robot file with "_CorrectionsApplied.csv" appended to the input filename
+
+"""
+
 
 import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
