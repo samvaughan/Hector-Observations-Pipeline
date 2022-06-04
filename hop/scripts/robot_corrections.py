@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+This module contains various functions which correct the magnet x and y positions before the robot places them on the Hector plate. 
+"""
+
 import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
 import numpy as np
@@ -5,11 +10,6 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import warnings
 from pathlib import Path
-
-"""
-Various functions which correct the magnet x and y positions on the Hector Plate
-"""
-
 
 def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePlacing):
     """
