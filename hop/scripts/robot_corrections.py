@@ -16,6 +16,14 @@ def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePla
     Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm. 
 
     First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022
+
+    Args:
+        robot_centre_x (float): Magnet x coordinate
+        robot_centre_y (float): Magnet y coordinate
+        rot_platePlacing (float): Theta coordinate of robot arm when placing each magnet. Should be from the rot_platePlacing column in the robot file
+
+    Returns:
+        tuple: The new magnet x coordinate and y coordinate
     """
     
     d = 24*0.001 # distance from center of pick up arm to center of rotation in [mm]
@@ -30,6 +38,16 @@ def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePla
 def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_correction=True, verbose=True):
     """
     Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.
+
+    Args:
+        df (dataframe): A dataframe made from reading in the robot file
+        offset (float): A given offset distance in mm to move each magnet in the radial direction. Positive is outwards.
+        robot_centre (list): A two element list containing the plate centre in robot coordinates. 
+        apply_telecentricity_correction (bool, optional): If True, apply the telescentricity correction term
+        verbose (bool, optional): If True, print information to the screen.
+
+    Returns:
+        dataframe: The updated dataframe containing positions with the offsets applied
     """
 
     if verbose:
