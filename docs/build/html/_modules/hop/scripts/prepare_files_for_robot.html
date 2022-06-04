@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hop.scripts.prepare_files_for_robot &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <title>hop.scripts.prepare_files_for_robot &#8212; Hector Observations Pipeline 1.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -102,6 +102,16 @@
       
   <h1>Source code for hop.scripts.prepare_files_for_robot</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Apply a number of corrections to the magnet x and y positions in a given Hector robot file, then write these updated positions in a file which can be read in by the Hector robot. </span>
+<span class="sd">Example:</span>
+<span class="sd">    This script should be run as::</span>
+
+<span class="sd">        $ python prepare_files_for_robot.py /path/to/robot/file /path/to/robot/shifts/file </span>
+<span class="sd">    </span>
+<span class="sd">The output is a robot file with &quot;_CorrectionsApplied.csv&quot; appended to the input filename</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">chained_assignment</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># disabled warning about writes making it back to the original frame</span>
@@ -198,24 +208,26 @@
 <span class="sd">            The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None. </span>
 <span class="sd">        T_configured (float, optional): </span>
 <span class="sd">            The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.</span>
-<span class="sd">        plate_radius (float, optional):</span>
+<span class="sd">        plate_radius (float, optional): </span>
 <span class="sd">            The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0</span>
-<span class="sd">        alpha (float, optional):</span>
+<span class="sd">        alpha (float, optional): </span>
 <span class="sd">            The coefficient of thermal expansion of invar. Default is 1.2e-6</span>
 <span class="sd">        robot_centre (list, optional): </span>
 <span class="sd">            A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn&#39;t change this unless you have a very good reason! Default is [324.470,297.834]</span>
-<span class="sd">        robot_shifts_file, (str, optional):</span>
+<span class="sd">        robot_shifts_file (str, optional): </span>
 <span class="sd">            The location of the metrology measurements file. Default is &#39;robot_shifts_abs.csv&#39;</span>
-<span class="sd">        apply_telecentricity_correction (bool, optional):</span>
+<span class="sd">        apply_telecentricity_correction (bool, optional): </span>
 <span class="sd">            Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True. </span>
-<span class="sd">        apply_metrology_calibration (bool, True):</span>
+<span class="sd">        apply_metrology_calibration (bool, optional): </span>
 <span class="sd">            Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True</span>
-<span class="sd">        apply_roll_correction (bool, True):</span>
+<span class="sd">        apply_roll_correction (bool, optional): </span>
 <span class="sd">            Whether or not to apply the robot roll correction. Should always be True. Default is True.</span>
-<span class="sd">        apply_rotation_correction (bool, True):</span>
+<span class="sd">        apply_rotation_correction (bool, optional): </span>
 <span class="sd">            Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. </span>
-<span class="sd">        verbose (bool, True):</span>
+<span class="sd">        verbose (bool, optional): </span>
 <span class="sd">            Print information about the corrections to the screen. Default is True. </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dataframe: A dataframe containing the updated coordinates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Some basic argument checking</span>

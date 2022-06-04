@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hop.scripts.robot_corrections &#8212; Hector Observations Pipeline 1.1 documentation</title>
+    <title>hop.scripts.robot_corrections &#8212; Hector Observations Pipeline 1.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -57,15 +57,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../calculating_offsets.html">Calculating Offsets from one Hexabundle to another</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../plot_plate_configuration.html">Plotting a plate configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../show_sky_fibre_changes_between_plates.html">Showing the Sky Fibre Changes between Plates</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../check_magnet_counts_between_tiles.html">Checking two plates can be observed after each other</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../prepare_files_for_robot.html">Preparing files to be configured by the robot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 </ul>
 </ul>
 </li>
@@ -82,10 +74,6 @@
 </li>
               
             
-            
-              
-                
-              
             
             
             
@@ -113,7 +101,11 @@
     <div class="body col-md-12 content" role="main">
       
   <h1>Source code for hop.scripts.robot_corrections</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;This module contains various functions which correct the magnet x and y positions before the robot places them on the Hector plate. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">chained_assignment</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># disabled warning about writes making it back to the original frame</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
@@ -121,16 +113,19 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Various functions which correct the magnet x and y positions on the Hector Plate</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-
 <div class="viewcode-block" id="pick_up_arm_rotation_correction"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.pick_up_arm_rotation_correction">[docs]</a><span class="k">def</span> <span class="nf">pick_up_arm_rotation_correction</span><span class="p">(</span><span class="n">robot_centre_x</span><span class="p">,</span> <span class="n">robot_centre_y</span><span class="p">,</span> <span class="n">rot_platePlacing</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm. </span>
 
 <span class="sd">    First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        robot_centre_x (float): Magnet x coordinate</span>
+<span class="sd">        robot_centre_y (float): Magnet y coordinate</span>
+<span class="sd">        rot_platePlacing (float): Theta coordinate of robot arm when placing each magnet. Should be from the rot_platePlacing column in the robot file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: The new magnet x coordinate and y coordinate</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="n">d</span> <span class="o">=</span> <span class="mi">24</span><span class="o">*</span><span class="mf">0.001</span> <span class="c1"># distance from center of pick up arm to center of rotation in [mm]</span>
@@ -145,6 +140,16 @@
 <div class="viewcode-block" id="apply_offsets_to_magnets"><a class="viewcode-back" href="../../../hop.scripts.html#hop.scripts.robot_corrections.apply_offsets_to_magnets">[docs]</a><span class="k">def</span> <span class="nf">apply_offsets_to_magnets</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">robot_centre</span><span class="p">,</span> <span class="n">apply_telecentricity_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (dataframe): A dataframe made from reading in the robot file</span>
+<span class="sd">        offset (float): A given offset distance in mm to move each magnet in the radial direction. Positive is outwards.</span>
+<span class="sd">        robot_centre (list): A two element list containing the plate centre in robot coordinates. </span>
+<span class="sd">        apply_telecentricity_correction (bool, optional): If True, apply the telescentricity correction term</span>
+<span class="sd">        verbose (bool, optional): If True, print information to the screen.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dataframe: The updated dataframe containing positions with the offsets applied</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
