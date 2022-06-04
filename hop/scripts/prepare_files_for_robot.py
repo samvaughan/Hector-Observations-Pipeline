@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Apply a number of corrections to the magnet x and y positions in a given Hector robot file, then write these updated positions in a file which can be read in by the Hector robot. 
-
 Example:
     This script should be run as::
 
@@ -10,7 +9,6 @@ Example:
 The output is a robot file with "_CorrectionsApplied.csv" appended to the input filename
 
 """
-
 
 import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
@@ -103,28 +101,17 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
             A Hector Robot file containing information about 27 circular and 27 rectnagular magnets to be placed on the plate.
         offset (float, optional):
             A radial offset (in mm) to be applied to all circular magnets. Negative values are towards the plate centre, positive values are away from the plate centre. The default is 0.0
-        T_observed (float, optional): 
-            The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None. 
-        T_configured (float, optional): 
-            The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.
-        plate_radius (float, optional):
-            The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0
-        alpha (float, optional):
-            The coefficient of thermal expansion of invar. Default is 1.2e-6
-        robot_centre (list, optional): 
-            A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn't change this unless you have a very good reason! Default is [324.470,297.834]
-        robot_shifts_file, (str, optional):
-            The location of the metrology measurements file. Default is 'robot_shifts_abs.csv'
-        apply_telecentricity_correction (bool, optional):
-            Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True. 
-        apply_metrology_calibration (bool, True):
-            Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
-        apply_roll_correction (bool, True):
-            Whether or not to apply the robot roll correction. Should always be True. Default is True.
-        apply_rotation_correction (bool, True):
-            Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. 
-        verbose (bool, True):
-            Print information about the corrections to the screen. Default is True. 
+        T_observed (float, optional): The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None. 
+        T_configured (float, optional): The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.
+        plate_radius (float, optional): The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0
+        alpha (float, optional): The coefficient of thermal expansion of invar. Default is 1.2e-6
+        robot_centre (list, optional): A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn't change this unless you have a very good reason! Default is [324.470,297.834]
+        robot_shifts_file, (str, optional): The location of the metrology measurements file. Default is 'robot_shifts_abs.csv'
+        apply_telecentricity_correction (bool, optional): Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True. 
+        apply_metrology_calibration (bool, True): Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
+        apply_roll_correction (bool, True): Whether or not to apply the robot roll correction. Should always be True. Default is True.
+        apply_rotation_correction (bool, True): Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. 
+        verbose (bool, True): Print information about the corrections to the screen. Default is True. 
     """
 
     # Some basic argument checking

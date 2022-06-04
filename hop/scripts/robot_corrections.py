@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-This module contains various functions which correct the magnet x and y positions before the robot places them on the Hector plate. 
+"""This module contains various functions which correct the magnet x and y positions before the robot places them on the Hector plate. 
 """
 
 import pandas as pd
