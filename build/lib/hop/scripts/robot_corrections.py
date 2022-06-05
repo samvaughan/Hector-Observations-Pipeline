@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""This module contains various functions which correct the magnet x and y positions before the robot places them on the Hector plate. 
+"""
+
 import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
 import numpy as np
@@ -6,19 +10,28 @@ import matplotlib.pyplot as plt
 import warnings
 from pathlib import Path
 
-"""
-Various functions which correct the magnet x and y positions on the Hector Plate
-"""
-
-
-def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePlacing):
+def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePlacing, sign='positive'):
     """
     Correct for the errors in magnet position introduced by the different centres of rotation of the robot cylinder and the pickup arm. 
 
     First written by Stefania Barsanti, May 2022. Edited by Sam Vaughan, May/June 2022
+
+    Args:
+        robot_centre_x (float): Magnet x coordinate
+        robot_centre_y (float): Magnet y coordinate
+        rot_platePlacing (float): Theta coordinate of robot arm when placing each magnet. Should be from the rot_platePlacing column in the robot file
+        sign (str): Must be "positve" or "negative". Apply a factor of +/- 1 to swap the direction of this correction.
+
+    Returns:
+        tuple: The new magnet x coordinate and y coordinate
     """
-    
-    d = 24*0.001 # distance from center of pick up arm to center of rotation in [mm]
+    if sign == 'positive':
+        factor = 1
+    elif sign == 'negative':
+        factor = -1
+    else:
+        raise NameError("Sign must be positive or negative!")
+    d = factor * 24*0.001 # distance from center of pick up arm to center of rotation in [mm]
     ang0 = 20 # when the robot is at 0deg, it is actually 20 deg from the +x axis. The rotation direction is clockwise
     theta = np.radians(rot_platePlacing - ang0)
 
@@ -30,6 +43,16 @@ def pick_up_arm_rotation_correction(robot_centre_x, robot_centre_y, rot_platePla
 def apply_offsets_to_magnets(df, offset, robot_centre, apply_telecentricity_correction=True, verbose=True):
     """
     Apply the radial and telecentricity offsets to the circular magnets, then calculate the corresponding positions of the rectangular magnets.
+
+    Args:
+        df (dataframe): A dataframe made from reading in the robot file
+        offset (float): A given offset distance in mm to move each magnet in the radial direction. Positive is outwards.
+        robot_centre (list): A two element list containing the plate centre in robot coordinates. 
+        apply_telecentricity_correction (bool, optional): If True, apply the telescentricity correction term
+        verbose (bool, optional): If True, print information to the screen.
+
+    Returns:
+        dataframe: The updated dataframe containing positions with the offsets applied
     """
 
     if verbose:
@@ -142,7 +165,7 @@ def calculate_rectangular_magnet_centre_coordinates(x, y, rm_angle):
     return rectangular_magnet_centre
 
 
-def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file, verbose=True, permagnet_theta_corr=True):
+def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, robot_shifts_file, verbose=True, permagnet_theta_corr=True, sign='negative'):
     """
     Apply a correction based on the measured metrology of the robot. Written by Barnaby Norris. 
     """
@@ -192,7 +215,14 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
         theta_d = all_theta_ds
     else:
         theta_d = popt[2]
-    output_theta_d = (input_theta_d - theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
+
+    if sign == 'positive':
+        factor = 1
+    elif sign == 'negative':
+        factor = -1
+    else:
+        raise NameError("Sign must be positive or negative!")
+    output_theta_d = (input_theta_d + factor * theta_d) % 360 ### SIGN ISSUE: If rotation direction is incorrect, change this + to -
 
     if verbose:
         if permagnet_theta_corr:

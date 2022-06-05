@@ -1733,9 +1733,11 @@ hop/scripts/robot_file_input_output.py
 hop/scripts/show_sky_fibre_changes_between_plates
 hop/scripts/__pycache__/__init__.cpython-39.pyc
 hop/scripts/__pycache__/prepare_files_for_robot.cpython-39.pyc
+hop/scripts/__pycache__/prepare_files_for_robot_EDITED.cpython-39.pyc
 hop/scripts/__pycache__/radialOffset_standaloneFunction.cpython-39.pyc
 hop/scripts/__pycache__/radialOffset_standaloneFunction_includeMetrologyCalibration.cpython-39.pyc
 hop/scripts/__pycache__/robot_corrections.cpython-39.pyc
+hop/scripts/__pycache__/robot_corrections_EDITED.cpython-39.pyc
 hop/scripts/__pycache__/robot_file_input_output.cpython-39.pyc
 hop/target_selection/HectorSim.mplstyle
 hop/target_selection/HectorSim.py

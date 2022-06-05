@@ -201,5 +201,5 @@ if __name__ == "__main__":
     #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
     parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
 
-    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='negative')
+    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive')
     parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
