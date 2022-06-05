@@ -48,7 +48,7 @@ def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None,
 
     return df
 
-def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True):
+def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive'):
 
     """
     Apply the necessary corrections to the x and y positions of magnets in a *Hector Robot file*. We also read in and update its header
@@ -75,7 +75,7 @@ def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None,
     df = file_functions.read_standard_robot_file(filename)
 
     # Now apply the corrections
-    df = apply_corrections(df, offset=offset, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=apply_telecentricity_correction, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=apply_rotation_correction, verbose=verbose)
+    df = apply_corrections(df, offset=offset, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=apply_telecentricity_correction, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=apply_rotation_correction, verbose=verbose, metrology_sign=metrology_sign, rotation_axis_misalignment_sign=rotation_axis_misalignment_sign)
 
     df, output_file = file_functions.write_standard_robot_file(df, filename, header)
 
@@ -84,7 +84,7 @@ def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None,
 
     return df
 
-def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, permagnet_theta_correction=True):
+def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, permagnet_theta_correction=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive'):
     
     """
     Apply a number of corrections to the magnet positions. The corrections are:
@@ -105,26 +105,24 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
             The temperature (in Celsius or Kelvin) at which the plate will be observed at. Default is None. 
         T_configured (float, optional): 
             The temperature (in Celsius or Kelvin) at which the plate was configured at. Default is None.
-        plate_radius (float, optional): 
+        plate_radius (float, optional):
             The radius of the plate in mm, for claculating the thermal expansion. Default is 226.0
-        alpha (float, optional): 
+        alpha (float, optional):
             The coefficient of thermal expansion of invar. Default is 1.2e-6
         robot_centre (list, optional): 
             A two element list comntaing the x and y coordinates of the plate centre in the coordinates of the robot. You really shouldn't change this unless you have a very good reason! Default is [324.470,297.834]
-        robot_shifts_file (str, optional): 
+        robot_shifts_file, (str, optional):
             The location of the metrology measurements file. Default is 'robot_shifts_abs.csv'
-        apply_telecentricity_correction (bool, optional): 
+        apply_telecentricity_correction (bool, optional):
             Whether or not to apply the telecentricity correction to the magnets. In all reasonable circumstances this should be True! Default is True. 
-        apply_metrology_calibration (bool, optional): 
+        apply_metrology_calibration (bool, True):
             Whether or not to apply the metrology-based calibration correction. Should always be True. Default is True
-        apply_roll_correction (bool, optional): 
+        apply_roll_correction (bool, True):
             Whether or not to apply the robot roll correction. Should always be True. Default is True.
-        apply_rotation_correction (bool, optional): 
+        apply_rotation_correction (bool, True):
             Whether or not to apply the correction for the different alignments of the robot cylinder and pickup arm. Should always be True, default is True. 
-        verbose (bool, optional): 
+        verbose (bool, True):
             Print information about the corrections to the screen. Default is True. 
-    Returns:
-        dataframe: A dataframe containing the updated coordinates
     """
 
     # Some basic argument checking
@@ -147,10 +145,11 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
 
     # Perform metrology-based calibration
     if apply_metrology_calibration:
+        print(f"Metrology sign is {metrology_sign.upper()}")
         orig_coords = np.array([df['Center_x'], df['Center_y']]).T
         theta_d = df['rot_platePlacing']
         metr_calibrated_coords, calibd_theta_d = corrections.perform_metrology_calibration(orig_coords, theta_d,
-                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose, permagnet_theta_corr=permagnet_theta_correction)
+                                                           robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose, permagnet_theta_corr=permagnet_theta_correction, sign=metrology_sign)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
         df['rot_platePlacing'] = calibd_theta_d
@@ -166,13 +165,14 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
     #Apply the correction for the unaligned centres of rotation for the pickup arm vs the cylinder
     if apply_rotation_correction:
         if verbose:
-            print("\tApplying the offset-rotation-axis correction")
+            print(f"\tApplying the offset-rotation-axis correction. Sign is {rotation_axis_misalignment_sign.upper()}")
         for index, row in df.iterrows():
-            new_x, new_y = corrections.pick_up_arm_rotation_correction(row['Center_x'], row['Center_y'], rot_platePlacing=row['rot_platePlacing'])
+            new_x, new_y = corrections.pick_up_arm_rotation_correction(row['Center_x'], row['Center_y'], rot_platePlacing=row['rot_platePlacing'], sign=rotation_axis_misalignment_sign)
             df.at[index, 'Center_x'] = new_x
             df.at[index, 'Center_y'] = new_y
 
     return df
+
 
 
 if __name__ == "__main__":
@@ -201,5 +201,5 @@ if __name__ == "__main__":
     #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
     parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
 
-    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose)
+    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='negative')
     parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
