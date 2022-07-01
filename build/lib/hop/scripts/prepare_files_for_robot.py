@@ -152,7 +152,22 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
                                                            robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose, permagnet_theta_corr=permagnet_theta_correction, sign=metrology_sign)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
-        df['rot_platePlacing'] = calibd_theta_d
+        #df['rot_platePlacing'] = calibd_theta_d
+
+    print("Only applying the theta calibs to the circular magnets...")
+    for (index, row), theta in zip(df.iterrows(), calibd_theta_d):
+        
+        if row.Magnet == 'circular_magnet':
+            delta_angle = row.rot_platePlacing - theta
+            df.at[index, "rot_platePlacing"] = theta
+            rectangular_magnet_mask = (df.Hexabundle == row.Hexabundle) & (df['Magnet'] == 'rectangular_magnet')
+            rectangular_magnet_index = df.index[rectangular_magnet_mask][0]
+            old_rm_angle = df.loc[rectangular_magnet_mask, "rot_platePlacing"]
+            df.at[rectangular_magnet_index, "rot_platePlacing"] = old_rm_angle - delta_angle
+
+            print(f"Hexa {row.Hexabundle} {row.Magnet}, delta_angle is {delta_angle:.3f}, cm_angle is {theta:.3f}, rm_angle is  {df.at[rectangular_magnet_index, 'rot_platePlacing']}")
+
+
 
     # Apply the roll correction to the x values of the magnets _after_ the metrology correction
     if apply_roll_correction:
@@ -186,6 +201,10 @@ if __name__ == "__main__":
     parser.add_argument("--T_observed", default=None, type=float, help='Temperature at which the plate will be observed')
     parser.add_argument("--T_configured", default=None, type=float, help='Temperature at which the plate is configured')
     parser.add_argument("--silent", action="store_true", help="Turn off output from the code")
+    parser.add_argument("--no-tel-corr", action="store_true", help="Turn off Telecentricity correction")
+    parser.add_argument("--no-metrology", action="store_true", help="Turn metrology")
+    parser.add_argument("--no-roll", action="store_true", help="Turn off roll")
+    parser.add_argument("--no-rotation-misalignment-corr", action="store_true", help="Turn off rotation correction")
 
     args = parser.parse_args()
     robot_filename = args.robot_filename
@@ -197,9 +216,14 @@ if __name__ == "__main__":
     T_observed = args.T_observed
     T_configured = args.T_configured
     verbose = not args.silent
+    do_tel_cor = not args.no_tel_corr
+    do_metrology = not args.no_metrology
+    do_metrology = not args.no_metrology
+    do_roll = not args.no_roll
+    do_rotation_misalignment_corr = not args.no_rotation_misalignment_corr
 
     #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
-    parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
+    #parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
 
-    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='negative')
-    parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
+    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_telecentricity_correction=do_tel_cor, apply_metrology_calibration=do_metrology, apply_roll_correction=do_roll, apply_rotation_correction=do_rotation_misalignment_corr)
+    #parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)

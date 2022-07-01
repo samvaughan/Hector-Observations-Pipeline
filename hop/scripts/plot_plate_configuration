@@ -43,8 +43,9 @@ if __name__ == "__main__":
     plate_radius = constants.HECTOR_plate_radius
 
     # Each of the hexabundles to plot
-    Hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
-
+    #Hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
+    Hexabundles = np.unique(robot.Hexabundle)
+    
     # Make a plot
     fig, ax = plt.subplots(figsize=(8,8))
     ax.set_aspect(1)
@@ -82,7 +83,7 @@ if __name__ == "__main__":
         # Plot the angle of the circular magnet
         # This line will always point towards the centre of the plate UNLESS THE METROLOGY/ROBOT CORRECTIONS HAVE BEEN APPLIED TO THE ROBOT FILE. If so, this line will be off (again by design)
         cm_angle = np.radians(270 - cm.rot_holdingPosition - cm.rot_platePlacing) 
-        ax.plot([cm_x, cm_x + 15 * np.sin(cm_angle)], [cm_y, cm_y + 15 * np.cos(cm_angle)], c='b', alpha=0.5)
+        ax.plot([cm_x, cm_x + 150 * np.sin(cm_angle)], [cm_y, cm_y + 150 * np.cos(cm_angle)], c='b', alpha=0.5)
 
         # Plot the circular magnet
         c = Circle(xy=(cm_x, cm_y), radius=circular_magnet_radius, facecolor='0.8', edgecolor='k', alpha=0.5)

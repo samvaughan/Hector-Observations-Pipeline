@@ -196,8 +196,10 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     input_coords_centred = input_coords - robot_centre + true_centre
 
     # Apply metrology-based correction
-    metr_calibrated_coords = apply_cal(input_coords_centred, popt)
+    print("Not applying a scale or shear to the output coords for testing!!!!")
+    metr_calibrated_coords = apply_cal_no_sh_no_scl(input_coords_centred, popt)
 
+    import ipdb; ipdb.set_trace()
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
     if permagnet_theta_corr:
@@ -250,6 +252,26 @@ def apply_cal(inputs, p):
         outvec = Rmat @ outvec
         outvec = shmat @ outvec
         outvec = sclmat @ outvec
+        out_coords[k,:] = outvec
+    return out_coords
+
+def apply_cal_no_sh_no_scl(inputs, p):
+    # Applies the offset and transformation matrix
+    thr = p[2]/180*np.pi
+    Rmat = np.array([[np.cos(thr), -np.sin(thr)],
+                     [np.sin(thr), np.cos(thr)]])
+    p[6]=0 # With 2 shear terms matrix is underconstrained
+    shmat = np.array([[1, p[5]],
+                     [p[6], 1]])
+    sclmat = np.array([[p[3], 0], [0, p[4]]])
+
+    out_coords = np.zeros_like(inputs)
+    for k in range(inputs.shape[0]):
+        invec = inputs[k,:]
+        outvec = invec + np.array([p[0], p[1]])
+        outvec = Rmat @ outvec
+        #outvec = shmat @ outvec
+        #outvec = sclmat @ outvec
         out_coords[k,:] = outvec
     return out_coords
 
