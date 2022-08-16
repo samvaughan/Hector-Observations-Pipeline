@@ -22,7 +22,7 @@ from pathlib import Path
 from hop.scripts import robot_corrections as corrections
 from hop.scripts import robot_file_input_output as file_functions
 
-def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_metrology_calibration=True, apply_roll_correction=True, verbose=True):
+def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_metrology_calibration=True, apply_roll_correction=True, verbose=True, apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive"):
 
     """
     Apply the necessary corrections to the x and y *parking positions* of the Hector magnets. We then write this file out to a new one with the exact same format
@@ -33,7 +33,7 @@ def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None,
 
     df = file_functions.read_parking_positions_file(filename)
 
-    df = apply_corrections(df, offset=0.0, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=False, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=False, verbose=verbose)
+    df = apply_corrections(df, offset=0.0, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=False, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=False, verbose=verbose, apply_barrel_rotation_to_all_magnets=apply_barrel_rotation_to_all_magnets, barrel_rotation_sign=barrel_rotation_sign)
 
     # Now write the parking positions file out in the correct format
     # We want to keep the same long string of numbers from the filename of the Robot Shifts file
@@ -48,7 +48,7 @@ def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None,
 
     return df, output_file
 
-def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive'):
+def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive"):
 
     """
     Apply the necessary corrections to the x and y positions of magnets in a *Hector Robot file*. We also read in and update its header
@@ -75,7 +75,7 @@ def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None,
     df = file_functions.read_standard_robot_file(filename)
 
     # Now apply the corrections
-    df = apply_corrections(df, offset=offset, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=apply_telecentricity_correction, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=apply_rotation_correction, verbose=verbose, metrology_sign=metrology_sign, rotation_axis_misalignment_sign=rotation_axis_misalignment_sign)
+    df = apply_corrections(df, offset=offset, T_observed=T_observed, T_configured=T_configured, plate_radius=plate_radius, alpha=alpha, robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, apply_telecentricity_correction=apply_telecentricity_correction, apply_metrology_calibration=apply_metrology_calibration, apply_roll_correction=apply_roll_correction, apply_rotation_correction=apply_rotation_correction, verbose=verbose, metrology_sign=metrology_sign, rotation_axis_misalignment_sign=rotation_axis_misalignment_sign, apply_barrel_rotation_to_all_magnets=apply_barrel_rotation_to_all_magnets, barrel_rotation_sign=barrel_rotation_sign)
 
     df, output_file = file_functions.write_standard_robot_file(df, filename, header)
 
@@ -84,7 +84,7 @@ def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None,
 
     return df
 
-def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, permagnet_theta_correction=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive'):
+def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, permagnet_theta_correction=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive"):
     
     """
     Apply a number of corrections to the magnet positions. The corrections are:
@@ -168,6 +168,15 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
             df.at[index, 'Center_x'] = new_x
             df.at[index, 'Center_y'] = new_y
 
+    if apply_barrel_rotation_to_all_magnets:
+        overall_barrel_rotation_value = 0.14
+        print(f"\tApplying a {overall_barrel_rotation_value} degree rotation to every magnet (due to the overall alignment of the robot barrel). Sign is {barrel_rotation_sign.upper()}")
+        if barrel_rotation_sign == 'positive':
+            df['rot_platePlacing'] = df['rot_platePlacing'] + overall_barrel_rotation_value
+        elif barrel_rotation_sign == 'negative':
+            df['rot_platePlacing'] = df['rot_platePlacing'] - overall_barrel_rotation_value
+        else:
+            raise NameError(f"The value of barrel_rotation_sign must be 'positive' or 'negative'. Currently it is {barrel_rotation_sign}")
     return df
 
 
@@ -255,11 +264,11 @@ if __name__ == "__main__":
     T_configured = args.T_configured
     verbose = not args.silent
 
-    #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
-    parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_211116-z25.7_final.csv"
+    parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
+    #parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_211116-z25.7_final.csv"
 
-    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive')
-    parking_positions_df, correct_parkingpos_file = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
+    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive")
+    parking_positions_df, correct_parkingpos_file = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True, apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive")
 
     if robot_labview_file is not None:
         update_parking_positions(robot_labview_file, correct_parkingpos_file)
