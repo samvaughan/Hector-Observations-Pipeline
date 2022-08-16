@@ -9,6 +9,8 @@ Example:
 The output is a robot file with "_CorrectionsApplied.csv" appended to the input filename
 
 """
+import sys
+import shutil
 
 import pandas as pd
 pd.options.mode.chained_assignment = None  # disabled warning about writes making it back to the original frame
@@ -37,7 +39,7 @@ def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None,
 
     # Now write the parking positions file out in the correct format
     # We want to keep the same long string of numbers from the filename of the Robot Shifts file
-    fname = Path(filename)
+    fname = Path(filename.replace('_211116-z25.7', ''))
 
     metrology_date = Path(robot_shifts_file).expanduser().stem.split('_')[-1]
     output_file = fname.parent / (fname.stem + f'_{metrology_date}.csv')
@@ -46,7 +48,7 @@ def correct_parking_positions_file(filename, robot_shifts_file, T_observed=None,
     if verbose:
         print(f'\tOutput file: {output_file}')
 
-    return df
+    return df, output_file
 
 def correct_robot_file(filename, offset=0.0, T_observed=None, T_configured=None, plate_radius=226.0, alpha=1.2e-6, robot_centre=[324.470,297.834], robot_shifts_file='./robot_shifts_abs.csv', apply_telecentricity_correction=True, apply_metrology_calibration=True, apply_roll_correction=True, apply_rotation_correction=True, verbose=True, metrology_sign='negative', rotation_axis_misalignment_sign='positive'):
 
@@ -152,22 +154,7 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
                                                            robot_centre=robot_centre, robot_shifts_file=robot_shifts_file, verbose=verbose, permagnet_theta_corr=permagnet_theta_correction, sign=metrology_sign)
         df['Center_x'] = metr_calibrated_coords[:, 0]
         df['Center_y'] = metr_calibrated_coords[:, 1]
-        #df['rot_platePlacing'] = calibd_theta_d
-
-    # print("Only applying the theta calibs to the circular magnets...")
-    # for (index, row), theta in zip(df.iterrows(), calibd_theta_d):
-        
-    #     if row.Magnet == 'circular_magnet':
-    #         delta_angle = row.rot_platePlacing - theta
-    #         df.at[index, "rot_platePlacing"] = theta
-    #         rectangular_magnet_mask = (df.Hexabundle == row.Hexabundle) & (df['Magnet'] == 'rectangular_magnet')
-    #         rectangular_magnet_index = df.index[rectangular_magnet_mask][0]
-    #         old_rm_angle = df.loc[rectangular_magnet_mask, "rot_platePlacing"]
-    #         df.at[rectangular_magnet_index, "rot_platePlacing"] = old_rm_angle - delta_angle
-
-    #         print(f"Hexa {row.Hexabundle} {row.Magnet}, delta_angle is {delta_angle:.3f}, cm_angle is {theta:.3f}, rm_angle is  {df.at[rectangular_magnet_index, 'rot_platePlacing']}")
-
-
+        df['rot_platePlacing'] = calibd_theta_d
 
     # Apply the roll correction to the x values of the magnets _after_ the metrology correction
     if apply_roll_correction:
@@ -196,34 +183,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("robot_filename", type=str, help='The full path of the robot file to apply corrections to')
     parser.add_argument("parking_positions_filename", type=str, help='The full path of the parking positions file to apply corrections to')
+    #parser.add_argument("parking_positions_filename", type=str, help='The full path of the parking positions file to apply corrections to')
     parser.add_argument("robot_shifts_file", type=str, help='Filename of the robot metrology measurements')
     parser.add_argument("--offset", default=0, type=float, help='Radial offset to apply in mm. +ve is outward, -ve is inwards')
     parser.add_argument("--T_observed", default=None, type=float, help='Temperature at which the plate will be observed')
     parser.add_argument("--T_configured", default=None, type=float, help='Temperature at which the plate is configured')
     parser.add_argument("--silent", action="store_true", help="Turn off output from the code")
-    parser.add_argument("--no-tel-corr", action="store_true", help="Turn off Telecentricity correction")
-    parser.add_argument("--no-metrology", action="store_true", help="Turn metrology")
-    parser.add_argument("--no-roll", action="store_true", help="Turn off roll")
-    parser.add_argument("--no-rotation-misalignment-corr", action="store_true", help="Turn off rotation correction")
 
     args = parser.parse_args()
     robot_filename = args.robot_filename
-    parking_positions_filename = args.parking_positions_filename
+    #parking_positions_filename = args.parking_positions_filename
     robot_shifts_file = args.robot_shifts_file
 
     #Optional Arguments
+    robot_labview_file = args.robot_labview_file
     offset = args.offset
     T_observed = args.T_observed
     T_configured = args.T_configured
     verbose = not args.silent
-    do_tel_cor = not args.no_tel_corr
-    do_metrology = not args.no_metrology
-    do_metrology = not args.no_metrology
-    do_roll = not args.no_roll
-    do_rotation_misalignment_corr = not args.no_rotation_misalignment_corr
 
     #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
-    #parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_final.csv"
+    parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_211116-z25.7_final.csv"
 
-    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_telecentricity_correction=do_tel_cor, apply_metrology_calibration=do_metrology, apply_roll_correction=do_roll, apply_rotation_correction=do_rotation_misalignment_corr)
-    parking_positions_df = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
+    robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive')
+    parking_positions_df, correct_parkingpos_file = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True)
+
+    if robot_labview_file is not None:
+        update_parking_positions(robot_labview_file, correct_parkingpos_file)
