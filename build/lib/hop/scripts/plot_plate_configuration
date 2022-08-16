@@ -43,8 +43,9 @@ if __name__ == "__main__":
     plate_radius = constants.HECTOR_plate_radius
 
     # Each of the hexabundles to plot
-    Hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
-
+    #Hexabundles = list(string.ascii_uppercase[:21]) + ['GS1', 'GS2', 'GS3', 'GS4', 'GS5', 'GS6']
+    Hexabundles = np.unique(robot.Hexabundle)
+    
     # Make a plot
     fig, ax = plt.subplots(figsize=(8,8))
     ax.set_aspect(1)

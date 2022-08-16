@@ -196,10 +196,8 @@ def perform_metrology_calibration(input_coords, input_theta_d, robot_centre, rob
     input_coords_centred = input_coords - robot_centre + true_centre
 
     # Apply metrology-based correction
-    print("Not applying a scale or shear to the output coords for testing!!!!")
-    metr_calibrated_coords = apply_cal_no_sh_no_scl(input_coords_centred, popt)
+    metr_calibrated_coords = apply_cal(input_coords_centred, popt)
 
-    import ipdb; ipdb.set_trace()
     # Now correct theta, the angle of robot rotation stage. Needs to be rotated by the same amount as global coordinate
     # rotation.
     if permagnet_theta_corr:
