@@ -169,7 +169,7 @@ def apply_corrections(df, robot_shifts_file, offset=0.0, T_observed=None, T_conf
             df.at[index, 'Center_y'] = new_y
 
     if apply_barrel_rotation_to_all_magnets:
-        overall_barrel_rotation_value = 0.14
+        overall_barrel_rotation_value = 0.24
         print(f"\tApplying a {overall_barrel_rotation_value} degree rotation to every magnet (due to the overall alignment of the robot barrel). Sign is {barrel_rotation_sign.upper()}")
         if barrel_rotation_sign == 'positive':
             df['rot_platePlacing'] = df['rot_platePlacing'] + overall_barrel_rotation_value
@@ -253,19 +253,29 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    robot_filename = args.robot_filename
+    robot_filename = Path(args.robot_filename)
     #parking_positions_filename = args.parking_positions_filename
-    robot_shifts_file = args.robot_shifts_file
+    robot_shifts_file = Path(args.robot_shifts_file)
 
     #Optional Arguments
     robot_labview_file = args.robot_labview_file
+    if robot_labview_file is not None:
+        robot_labview_file = Path(robot_labview_file)
     offset = args.offset
     T_observed = args.T_observed
     T_configured = args.T_configured
     verbose = not args.silent
 
-    parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
-    #parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_211116-z25.7_final.csv"
+    #parking_positions_filename = "/Users/samvaughan/Science/Hector/HectorObservationPipeline/tests/data/robot_corrections_files/ParkingPosns_211116-z25.7_final.csv"
+    parking_positions_filename = r"Z:\Robot_tile_files\ParkingPosns_211116-z25.7_final.csv"
+
+    """
+    Check to see whether the file we're going reading in ends with "CorrectionsApplied". If so, STOP! This is a very easy error to make (especially when unconfiguring) but will lead to Very Bad Things happening (i.e. the robot might crash). Raise a NameError if this is the case.
+    """
+
+    if robot_filename.stem.endswith("CorrectionsApplied"):
+        raise NameError("\n\n\n\t\t\t\t**STOP!**\n\n\nIt looks like you're trying to run this script on a file which has already had the robot corrections applied to it. This is probably a mistake and can cause Very Bad Things to happen unless you **really** understand what you're doing (or Julia told you to). Try running this script again with the original Robot file (i.e. one which doesn't end with _CorrectionsApplied.csv).\n\n")
+
 
     robot_df = correct_robot_file(robot_filename, robot_shifts_file=robot_shifts_file, offset=offset, T_observed=T_observed, T_configured=T_configured, verbose=verbose, metrology_sign='negative', rotation_axis_misalignment_sign='positive', apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive")
     parking_positions_df, correct_parkingpos_file = correct_parking_positions_file(parking_positions_filename, robot_shifts_file=robot_shifts_file, verbose=verbose, apply_metrology_calibration=True, apply_roll_correction=True, apply_barrel_rotation_to_all_magnets=True, barrel_rotation_sign="positive")

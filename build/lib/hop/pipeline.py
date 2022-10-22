@@ -657,7 +657,7 @@ class HectorPipe:
                 header_dict[key] = value
             label_string = header_dict['LABEL']
 
-
+        
         # files to be output to after arranging the guide and hexa probe data
         # proxy output file
         plate_file = f"{self.allocation_files_location_base}/Hexa_and_Guides_{fileNameHexa_stem}.txt"
