@@ -1728,6 +1728,7 @@ hop/scripts/__init__.py
 hop/scripts/check_magnet_counts_between_tiles
 hop/scripts/plot_plate_configuration
 hop/scripts/prepare_files_for_robot.py
+hop/scripts/prepare_files_for_robot.txt
 hop/scripts/robot_corrections.py
 hop/scripts/robot_file_input_output.py
 hop/scripts/show_sky_fibre_changes_between_plates

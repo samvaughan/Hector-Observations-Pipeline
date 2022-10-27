@@ -46,7 +46,7 @@ probe_w <<- 18.5
 probe_l <<- 45 
 cable_w <<- 8.5 
 cable_l <<- 38 
-excl_radius <<- sqrt(2.*((tip_w/2)^2))
+excl_radius <<- sqrt(2.*((tip_w/2)^2)) * 1.05 #Added by Sam after an issue where two probes were ever so slightly too close in Feb2022 commissioning
 dngalprobes <<- 19
 nstdprobes <<- 2
 ngprobesmin <<- 3
@@ -847,6 +847,12 @@ cleanconflictedstds <- function(angs,pos=pos, stdpos=pos_master$stdpos){
   clstdpos=stdpos[order(mindists, decreasing=TRUE),] #Ordering standards according to their distance from the closest probe.
   mindists=mindists[order(mindists, decreasing=TRUE)]
   clstdpos=clstdpos[mindists > excl_radius,] #Removing standards that overlap with nearest probe.
+  
+  #Reordering the clean standard stars by distance from the centre (closest at the top):
+  dist2cen=sqrt(clstdpos[,'x']^2+clstdpos[,'y']^2)
+  #removing standard probes that are very close to the edge of the field.
+  clstdpos=clstdpos[which(dist2cen < (fov/2. - 1.5* excl_radius)),]
+  clstdpos=clstdpos[order(dist2cen, decreasing=FALSE),]
   
   return(clstdpos)
 }
