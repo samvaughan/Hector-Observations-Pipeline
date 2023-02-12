@@ -32,15 +32,16 @@ def _read_table(fname):
         table = pd.read_csv(fname, sep='\t')
     elif extension == '.fits':
         table = P.load_FITS_table_in_pandas(fname)
+    elif extension == ".parquet":
+        table = pd.read_parquet(fname)
     else:
-        raise TypeError(f"Catalogue {fname} data type \
-            not understood")
+        raise TypeError(f"Catalogue {fname} data type not understood")
     return table
 
 
 def create_output_directories(output_folder, subfolders_to_be_made):
 
-        # Make the folder if it doesn't exist
+    # Make the folder if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
