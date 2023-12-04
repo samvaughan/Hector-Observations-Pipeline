@@ -259,8 +259,8 @@ if __name__ == "__main__":
 
     #Optional Arguments
     robot_labview_file = args.robot_labview_file
-    if robot_labview_file is not None:
-        robot_labview_file = Path(robot_labview_file)
+    # if robot_labview_file is not None:
+    #     robot_labview_file = Path(robot_labview_file)
     offset = args.offset
     T_observed = args.T_observed
     T_configured = args.T_configured
