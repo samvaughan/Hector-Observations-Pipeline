@@ -9,12 +9,7 @@ The output is a robot file with "_CorrectionsApplied.csv" appended to the input 
 """
 import sys
 import shutil
-
 import pandas as pd
-
-pd.options.mode.chained_assignment = (
-    None  # disabled warning about writes making it back to the original frame
-)
 from math import atan, sin, cos, sqrt, degrees, radians, pi
 import numpy as np
 from scipy.optimize import curve_fit
@@ -24,6 +19,10 @@ from pathlib import Path
 
 from hop.scripts import robot_corrections as corrections
 from hop.scripts import robot_file_input_output as file_functions
+
+pd.options.mode.chained_assignment = (
+    None  # disabled warning about writes making it back to the original frame
+)
 
 
 def correct_parking_positions_file(
@@ -40,7 +39,6 @@ def correct_parking_positions_file(
     apply_barrel_rotation_to_all_magnets=True,
     barrel_rotation_sign="positive",
 ):
-
     """
     Apply the necessary corrections to the x and y *parking positions* of the Hector magnets. We then write this file out to a new one with the exact same format
     """
@@ -101,7 +99,6 @@ def correct_robot_file(
     apply_barrel_rotation_to_all_magnets=True,
     barrel_rotation_sign="positive",
 ):
-
     """
     Apply the necessary corrections to the x and y positions of magnets in a *Hector Robot file*. We also read in and update its header
     """
@@ -185,7 +182,6 @@ def apply_corrections(
     apply_barrel_rotation_to_all_magnets=True,
     barrel_rotation_sign="positive",
 ):
-
     """
     Apply a number of corrections to the magnet positions. The corrections are:
     * A radial shift inwards or outwards applied to all circular magnets to account for a difference in temperature between the plate at the time it was configured and the plate at the time it will be observed. Note that this offset can be entered in millimetres, or otherwise two temnperatures and a coefficient of thermal expansion can be given instead.
@@ -295,7 +291,8 @@ def apply_corrections(
             df.at[index, "Center_y"] = new_y
 
     if apply_barrel_rotation_to_all_magnets:
-        overall_barrel_rotation_value = 0.24
+        # overall_barrel_rotation_value = 0.24
+        overall_barrel_rotation_value = 0.12  # Orientation of the pick arm to the robot axis (degrees). Changed on September 28th 2023 to be 0.12 degrees after robot re-alignment
         print(
             f"\tApplying a {overall_barrel_rotation_value} degree rotation to every magnet (due to the overall alignment of the robot barrel). Sign is {barrel_rotation_sign.upper()}"
         )

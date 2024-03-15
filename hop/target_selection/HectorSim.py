@@ -397,7 +397,7 @@ class HectorSim:
             & (self.entire_table.Mstar < self.MstarMax)
             & (self.entire_table.Re > 0)
             & (self.entire_table.Re < 100)
-            & (self.entire_table.bad_class == 0)
+            # & (self.entire_table.bad_class == 0)
         )
         # Add in columns we'll need, such as g-i colour and the IFU diameter to get to 2Re
         self.entire_table["g_m_i"] = (
@@ -627,18 +627,18 @@ class HectorSim:
                 self.sf_config["lower_gradient"] * z[z < self.sf_config["lower_lim"]]
                 + self.sf_config["lower_constant_offset"]
             )
-            y[
-                (z >= self.sf_config["lower_lim"]) & (z < self.sf_config["limit_2"])
-            ] = self.sf_config["mass_step_2"]
-            y[
-                (z >= self.sf_config["limit_2"]) & (z < self.sf_config["limit_3"])
-            ] = self.sf_config["mass_step_3"]
-            y[
-                (z >= self.sf_config["limit_3"]) & (z < self.sf_config["limit_4"])
-            ] = self.sf_config["mass_step_4"]
-            y[
-                (z >= self.sf_config["limit_4"]) & (z < self.sf_config["limit_5"])
-            ] = self.sf_config["mass_step_5"]
+            y[(z >= self.sf_config["lower_lim"]) & (z < self.sf_config["limit_2"])] = (
+                self.sf_config["mass_step_2"]
+            )
+            y[(z >= self.sf_config["limit_2"]) & (z < self.sf_config["limit_3"])] = (
+                self.sf_config["mass_step_3"]
+            )
+            y[(z >= self.sf_config["limit_3"]) & (z < self.sf_config["limit_4"])] = (
+                self.sf_config["mass_step_4"]
+            )
+            y[(z >= self.sf_config["limit_4"]) & (z < self.sf_config["limit_5"])] = (
+                self.sf_config["mass_step_5"]
+            )
             y[(z >= self.sf_config["limit_5"])] = self.sf_config["final_mass_step"]
 
         return y
@@ -1282,9 +1282,7 @@ class HectorSim:
         # Set maximum bundle size that is likely as 469=core, or the 13th element of the CORES and DIA arrays, which is overkill, but set here (-1 because 0 to 12 array):
         MAX_bundle = 13 - 1
         coresplot = CORES[0:MAX_bundle]
-        bundles_frac_magenta = (
-            []
-        )  # to make a zero length array that I will append to during the loop.
+        bundles_frac_magenta = []  # to make a zero length array that I will append to during the loop.
         bundles_frac_blue = []
         for i in range(0, MAX_bundle):
             # test = np.where(CORES==i) #find the index at position i, as a tuple
